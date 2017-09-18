@@ -23,7 +23,7 @@ import { message } from "antd"
 const logger = WebIM.loglevel.getLogger("WebIMRedux")
 
 WebIM.conn.listen({
-    // xmpp连接成功
+    // success connect to xmpp
     onOpened: msg => {
         const username = store.getState().login.username
         const token = utils.getToken()
@@ -39,22 +39,26 @@ WebIM.conn.listen({
         // get unread message number from localdb
         store.dispatch(MessageActions.initUnread())
 
-        // 出席后才能接受推送消息
-        // presence to be online
+        // presence to be online and receive messafe
         WebIM.conn.setPresence()
-        // 获取好友信息
+    
         // get roster
         store.dispatch(RosterActions.getContacts())
-        // 通知登陆成功
+        
+        // dispatch login success callback
         store.dispatch(LoginActions.setLoginSuccess())
-        // 获取黑名单列表
+        
+        // fetch blacklist
         store.dispatch(BlacklistActions.getBlacklist())
-        // 获取群组列表
+
+        // fetch grouplist
         // store.dispatch(GroupActions.getGroups())
-        // 获取聊天室列表
+
+        // fetch chatrooms
         // store.dispatch(ChatRoomActions.getChatRooms())
 
         store.dispatch(LoginActions.stopLoging())
+
         // refresh page
         hash.indexOf(redirectUrl) === -1 && history.push(redirectUrl)
     },
@@ -90,9 +94,8 @@ WebIM.conn.listen({
             message.error(`${I18n.t("joinGroup")}${I18n.t("failed")}`)
             break
         case "subscribe":
-            // 加好友时双向订阅过程，所以当对方同意添加好友的时候
-            // 会有一步对方自动订阅本人的操作，这步操作是自动发起
-            // 不需要通知提示，所以此处通过state=[resp:true]标示
+            // jion friend action is subscribe/publish pattern，so when you agree to add a friend
+            // it will notify the other side automatic，when state equasl [resp:true], do nothing
             if (msg.status === "[resp:true]") {
                 return
             }

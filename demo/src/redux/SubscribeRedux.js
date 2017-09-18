@@ -10,7 +10,8 @@ const { Types, Creators } = createActions({
     addSubscribe: [ "msg" ],
     removeSubscribe: [ "name" ],
     // ----------------async------------------
-    // 接受好友请求
+    
+    // accept add friend action
     acceptSubscribe: name => {
         return (dispatch, getState) => {
             dispatch(Creators.removeSubscribe(name))
@@ -21,7 +22,8 @@ const { Types, Creators } = createActions({
             })
         }
     },
-    // 拒绝好友请求
+
+    //refuse add friend action
     declineSubscribe: name => {
         return (dispatch, getState) => {
             dispatch(Creators.removeSubscribe(name))
