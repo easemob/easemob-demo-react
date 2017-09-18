@@ -79,7 +79,7 @@ class DefaultLayout extends Component {
         })
     }
 
-    // 切换聊天类型
+    // switch chatType
     changeTab(e) {
         const { history, location } = this.props
         const { selectItem, selectTab } = this.state
@@ -93,7 +93,7 @@ class DefaultLayout extends Component {
         history.push(redirectPath + location.search)
     }
 
-    // 切换联系人
+    // switch contact
     changeItem(e) {
         console.log("changeItem", e)
         const { history, location, group } = this.props

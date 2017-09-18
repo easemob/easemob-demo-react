@@ -43,7 +43,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         break
     case "group":
         if (!common.isGetGroupAlready) {
-            // 获取群组列表
+            // get group list
             getGroups()
         } else {
             _.forEach(_.get(contacts, "names", []), (v, index) => {
@@ -63,7 +63,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         break
     case "chatroom":
         if (!common.isGetChatRoomAlready) {
-            // 获取聊天室列表
+            // get chatroom list
             getChatRooms()
         } else {
             _.forEach(_.get(contacts, "names", []), (v, index) => {
@@ -83,7 +83,6 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         break
     case "stranger":
         _.forEach(_.get(contacts, "byId", []), (v, name) => {
-            // TODO: 目前的数据结构不利于实现最新未读置顶，可能需要改造 entities.stranger 结构
             const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], name ], []))
             const count = message.getIn([ "unread", "stranger", name ], 0)
             items.push({
@@ -96,7 +95,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         })
         break
     default:
-        // 不加 default 的话，编辑器提醒辣眼睛
+        // fix the ide warnings
         break
     }
     // console.log(chatType, chatId, items)

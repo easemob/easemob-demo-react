@@ -38,7 +38,7 @@ WebIM.conn.listen({
 
         // get unread message number from localdb
         store.dispatch(MessageActions.initUnread())
-        
+
         // 出席后才能接受推送消息
         // presence to be online
         WebIM.conn.setPresence()
@@ -58,7 +58,6 @@ WebIM.conn.listen({
         // refresh page
         hash.indexOf(redirectUrl) === -1 && history.push(redirectUrl)
     },
-    // 出席消息
     onPresence: msg => {
         // console.log("onPresence", msg, store.getState())
         switch (msg.type) {
@@ -107,7 +106,6 @@ WebIM.conn.listen({
             break
         case "unsubscribe": // The sender deletes a friend.
         case "unsubscribed": // The other party has removed you from the friend list.
-            // 好友退订消息
             store.dispatch(RosterActions.getContacts())
             // Alert.alert(msg.from + " " + I18n.t("unsubscribed"))
             if ("code" in msg) {
@@ -136,7 +134,7 @@ WebIM.conn.listen({
             break
         }
     },
-    // 各种异常
+    // handle all exception
     onError: error => {
         console.log(error)
         // 16: server-side close the websocket connection
@@ -153,7 +151,7 @@ WebIM.conn.listen({
             history.push("/login")
             return
         }
-        // 2: token 登录失败
+        // 2: login by token failed
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_AUTH_ERROR) {
             message.error(`${I18n.t("webIMConnectionAuthError")}`)
 
@@ -162,7 +160,7 @@ WebIM.conn.listen({
         // 7: client-side network offline (net::ERR_INTERNET_DISCONNECTED)
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_SERVER_CLOSE_ERROR) {
             console.log("WEBIM_CONNCTION_SERVER_CLOSE_ERROR")
-            //TODO 需要加判断 如果是logout 就不显示错误信息
+            //TODO: need add judgement first: should not display err message while logout
             // message.error("client-side network offline")
 
             return
@@ -180,13 +178,11 @@ WebIM.conn.listen({
             store.dispatch(LoginActions.loginFailure(error))
         }
     },
-    // 连接断开
     onClosed: msg => {
         console.log("onClosed", msg)
         // msg.msg && message.error(msg.msg)
         store.dispatch(Creators.logoutSuccess())
     },
-    // 更新黑名单
     onBlacklistUpdate: list => {
         store.dispatch(BlacklistActions.updateBlacklist(list))
     },
@@ -195,7 +191,6 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.updateMessageStatus(message, "read"))
     },
     onDeliveredMessage: message => {
-        // 收到已送达回执
         logger.info("onDeliveredMessage", message)
         // store.dispatch(MessageActions.updateMessageStatus(message, "sent"))
     },
@@ -204,7 +199,6 @@ WebIM.conn.listen({
         const { id, mid } = message
         store.dispatch(MessageActions.updateMessageMid(id, mid))
     },
-    // 文本信息
     onTextMessage: message => {
         console.log("onTextMessage", message)
         store.dispatch(MessageActions.addMessage(message, "txt"))
@@ -317,7 +311,6 @@ const { Types, Creators } = createActions({
     signin: null,
 
     // ----------------async------------------
-    // 登出
     logout: () => {
         return (dispatch, state) => {
             let I18N = store.getState().i18n.translations[store.getState().i18n.locale]

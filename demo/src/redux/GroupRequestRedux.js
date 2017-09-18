@@ -10,7 +10,6 @@ const { Types, Creators } = createActions({
     addGroupRequest: [ "msg" ],
     removeGroupRequest: [ "gid", "applicant" ],
     // ----------------async------------------
-    // 接受好友请求
     agreeJoinGroup: (gid, options) => {
         return (dispatch, getState) => {
             dispatch(Creators.removeGroupRequest(gid, options.applicant))

@@ -10,13 +10,13 @@ import CommonActions from "./CommonRedux"
 const { Types, Creators } = createActions({
     updateBlacklist: [ "list" ],
     // ----------------async------------------
-    // 更新黑名单列表
+    // update black list
     getBlacklist: () => {
         return (dispatch, getState) => {
             WebIM.conn.getBlacklist()
         }
     },
-    // 添加到黑名单
+    // add to black list
     doAddBlacklist: id => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
@@ -28,17 +28,17 @@ const { Types, Creators } = createActions({
             WebIM.conn.addToBlackList({
                 list: blacklist,
                 type: "jid",
-                success: function() {
-                    // TODO: 之前添加当前黑名单用户还是重新拉取黑名单
+                success: function () {
+                    // TODO: add to black list directly , shouldn't  re-pull
                     dispatch(CommonActions.fetched())
                 },
-                error: function() {
+                error: function () {
                     dispatch(CommonActions.fetched())
                 }
             })
         }
     },
-    // 从黑名单删除
+    // delete from blacklist
     doRemoveBlacklist: id => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
@@ -48,13 +48,11 @@ const { Types, Creators } = createActions({
             WebIM.conn.removeFromBlackList({
                 list: blacklist,
                 type: "jid",
-                success: function() {
-                    // TODO: 之前添加当前黑名单用户还是重新拉取黑名单
-                    // 其实此处可以支持同步完成，只不过sdk中写的代码也自持listen
-                    // 就直接使用listen，但是都没有做增量更新blacklist的操作
+                success: function () {
+                    // TODO: delete from black list directly , shouldn't  re-pull
                     dispatch(CommonActions.fetched())
                 },
-                error: function() {
+                error: function () {
                     dispatch(CommonActions.fetched())
                 }
             })

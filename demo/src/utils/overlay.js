@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-// 无法使用redux
+// can not use redux
 export default function overlay({ component, ...rest }) {
     const dom = document.createElement("div")
     document.body.appendChild(dom)

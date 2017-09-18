@@ -5,8 +5,8 @@ import WebIM from "@/config/WebIM"
 import { store } from "@/redux"
 import AppDB from "@/utils/AppDB"
 
-// roomType true 聊天室chatroom | false 群组group
-// chatType singleChat 单聊 | chatRoom 群组或聊天室
+// roomType true-chatroom | false-group
+// chatType singleChat  | chatRoom- group or chatroom
 // setGroup called when chatType=chatRoom set to 'groupchat'
 
 /* ------------- Types and Action Creators ------------- */
@@ -16,10 +16,10 @@ const msgTpl = {
         error: false,
         errorCode: "",
         errorText: "",
-        // status 为空将被当做服务端的数据处理，处理成sent
+        // if status is blank, it's treated as "sent" from server side
         status: "sending", // [sending, sent ,fail, read]
         id: "",
-        // from 不能删除，决定了房间id
+        // from - room id need it,should not be deleted
         from: "",
         to: "",
         toJid: "",
@@ -87,7 +87,7 @@ const msgTpl = {
     }
 }
 
-// 统一消息格式：本地发送
+// unify message format: local side
 function parseFromLocal(type, to, message = {}, bodyType) {
     let ext = message.ext || {}
     let obj = copy(message, msgTpl.base)
@@ -105,7 +105,7 @@ function parseFromLocal(type, to, message = {}, bodyType) {
     }
 }
 
-// 统一消息格式：服务端
+// unify message format: server side
 export const parseFromServer = (message = {}, bodyType) => {
     let ext = message.ext || {}
     let obj = copy(message, msgTpl.base)
@@ -266,7 +266,7 @@ const { Types, Creators } = createActions({
                 }
             })
 
-            // 与 sendTextMessage 逻辑保持一致
+            // keep the same logic as sendTextMessage
             if (chatType === "groupchat" || chatType === "chatroom") {
                 msgObj.setGroup("groupchat")
             }
@@ -276,7 +276,7 @@ const { Types, Creators } = createActions({
             // NOTE: parseFromLocal will overwrite original id of msgObj
             // Recover it here.
             pMessage.id = id
-            // uri只记录在本地
+            // url at local only
             pMessage.body.url = source.url
             // console.log('pMessage', pMessage, pMessage.body.uri)
             dispatch(Creators.addMessage(pMessage, type))
@@ -329,7 +329,7 @@ const { Types, Creators } = createActions({
                 }
             })
 
-            // 与 sendTextMessage 逻辑保持一致
+            // keep the same logic as sendTextMessage
             if (chatType === "groupchat" || chatType === "chatroom") {
                 msgObj.setGroup("groupchat")
             }
@@ -339,7 +339,7 @@ const { Types, Creators } = createActions({
             // NOTE: parseFromLocal will overwrite original id of msgObj
             // Recover it here.
             pMessage.id = id
-            // uri只记录在本地
+            // url at local only
             pMessage.body.url = source.url
             pMessage.body.file_length = source.data.size
             console.log("pMessage: ", pMessage)
@@ -377,7 +377,7 @@ const { Types, Creators } = createActions({
                     "stranger": {}
                 }
 
-                // 整理未读消息数目
+                // unread message count
                 res.forEach((msg, index) => {
                     if (!msg.error) {
 

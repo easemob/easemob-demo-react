@@ -151,9 +151,9 @@ class Chat extends React.Component {
     }
 
     handleChange(e) {
-        // 场景1：正常+ -
-        // 场景2：从中间位置+ - -> 如果删除一个字符后字符串匹配，则非中间位置
-        // 场景3：删除操作可以从textInput直接编辑，适应于以上情况
+        // scenario 1：normal+ -
+        // scenario 2：center + - -> after delete one character, string match , then it's not the center postion
+        // scenario 3：the delete action can  edit  inside the  textInput directly, compatible the above 
         const v = e.target.value
         const splitValue = this.state.value ? this.state.value.split("") : []
         splitValue.pop()
@@ -198,14 +198,14 @@ class Chat extends React.Component {
     }
 
     /**
-     * 右上角按钮点击事件
+     * top-right button click
      *
      * @memberof Chat
      */
     handleRightIconClick() {
         const { selectTab } = this.state
         if (selectTab === "group") {
-            // 显示群组侧边栏
+            // display group side bar
             const rightSiderOffset = -1 * config.RIGHT_SIDER_WIDTH
             this.props.switchRightSider({ rightSiderOffset })
         }
@@ -251,21 +251,21 @@ class Chat extends React.Component {
         const search = history.location.search
         switch (key) {
         case "0":
-            // 屏蔽好友
+            // block friend
             this.props.doAddBlacklist(selectItem)
             history.push("/contact" + search)
             break
         case "1":
-            // 删除好友
+            // delete friend
             this.props.removeContact(selectItem)
             break
         case "2":
-            // 加为好友
+            // join as friend
             this.props.addContact(selectItem)
             message.success(`${I18n.t("addFriendMessage")}`)
             break
         case "3":
-            // 删除
+            // delete
             this.props.deleteStranger(selectItem)
             history.push("/stranger" + search)
             break
@@ -331,18 +331,23 @@ class Chat extends React.Component {
     handleScroll = (e) => {
         const _this = this
         if (e.target.scrollTop === 0) {
-            // TODO: 要优化
-            setTimeout(function() {
+            // TODO: should be optimized
+            setTimeout(function () {
                 console.log(_this.props.messageList)
-                const offset = _this.props.messageList ? _this.props.messageList.length : 0            
+                const offset = _this.props.messageList ? _this.props.messageList.length : 0
                 const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
-                const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
+                const chatTypes = {
+                    "contact": "chat",
+                    "group": "groupchat",
+                    "chatroom": "chatroom",
+                    "stranger": "stranger"
+                }
                 const chatType = chatTypes[selectTab]
-                
-                // 拉取更多历史消息
+
+                // pull more history message
                 _this.props.fetchMessage(selectItem, chatType, offset, (res) => {
-                    
-                    // 拉取的数量少于20条说明消息说明没有了 
+
+                    // if the last pull messages count < 20 ,means no more  
                     if (res < PAGE_NUM) {
                         _this.setState({
                             isLoaded: true
@@ -351,7 +356,7 @@ class Chat extends React.Component {
                         _this._not_scroll_bottom = false
                     }
                 })
-    
+
                 _this._not_scroll_bottom = true
             }, 500)
         }
@@ -425,7 +430,16 @@ class Chat extends React.Component {
                 </div>
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
-                    {this.state.isLoaded && <div style={{ width:"150px",height:"30px",lineHeight:"30px",backgroundColor:"#888",color:"#fff",borderRadius:"15px", textAlign:"center", margin:"10px auto" }}>{I18n.t("noMoreMessage")}</div>}
+                    {this.state.isLoaded && <div style={{
+                        width: "150px",
+                        height: "30px",
+                        lineHeight: "30px",
+                        backgroundColor: "#888",
+                        color: "#fff",
+                        borderRadius: "15px",
+                        textAlign: "center",
+                        margin: "10px auto"
+                    }}>{I18n.t("noMoreMessage")}</div>}
                     {_.map(messageList, message => <ChatMessage key={message.id} {...message} />)}
                 </div>
                 <div className="x-chat-footer">
