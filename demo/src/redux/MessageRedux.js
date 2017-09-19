@@ -109,8 +109,8 @@ function parseFromLocal(type, to, message = {}, bodyType) {
 export const parseFromServer = (message = {}, bodyType) => {
     let ext = message.ext || {}
     let obj = copy(message, msgTpl.base)
-    // body 包含：所有message实体信息都放到body当中，与base区分开
-    // body 包含：ext 存放用户自定义信息，比如图片大小、宽高等
+    // all of entities of message should in body, not in base
+    // body.ext could save any customize info of message, like image size, width, height etc
     let body = copy(message, msgTpl[bodyType])
     switch (bodyType) {
     case "txt":
@@ -380,8 +380,6 @@ const { Types, Creators } = createActions({
                 // unread message count
                 res.forEach((msg, index) => {
                     if (!msg.error) {
-
-                        // 单聊消息来之对方，群聊来至群组id
                         let type = msg.type
                         let from = type === "chat" ? "from" : "to"
                         let id = msg[from]
@@ -462,7 +460,7 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 /**
- * 添加信息
+ * add message to store
  * @param state
  * @param message object `{data,error,errorCode,errorText,ext:{weichat:{originType:webim}},from,id,to,type}`
  * @param bodyType enum [txt]
@@ -475,19 +473,19 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     const { id, to, status } = message
     let { type } = message
     console.log(message)
-    // 消息来源：没有from默认即为当前用户发送
+    // where the message comes from, when from current user, it is null
     const from = message.from || username
-    // 当前用户：标识为自己发送
+    // bySelf is true when sent by current user, otherwise is false
     const bySelf = from == username
-    // 房间id：自己发送或者不是单聊的时候，是接收人的ID， 否则是发送人的ID
+    // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
     const chatId = bySelf || type !== "chat" ? to : from
 
-    // 陌生人修改type
+    // change type as stranger
     if (type === "chat" && !store.getState().entities.roster.byName[chatId]) {
         type = "stranger"
     }
 
-    // 更新对应消息数组
+    // update message array
     const chatData = state.getIn([ type, chatId ], Immutable([])).asMutable()
     const _message = {
         ...message,
@@ -526,7 +524,7 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
 
     state = state.setIn([ type, chatId ], chatData)
 
-    // 未读消息数
+    // unread
     if (!bySelf && !isPushed) {
         let count = state.getIn([ "unread", type, chatId ], 0)
         state = state.setIn([ "unread", type, chatId ], ++count)
@@ -538,7 +536,7 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
 }
 
 /**
- * updateMessageStatus 更新消息状态
+ * update message status
  * @param state
  * @param message object
  * @param status enum [sending, sent ,fail]
