@@ -1,0 +1,73 @@
+workspace:
+  base: /data/apps/opt
+  path: webim
+
+
+pipeline:
+
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - node_modules
+      - tag
+    volumes:
+      - /data/apps/opt/webim:/cache
+
+  build:
+    image: node:7.8
+    privileged: true
+    commands:
+      - cd demo && npm install
+      - npm run build
+      # 2.0 demo 相关编译操作在demo目录下面
+      - cd ..
+      - cp -rf demo/build image/docker/webim/webim
+      - cp -rf demo/storybook-static image/docker/webim/storybook
+      - echo 'build success'
+    when:
+      branch: [ master ]
+
+
+
+  dockerize-latest:
+    image: plugins/docker
+    environment:
+      - DOCKER_LAUNCH_DEBUG=true
+    debug: true
+    repo: docker-registry-cn.easemob.com/kubernetes/im/webim
+    tags: 20
+    registry: docker-registry-cn.easemob.com
+    secrets: [ docker_username, docker_password ]
+    dockerfile: image/docker/webim/Dockerfile
+    context: image/docker/webim/
+    when:
+      branch: [ master ]
+
+  deploy-latest:
+    image: docker-registry-cn.easemob.com/kubernetes/im/webim-deploy:latest
+    pull: true
+    environment:
+      - DOCKER_LAUNCH_DEBUG=true
+      - TAG=20
+    secrets: [ ssh_key, jumpserver_host, jumpserver_port, sandbox_host ]
+    debug: true
+    when:
+      branch: [ master ]
+
+
+  rebuild-cache:
+      image: drillster/drone-volume-cache
+      rebuild: true
+      mount:
+        - node_modules
+        - tag
+      volumes:
+        - /data/apps/opt/webim:/cache
+
+  notify:
+    image: drillster/drone-email
+    port: 25
+    secrets: [ plugin_host, plugin_from, plugin_username, plugin_password ]
+    when:
+      status:  [ failure, success ]
