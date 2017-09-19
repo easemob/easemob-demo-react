@@ -113,7 +113,7 @@ export default ({ bySelf, from, time, body, status }) => {
     let statusTag
     switch (status) {
     case "sent":
-        statusTag = <Tag color="#2db7f5">{I18n.t("unread")}</Tag>
+        statusTag = <Tag color="#f39c12">{I18n.t("unread")}</Tag>
         break
     case "muted":
         statusTag = <Tag color="#f50">{I18n.t("muted")}</Tag>
