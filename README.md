@@ -1,9 +1,9 @@
 ## 说明
 WebIM 2.0 在1.x的基础上, 主要做了以下更新:
-1. 响应式布局,一套Demo同时支持PC和H5,自适应不同终端屏幕宽度
+1. 响应式布局, 一套Demo同时支持PC和H5,自适应不同终端屏幕尺寸
 2. 完全基于Reac + Redux的单向数据流
-3. 引入ant-design组件库，方便开发者维护
-4. 支持IE9+,Chrome/Firefox/Safari等现代浏览器最新版
+3. 引入ant-design组件库，方便开发者后续开发
+4. 支持所有的现代浏览器(不支持IE6-11)
 
 ## 安装
 
@@ -31,7 +31,7 @@ WebIM 2.0 在1.x的基础上, 主要做了以下更新:
 	   https://localhost:3001
 
 5. 发布demo
-`cd demo && yarn build `
+`cd demo && npm run build `
 /demo/build 目录下的就是可以允许和部署的版本
 
 
