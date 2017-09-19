@@ -13,7 +13,7 @@ const { Types, Creators } = createActions({
     removeRoster: [ "name" ],
     topRoster: [ "name" ],
     // ----------------async------------------
-    // 获取好友列表
+    // get contacts list
     getContacts: () => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
@@ -29,7 +29,7 @@ const { Types, Creators } = createActions({
             })
         }
     },
-    // 删除联系人
+    // delete contact
     removeContact: id => {
         return (dispatch, getState) => {
             //loading
@@ -52,7 +52,7 @@ const { Types, Creators } = createActions({
             })
         }
     },
-    // 添加联系人
+    // add contact
     addContact: id => {
         return (dispatch, getState) => {
             const u = getState().login.username
