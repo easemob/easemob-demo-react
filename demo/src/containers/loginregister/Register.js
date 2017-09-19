@@ -29,11 +29,11 @@ const Register = ({
         })
     }
 
-    //
+    const logo = WebIM.config.i18n == "cn" ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
         <div className="form x-login">
             <div className="logo">
-                <i className="iconfont icon-hyphenate"/>
+                {logo}
                 <span>
                     {config.name}
                 </span>
@@ -107,7 +107,7 @@ Register.propTypes = {
     dispatch: PropTypes.func
 }
 
-export default    connect(
+export default connect(
     ({ i18n, login }) => ({
         I18N: i18n.locale && i18n.translations && i18n.translations[i18n.locale] || {},
         login: {

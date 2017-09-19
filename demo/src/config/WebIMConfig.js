@@ -78,7 +78,7 @@ let config = {
      *  cn: chinese
      *  us: english
      */
-    i18n: "us",
+    i18n: "cn",
     /*
      * Set to auto sign-in
      */
@@ -105,8 +105,8 @@ let config = {
     loglevel: "ERROR",
 
     /**
-    * enable localstorage for history messages
-    */
+     * enable localstorage for history messages
+     */
     enableLocalStorage: true
 }
 
