@@ -29,7 +29,7 @@ WebIM.conn.listen({
         const token = utils.getToken()
         const hash = utils.getHash()
         console.log(history)
-        // todo 所有不需要默认登陆的path都需要配置
+        // TODO all path could visited by anonymous should be declared directly
         const path = history.location.pathname.indexOf("login") !== -1 ? "/contact" : history.location.pathname
         const redirectUrl = `${path}?username=${username}`
 
