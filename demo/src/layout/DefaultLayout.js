@@ -79,7 +79,7 @@ class DefaultLayout extends Component {
         })
     }
 
-    // switch chatType
+    // switch chat type
     changeTab(e) {
         const { history, location } = this.props
         const { selectItem, selectTab } = this.state
