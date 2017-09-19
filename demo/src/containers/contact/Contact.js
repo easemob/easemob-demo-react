@@ -43,7 +43,6 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         break
     case "group":
         if (!common.isGetGroupAlready) {
-            // get group list
             getGroups()
         } else {
             _.forEach(_.get(contacts, "names", []), (v, index) => {
@@ -63,7 +62,6 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         break
     case "chatroom":
         if (!common.isGetChatRoomAlready) {
-            // get chatroom list
             getChatRooms()
         } else {
             _.forEach(_.get(contacts, "names", []), (v, index) => {
@@ -95,7 +93,6 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
         })
         break
     default:
-        // fix the ide warnings
         break
     }
     // console.log(chatType, chatId, items)

@@ -151,9 +151,6 @@ class Chat extends React.Component {
     }
 
     handleChange(e) {
-        // scenario 1：normal+ -
-        // scenario 2：center + - -> after delete one character, string match , then it's not the center postion
-        // scenario 3：the delete action can  edit  inside the  textInput directly, compatible the above 
         const v = e.target.value
         const splitValue = this.state.value ? this.state.value.split("") : []
         splitValue.pop()
@@ -198,14 +195,13 @@ class Chat extends React.Component {
     }
 
     /**
-     * top-right button click
+     * click event for button at top-right corner
      *
      * @memberof Chat
      */
     handleRightIconClick() {
         const { selectTab } = this.state
         if (selectTab === "group") {
-            // display group side bar
             const rightSiderOffset = -1 * config.RIGHT_SIDER_WIDTH
             this.props.switchRightSider({ rightSiderOffset })
         }
@@ -251,16 +247,16 @@ class Chat extends React.Component {
         const search = history.location.search
         switch (key) {
         case "0":
-            // block friend
+            // block a friend
             this.props.doAddBlacklist(selectItem)
             history.push("/contact" + search)
             break
         case "1":
-            // delete friend
+            // delete a friend
             this.props.removeContact(selectItem)
             break
         case "2":
-            // join as friend
+            // add a friend
             this.props.addContact(selectItem)
             message.success(`${I18n.t("addFriendMessage")}`)
             break
@@ -331,23 +327,18 @@ class Chat extends React.Component {
     handleScroll = (e) => {
         const _this = this
         if (e.target.scrollTop === 0) {
-            // TODO: should be optimized
-            setTimeout(function () {
+            // TODO: optimization needed
+            setTimeout(function() {
                 console.log(_this.props.messageList)
-                const offset = _this.props.messageList ? _this.props.messageList.length : 0
+                const offset = _this.props.messageList ? _this.props.messageList.length : 0            
                 const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
-                const chatTypes = {
-                    "contact": "chat",
-                    "group": "groupchat",
-                    "chatroom": "chatroom",
-                    "stranger": "stranger"
-                }
+                const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
                 const chatType = chatTypes[selectTab]
-
-                // pull more history message
+                
+                // load more history message
                 _this.props.fetchMessage(selectItem, chatType, offset, (res) => {
-
-                    // if the last pull messages count < 20 ,means no more  
+                    
+                    // no more history when length less than 20
                     if (res < PAGE_NUM) {
                         _this.setState({
                             isLoaded: true
@@ -356,7 +347,7 @@ class Chat extends React.Component {
                         _this._not_scroll_bottom = false
                     }
                 })
-
+    
                 _this._not_scroll_bottom = true
             }, 500)
         }
@@ -430,16 +421,7 @@ class Chat extends React.Component {
                 </div>
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
-                    {this.state.isLoaded && <div style={{
-                        width: "150px",
-                        height: "30px",
-                        lineHeight: "30px",
-                        backgroundColor: "#888",
-                        color: "#fff",
-                        borderRadius: "15px",
-                        textAlign: "center",
-                        margin: "10px auto"
-                    }}>{I18n.t("noMoreMessage")}</div>}
+                    {this.state.isLoaded && <div style={{ width:"150px",height:"30px",lineHeight:"30px",backgroundColor:"#888",color:"#fff",borderRadius:"15px", textAlign:"center", margin:"10px auto" }}>{I18n.t("noMoreMessage")}</div>}
                     {_.map(messageList, message => <ChatMessage key={message.id} {...message} />)}
                 </div>
                 <div className="x-chat-footer">
