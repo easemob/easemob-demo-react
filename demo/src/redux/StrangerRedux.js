@@ -23,18 +23,17 @@ export const INITIAL_STATE = Immutable({
 /* ------------- Reducers ------------- */
 
 export const updateStrangerMessage = (state, { stranger, message, bodyType = "txt" }) => {
-    // TODO: 接收好友请求之后，需要把陌生人含消息，挪到roster里面去
-    // TODO: 在MessageRedux中封装一个函数 export给这里直接调用,避免逻辑重复
+    // TODO: when receiving friend request, it should move contact with his messages to roster
     !message.status && (message = parseFromServer(message, bodyType))
     const { username = "" } = state.user || {}
     const { id, to, status } = message
     let { type } = message
 
-    // 消息来源：没有from默认即为当前用户发送
+    // source of message, default as current user when it's empty
     const from = message.from || username
-    // 当前用户：标识为自己发送
+    // true when the message was sent by current user, otherwise is false
     const bySelf = from == username
-    // 房间id：自己发送或者不是单聊的时候，是接收人的ID， 否则是发送人的ID
+    // root id, is id of receiver when sent by current user, otherwise is id of sender
     const chatId = bySelf || type !== "chat" ? to : from
 
     state = state.setIn([ "byId", stranger, id ], {
