@@ -469,7 +469,8 @@ export const INITIAL_STATE = Immutable({
 export const addMessage = (state, { message, bodyType = "txt" }) => {
     console.log("redux addMessage", message)
     !message.status && (message = parseFromServer(message, bodyType))
-    const username = _.get(store.getState(), "login.username", "")
+    const rootState = store.getState()
+    const username = _.get(rootState, "login.username", "")
     const { id, to, status } = message
     let { type } = message
     console.log(message)
@@ -481,7 +482,7 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     const chatId = bySelf || type !== "chat" ? to : from
 
     // change type as stranger
-    if (type === "chat" && !store.getState().entities.roster.byName[chatId]) {
+    if (type === "chat" && !rootState.entities.roster.byName[chatId]) {
         type = "stranger"
     }
 
@@ -525,7 +526,8 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     state = state.setIn([ type, chatId ], chatData)
 
     // unread
-    if (!bySelf && !isPushed) {
+    const activeContact = _.get(rootState,[ "common", "activeContact" ])
+    if (!bySelf && !isPushed && message.from !== activeContact) {
         let count = state.getIn([ "unread", type, chatId ], 0)
         state = state.setIn([ "unread", type, chatId ], ++count)
     }
