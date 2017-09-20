@@ -16,4 +16,4 @@ webrtc/dist/webrtc-*.js
 demo/build
 demo/remote_docker_restart.sh
 *.orig
-*.sh
+demo/*.sh
