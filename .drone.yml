@@ -1,6 +1,6 @@
 workspace:
   base: /data/apps/opt
-  path: webim
+  path: web-im
 
 
 pipeline:
@@ -12,7 +12,7 @@ pipeline:
       - node_modules
       - tag
     volumes:
-      - /data/apps/opt/webim:/cache
+      - /data/apps/opt/web-im:/cache
 
   build:
     image: node:7.8
@@ -63,7 +63,7 @@ pipeline:
         - node_modules
         - tag
       volumes:
-        - /data/apps/opt/webim:/cache
+        - /data/apps/opt/web-im:/cache
 
   notify:
     image: drillster/drone-email
