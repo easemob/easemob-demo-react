@@ -2,9 +2,11 @@ import { createStore, applyMiddleware, compose, combineReducers } from "redux"
 import { config } from "@/config"
 import { forEach } from "lodash"
 import thunkMiddleware from "redux-thunk"
+import { routerReducer, routerMiddleware } from "react-router-redux"
 import { loadTranslations, setLocale, syncTranslationWithStore, i18nReducer } from "react-redux-i18n"
 import { translationsObject } from "@/config/i18n/index.js"
 import WebIMConfig from "@/config/WebIMConfig"
+import { history } from "@/utils"
 
 // todo media query pollyfill
 import { breakpointReducer, combinedReducer, MATCH_MEDIA } from "./IndexRedux"
@@ -21,7 +23,7 @@ const enhancers = []
 // const customMiddleware = store => next => action => {
 //     next({ ...action, getState: store.getState })
 // }
-const middlewares = [ thunkMiddleware ]
+const middlewares = [ thunkMiddleware, routerMiddleware(history) ]
 
 enhancers.push(applyMiddleware(...middlewares))
 
@@ -52,7 +54,8 @@ const rootReducer = combineReducers({
     register: require("./RegisterRedux").reducer,
     contacts: require("./ContactsScreenRedux").reducer,
     im: require("./WebIMRedux").reducer,
-    i18n: i18nReducer
+    i18n: i18nReducer,
+    router: routerReducer
 })
 
 /* ------------- Global Reducers ------------- */
