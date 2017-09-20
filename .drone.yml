@@ -1,6 +1,6 @@
 workspace:
   base: /data/apps/opt
-  path: web-im
+  path: webim
 
 
 pipeline:
@@ -12,12 +12,16 @@ pipeline:
       - node_modules
       - tag
     volumes:
-      - /data/apps/opt/web-im:/cache
+      - /data/apps/opt/webim:/cache
 
   build:
     image: node:7.8
     privileged: true
     commands:
+      - cd sdk && npm link && cd ..
+      - cd webrtc && npm link && cd ..
+      - npm link easemob-websdk
+      - npm link easemob-webrtc
       - cd demo && npm install
       - npm run build
       # 2.0 demo 相关编译操作在demo目录下面
