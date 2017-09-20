@@ -67,7 +67,7 @@ pipeline:
         - node_modules
         - tag
       volumes:
-        - /data/apps/opt/web-im:/cache
+        - /data/apps/opt/webim:/cache
 
   notify:
     image: drillster/drone-email
