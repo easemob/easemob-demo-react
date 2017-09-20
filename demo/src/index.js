@@ -1,6 +1,7 @@
 import "babel-polyfill"
 import React from "react"
 import ReactDOM from "react-dom"
+import { ConnectedRouter } from "react-router-redux"
 // antd theme
 import "./App.css"
 import "./themes/theme.less"
@@ -26,9 +27,11 @@ const rootEl = document.getElementById("root")
 const render = Component =>
     ReactDOM.render(
         <Provider store={store}>
-            <Router history={history}>
-                <Component />
-            </Router>
+            <ConnectedRouter history={history}>
+                <Router history={history}>
+                    <Component />
+                </Router>
+            </ConnectedRouter>
         </Provider>,
         rootEl
     )
