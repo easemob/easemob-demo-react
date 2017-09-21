@@ -1,6 +1,6 @@
 workspace:
   base: /data/apps/opt
-  path: webim
+  path: webim-h5
 
 
 pipeline:
@@ -12,7 +12,7 @@ pipeline:
       - node_modules
       - tag
     volumes:
-      - /data/apps/opt/webim:/cache
+      - /data/apps/opt/webim-h5:/cache
 
   build:
     image: node:7.8
@@ -33,32 +33,65 @@ pipeline:
       branch: [ master ]
 
 
+  dockerize-sandbox:
+      image: plugins/docker
+      environment:
+        - DOCKER_LAUNCH_DEBUG=true
+      debug: true
+      repo: docker-registry-cn.easemob.com/kubernetes/im/webim
+      tags: latest
+      registry: docker-registry-cn.easemob.com
+      secrets: [ docker_username, docker_password ]
+      dockerfile: image/docker/webim/Dockerfile
+      context: image/docker/webim/
+      when:
+        branch: dev
 
-  dockerize-latest:
+  deploy-sandbox:
+    image: docker-registry-cn.easemob.com/kubernetes/im/webim-deploy:latest
+    pull: true
+    environment:
+      - DOCKER_LAUNCH_DEBUG=true
+      - TAG=latest
+    secrets: [ ssh_key, jumpserver_host, jumpserver_port, sandbox_host ]
+    debug: true
+    when:
+      branch: dev
+
+  dockerize-online:
     image: plugins/docker
     environment:
       - DOCKER_LAUNCH_DEBUG=true
     debug: true
     repo: docker-registry-cn.easemob.com/kubernetes/im/webim
-    tags: 20
+    tags: ${DRONE_COMMIT:0:7}
     registry: docker-registry-cn.easemob.com
     secrets: [ docker_username, docker_password ]
     dockerfile: image/docker/webim/Dockerfile
     context: image/docker/webim/
     when:
-      branch: [ master ]
+      branch: master
 
-  deploy-latest:
-    image: docker-registry-cn.easemob.com/kubernetes/im/webim-deploy:latest
+  deploy-online:
+    image: docker-registry-cn.easemob.com/kubernetes/im/webim-h5-online:latest
     pull: true
     environment:
       - DOCKER_LAUNCH_DEBUG=true
-      - TAG=20
-    secrets: [ ssh_key, jumpserver_host, jumpserver_port, sandbox_host ]
+      - TAG=${DRONE_COMMIT:0:7}
+    secrets: [ ssh_key, jumpserver_host, jumpserver_port, online_host ]
     debug: true
     when:
-      branch: [ master ]
+      branch: master
 
+  rollback-online:
+    image: docker-registry-cn.easemob.com/kubernetes/im/webim-h5-rollback:latest
+    pull: true
+    environment:
+      - DOCKER_LAUNCH_DEBUG=true
+    secrets: [ ssh_key, jumpserver_host, jumpserver_port, online_host ]
+    debug: true
+    when:
+      branch: rollback
 
   rebuild-cache:
       image: drillster/drone-volume-cache
@@ -67,7 +100,7 @@ pipeline:
         - node_modules
         - tag
       volumes:
-        - /data/apps/opt/webim:/cache
+        - /data/apps/opt/webim-h5:/cache
 
   notify:
     image: drillster/drone-email

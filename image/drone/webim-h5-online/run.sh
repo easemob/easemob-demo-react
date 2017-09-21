@@ -4,6 +4,7 @@ if [[ -z $TAG ]]; then
     TAG="latest"
 fi
 
+
 echo TAG=$TAG
 
 mkdir -p /root/.ssh
@@ -21,7 +22,7 @@ spawn ssh -p$JUMPSERVER_PORT easemob@$JUMPSERVER_HOST
         "\~\]" {send "ssh ${ONLINE_HOST}\r"}
     }
     expect "\~"
-    send "cd /data/Dockerfile/kubernetes/webim\r"
+    send "cd /data/Dockerfile/kubernetes/webim-h5\r"
     send "./update.sh ${TAG}\r"
     send "exit\r"
     expect "\~\]"
