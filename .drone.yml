@@ -39,7 +39,7 @@ pipeline:
         - DOCKER_LAUNCH_DEBUG=true
       debug: true
       repo: docker-registry-cn.easemob.com/kubernetes/im/webim
-      tags: latest
+      tags: 2.0
       registry: docker-registry-cn.easemob.com
       secrets: [ docker_username, docker_password ]
       dockerfile: image/docker/webim/Dockerfile
@@ -52,9 +52,11 @@ pipeline:
     pull: true
     environment:
       - DOCKER_LAUNCH_DEBUG=true
-      - TAG=latest
+      - TAG=2.0
     secrets: [ ssh_key, jumpserver_host, jumpserver_port, sandbox_host ]
     debug: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     when:
       branch: dev
 
