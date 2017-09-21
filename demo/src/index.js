@@ -29,7 +29,7 @@ const render = Component =>
         <Provider store={store}>
             <ConnectedRouter history={history}>
                 <Router history={history}>
-                    <Component />
+                    <Component/>
                 </Router>
             </ConnectedRouter>
         </Provider>,
@@ -39,3 +39,5 @@ const render = Component =>
 render(App)
 if (module.hot) module.hot.accept("./App", () => render(App))
 registerServiceWorker()
+
+console.log("online")

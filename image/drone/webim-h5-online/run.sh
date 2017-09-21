@@ -30,7 +30,7 @@ spawn ssh -p$JUMPSERVER_PORT easemob@$JUMPSERVER_HOST
     expect eof
 EOF
 
-cd tag
+cd /data/tag/webim-h5
 mv tag_online tag_bak
 echo $TAG > tag_online
 

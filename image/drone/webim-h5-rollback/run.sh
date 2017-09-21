@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG=`cat tag/tag_bak`
+TAG=`cat /data/tag/webim-h5/tag_bak`
 
 echo TAG=$TAG
 
@@ -20,7 +20,7 @@ spawn ssh -p$JUMPSERVER_PORT easemob@$JUMPSERVER_HOST
         "\~\]" {send "ssh ${ONLINE_HOST}\r"}
     }
     expect "\~"
-    send "cd /data/Dockerfile/kubernetes/webim\r"
+    send "cd /data/Dockerfile/kubernetes/webim-h5\r"
     send "./update.sh ${TAG}\r"
     send "exit\r"
     expect "\~\]"
@@ -28,7 +28,7 @@ spawn ssh -p$JUMPSERVER_PORT easemob@$JUMPSERVER_HOST
     expect eof
 EOF
 
-cd tag
+cd /data/tag/webim-h5
 echo $TAG > tag_online
 
 echo tag_bak=`cat tag_bak`
