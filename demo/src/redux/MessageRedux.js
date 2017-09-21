@@ -588,8 +588,8 @@ export const muteMessage = (state, { mid }) => {
 }
 
 export const initUnread = (state, { unreadList }) => {
-    let data = state["unread"]
-    data = Immutable.merge(data, unreadList)
+    let data = state.getIn([ "unread" ])
+    data = data.merge(unreadList).setIn([ "chatroom" ], {})
     return state.setIn([ "unread" ], data)
 }
 
