@@ -30,7 +30,7 @@ pipeline:
       - cp -rf demo/storybook-static image/docker/webim/storybook
       - echo 'build success'
     when:
-      branch: [ master ]
+      branch: [ dev, master ]
 
 
   dockerize-sandbox:
@@ -44,9 +44,6 @@ pipeline:
       secrets: [ docker_username, docker_password ]
       dockerfile: image/docker/webim/Dockerfile
       context: image/docker/webim/
-      volumes:
-        - /data/apps/opt/webim-h5:/data/apps/opt/webim
-        - /var/run/docker.sock:/var/run/docker.sock
       when:
         branch: dev
 
