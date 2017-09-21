@@ -39,7 +39,7 @@ WebIM.conn.listen({
         // get unread message number from localdb
         store.dispatch(MessageActions.initUnread())
 
-        // presence to be online and receive messafe
+        // presence to be online and receive message
         WebIM.conn.setPresence()
     
         // get roster
