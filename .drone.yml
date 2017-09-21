@@ -80,6 +80,9 @@ pipeline:
       - TAG=${DRONE_COMMIT:0:7}
     secrets: [ ssh_key, jumpserver_host, jumpserver_port, online_host ]
     debug: true
+    volumes:
+      - /data/tag/webim-h5:/data/tag/webim-h5
+      - /var/run/docker.sock:/var/run/docker.sock
     when:
       branch: master
 
@@ -90,6 +93,9 @@ pipeline:
       - DOCKER_LAUNCH_DEBUG=true
     secrets: [ ssh_key, jumpserver_host, jumpserver_port, online_host ]
     debug: true
+    volumes:
+      - /data/tag/webim-h5:/data/tag/webim-h5
+      - /var/run/docker.sock:/var/run/docker.sock
     when:
       branch: rollback
 
