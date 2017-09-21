@@ -48,16 +48,13 @@ pipeline:
         branch: dev
 
   deploy-sandbox:
-    image: docker-registry-cn.easemob.com/kubernetes/im/webim-deploy:latest
+    image: docker-registry-cn.easemob.com/kubernetes/im/webim-h5-deploy:latest
     pull: true
     environment:
       - DOCKER_LAUNCH_DEBUG=true
       - TAG=2.0
     secrets: [ ssh_key, jumpserver_host, jumpserver_port, sandbox_host ]
     debug: true
-    volumes:
-      - /data/apps/opt/webim-h5:/data/apps/opt/webim
-      - /var/run/docker.sock:/var/run/docker.sock
     when:
       branch: dev
 
