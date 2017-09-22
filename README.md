@@ -110,7 +110,7 @@ FIX: 请检查node版本是否是v6.0+
 		fetching: false,
 		isGetGroupAlready: true,
 		isGetChatRoomAlready: false,
-		showGroupRequestModal: false
+		showGroupRequestModal: false   //群主管理加入群消息
 	},
 	
 	// ---------------------------------	
@@ -125,9 +125,6 @@ FIX: 请检查node版本是否是v6.0+
 		isLogin: true,
 	},
 	
-	// TODO: 待了解
-	im: {},
-	
 	// ---------------------------------
 	// 语言包
 	// ---------------------------------
@@ -137,15 +134,12 @@ FIX: 请检查node版本是否是v6.0+
 		translations: {
 			cn: {},
 			us: {},
-			en: {}
 		},
 		
 		// 当前语言包
-		locale: "us"
+		locale: "cn"
 	},
 	
-	// TODO: 待了解
-	contacts: {},
 	
 	// 注册信息，没进行注册操作为{}
 	register: {
@@ -159,49 +153,48 @@ FIX: 请检查node版本是否是v6.0+
 	// 数据实体
 	// ---------------------------------
 	entities: {
-	
+	    // 好友
 		roster: {
 			byName: {
-				[name]: {
-					jid, name, subscription, groups
-				}
+				name: { subscription,jid, ask, name, groups }
+				...
 			},
-			names: ['lwz2'...],
+			names: ['lwz2' ...],
 			// 好友列表在此，因为好友列表来源于roster，息息相关
 			friends: [],
 		},
-		
+		// 群组
 		group: {
 			loadingFailed: <Boolean>,
 			isLoading: <Booleadn>,
-			rightSiderOffset: <Number>
+			rightSiderOffset: <Number>, //控制右侧群组管理面板
 			byId: {
-				[groupId]: {groupid, groupname},
+				groupId: {groupid, groupname},
 				....
 			},
 			names: [groupName_#-#_groupId, ....]
 		},
-		
+		// 聊天室
 		chatroom: {
 			byId: {
-				[chatId]: {chatId, name, owner, affiliations_count}
+				chatId: {chatId, name, owner, affiliations_count}
 				...
 			},
 			names: [chatName_#-#_chatId, ....]
 		},
-		
+		// 陌生人
 		stranger: {
 		},
 		
 		// 群组成员信息
 		groupMember: {
-			[groupid]: {
-				muted: {byName: {}},
+			groupId: {
+				muted: {byName: {}},//群主可见，禁言列表
 				byName: {
-					[name]: {name: <String: name>, affiliation: 'member'}
+					name: {name: <String: name>, affiliation: 'member'}
 				},
-				names: <Array>,
-				admins: <Array>
+				names: [],
+				admins: [],  //群管理员可见
 			},
 			...
 		}
@@ -211,9 +204,10 @@ FIX: 请检查node版本是否是v6.0+
 			byFrom: {}
 		},
 		
+		// 黑名单列表
 		blacklist: {
-			byName: <Object>
-			name: <Array>
+			byName: {}
+			name: []
 		},
 		
 		// 消息
@@ -221,79 +215,77 @@ FIX: 请检查node版本是否是v6.0+
 		
 			// 所有消息
 			byId: {
-				[mid]: {"type":"chat|groupchat|chatroom|stranger|error", "chatId": <String: chatId>}
-				...
+				mid: {"type":"chat|groupchat|chatroom|stranger|error", "chatId": <String: chatId>},
 				...
 			}
 			
 			// 单聊消息列表
 			chat: {
-				[chatId]: <Array: messageList>,
-				...
-				...
+				chatId: [
+                         {message},
+                         ...
+                        ]
 			},
 			
 			// 群组消息列表
 			groupChat: {
-				[chatId]: <Array: messageList>,
-				...
-				...
+				chatId: [
+                         {message},
+                         ...
+                        ]
 			},
 			
 			// 聊天室消息列表
 			chatroom: {
-				[chatId]: <Array: messageList>,
-				...
-				...
+				chatId: [
+                         {message},
+                         ...
+                        ]
 			},
 			
 			// 陌生人消息列表
 			stranger: {
-				[chatId]: <Array: messageList>,
-				...
-				...
+				chatId: [
+                         {message},
+                         ...
+                        ]
 			},
 			
-			// TODO: 待了解
+			// 预留 暂无用
 			extra: {}
 			
 			// 未读消息记录
 			unread: {
+			    // 好友
 				chat: {
-					[chatId]: <Number: unreadNum>,
+					chatId: <Number: unreadNum>,
 					...
 				},
+				// 群组
 				groupchat: {
-					[chatId]: <Number: unreadNum>,
+					chatId: <Number: unreadNum>,
 					...
 				},
+				// 聊天室
 				chatroom: {
-					[chatId]: <Number: unreadNum>,
+					chatId: <Number: unreadNum>,
 					...
 				},
+				// 陌生人
 				stranger: {
-					[chatId]: <Number: unreadNum>,
+					chatId: <Number: unreadNum>,
 					...
 				}
 			}
 			
 			// 自己发的消息mid跟本地id对照
 			byMid: {
-				[messageId]: {id: <String: localId>},
-				...
+				messageId: {id: <String: localId>},
 				...
 			},
-			
-			// 错误消息列表
-			error: {
-				[chatId]: <Array: messageList>,
-				...
-				...
-			}
-			
 		},
 		
-		// TODO 待了解
+		// 加入群申请
 		groupRequest: {
 			byGid: {}
 		}
