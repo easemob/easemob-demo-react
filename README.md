@@ -1,5 +1,5 @@
 ## 说明
-WebIM 2.0 在1.x的基础上, 主要做了以下更新:
+WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 1. 响应式布局, 一套Demo同时支持PC和H5,自适应不同终端屏幕尺寸
 2. 完全基于Reac + Redux的单向数据流
 3. 引入ant-design组件库，方便开发者后续开发
@@ -9,18 +9,9 @@ WebIM 2.0 在1.x的基础上, 主要做了以下更新:
 
 1. 初始化安装
 	- 在/demo下执行 `npm i`
-2. 如果需要同时编辑sdk
-	- `cd sdk && npm link && cd ..`
-	- 在根目录下执行 `npm link easemob-websdk`
+2. 如果需要同时编辑sdk  `cd sdk && npm link && cd .. && npm link easemob-websdk`
 
-    ```
-    否则会报错:
-    ./src/config/WebIM.js
-    Module not found: Can't resolve 'easemob-websdk/dist/strophe-1.2.8-g.js' in '<YourRootDir>/demo/src/config'
-    ```
-3. 如果需要同时编辑webrtc
-	- `cd webrtc && npm link && cd ..`
-	- 在根目录下执行 `npm link easemob-webrtc`
+3. 如果需要同时编辑webrtc `cd webrtc && npm link && cd .. && npm link easemob-webrtc`
 
 4. 运行demo
 	- `cd demo && npm start` （requires node@>=6）
@@ -32,9 +23,7 @@ WebIM 2.0 在1.x的基础上, 主要做了以下更新:
 
 5. 发布demo
 `cd demo && npm run build `
-/demo/build 目录下的就是可以允许和部署的版本
-
-
+/demo/build 目录下的就是可以运行和部署的版本
 
  
 ## FAQ
@@ -61,6 +50,14 @@ FIX: 这个问题，可以尝试PHANTOMJS_CDNURL=https://npm.taobao.org/mirrors/
 
 ### 2. 执行npm start时如果出现
 
+    ```
+    ./src/config/WebIM.js
+    Module not found: Can't resolve 'easemob-websdk/dist/strophe-1.2.8-g.js' in '<YourRootDir>/demo/src/config'
+    ```
+FIX: 没有执行 npm link easemob-websdk
+
+### 3. 执行npm start时如果出现
+
 ```
 > node scripts/start.js
 
@@ -80,9 +77,7 @@ SyntaxError: Unexpected token {
 ```
 FIX: 请检查node版本是否是v6.0+ 
 
-### 3. Redux State 说明
-
-通过 redux 进行管理的 state 结构如下：
+### 4. Redux State 的数据结构如下：
 
 
 ```
