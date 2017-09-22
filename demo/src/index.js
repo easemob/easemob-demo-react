@@ -27,11 +27,11 @@ const rootEl = document.getElementById("root")
 const render = Component =>
     ReactDOM.render(
         <Provider store={store}>
-            <ConnectedRouter history={history}>
-                <Router history={history}>
-                    <Component/>
-                </Router>
-            </ConnectedRouter>
+            {/* <ConnectedRouter history={history}> */}
+            <Router history={history}>
+                <Component/>
+            </Router>
+            {/* </ConnectedRouter> */}
         </Provider>,
         rootEl
     )
