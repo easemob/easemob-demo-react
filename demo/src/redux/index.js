@@ -33,11 +33,7 @@ const initState = {
     breakpoint: {},
     entities: {},
     login: {},
-    register: {},
-    common: {},
-    login: {},
-    register: {},
-    i18n: {}
+    im: {}
 }
 const rootReducer = combineReducers({
     breakpoint: breakpointReducer,
@@ -55,7 +51,9 @@ const rootReducer = combineReducers({
     common: require("./CommonRedux").reducer,
     login: require("./LoginRedux").reducer,
     register: require("./RegisterRedux").reducer,
-    i18n: i18nReducer
+    i18n: i18nReducer,
+    contacts: require("./ContactsScreenRedux").reducer,
+    im: require("./WebIMRedux").reducer
 })
 
 /* ------------- Global Reducers ------------- */
