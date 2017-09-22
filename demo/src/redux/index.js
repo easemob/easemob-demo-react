@@ -23,7 +23,7 @@ const enhancers = []
 // const customMiddleware = store => next => action => {
 //     next({ ...action, getState: store.getState })
 // }
-const middlewares = [ thunkMiddleware, routerMiddleware(history) ]
+const middlewares = [ thunkMiddleware ]
 
 enhancers.push(applyMiddleware(...middlewares))
 
@@ -37,8 +37,7 @@ const initState = {
     common: {},
     login: {},
     register: {},
-    i18n: {},
-    router: {},
+    i18n: {}
 }
 const rootReducer = combineReducers({
     breakpoint: breakpointReducer,
@@ -56,8 +55,7 @@ const rootReducer = combineReducers({
     common: require("./CommonRedux").reducer,
     login: require("./LoginRedux").reducer,
     register: require("./RegisterRedux").reducer,
-    i18n: i18nReducer,
-    router: routerReducer
+    i18n: i18nReducer
 })
 
 /* ------------- Global Reducers ------------- */

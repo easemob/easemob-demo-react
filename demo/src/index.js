@@ -1,7 +1,6 @@
 import "babel-polyfill"
 import React from "react"
 import ReactDOM from "react-dom"
-import { ConnectedRouter } from "react-router-redux"
 // antd theme
 import "./App.css"
 import "./themes/theme.less"

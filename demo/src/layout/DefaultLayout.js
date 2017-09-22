@@ -12,11 +12,9 @@ import Contact from "@/containers/contact/Contact"
 import Chat from "@/containers/chat/Chat"
 import HeaderTab from "@/components/header/HeaderTab"
 import HeaderOps from "@/components/header/HeaderOps"
-import { store } from "@/redux"
 import GroupActions from "@/redux/GroupRedux"
 import GroupMemberActions from "@/redux/GroupMemberRedux"
 import MessageActions from "@/redux/MessageRedux"
-import CommonActions from "@/redux/CommonRedux"
 import { config } from "@/config"
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
@@ -114,8 +112,6 @@ class DefaultLayout extends Component {
         if (selectItem == e.key) {
             return
         }
-
-        store.dispatch(CommonActions.setActiveContact(selectTab, e.key))
 
         if (selectTab === "group") {
             const groupId = e.key
