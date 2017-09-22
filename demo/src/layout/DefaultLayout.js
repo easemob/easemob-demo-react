@@ -6,6 +6,7 @@ import { connect } from "react-redux"
 import { I18n } from "react-redux-i18n"
 import { withRouter, Route } from "react-router-dom"
 import _ from "lodash"
+import classNames from "classnames"
 //import ContactItem from "@/components/contact/ContactItem"
 import ChatRoomActions from "@/redux/ChatRoomRedux"
 import Contact from "@/containers/contact/Contact"
@@ -225,7 +226,7 @@ class DefaultLayout extends Component {
                         />
                     </Content>
                     <div
-                        className="x-layout-right-sider"
+                        className={classNames("x-layout-right-sider", { "hide": this.props.rightSiderOffset === 0 })}
                         style={{
                             width: `${RIGHT_SIDER_WIDTH}px`,
                             marginLeft: `${rightSiderOffset}px`
