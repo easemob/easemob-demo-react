@@ -80,31 +80,86 @@ SyntaxError: Unexpected token {
 ```
 FIX: 请检查node版本是否是v6.0+ 
 
-### 3. redux state
+### 3. Redux State 说明
+
+通过 redux 进行管理的 state 结构如下：
+
 
 ```
 {
-	// ------- 响应式断点 ---------
-	//xs: "480px",
-	//sm: "768px",
- 	//md: "992px",
-	//lg: "1200px",
+	// ---------------------------------
+	// 响应式断点
+	// ---------------------------------
+	//xs: "480px"
+	//sm: "768px"
+ 	//md: "992px"
+	//lg: "1200px"
 	//xl: "1600px"
 	breakpoint: {
-		sm: true
+		xs: false,
+		sm: false,
+		md: false,
+		lg: false,
+		xl: false
 	},
-	// ------ ui 相关 ------------
+	
+	// ---------------------------------
+	// UI相关
+	// ---------------------------------
 	common: {
-		fetching:false
+		fetching: false,
+		isGetGroupAlready: true,
+		isGetChatRoomAlready: false,
+		showGroupRequestModal: false
 	},
+	
+	// ---------------------------------	
+	// 用户登录信息
+	// ---------------------------------
 	login: {
-		username: '',
-		password: '',
-		isSigned: false,
+		username: 'sunylt',
+		password: null,
+		token: "YWMtZ0m-opwTEeeS-e0Ko59rsU1-S6DcShHjkNXh_7qs2vV",
+		fetching: false,
+		error: false
+		isLogin: true,
 	},
-	im: [],
-	// ------ 数据实体 -------
+	
+	// TODO: 待了解
+	im: {},
+	
+	// ---------------------------------
+	// 语言包
+	// ---------------------------------
+	i18n: {
+	
+		// 已配置语言
+		translations: {
+			cn: {},
+			us: {},
+			en: {}
+		},
+		
+		// 当前语言包
+		locale: "us"
+	},
+	
+	// TODO: 待了解
+	contacts: {},
+	
+	// 注册信息，没进行注册操作为{}
+	register: {
+		username: "123abcdbb",
+		password: "123",
+		fetching: false,
+		registerError: null
+	},
+
+	// ---------------------------------	
+	// 数据实体
+	// ---------------------------------
 	entities: {
+	
 		roster: {
 			byName: {
 				[name]: {
@@ -115,28 +170,132 @@ FIX: 请检查node版本是否是v6.0+
 			// 好友列表在此，因为好友列表来源于roster，息息相关
 			friends: [],
 		},
+		
+		group: {
+			loadingFailed: <Boolean>,
+			isLoading: <Booleadn>,
+			rightSiderOffset: <Number>
+			byId: {
+				[groupId]: {groupid, groupname},
+				....
+			},
+			names: [groupName_#-#_groupId, ....]
+		},
+		
+		chatroom: {
+			byId: {
+				[chatId]: {chatId, name, owner, affiliations_count}
+				...
+			},
+			names: [chatName_#-#_chatId, ....]
+		},
+		
+		stranger: {
+		},
+		
+		// 群组成员信息
+		groupMember: {
+			[groupid]: {
+				muted: {byName: {}},
+				byName: {
+					[name]: {name: <String: name>, affiliation: 'member'}
+				},
+				names: <Array>,
+				admins: <Array>
+			},
+			...
+		}
+		
 		// 订阅通知
 		subscribe: {
 			byFrom: {}
 		},
-		room: {},
-		group: {
-			byId: {},
-			names: []
+		
+		blacklist: {
+			byName: <Object>
+			name: <Array>
 		},
-		members: {
-			byName: [],
-			byGroupId: []
-		}
-		blacklist: {},
+		
+		// 消息
 		message: {
-			byId: {}
+		
+			// 所有消息
+			byId: {
+				[mid]: {"type":"chat|groupchat|chatroom|stranger|error", "chatId": <String: chatId>}
+				...
+				...
+			}
+			
+			// 单聊消息列表
 			chat: {
-				[chatId]: [messageId1, messageId2]
+				[chatId]: <Array: messageList>,
+				...
+				...
 			},
+			
+			// 群组消息列表
 			groupChat: {
-				[chatId]: {}
+				[chatId]: <Array: messageList>,
+				...
+				...
 			},
+			
+			// 聊天室消息列表
+			chatroom: {
+				[chatId]: <Array: messageList>,
+				...
+				...
+			},
+			
+			// 陌生人消息列表
+			stranger: {
+				[chatId]: <Array: messageList>,
+				...
+				...
+			},
+			
+			// TODO: 待了解
+			extra: {}
+			
+			// 未读消息记录
+			unread: {
+				chat: {
+					[chatId]: <Number: unreadNum>,
+					...
+				},
+				groupchat: {
+					[chatId]: <Number: unreadNum>,
+					...
+				},
+				chatroom: {
+					[chatId]: <Number: unreadNum>,
+					...
+				},
+				stranger: {
+					[chatId]: <Number: unreadNum>,
+					...
+				}
+			}
+			
+			// 自己发的消息mid跟本地id对照
+			byMid: {
+				[messageId]: {id: <String: localId>},
+				...
+				...
+			},
+			
+			// 错误消息列表
+			error: {
+				[chatId]: <Array: messageList>,
+				...
+				...
+			}
+			
+		},
+		
+		// TODO 待了解
+		groupRequest: {
+			byGid: {}
 		}
 	}
 }
