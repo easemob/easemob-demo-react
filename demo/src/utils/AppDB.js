@@ -1,7 +1,7 @@
 
 
 import Dexie from "dexie"
-import WebIMConfig from "@/config/WebIMConfig"
+import WebIMConfig from "WebIMConfig"
 import { config } from "@/config/"
 
 const DB_ENABLE = WebIMConfig.enableLocalStorage

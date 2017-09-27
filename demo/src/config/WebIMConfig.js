@@ -7,11 +7,11 @@
  */
 
 // for react native
-let location = {
+var location = {
     protocol: "https"
 }
 
-let config = {
+var config = {
     /*
      * XMPP server
      */

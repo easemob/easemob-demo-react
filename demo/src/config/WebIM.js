@@ -4,7 +4,7 @@ import "script-loader!easemob-webrtc/dist/adapter.js"
 /* eslint-enable */
 import webrtc from "easemob-webrtc"
 import websdk from "easemob-websdk"
-import config from "./WebIMConfig"
+import config from "WebIMConfig"
 import emoji from "./emoji"
 import Api from "axios"
 import { message } from "antd"

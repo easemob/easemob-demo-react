@@ -5,7 +5,7 @@ import thunkMiddleware from "redux-thunk"
 import { routerReducer, routerMiddleware } from "react-router-redux"
 import { loadTranslations, setLocale, syncTranslationWithStore, i18nReducer } from "react-redux-i18n"
 import { translationsObject } from "@/config/i18n/index.js"
-import WebIMConfig from "@/config/WebIMConfig"
+import WebIMConfig from "WebIMConfig"
 import { history } from "@/utils"
 
 // todo media query pollyfill
