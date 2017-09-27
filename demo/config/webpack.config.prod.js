@@ -73,6 +73,8 @@ module.exports = {
 		// We don't currently advertise code splitting but Webpack supports it.
 		filename: "static/js/[name].[chunkhash:8].js",
 		chunkFilename: "static/js/[name].[chunkhash:8].chunk.js",
+        library: 'WebIMConfig',
+        libraryTarget: 'umd',
 		// We inferred the "public path" (such as / or /my-project) from homepage.
 		publicPath: publicPath,
 		// Point sourcemap entries to original disk location (format as URL on Windows)
@@ -310,6 +312,7 @@ module.exports = {
 		new webpack.DefinePlugin(env.stringified),
 		// Minify the code.
 		new webpack.optimize.UglifyJsPlugin({
+            exclude: /WebIMConfig/,
 			compress: {
 				warnings: false,
 				// Disabled because of an issue with Uglify breaking seemingly valid code:
