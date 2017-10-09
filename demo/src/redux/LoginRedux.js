@@ -2,7 +2,7 @@
 
 import { createReducer, createActions } from "reduxsauce"
 import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
+import WebIM, { proxyconn } from "@/config/WebIM"
 import Cookie from "js-cookie"
 import { message } from "antd"
 import { history } from "@/utils"
@@ -29,7 +29,7 @@ const { Types, Creators } = createActions({
             if (WebIM.conn.isOpened()) {
                 WebIM.conn.close("logout")
             }
-            WebIM.conn.open({
+            proxyconn.open({
                 apiUrl: WebIM.config.apiURL,
                 user: username.trim().toLowerCase(),
                 pwd: password,

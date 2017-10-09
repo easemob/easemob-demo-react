@@ -1,7 +1,7 @@
 import { createReducer, createActions } from "reduxsauce"
 import Immutable from "seamless-immutable"
 import _ from "lodash"
-import WebIM from "@/config/WebIM"
+import WebIM, { proxyconn } from "@/config/WebIM"
 import CommonActions from "@/redux/CommonRedux"
 import RosterActions from "@/redux/RosterRedux"
 import LoginActions from "@/redux/LoginRedux"
@@ -321,7 +321,7 @@ const { Types, Creators } = createActions({
             dispatch(CommonActions.fetching())
             dispatch(LoginActions.logout())
             if (WebIM.conn.isOpened()) {
-                WebIM.conn.close("logout")
+                proxyconn.close("logout")
             }
         }
     }
