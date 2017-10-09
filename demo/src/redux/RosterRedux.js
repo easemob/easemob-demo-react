@@ -1,7 +1,7 @@
 import { createReducer, createActions } from "reduxsauce"
 import Immutable from "seamless-immutable"
 import _ from "lodash"
-import WebIM, { proxyconn } from "@/config/WebIM"
+import WebIM from "@/config/WebIM"
 import { I18n } from "react-redux-i18n"
 
 import CommonActions from "@/redux/CommonRedux"
@@ -17,7 +17,7 @@ const { Types, Creators } = createActions({
     getContacts: () => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
-            proxyconn.getRoster({
+            WebIM.conn.getRoster({
                 success: roster => {
                     dispatch(Creators.updateRoster(roster))
                     dispatch(CommonActions.fetched())
@@ -34,7 +34,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             //loading
             dispatch(CommonActions.fetching())
-            proxyconn.removeRoster({
+            WebIM.conn.removeRoster({
                 to: id,
                 success: function() {
                     //loading end

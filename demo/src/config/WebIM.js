@@ -9,7 +9,6 @@ import emoji from "./emoji"
 import Api from "axios"
 import { message } from "antd"
 import loglevel from "@/utils/loglevel"
-import ProxyConn from "@/utils/proxyconn"
 
 console = console || {}
 console.group = console.group || function () {}
@@ -81,6 +80,4 @@ api.interceptors.response.use(
 WebIM.api = api
 WebIM.emoji = emoji
 WebIM.WebRTC = webrtc
-
-export const proxyconn = new ProxyConn(WebIM, WebIM.config.isWindowSDK)
 export default WebIM
