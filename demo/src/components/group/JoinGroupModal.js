@@ -82,7 +82,7 @@ class JoinGroupModal extends React.Component {
                 var groupsData = this.state.groupsData
                 for (var i in groupData) {
                     if (
-                        !groupsData.find(v => v.groupid == groupData[i].groupid)
+                        !groupsData.find(v => v.groupId == groupData[i].groupId)
                     ) {
                         groupsData.push(groupData[i])
                     } else {
@@ -92,14 +92,14 @@ class JoinGroupModal extends React.Component {
                     groups.push(
                         <li
                             className="x-list-item"
-                            data-gid={groupData[i].groupid}
-                            key={groupData[i].groupid}
+                            data-gid={groupData[i].groupId}
+                            key={groupData[i].groupId}
                             onClick={this.showDetail.bind(
                                 this,
-                                groupData[i].groupid
+                                groupData[i].groupId
                             )}
                         >
-                            {groupData[i].groupname}
+                            {groupData[i].groupName}
                         </li>
                     )
                 }

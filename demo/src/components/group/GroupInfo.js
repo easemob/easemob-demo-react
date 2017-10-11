@@ -134,7 +134,7 @@ class GroupInfo extends React.Component {
 
     renderGroupOperationMenu = () => {
         const { login, groupMember, room } = this.props
-        const user = _.get(groupMember, [ room.roomId, "byName", _.get(login, "username") ], {
+        const user = _.get(groupMember, [ room.groupId, "byName", _.get(login, "username") ], {
             name: null,
             affiliation: null
         })
