@@ -20,6 +20,8 @@ class Connection {
         WebIM.connection.prototype.listen.call(this, options)
     }
 
+    setPresence() {}
+
     _onTextMessage(message) {
         this.onTextMessage(JSON.parseJSON(message))
     }
