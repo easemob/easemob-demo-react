@@ -4,12 +4,14 @@ import "script-loader!easemob-webrtc/dist/adapter.js"
 /* eslint-enable */
 import webrtc from "easemob-webrtc"
 import websdk from "easemob-websdk"
+import winsdk from "./winsdk"
 import config from "WebIMConfig"
 import emoji from "./emoji"
 import Api from "axios"
 import { message } from "antd"
 import loglevel from "@/utils/loglevel"
 
+const sdk = true ? winsdk : websdk
 console = console || {}
 console.group = console.group || function () {}
 console.groupEnd = console.groupEnd || function () {}
@@ -22,7 +24,7 @@ WebIM.loglevel = loglevel
 // replace all console.log with loglevel.info
 // console.log = loglevel.info
 
-WebIM.conn = new websdk.connection({
+WebIM.conn = new sdk.connection({
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     https: WebIM.config.https,
     url: WebIM.config.xmppURL,
@@ -39,7 +41,7 @@ if (!WebIM.conn.apiUrl) {
     WebIM.conn.apiUrl = WebIM.config.apiURL
 }
 
-websdk.debug(true)
+WebIM.debug(true)
 
 const appKeyPair = WebIM.config.appkey.split("#")
 export let api = Api.create({
