@@ -4,7 +4,9 @@
 
 import WebIM from "easemob-websdk"
 
+const _doQuery = WebIM.doQuery
 const location = window.location
+const { listen, getUniqueId } = WebIM.prototype
 
 class Connection {
 
@@ -24,6 +26,8 @@ class Connection {
     }
 
     _onTextMessage(message) {
+        message = JSON.parse(message)
+        message.data = encodeURI(message.data)
         this.onTextMessage(JSON.parse(message))
     }
 
@@ -32,11 +36,11 @@ class Connection {
     }
 
     listen(options) {
-        WebIM.connection.prototype.listen.call(this, options)
+        listen.call(this, options)
     }
 
     getUniqueId() {
-        WebIM.connection.prototype.getUniqueId.call(this)
+        getUniqueId.call(this)
     }
 
     setPresence() {}
@@ -50,7 +54,7 @@ class Connection {
             "chatType": message.chatType
         })
 
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             message.success(res)
         }, (errCode, errMsg) => {
             message.fail(errMsg)
@@ -66,7 +70,7 @@ class Connection {
 
         this.appkey = options.appKey
 
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             this.onOpened()
             options.success(res)
         }, (errCode, errMessage) => {
@@ -80,7 +84,7 @@ class Connection {
         const params = JSON.stringify({
             "type": "logout"
         })
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             this.onClosed(res)
         }, (errCode, errMessage) => {
 
@@ -91,7 +95,7 @@ class Connection {
         const params = JSON.stringify({
             "type": "getRoster"
         })
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             res = JSON.parse(res)
             options.success(res)
         }, (errCode, errMessage) => {
@@ -108,7 +112,7 @@ class Connection {
             "type": "delFriend",
             "to": options.to
         })
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             options.success(res)
         }, (errCode, errMessage) => {
             options.error()
@@ -119,7 +123,7 @@ class Connection {
         const params = JSON.stringify({
             "type": "getGroup"
         })
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             options.success(JSON.parse(res))
         }, (errCode, errMessage) => {
             options.error(errMessage)
@@ -158,7 +162,7 @@ class Connection {
         const params = JSON.stringify({
             "type": "getChatroom"
         })
-        WebIM.doQuery(params, res => {
+        _doQuery(params, res => {
             const _res = {
                 data: JSON.parse(res)
             }
