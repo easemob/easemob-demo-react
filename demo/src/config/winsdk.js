@@ -23,11 +23,11 @@ class Connection {
     setPresence() {}
 
     _onTextMessage(message) {
-        this.onTextMessage(JSON.parseJSON(message))
+        this.onTextMessage(JSON.parse(message))
     }
 
     _onPictureMessage(message) {
-        this.onPictureMessage(JSON.parseJSON(message))
+        this.onPictureMessage(JSON.parse(message))
     }
 
     send(message) {
