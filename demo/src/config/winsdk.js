@@ -1,4 +1,7 @@
 
+// winsdk fro demo2.0 run in window
+// methods like _xxxxx are for c++，others are for demo code
+
 import WebIM from "easemob-websdk"
 
 const location = window.location
@@ -16,11 +19,9 @@ class Connection {
 
     }
 
-    listen(options) {
-        WebIM.connection.prototype.listen.call(this, options)
+    _onPresence(msg) {
+        this.onPrecence(msg)
     }
-
-    setPresence() {}
 
     _onTextMessage(message) {
         this.onTextMessage(JSON.parse(message))
@@ -29,6 +30,12 @@ class Connection {
     _onPictureMessage(message) {
         this.onPictureMessage(JSON.parse(message))
     }
+
+    listen(options) {
+        WebIM.connection.prototype.listen.call(this, options)
+    }
+
+    setPresence() {}
 
     send(message) {
         const params = JSON.stringify({
