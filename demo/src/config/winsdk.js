@@ -35,6 +35,10 @@ class Connection {
         WebIM.connection.prototype.listen.call(this, options)
     }
 
+    getUniqueId() {
+        WebIM.connection.prototype.getUniqueId.call(this)
+    }
+
     setPresence() {}
 
     send(message) {
