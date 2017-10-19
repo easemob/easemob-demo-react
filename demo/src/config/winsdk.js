@@ -6,7 +6,7 @@ import WebIM from "easemob-websdk"
 
 const _doQuery = WebIM.doQuery
 const location = window.location
-const { listen, getUniqueId } = WebIM.prototype
+const { listen, getUniqueId } = WebIM.connection.prototype
 
 class Connection {
 
