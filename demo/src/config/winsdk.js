@@ -57,6 +57,7 @@ class Connection {
 
         WebIM.doQuery(params, res => {
             this.onOpened()
+            options.success(res)
         }, (errCode, errMessage) => {
             options.error(errMessage)
         })
@@ -80,11 +81,15 @@ class Connection {
             "type": "getRoster"
         })
         WebIM.doQuery(params, res => {
-            res = JSON.parseJSON(res)
+            res = JSON.parse(res)
             options.success(res)
         }, (errCode, errMessage) => {
             options.error(errMessage)
         })
+    }
+
+    getBlacklist(options) {
+
     }
 
     removeRoster(options) {

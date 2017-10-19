@@ -38,8 +38,8 @@ const { Types, Creators } = createActions({
                 success(token) {
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                     message.success(I18N.loginSuccessfully, 1)
-
-                    dispatch(Creators.setLoginToken(username, token.access_token))
+                    console.log("登录成功了")
+                    //dispatch(Creators.setLoginToken(username, token.access_token))
                     dispatch(Creators.setLoginSuccess(username))
                 },
                 error: e => {

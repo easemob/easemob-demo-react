@@ -19,7 +19,7 @@ import Loading from "@/components/common/LoadingComponent"
 import { store } from "@/redux"
 import utils from "@/utils"
 
-const debug = false
+const debug = true
 
 // const AuthorizedComponent = ({ token, Layout, ...rest }) => {
 //     console.log("auth", token)
@@ -39,13 +39,15 @@ const debug = false
 
 class AuthorizedComponent extends Component {
     render() {
-        const { token, ...rest } = this.props
+        const { token, isLogin, ...rest } = this.props
 
-        console.log("auth", token)
+        console.log("token", token)
 
-        if (!token && !debug) {
+        if (!isLogin) {
             return <Redirect to="/login" />
         }
+
+        console.log("进入主界面渲染")
 
         return (
             <Switch>

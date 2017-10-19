@@ -11,7 +11,7 @@ import Api from "axios"
 import { message } from "antd"
 import loglevel from "@/utils/loglevel"
 
-const sdk = true ? winsdk : websdk
+const sdk = typeof window.cefQuery !== "undefined" ? winsdk : websdk
 console = console || {}
 console.group = console.group || function () {}
 console.groupEnd = console.groupEnd || function () {}
