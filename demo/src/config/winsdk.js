@@ -46,6 +46,7 @@ class Connection {
     setPresence() {}
 
     send(message) {
+        console.log(message)
         if (message.type === "read") {
             return
         }
@@ -163,20 +164,6 @@ class Connection {
     joinChatRoom(options) {
 
     }
-
-    // group
-
-    // groupmember
-
-    // grouprequest
-
-    // login
-
-    // message
-    
-    // roster
-
-    // subscribe
 
     getChatRooms(options) {
         const params = JSON.stringify({
