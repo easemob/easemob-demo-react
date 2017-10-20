@@ -28,7 +28,7 @@ class Connection {
     _onTextMessage(message) {
         message = JSON.parse(message)
         message.data = encodeURI(message.data)
-        this.onTextMessage(JSON.parse(message))
+        this.onTextMessage(message)
     }
 
     _onPictureMessage(message) {
