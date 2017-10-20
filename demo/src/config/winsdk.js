@@ -27,7 +27,7 @@ class Connection {
 
     _onTextMessage(message) {
         message = JSON.parse(message)
-        message.data = encodeURI(message.data)
+        message.data = decodeURI(message.data)
         this.onTextMessage(message)
     }
 
@@ -104,7 +104,29 @@ class Connection {
     }
 
     getBlacklist(options) {
+        const params = JSON.stringify({
+            "type": "getBlacklist"
+        })
+        _doQuery(params, res => {
+            res = JSON.parse(res)
+            options.success(res)
+        }, (errCode, errMessage) => {
+            options.error(errMessage)
+        })
+    }
 
+    addFriend(options) {
+        const params = JSON.stringify({
+            "type": "addFriend",
+            "to": options.to,
+            "message": options.message
+        })
+        _doQuery(params, res => {
+            res = JSON.parse(res)
+            options.success(res)
+        }, (errCode, errMessage) => {
+            options.error()
+        })
     }
 
     removeRoster(options) {
