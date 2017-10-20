@@ -46,6 +46,9 @@ class Connection {
     setPresence() {}
 
     send(message) {
+        if (message.type === "read") {
+            return
+        }
         const params = JSON.stringify({
             "type": "sendMessage",
             "to": message.to,
@@ -131,11 +134,6 @@ class Connection {
     }
 
     destoryGroup(options) {
-
-    }
-
-    onTextMessage(msg) {
-        
 
     }
 
