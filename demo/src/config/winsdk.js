@@ -47,7 +47,7 @@ class Connection {
 
     send(message) {
         console.log(message)
-        if (message.type === "read") {
+        if (message.ackId) {
             return
         }
         const params = JSON.stringify({
