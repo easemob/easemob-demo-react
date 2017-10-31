@@ -378,7 +378,7 @@ class Chat extends React.Component {
 
         let name = selectItem
         let webrtcButtons = []
-        if (WebIM.config.isWebRTC && selectTab === "contact") {
+        if (WebIM.config.isWebRTC && selectTab === "contact" || selectTab === "group") {
             // webrtc video button
             webrtcButtons.push(<label key="video" htmlFor="clearMessage" className="x-chat-ops-icon ib"
                 onClick={this.callVideo}>

@@ -1,4 +1,4 @@
-var _version = '1.4.2';
+var _version = '1.4.13';
 var _code = require('./status').code;
 var _utils = require('./utils').utils;
 var _msg = require('./message');

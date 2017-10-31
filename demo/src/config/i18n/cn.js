@@ -59,9 +59,18 @@ export const cn = {
     unread: "未读",
     // 群组
     createGroup: "创建群组",
+    groupType: "群组类型",
+    private: "私有群",
+    public: "公有群",
+    permission: "加群权限",
+    approvalTrue: "审批",
+    approvalFalse: "随便加",
+    next: "下一步",
+    back: "上一步",
     joinGroup: "申请入群",
     groupInfo: "群信息",
     groupName: "群组名称",
+    groupNameWaring: "请输入群组名称！",
     inviteToGroup: "邀请群成员",
     groupRequest: "加群申请",
     modifyGroupInfo: "修改群信息",
@@ -75,6 +84,7 @@ export const cn = {
     mute: "禁言",
     groupBlockSingle: "加入群黑名单",
     removeSingleGroupMember: "从本群移除",
+    descriptionWaring: "请输入群组简介！",
     description: "简介",
     // 陌生人
     addFriend: "加为好友",
@@ -106,7 +116,7 @@ export const cn = {
     //webrtc
     requestVideo: " 请求视频通话...",
     requestVoice: " 请求语音通话...",
-    waiting: "等候 ",
+    waiting: "等待对方接受邀请",
     waitingVideo: " 视频中...",
     waitingVoice: " 语音中...",
 }
