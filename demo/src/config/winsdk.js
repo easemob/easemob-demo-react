@@ -69,8 +69,31 @@ class Connection {
         if (message.ackId) {
             return
         }
+
         const params = JSON.stringify({
             "type": "sendMessage",
+            "to": message.to,
+            "message_type": message.type,
+            "msg": encodeURI(message.msg),
+            "chatType": message.roomType,
+            "id": message.id
+        })
+
+        _doQuery(params, res => {
+            message.success(res)
+        }, (errCode, errMsg) => {
+            message.fail(errMsg)
+        })
+    }
+
+    sendFile(message) {
+        console.log(message)
+        if (message.ackId) {
+            return
+        }
+
+        const params = JSON.stringify({
+            "type": "sendFileMessage",
             "to": message.to,
             "message_type": message.type,
             "msg": encodeURI(message.msg),
