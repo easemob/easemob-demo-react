@@ -231,8 +231,8 @@ const { Types, Creators } = createActions({
                 msg: "",
                 to,
                 roomType: chatType === "chatroom",
-                success: function (url) {
-                    pMessage.body.url = url
+                success: function (res) {
+                    pMessage.body.url = res.url
                     dispatch(Creators.addMessage(pMessage, type))
                 }
             })
