@@ -1,4 +1,3 @@
-
 // winsdk fro demo2.0 run in window
 // methods like _xxxxx are for c++，others are for demo code
 
@@ -12,7 +11,7 @@ class Connection {
 
     constructor(options) {
         options = options || {}
-        
+
         this.https = options.https || location.protocol === "https:"
         this.url = options.url
         this.appkey = options.appkey
@@ -25,6 +24,10 @@ class Connection {
         this.onPrecence(msg)
     }
 
+    _onReceivedMessage(message) {
+        this.onReceivedMessage(JSON.parse(message))
+    }
+
     _onTextMessage(message) {
         message = JSON.parse(message)
         message.data = decodeURI(message.data)
@@ -35,19 +38,35 @@ class Connection {
         this.onPictureMessage(JSON.parse(message))
     }
 
+    _onAudioMessage(message) {
+        this.onAudioMessage(JSON.parse(message))
+    }
+
+    _onVideoMessage(message) {
+        this.onVideoMessage(JSON.parse(message))
+    }
+
+    _onReadMessage(message) {
+        this.onReadMessage(JSON.parse(message))
+    }
+
+    _onDeliveredMessage(message) {
+        this.onDeliveredMessage(JSON.parse(message))
+    }
+
     listen(options) {
         listen.call(this, options)
     }
 
     getUniqueId() {
-        getUniqueId.call(this)
+        return getUniqueId.call(this)
     }
 
     setPresence() {}
 
     send(message) {
         console.log(message)
-        if (message.type === "read") {
+        if (message.ackId) {
             return
         }
         const params = JSON.stringify({
@@ -55,7 +74,8 @@ class Connection {
             "to": message.to,
             "message_type": message.type,
             "msg": encodeURI(message.msg),
-            "chatType": message.chatType
+            "chatType": message.roomType,
+            "id": message.id
         })
 
         _doQuery(params, res => {
