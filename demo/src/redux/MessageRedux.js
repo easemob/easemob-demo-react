@@ -349,21 +349,27 @@ const { Types, Creators } = createActions({
     },
     addAudioMessage: (message, bodyType) => {
         return (dispatch, getState) => {
-            let options = {
-                url: message.url,
-                headers: {
-                    Accept: "audio/mp3"
-                },
-                onFileDownloadComplete: function (response) {
-                    let objectUrl = WebIM.utils.parseDownloadResponse.call(WebIM.conn, response)
-                    message.url = objectUrl
-                    dispatch(Creators.addMessage(message, bodyType))
-                },
-                onFileDownloadError: function () {
-                    console.log("Audio Error")
+
+            // c++ runtime, audio message will be show directly, don't need to download from server.
+            if (typeof window.cefQuery !== "undefined") {
+                dispatch(Creators.addMessage(message, bodyType))
+            } else {
+                let options = {
+                    url: message.url,
+                    headers: {
+                        Accept: "audio/mp3"
+                    },
+                    onFileDownloadComplete: function (response) {
+                        let objectUrl = WebIM.utils.parseDownloadResponse.call(WebIM.conn, response)
+                        message.url = objectUrl
+                        dispatch(Creators.addMessage(message, bodyType))
+                    },
+                    onFileDownloadError: function () {
+                        console.log("Audio Error")
+                    }
                 }
+                WebIM.utils.download.call(WebIM.conn, options)
             }
-            WebIM.utils.download.call(WebIM.conn, options)
         }
     },
     initUnread: () => {
