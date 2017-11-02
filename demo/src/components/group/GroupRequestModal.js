@@ -14,10 +14,11 @@ class GroupRequestModal extends React.Component {
         groupName: "",
         reason: ""
     }
-    onRefuse = gid => {
-        const { from } = this.props.groupRequests[gid] || {}
+    onRefuse = (gid, applicant) => {
+        // const { from } = this.props.groupRequests[gid] || {}
+        // const request = _.get(this.props.groupRequests, from, {})
         var options = {
-            applicant: from,
+            applicant: applicant,
             groupId: gid,
             success: function(resp) {
                 console.log(resp)
@@ -71,7 +72,7 @@ class GroupRequestModal extends React.Component {
                                 }}
                                 className="fr"
                                 type="danger"
-                                onClick={() => this.onRefuse(gid)}
+                                onClick={() => this.onRefuse(gid, from)}
                             >
                                 {I18n.t("reject")}
                             </Button>

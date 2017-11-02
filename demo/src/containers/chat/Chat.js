@@ -127,7 +127,12 @@ class Chat extends React.Component {
     handleEmojiSelect(v) {
         this.setState({
             value: (this.state.value || "") + v.key
+        }, () => {
+            this.logger.info("callback")
+            this.logger.info(this.state.value)
         })
+        this.logger.info("async")
+        this.logger.info(this.state.value)
         this.input.focus()
     }
 
