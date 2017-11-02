@@ -105,6 +105,17 @@ class Chat extends React.Component {
         //
     }
 
+    choosePic = (e) => {
+        // for c++, don't need
+        if (window.isWinsdk) {
+            e.preventDefault()
+            const { match } = this.props
+            const { selectItem, selectTab } = match.params
+            const isRoom = chatType[selectTab] == "chatroom" || chatType[selectTab] == "groupchat"     
+            this.props.fakeSendFileMessage(chatType[selectTab], selectItem, { isRoom })
+        }
+    }
+
     fileChange(e) {
         const { match } = this.props
         const { selectItem, selectTab } = match.params
@@ -445,6 +456,7 @@ class Chat extends React.Component {
                                 id="uploadImage"
                                 ref={node => (this.image = node)}
                                 onChange={this.pictureChange}
+                                onClick={this.choosePic}
                                 type="file"
                                 className="hide"
                             />
@@ -502,6 +514,7 @@ export default connect(
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         sendImgMessage: (chatType, id, message, source) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source)),
+        fakeSendFileMessage: (chatType, id, message) => dispatch(MessageActions.fakeSendFileMessage(chatType, id, message)),
         sendFileMessage: (chatType, id, message, source) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),
         listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),

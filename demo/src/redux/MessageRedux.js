@@ -219,6 +219,36 @@ const { Types, Creators } = createActions({
             dispatch(Creators.addMessage(pMessage, type))
         }
     },
+
+    fakeSendFileMessage: (chatType, chatId, message={}) => {
+        return (dispatch, getState) => {
+            let pMessage = null
+            const id = WebIM.conn.getUniqueId()
+            const type = "img"
+            const to = chatId
+            const msgObj = new WebIM.message(type, id)
+            msgObj.set({
+                msg: "",
+                to,
+                roomType: chatType === "chatroom",
+                success: function (url) {
+                    pMessage.body.url = url
+                    dispatch(Creators.addMessage(pMessage, type))
+                }
+            })
+
+            // keep the same logic as sendTextMessage
+            if (chatType === "groupchat" || chatType === "chatroom") {
+                msgObj.setGroup("groupchat")
+            }
+
+            WebIM.conn.sendFile(msgObj.body)
+            pMessage = parseFromLocal(chatType, chatId, msgObj.body, "img")
+            pMessage.id = id
+            
+        }
+    },
+
     sendImgMessage: (chatType, chatId, message = {}, source = {}, callback = () => {
     }) => {
         return (dispatch, getState) => {

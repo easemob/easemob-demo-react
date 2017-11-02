@@ -10,8 +10,8 @@ import emoji from "./emoji"
 import Api from "axios"
 import { message } from "antd"
 import loglevel from "@/utils/loglevel"
-
-const sdk = typeof window.cefQuery !== "undefined" ? winsdk : websdk
+window.isWinsdk = typeof window.cefQuery !== "undefined" ? true : false
+const sdk = window.isWinsdk ? winsdk : websdk
 console = console || {}
 console.group = console.group || function () {}
 console.groupEnd = console.groupEnd || function () {}
