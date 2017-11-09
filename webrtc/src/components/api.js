@@ -60,7 +60,7 @@ var _clazz = {
 
         // '200' : 'onEnter',
         // '201' : 'onExit',
-        // '202' : 'onInvite',
+        '202' : 'onInvite',
         // '203' : 'onGetMems',
 
         // '205' : 'onSubC',
@@ -281,7 +281,7 @@ var _clazz = {
      *            rtcOptions)
      *
      */
-    reqTkt: function (rt, WebRTCId, callback) {
+    reqTkt: function (rt, isCreate, confrId, password, callback) {
         _logger.debug("reqTkt ...");
 
         var self = this;
@@ -292,7 +292,26 @@ var _clazz = {
             }
         };
 
-        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        isCreate && (rtcOptions.data.isCreate = isCreate);
+        confrId && (rtcOptions.data.confrId = confrId);
+        password && (rtcOptions.data.password = password);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    invite: function (rt, confrId, password, callback) {
+        _logger.debug("reqTkt ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op:  202
+            }
+        };
+
+        confrId && (rtcOptions.data.confrId = confrId); // 格式需要跟雅洁确定
+        password && (rtcOptions.data.password = password);
 
         self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },

@@ -53,7 +53,8 @@ const rootReducer = combineReducers({
     register: require("./RegisterRedux").reducer,
     i18n: i18nReducer,
     contacts: require("./ContactsScreenRedux").reducer,
-    im: require("./WebIMRedux").reducer
+    im: require("./WebIMRedux").reducer,
+    multiAV: require("./MultiAVRedux").reducer
 })
 
 /* ------------- Global Reducers ------------- */
