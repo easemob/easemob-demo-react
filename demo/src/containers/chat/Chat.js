@@ -18,11 +18,14 @@ import GroupMemberActions from "@/redux/GroupMemberRedux"
 import StrangerActions from "@/redux/StrangerRedux"
 import RosterActions from "@/redux/RosterRedux"
 import BlacklistActions from "@/redux/BlacklistRedux"
+import MultiAVActions from "@/redux/MultiAVRedux"
 import WebIM from "@/config/WebIM"
 import { message } from "antd"
 import { history } from "@/utils"
 import getTabMessages from "@/selectors/ChatSelector"
 import WebRTCModal from "@/components/webrtc/WebRTCModal"
+import AddAVMemberModal from "@/components/webrtc/AddAVMemberModal"
+import ModalComponent from "@/components/common/ModalComponent"
 
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -45,6 +48,7 @@ class Chat extends React.Component {
         const { selectTab, selectItem = "" } = match.params
         this.state = {
             showWebRTC: false,
+            showConfrModal: false,
             selectTab,
             selectItem,
             value: "",
@@ -60,12 +64,6 @@ class Chat extends React.Component {
         this.handleRightIconClick = this.handleRightIconClick.bind(this)
         this.onMenuContactClick = this.onMenuContactClick.bind(this)
 
-        //console.log("---chat.js--")
-        //const a = {}
-        // const b = a.b.c
-        //console.log("-----")
-
-        // throw new Error("1")
         this.logger = WebIM.loglevel.getLogger("chat component")
     }
 
@@ -173,7 +171,6 @@ class Chat extends React.Component {
         const {
             match,
             message
-            // form: { getFieldDecorator, validateFieldsAndScroll }
         } = this.props
         const { selectItem, selectTab } = match.params
         const { value } = this.state
@@ -216,20 +213,20 @@ class Chat extends React.Component {
         let tabs = null
         if (selectTab == "contact") {
             tabs = [
-                [ "0", `${I18n.t("block")}`, "iconfont icon-circle-minus" ],
-                [ "1", `${I18n.t("delAFriend")}`, "iconfont icon-trash" ]
+                ["0", `${I18n.t("block")}`, "iconfont icon-circle-minus"],
+                ["1", `${I18n.t("delAFriend")}`, "iconfont icon-trash"]
             ]
         } else {
             // stranger
             tabs = [
-                [ "2", `${I18n.t("addFriend")}`, "anticon anticon-user-add" ],
-                [ "3", `${I18n.t("delete")}`, "iconfont icon-trash" ]
+                ["2", `${I18n.t("addFriend")}`, "anticon anticon-user-add"],
+                ["3", `${I18n.t("delete")}`, "iconfont icon-trash"]
             ]
         }
 
-        const tabsItem = tabs.map(([ key, name, icon ]) =>
+        const tabsItem = tabs.map(([key, name, icon]) =>
             <Menu.Item key={key}>
-                <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: "middle" }}/>
+                <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: "middle" }} />
                 <span>
                     <span>
                         {name}
@@ -251,31 +248,31 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const search = history.location.search
         switch (key) {
-        case "0":
-            // block a friend
-            this.props.doAddBlacklist(selectItem)
-            history.push("/contact" + search)
-            break
-        case "1":
-            // delete a friend
-            this.props.removeContact(selectItem)
-            break
-        case "2":
-            // add a friend
-            this.props.addContact(selectItem)
-            message.success(`${I18n.t("addFriendMessage")}`)
-            break
-        case "3":
-            // delete
-            this.props.deleteStranger(selectItem)
-            history.push("/stranger" + search)
-            break
-        default:
+            case "0":
+                // block a friend
+                this.props.doAddBlacklist(selectItem)
+                history.push("/contact" + search)
+                break
+            case "1":
+                // delete a friend
+                this.props.removeContact(selectItem)
+                break
+            case "2":
+                // add a friend
+                this.props.addContact(selectItem)
+                message.success(`${I18n.t("addFriendMessage")}`)
+                break
+            case "3":
+                // delete
+                this.props.deleteStranger(selectItem)
+                history.push("/stranger" + search)
+                break
+            default:
         }
     }
 
     onClearMessage = () => {
-        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
         console.log(selectItem, selectTab)
         const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
         const chatType = chatTypes[selectTab]
@@ -310,18 +307,35 @@ class Chat extends React.Component {
     }
 
     callVideo = () => {
-        const { selectItem } = _.get(this.props, [ "match", "params" ], {})
-        console.log("sendWrapper::callVideo", WebIM.conn.context.userId, selectItem)
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
+        console.log("sendWrapper::callVideo", WebIM.conn.context.userId, selectItem, selectTab)
+        if (selectTab === "contact") {
+            this.setState({
+                showWebRTC: true
+            })
+            WebIM.call.caller = WebIM.conn.context.userId
+            WebIM.call.makeVideoCall(selectItem)
+        } else if (selectTab === "group") {
+            // Create Confrence
+            this.setState({
+                showConfrModal: true
+            })
+            const pwd = Math.random().toString(36).substr(2)
+            this.props.updateConfrInfo(selectItem);
+        }
+    }
+
+    handleModalClose = () => {
         this.setState({
-            showWebRTC: true
+            showConfrModal: false
         })
-        WebIM.call.caller = WebIM.conn.context.userId
-        WebIM.call.makeVideoCall(selectItem)
     }
 
     callVoice = () => {
-        const { selectItem } = _.get(this.props, [ "match", "params" ], {})
-        console.log("sendWrapper::callVoice", WebIM.conn.context.userId, selectItem)
+
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
+        console.log("sendWrapper::callVoice", WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
+
         this.setState({
             showWebRTC: true
         })
@@ -333,16 +347,16 @@ class Chat extends React.Component {
         const _this = this
         if (e.target.scrollTop === 0) {
             // TODO: optimization needed
-            setTimeout(function() {
+            setTimeout(function () {
                 console.log(_this.props.messageList)
-                const offset = _this.props.messageList ? _this.props.messageList.length : 0            
-                const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
+                const offset = _this.props.messageList ? _this.props.messageList.length : 0
+                const { selectItem, selectTab } = _.get(_this.props, ["match", "params"], {})
                 const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
                 const chatType = chatTypes[selectTab]
-                
+
                 // load more history message
                 _this.props.fetchMessage(selectItem, chatType, offset, (res) => {
-                    
+
                     // no more history when length less than 20
                     if (res < PAGE_NUM) {
                         _this.setState({
@@ -352,7 +366,7 @@ class Chat extends React.Component {
                         _this._not_scroll_bottom = false
                     }
                 })
-    
+
                 _this._not_scroll_bottom = true
             }, 500)
         }
@@ -365,14 +379,14 @@ class Chat extends React.Component {
             match,
             history,
             location,
-            messageList,
+            messageList
         } = this.props
 
         const { selectItem, selectTab } = match.params
         // console.log(collapsed, selectTab, selectItem)
 
         const back = () => {
-            const redirectPath = "/" + [ selectTab ].join("/") + location.search
+            const redirectPath = "/" + [selectTab].join("/") + location.search
             history.push(redirectPath)
         }
 
@@ -391,7 +405,8 @@ class Chat extends React.Component {
             </label>)
         }
 
-        const { showWebRTC } = this.state
+        const { showWebRTC, showConfrModal } = this.state
+
         return (
             <div className="x-chat">
                 <div className="x-list-item x-chat-header">
@@ -416,31 +431,31 @@ class Chat extends React.Component {
                                 ? <Dropdown
                                     overlay={this.renderContactMenu(selectTab)}
                                     placement="bottomRight"
-                                    trigger={[ "click" ]}
+                                    trigger={["click"]}
                                 >
-                                    <Icon type="ellipsis"/>
+                                    <Icon type="ellipsis" />
                                 </Dropdown>
-                                : <Icon type="ellipsis" onClick={this.handleRightIconClick}/>}
+                                : <Icon type="ellipsis" onClick={this.handleRightIconClick} />}
                         </span>
                     </div>
                 </div>
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
-                    {this.state.isLoaded && <div style={{ width:"150px",height:"30px",lineHeight:"30px",backgroundColor:"#888",color:"#fff",borderRadius:"15px", textAlign:"center", margin:"10px auto" }}>{I18n.t("noMoreMessage")}</div>}
+                    {this.state.isLoaded && <div style={{ width: "150px", height: "30px", lineHeight: "30px", backgroundColor: "#888", color: "#fff", borderRadius: "15px", textAlign: "center", margin: "10px auto" }}>{I18n.t("noMoreMessage")}</div>}
                     {_.map(messageList, message => <ChatMessage key={message.id} {...message} />)}
                 </div>
                 <div className="x-chat-footer">
                     <div className="x-list-item x-chat-ops">
                         {/* emoji */}
                         <div className="x-chat-ops-icon ib">
-                            <ChatEmoji onSelect={this.handleEmojiSelect}/>
+                            <ChatEmoji onSelect={this.handleEmojiSelect} />
                         </div>
                         {/* image upload */}
                         <label
                             htmlFor="uploadImage"
                             className="x-chat-ops-icon ib"
                             onClick={() => this.image && this.image.focus() && this.image.click()}>
-                            <i className="iconfont icon-picture"/>
+                            <i className="iconfont icon-picture" />
                             <input
                                 id="uploadImage"
                                 ref={node => (this.image = node)}
@@ -454,7 +469,7 @@ class Chat extends React.Component {
                             htmlFor="uploadFile"
                             className="x-chat-ops-icon ib"
                             onClick={() => this.file && this.file.focus() && this.file.click()}>
-                            <i className="icon iconfont icon-file-empty"/>
+                            <i className="icon iconfont icon-file-empty" />
                             <input
                                 id="uploadFile"
                                 ref={node => (this.file = node)}
@@ -488,7 +503,15 @@ class Chat extends React.Component {
                         {/*<TextArea rows={2} />*/}
                     </div>
                 </div>
-                <WebRTCModal collapsed={collapsed} visible={showWebRTC}/>
+                <WebRTCModal collapsed={collapsed} visible={showWebRTC} />
+                <ModalComponent
+                    width={460}
+                    /* title={I18n.t("addAFriend")} */
+                    title={"选择成员"}
+                    visible={showConfrModal === true}
+                    component={AddAVMemberModal}
+                    onModalClose={this.handleModalClose}
+                />
             </div>
         )
     }
@@ -511,6 +534,7 @@ export default connect(
         addContact: id => dispatch(RosterActions.addContact(id)),
         deleteStranger: id => dispatch(StrangerActions.deleteStranger(id)),
         doAddBlacklist: id => dispatch(BlacklistActions.doAddBlacklist(id)),
-        fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb))
+        fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),
+        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid))
     })
 )(Chat)

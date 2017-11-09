@@ -90,7 +90,7 @@ var _RtcHandler = {
 
         //if a->b already, c->a/b should be termiated with 'busy' reason
         if (from.indexOf("@") >= 0) {
-            if (self._connectedSid == '' && rtcOptions.op == 102) {
+            if (self._connectedSid == '' && (rtcOptions.op == 102 || rtcOptions.op == 202)) {
                 self._connectedSid = fromSessionId;
             } else {
                 if (self._connectedSid != fromSessionId) {
@@ -275,7 +275,7 @@ var _RtcHandler = {
 
         var rtflag = rt.rtflag;
         // rtflag && delete rt.rtflag;
-        rtflag || (rtflag = 1);
+        !isNaN(rtflag) || (rtflag = 1);
 
         options.data || (options.data = {});
         options.data.tsxId = tsxId;

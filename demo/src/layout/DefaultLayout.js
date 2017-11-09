@@ -13,6 +13,7 @@ import Contact from "@/containers/contact/Contact"
 import Chat from "@/containers/chat/Chat"
 import HeaderTab from "@/components/header/HeaderTab"
 import HeaderOps from "@/components/header/HeaderOps"
+import MultiAVModal from "@/components/webrtc/MultiAVModal"
 import GroupActions from "@/redux/GroupRedux"
 import GroupMemberActions from "@/redux/GroupMemberRedux"
 import MessageActions from "@/redux/MessageRedux"
@@ -186,8 +187,9 @@ class DefaultLayout extends Component {
 
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
-        const { login, rightSiderOffset } = this.props
+        const { login, rightSiderOffset, multiAV } = this.props
 
+        let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal/> : null
 
         return (
             <Layout>
@@ -234,24 +236,25 @@ class DefaultLayout extends Component {
                     >
                         <RightSider roomId={roomId} room={this.state.room} ref="rightSider"/>
                     </div>
+                    { multiAVModal }
                     {/*<Footer style={{ textAlign: "center" }}>
                      Ant Design ©2016 Created by Ant UED
                      </Footer>*/}
                 </Content>
             </Layout>
-
         )
     }
 }
 
 export default withRouter(
     connect(
-        ({ breakpoint, entities, login, common }) => ({
+        ({ breakpoint, entities, login, common, rightSiderOffset, multiAV }) => ({
             breakpoint,
             group: entities.group,
             login,
             common,
             rightSiderOffset: entities.group.rightSiderOffset,
+            multiAV,
         }),
         dispatch => ({
             getGroupMember: id => dispatch(GroupMemberActions.getGroupMember(id)),
