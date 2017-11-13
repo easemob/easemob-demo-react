@@ -173,7 +173,6 @@ class MultiAVModal extends React.Component {
                 },
 
                 onAddMember: function onAddMember(member) {
-                    console.error("onAddMember")
                     console.log(member.id + " " + (member.nickName || "") + " enter， ext = " + member.ext);
                 },
                 onRemoveMember: function onRemoveMember(member) {
@@ -182,11 +181,6 @@ class MultiAVModal extends React.Component {
                 },
 
                 onAddStream: function onAddStream(stream) {
-                    console.error("onAddStream htmlId: ", stream.getHtmlDOMID())
-                    console.error("onAddStream streamId: ", stream.id)
-                    console.error("onAddStream name: ", stream.name)
-                    console.error("onAddStream type: ", stream.type)
-                    console.error("onAddStream located: ", stream.located())
                     console.log("Add stream: " + stream.id + " located: " + stream.located() + " webrtc: " + (stream.rtcId || "--") + "， ext = " + stream.ext);
                 },
                 onRemoveStream: function onRemoveStream(stream) {
@@ -213,7 +207,6 @@ class MultiAVModal extends React.Component {
                         me.setState({
                             localVideo: lv
                         })
-                        me.props.setLocalStream(stream)
                     } else {
                         let remoteVideos = me.state.remoteVideos
                         let remoteUsernames = me.state.remoteUsernames
@@ -310,6 +303,7 @@ class MultiAVModal extends React.Component {
         clearInterval(this.state.interval)
         WebIM.EMService.exit()
         this.props.closeModal()
+        this.props.resetConfr()
     }
 
     localMic() {
@@ -363,16 +357,18 @@ class MultiAVModal extends React.Component {
     }
 
     remoteVideo(id) {
-        let rv =  _.cloneDeep(this.state.rv)
+        let rv = _.cloneDeep(this.state.rv)
         let elem = rv[id]
+        if (elem.streamId === "") {
+            return
+        }
         if (elem.open) {
-                rv[id].open = false
+            rv[id].open = false
             WebIM.EMService.hungup(elem.streamId, function (_evt) {
-                
+
             });
         } else {
             WebIM.EMService.subscribe(elem.streamId, function (_evt) {
-
                 elem.open = true
                 rv[id] = elem
             })
@@ -420,14 +416,15 @@ class MultiAVModal extends React.Component {
                             <video ref="local" muted autoPlay />
                             <div className="user-name">
                                 <span>{WebIM.conn.context.userId}</span>
-                                <i className="icon iconfont icon-alarm"></i>
+                                <i className="icon webim icon-s_sound"></i>
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[0] && rv[0].video}
-                            <div className="user-name">
+                            <div className={rv[0].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[0].nickName}</span>
-                                <i className="icon iconfont icon-alarm"
+                                <i className="icon webim icon-s_sound"></i>
+                                <i className={rv[0].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 0)}
                                 >
                                 </i>
@@ -435,9 +432,10 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[1] && rv[1].video}
-                            <div className="user-name">
+                            <div className={rv[1].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[1].nickName}</span>
-                                <i className="icon iconfont icon-alarm"
+                                <i className="icon webim icon-s_sound"></i>
+                                <i className={rv[1].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 1)}
                                 ></i>
                             </div>
@@ -451,27 +449,30 @@ class MultiAVModal extends React.Component {
                     <Row gutter={10}>
                         <Col span={8} className="gutter-row">
                             {rv[2] && rv[2].video}
-                            <div className="user-name">
+                            <div className={rv[2].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[2].nickName}</span>
-                                <i className="icon iconfont icon-alarm"
+                                <i className="icon webim icon-s_sound"></i>
+                                <i className={rv[2].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 2)}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[3] && rv[3].video}
-                            <div className="user-name">
+                            <div className={rv[3].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[3].nickName}</span>
-                                <i className="icon iconfont icon-alarm"
+                                <i className="icon webim icon-s_sound"></i>
+                                <i className={rv[3].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 3)}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[4] && rv[4].video}
-                            <div className="user-name">
+                            <div className={rv[4].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[4].nickName}</span>
-                                <i className="icon iconfont icon-alarm"
+                                <i className="icon webim icon-s_sound"></i>
+                                <i className={rv[4].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 4)}
                                 ></i>
                             </div>
@@ -485,7 +486,7 @@ class MultiAVModal extends React.Component {
                     <Row>
                         <Col span={4} offset={4}>
                             <div className="tools">
-                                <i className={"icon iconfont icon-mic " + toolsColor[0]}
+                                <i className={"icon webim1 webim1-off-microphone " + toolsColor[0]}
                                     onMouseOver={(e) => {
                                         if (toolsColor[0] === "") {
                                             toolsColor[0] = "i-hover"
@@ -521,7 +522,7 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={"icon iconfont icon-mic " + toolsColor[1]}
+                                <i className={"icon webim1 webim1-Shut-down " + toolsColor[1]}
                                     onMouseOver={(e) => {
                                         if (toolsColor[1] === "") {
                                             toolsColor[1] = "i-hover"
@@ -558,7 +559,7 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={"icon iconfont icon-mic " + toolsColor[2]}
+                                <i className={"icon webim1 webim1-off-camera " + toolsColor[2]}
                                     onMouseOver={(e) => {
                                         if (toolsColor[2] === "") {
                                             toolsColor[2] = "i-hover"
@@ -615,6 +616,7 @@ export default connect(
     }),
     dispatch => ({
         closeModal: () => dispatch(MutiAVActions.closeModal()),
-        setLocalStream: (stream) => dispatch(MutiAVActions.setLocalStream(stream))
+        setLocalStream: (stream) => dispatch(MutiAVActions.setLocalStream(stream)),
+        resetConfr: () => dispatch(MutiAVActions.resetAll())
     })
 )(MultiAVModal)

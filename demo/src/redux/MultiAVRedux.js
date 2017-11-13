@@ -11,12 +11,15 @@ import { store } from "@/redux"
 /* ----- Types and Action Creators ------ */
 
 const { Types, Creators } = createActions({
+    showConfrModal: null,
+    closeConfrModal: null,
     showModal: null,
     closeModal: null,
     updateConfrInfo: ["pwd", "from", "rtcOptions"],
     setGid: ["gid"],
-    setLocalStream: ["stream"],
     setRtcOptions: ["rtcOptions"],
+    setSelectedMembers: ["selected"],
+    resetAll: null,
 
     /* ------async------ */
     updateConfrInfoAsync: (gid) => {
@@ -42,6 +45,7 @@ const { Types, Creators } = createActions({
 /* ----- Initial State ------ */
 export const INITIAL_STATE = Immutable({
     ifShowMultiAVModal: false,
+    confrModal: false,
     gid: "",
     confr: {
         password: "",
@@ -49,10 +53,14 @@ export const INITIAL_STATE = Immutable({
         rtcOptions: {}
     },
     localStream: {},
-    remoteStream: []
+    selectedMembers: []
 })
 
 /* ------ Reducers ------ */
+
+export const setSelectedMembers = (state, {selected}) => {
+    return state.setIn(["selectedMembers"], selected)
+}
 
 export const updateConfrInfo = (state, { pwd, from, rtcOptions }) => {
     let confr = state.getIn(["confr"])
@@ -60,6 +68,15 @@ export const updateConfrInfo = (state, { pwd, from, rtcOptions }) => {
     confr = confr.setIn(["from"], from)
     confr = confr.setIn(["rtcOptions"], rtcOptions)
     return state.setIn(["confr"], confr)
+}
+
+export const showConfrModal = (state) => {
+    console.log("SSSSSSSSSSSSSSSSss......")
+    return state.setIn(["confrModal"], true)
+}
+
+export const closeConfrModal = (state) => {
+    return state.setIn(["confrModal"], false)
 }
 
 export const showModal = (state) => {
@@ -75,14 +92,15 @@ export const setGid = (state, { gid }) => {
     return state.setIn(["gid"], gid)
 }
 
-export const setLocalStream = (state, { stream }) => {
-    console.log("SetLocalStream")
-    return state.setIn(["localStream"], stream)
-}
-
 export const setRtcOptions = (state, { rtcOptions }) => {
     return state.setIn(["confr", "rtcOptions"], rtcOptions)
 }
+
+export const resetAll = (state) => {
+    console.log("ResetAll...")
+    return state.setIn(["selectedMembers"], [])
+}
+
 
 export default Creators
 
@@ -92,6 +110,9 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.SHOW_MODAL]: showModal,
     [Types.CLOSE_MODAL]: closeModal,
     [Types.SET_GID]: setGid,
-    [Types.SET_LOCAL_STREAM]: setLocalStream,
-    [Types.SET_RTC_OPTIONS]: setRtcOptions
+    [Types.SET_RTC_OPTIONS]: setRtcOptions,
+    [Types.SHOW_CONFR_MODAL]: showConfrModal,
+    [Types.CLOSE_CONFR_MODAL]: closeConfrModal,
+    [Types.SET_SELECTED_MEMBERS]: setSelectedMembers,
+    [Types.RESET_ALL]: resetAll
 })

@@ -110,6 +110,10 @@ body {
     padding: 10px;
 }
 
+.multi-webim-rtc .remote-ajust{
+    bottom: 1px;
+}
+
 .multi-webim-rtc .user-name span{
     height: 20px;
     width: 28px;
@@ -121,14 +125,22 @@ body {
 }
 
 .multi-webim-rtc .user-name i{
-    position: absolute;
-    display: inline-block;
-    right: 10px;
-    bottom: 15px;
-    height: 20px;
-    width: 20px;
     color: #FFF;
+    float: right;
     font-size: 20px;
+    margin-left: 8px;
+    line-height: 20px;
+    background-color: rgba(0, 186, 110, 1);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.multi-webim-rtc .user-name i.camera{
+    background-color: rgba(251, 0, 22, 0.6);
+}
+
+.multi-webim-rtc .user-name i.camera-shut{
+    background-color: rgba(251, 0, 22, 1);
 }
 
 .multi-webim-rtc .video-divisor {
