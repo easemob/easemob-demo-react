@@ -14,7 +14,7 @@ class AddAVMemberModal extends React.Component {
 
     state = {
         options: [],
-        maxUsers: 2,
+        maxUsers: 6,
         disabled: false
     }
 
