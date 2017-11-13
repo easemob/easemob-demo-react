@@ -313,11 +313,11 @@ class Chat extends React.Component {
             WebIM.call.makeVideoCall(selectItem)
         } else if (selectTab === "group") {
             // Create Confrence
-            if(avModal){
+            if (avModal) {
                 message.info("您正在进行视频通话，不能新建其它视频")
                 return
             }
-            if(confrModal){
+            if (confrModal) {
                 message.info("您正在创建视频通话，不能重复创建")
                 return
             }
@@ -393,7 +393,7 @@ class Chat extends React.Component {
 
         let name = selectItem
         let webrtcButtons = []
-        if (WebIM.config.isWebRTC && selectTab === "contact" || selectTab === "group") {
+        if (WebIM.config.isWebRTC && selectTab === "contact") {
             // webrtc video button
             webrtcButtons.push(<label key="video" htmlFor="clearMessage" className="x-chat-ops-icon ib"
                 onClick={this.callVideo}>
@@ -403,6 +403,12 @@ class Chat extends React.Component {
             webrtcButtons.push(<label key="audio" htmlFor="clearMessage" className="x-chat-ops-icon ib"
                 onClick={this.callVoice}>
                 <i className="icon iconfont icon-mic"></i>
+            </label>)
+        } else if (WebIM.config.isWebRTC && selectTab === "group") {
+            // webrtc video button
+            webrtcButtons.push(<label key="video" htmlFor="clearMessage" className="x-chat-ops-icon ib"
+                onClick={this.callVideo}>
+                <i className="icon iconfont icon-camera-video"></i>
             </label>)
         }
 
