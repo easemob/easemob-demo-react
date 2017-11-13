@@ -384,7 +384,6 @@ class Chat extends React.Component {
         } = this.props
 
         const { selectItem, selectTab } = match.params
-        // console.log(collapsed, selectTab, selectItem)
 
         const back = () => {
             const redirectPath = "/" + [selectTab].join("/") + location.search

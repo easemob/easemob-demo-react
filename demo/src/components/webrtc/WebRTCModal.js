@@ -139,6 +139,7 @@ class WebRTCModal extends React.Component {
                 onInvite: function (from, rtcOption) {
                     const { confrId, password } = rtcOption
                     const { appkey, xmppURL } = WebIM.config
+                    const { avModal, multiAV } = me.props
                     let host = xmppURL.split(".")
                     host = "@" + host[1] + "." + host[2]
                     from = from.replace(appkey + '_', "")
@@ -148,7 +149,10 @@ class WebRTCModal extends React.Component {
                         confirm({
                             title: from + "邀请您进入多人会议",
                             onOk() {
-                                console.log("OK")
+                                if(avModal){
+                                    message.info("您正在进行视频通话，不能接受其它邀请")
+                                    return
+                                }
                                 me.props.showMultiAVModal()
                                 setTimeout(() => {
                                     const pub = new WebIM.EMService.AVPubstream({
@@ -193,8 +197,10 @@ class WebRTCModal extends React.Component {
 }
 
 export default connect(
-    ({ multiAV }) => ({
-        confr: multiAV.confr
+    (state, props) => ({
+        confr: state.multiAV.confr,
+        avModal: state.multiAV.ifShowMultiAVModal,
+        multiAV: state.multiAV
     }),
     dispatch => ({
         setRtcOptions: (rtfOptions) => dispatch(MultiAVActions.setRtcOptions(rtfOptions)),
