@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import { withRouter } from "react-router-dom"
 import { I18n } from "react-redux-i18n"
 import _ from "lodash"
-import { Button, Row, Form, Input, Icon, Dropdown, Menu } from "antd"
+import { Button, Row, Form, Input, Icon, Dropdown, Menu, message } from "antd"
 import { config } from "@/config"
 import ListItem from "@/components/list/ListItem"
 import ChatMessage from "@/components/chat/ChatMessage"
@@ -20,7 +20,6 @@ import RosterActions from "@/redux/RosterRedux"
 import BlacklistActions from "@/redux/BlacklistRedux"
 import MultiAVActions from "@/redux/MultiAVRedux"
 import WebIM from "@/config/WebIM"
-import { message } from "antd"
 import { history } from "@/utils"
 import getTabMessages from "@/selectors/ChatSelector"
 import WebRTCModal from "@/components/webrtc/WebRTCModal"
@@ -48,7 +47,6 @@ class Chat extends React.Component {
         const { selectTab, selectItem = "" } = match.params
         this.state = {
             showWebRTC: false,
-            showConfrModal: false,
             selectTab,
             selectItem,
             value: "",
@@ -108,7 +106,6 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const isRoom = chatType[selectTab] == "chatroom" || chatType[selectTab] == "groupchat"
 
-        // console.log(e, e.target)
         let file = WebIM.utils.getFileUrl(e.target)
         console.log(file)
 
@@ -167,7 +164,6 @@ class Chat extends React.Component {
     }
 
     handleSend(e) {
-        // console.log(this.state.value)
         const {
             match,
             message
@@ -308,7 +304,7 @@ class Chat extends React.Component {
 
     callVideo = () => {
         const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
-        console.log("sendWrapper::callVideo", WebIM.conn.context.userId, selectItem, selectTab)
+        const { confrModal, avModal } = this.props
         if (selectTab === "contact") {
             this.setState({
                 showWebRTC: true
@@ -317,18 +313,22 @@ class Chat extends React.Component {
             WebIM.call.makeVideoCall(selectItem)
         } else if (selectTab === "group") {
             // Create Confrence
-            this.setState({
-                showConfrModal: true
-            })
+            if(avModal){
+                message.info("您正在进行视频通话，不能新建其它视频")
+                return
+            }
+            if(confrModal){
+                message.info("您正在创建视频通话，不能重复创建")
+                return
+            }
+            this.props.showConfrModal()
             const pwd = Math.random().toString(36).substr(2)
             this.props.updateConfrInfo(selectItem);
         }
     }
 
     handleModalClose = () => {
-        this.setState({
-            showConfrModal: false
-        })
+        this.props.closeConfrModal()
     }
 
     callVoice = () => {
@@ -379,7 +379,8 @@ class Chat extends React.Component {
             match,
             history,
             location,
-            messageList
+            messageList,
+            confrModal
         } = this.props
 
         const { selectItem, selectTab } = match.params
@@ -405,7 +406,7 @@ class Chat extends React.Component {
             </label>)
         }
 
-        const { showWebRTC, showConfrModal } = this.state
+        const { showWebRTC } = this.state
 
         return (
             <div className="x-chat">
@@ -508,7 +509,7 @@ class Chat extends React.Component {
                     width={460}
                     /* title={I18n.t("addAFriend")} */
                     title={"选择成员"}
-                    visible={showConfrModal === true}
+                    visible={confrModal === true}
                     component={AddAVMemberModal}
                     onModalClose={this.handleModalClose}
                 />
@@ -519,7 +520,9 @@ class Chat extends React.Component {
 
 export default connect(
     (state, props) => ({
-        messageList: getTabMessages(state, props)
+        messageList: getTabMessages(state, props),
+        confrModal: state.multiAV.confrModal,
+        avModal: state.multiAV.ifShowMultiAVModal
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
@@ -535,6 +538,8 @@ export default connect(
         deleteStranger: id => dispatch(StrangerActions.deleteStranger(id)),
         doAddBlacklist: id => dispatch(BlacklistActions.doAddBlacklist(id)),
         fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),
-        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid))
+        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid)),
+        showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
+        closeConfrModal: (gid) => dispatch(MultiAVActions.closeConfrModal())
     })
 )(Chat)

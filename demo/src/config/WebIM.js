@@ -11,8 +11,6 @@ import Api from "axios"
 import { message } from "antd"
 import loglevel from "@/utils/loglevel"
 
-console.log("Emedia: ", emedia)
-
 console = console || {}
 console.group = console.group || function () {}
 console.groupEnd = console.groupEnd || function () {}
