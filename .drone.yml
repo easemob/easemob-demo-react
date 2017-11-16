@@ -20,8 +20,10 @@ pipeline:
     commands:
       - cd sdk && npm link && cd ..
       - cd webrtc && npm link && cd ..
+      - cd emedia && npm link && cd ..
       - npm link easemob-websdk
       - npm link easemob-webrtc
+      - npm link easemob-emedia
       - cd demo && npm install
       - npm run build
       # 2.0 demo 相关编译操作在demo目录下面

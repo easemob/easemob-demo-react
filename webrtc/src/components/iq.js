@@ -164,6 +164,7 @@ var _RtcHandler = {
         rtcOptions.rtcCfg && (typeof rtcOptions.rtcCfg === 'string') && (rtcOptions.rtcCfg = _util.parseJSON(rtcOptions.rtcCfg));
         rtcOptions.rtcCfg2 && (typeof rtcOptions.rtcCfg2 === 'string') && (rtcOptions.rtcCfg2 = _util.parseJSON(rtcOptions.rtcCfg2));
         rtcOptions.WebRTC && (typeof rtcOptions.WebRTC === 'string') && (rtcOptions.WebRTC = _util.parseJSON(rtcOptions.WebRTC));
+        rtcOptions.confrId && (rtcOptions.conferenceId = rtcOptions.confrId)
 
         if (tsxId && self._apiCallbacks[tsxId]) {
             try {

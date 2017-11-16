@@ -1,7 +1,7 @@
 ## 说明
 WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 1. 响应式布局, 一套Demo同时支持PC和H5,自适应不同终端屏幕尺寸
-2. 完全基于Reac + Redux的单向数据流
+2. 完全基于React + Redux的单向数据流
 3. 引入ant-design组件库，方便开发者后续开发
 4. 支持所有的现代浏览器(不支持IE6-11)
 
@@ -12,6 +12,7 @@ WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 2. 如果需要同时编辑sdk  `cd sdk && npm link && cd .. && npm link easemob-websdk`
 
 3. 如果需要同时编辑webrtc `cd webrtc && npm link && cd .. && npm link easemob-webrtc`
+4. 如果需要同时编辑emedia `cd emedia && npm link && cd .. && npm link easemob-emedia`
 
 4. 运行demo
 	- `cd demo && npm start` （requires node@>=6）

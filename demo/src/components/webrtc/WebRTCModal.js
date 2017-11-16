@@ -182,7 +182,7 @@ class WebRTCModal extends React.Component {
                             }
                         })
                     }
-                    WebIM.call.getConfrTkt(confrId, password, callback)
+                    WebIM.call.getConferenceTkt(confrId, password, callback)
                 }
             }
         })
