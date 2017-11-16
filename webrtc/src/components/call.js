@@ -63,7 +63,7 @@ var _Call = {
         }
     },
 
-    createConfr: function(pwd, _callback){
+    createConference: function(pwd, _callback){
         var rt = new RouteTo({
             rtKey: ""
         })
@@ -74,11 +74,12 @@ var _Call = {
             pwd, 
             function(from, rtcOptions){
             var ticketStr = rtcOptions.ticket
+            rtcOptions.conferenceId = rtcOptions.confrId
             _callback(from, rtcOptions)
         })
     },
 
-    inviteConfr: function(confrId, pwd, to, _callback){
+    inviteConference: function(confrId, pwd, to, _callback){
         var rt = new RouteTo({
             to: to,
             rtKey: "",
@@ -94,7 +95,7 @@ var _Call = {
         );
     },
 
-    getConfrTkt: function(confrId, pwd, _callback){
+    getConferenceTkt: function(confrId, pwd, _callback){
         var rt = new RouteTo({
             rtKey: ""
         });

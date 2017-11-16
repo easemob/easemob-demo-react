@@ -270,7 +270,7 @@ var CryptoJS = require('crypto-js');
             }
             if (message.bodyId) {
                 dom = $msg({
-                    type: message.group || 'chat'
+                    from: conn.context.jid || ''
                     , to: message.toJid
                     , id: message.id
                     , xmlns: 'jabber:client'
@@ -279,11 +279,15 @@ var CryptoJS = require('crypto-js');
                     xmlns: 'urn:xmpp:receipts'
                     , id: message.bodyId
                 };
-                dom.up().c('delivery').t(_utils.stringify(delivery));
+                dom.up().c('delivery', delivery);
             }
             if (message.ackId) {
+
+                if (conn.context.jid.indexOf(message.toJid) >= 0) {
+                    return;
+                }
                 dom = $msg({
-                    type: message.group || 'chat'
+                    from: conn.context.jid || ''
                     , to: message.toJid
                     , id: message.id
                     , xmlns: 'jabber:client'
@@ -292,7 +296,7 @@ var CryptoJS = require('crypto-js');
                     xmlns: 'urn:xmpp:receipts'
                     , id: message.ackId
                 };
-                dom.up().c('acked').t(_utils.stringify(read));
+                dom.up().c('acked', read);
             }
 
             setTimeout(function () {

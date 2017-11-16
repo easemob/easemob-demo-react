@@ -10,6 +10,7 @@ var _ = require('underscore');
 
 var Strophe = window.Strophe
 var isStropheLog;
+var stropheConn = null
 
 window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 
@@ -119,6 +120,14 @@ Strophe.log =  function (level, msg) {
  */
 Strophe.Websocket.prototype._onMessage = function (message) {
     logMessage(message)
+    // 获取Resource
+    var data = message.data;
+    if (data.indexOf('<jid>') > 0) {
+        var start = data.indexOf('<jid>'),
+            end = data.indexOf('</jid>'),
+            data = data.substring(start + 5, end);
+        stropheConn.setJid(data);
+    }
     var elem, data;
     // check for closing stream
     // var close = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
@@ -344,7 +353,8 @@ var _parseFriend = function (queryTag, conn, from) {
             // fix: 含有ask标示的好友代表已经发送过反向订阅消息，不需要再次发送。
             if (conn && (subscription == 'from') && !ask) {
                 conn.subscribe({
-                    toJid: jid
+                    toJid: jid,
+                    message: "[resp:true]"
                 });
             }
 
@@ -370,9 +380,7 @@ var _login = function (options, conn) {
     }
     conn.context.accessToken = options.access_token;
     conn.context.accessTokenExpires = options.expires_in;
-    var stropheConn = null;
     if (conn.isOpening() && conn.context.stropheConn) {
-        // stropheConn = conn.context.stropheConn;
         stropheConn = conn.getStrophe();
     } else if (conn.isOpened() && conn.context.stropheConn) {
         // return;
@@ -384,7 +392,6 @@ var _login = function (options, conn) {
         _loginCallback(status, msg, conn);
     };
 
-    //console.log('jid=', conn.context.jid)
     conn.context.stropheConn = stropheConn;
     if (conn.route) {
         stropheConn.connect(conn.context.jid, '$t$' + accessToken, callback, conn.wait, conn.hold, conn.route);
@@ -446,6 +453,7 @@ var _loginCallback = function (status, msg, conn) {
 
     if (msg === 'conflict') {
         conflict = true;
+        conn.close();
     }
 
     if (status == Strophe.Status.CONNFAIL) {
@@ -546,6 +554,19 @@ var _loginCallback = function (status, msg, conn) {
         conn.retry && _handleMessageQueue(conn);
         conn.heartBeat();
         conn.isAutoLogin && conn.setPresence();
+        try {
+            if (conn.unSendMsgArr.length > 0) {
+                for (var i in conn.unSendMsgArr) {
+                    var dom = conn.unSendMsgArr[i];
+                    conn.sendCommand(dom);
+                    delete conn.unSendMsgArr[i];
+                }
+            }
+        } catch (e) {
+            console.error(e.message);
+        }
+        conn.offLineSendConnecting = false;
+        conn.logOut = false;
         conn.onOpened({
             canReceive: supportRecMessage,
             canSend: supportSedMessage,

@@ -84,7 +84,7 @@ class AddAVMemberModal extends React.Component {
                 }
                 const { confrId, password } = me.props.confr.rtcOptions
                 for (let jid of jids) {
-                    WebIM.call.inviteConfr(confrId, password, jid)
+                    WebIM.call.inviteConference(confrId, password, jid)
                 }
             }
         })

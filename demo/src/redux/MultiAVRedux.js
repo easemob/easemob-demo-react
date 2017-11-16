@@ -26,7 +26,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(Creators.setGid(gid))
             const pwd = Math.random().toString(36).substr(2)
-            WebIM.call.createConfr(pwd, function (from, rtcOptions) {
+            WebIM.call.createConference(pwd, function (from, rtcOptions) {
                 dispatch(Creators.updateConfrInfo(pwd, from, rtcOptions))
             })
         }
@@ -37,7 +37,7 @@ const { Types, Creators } = createActions({
             let callback = (from, rtcOptions) => {
                 dispatch(Creators.setRtcOptions(rtcOptions))
             };
-            WebIM.call.getConfrTkt(confrId, password, callback)
+            WebIM.call.getConferenceTkt(confrId, password, callback)
         }
     }
 })
