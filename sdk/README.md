@@ -1,5 +1,41 @@
 # Changelog
 
+## v1.5.0 @ 2017-11-16
+
+###Feature
+
+* [sdk] Modify the form of delivery ack and read ack
+* [sdk] When a user sends a message offline, it automatically reconnects and sends out messages that have not been successfully sent
+* [sdk] WEBIM supports multiple devices, adding chat room events
+* [sdk] Give the delivered and ack plus the from field 
+* [sdk] Debug.js integrates into the SDK and optimizes the log content output
+* [sdk] Block groups by Rest
+* [sdk] Send a group application through Rest
+* [sdk] Get the group list through Rest
+* [sdk] Gets group details from Rest based on groupid
+* [sdk] Lists all groups that a user has added through Rest
+* [sdk] Lists all members of the group through Rest
+* [sdk] Group users are not allowed to speak through Rest
+* [sdk] Cancels the ban on user bans through Rest
+* [sdk] Get all the administrators from the group through Rest
+* [sdk] Get all the banned members of the group through Rest
+* [sdk] Set up group administrators through Rest
+* [sdk] Ungroup administrators through Rest
+* [sdk] Users are allowed to join groups through Rest
+* [sdk] Reject users to join groups through Rest
+* [sdk] Add users to the group blacklist through Rest ( single )
+* [sdk] Add users to the group blacklist through Rest ( batch )
+* [sdk] Remove users from the group blacklist through Rest ( single )
+* [sdk] Remove users from the group blacklist through Rest ( batch )
+
+###BugFix
+
+* [sdk] Improve ie8 compatibility
+* [sdk] The message sent by itself is read ack and no longer sent to itself
+* [sdk] Adding a friend produces additional subscription messages
+* [sdk] Frequently sending messages causes the message id to repeat the problem
+* [sdk] The appropriate SDK sends files and images to size
+
 ## v1.4.11 @ 2017-06-07
 
 ###Feature

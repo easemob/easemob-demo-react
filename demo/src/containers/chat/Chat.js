@@ -119,7 +119,7 @@ class Chat extends React.Component {
         })
     }
 
-    handleEmojiSelect(v) {
+    handleEmojiSelect(v) {       
         this.setState({
             value: (this.state.value || "") + v.key
         }, () => {
@@ -454,7 +454,7 @@ class Chat extends React.Component {
                     <div className="x-list-item x-chat-ops">
                         {/* emoji */}
                         <div className="x-chat-ops-icon ib">
-                            <ChatEmoji onSelect={this.handleEmojiSelect} />
+                            <ChatEmoji onClick={this.handleEmojiSelect} />
                         </div>
                         {/* image upload */}
                         <label

@@ -1,6 +1,6 @@
 ;
 (function () {
-
+    //管理各种错误信息
     exports.code = {
         WEBIM_CONNCTION_USER_NOT_ASSIGN_ERROR: 0,
         WEBIM_CONNCTION_OPEN_ERROR: 1,

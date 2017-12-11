@@ -6,7 +6,7 @@ let version = packageJson.version
 
 var gulp = require('gulp')
 var webpack = require('webpack-stream')
-var mocha = require('gulp-mocha')   // 用于单元测试
+//var mocha = require('gulp-mocha')   // 用于单元测试
 var babel = require('gulp-babel')   // 用于ES6转化ES5
 // var browserify = require('browserify');
 // var source = require('vinyl-source-stream');
@@ -33,20 +33,21 @@ gulp.task('sdk:umd', function () {
 
 // websdk-{version}.min.js
 // websdk-{version}.min.js.map
-gulp.task('sdk:umd:min', ['sdk:umd'], function () {
-    return gulp.src('./dist/websdk-' + version + '.js')
-        .pipe(babel({
-            presets: [es2015]
-        }))
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(uglify())
-        .pipe(rename('websdk-' + version + '.min.js'))
-        .on('error', gutil.log)
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('dist/'))
-})
+// gulp.task('sdk:umd:min', ['sdk:umd'], function () {
+//     return gulp.src('./dist/websdk-' + version + '.js')
+//         .pipe(babel({
+//             presets: [es2015]
+//         }))
+//         .pipe(sourcemaps.init({loadMaps: true}))
+//         .pipe(uglify())
+//         .pipe(rename('websdk-' + version + '.min.js'))
+//         .on('error', gutil.log)
+//         .pipe(sourcemaps.write('./'))
+//         .pipe(gulp.dest('dist/'))
+// })
 
-gulp.task('sdk', ['sdk:umd', 'sdk:umd:min'])
+//gulp.task('sdk', ['sdk:umd', 'sdk:umd:min'])
+gulp.task('sdk', ['sdk:umd'])
 
 gulp.task('default', ['sdk'])
 
