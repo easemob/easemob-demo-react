@@ -247,6 +247,7 @@ const { Types, Creators } = createActions({
                 to,
                 roomType: chatType === "chatroom",
                 onFileUploadError: function (error) {
+                    console.log("shibai");
                     console.log(error)
                     // dispatch(Creators.updateMessageStatus(pMessage, "fail"))
                     pMessage.body.status = "fail"
@@ -554,7 +555,7 @@ export const updateMessageStatus = (state, { message, status = "" }) => {
         const found = _.find(messages, { id })
         const msg = found.setIn([ "status" ], status)
         messages.splice(messages.indexOf(found), 1, msg)
-        AppDB.updateMessageStatus(id, status).then(res => console.log("db status update success"))
+        AppDB.updateMessageStatus(id, status).then(res => console.log(""))
         state = state.setIn([ type, chatId ], messages)
     }
     return state

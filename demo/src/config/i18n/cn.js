@@ -109,7 +109,7 @@ export const cn = {
     already: "已经",
     in: "在",
     id: "ID",
-    notExist: "存在",
+    notExist: "不存在",
     needApproval: "需要审批",
     empty: "空",
     back: "后退",

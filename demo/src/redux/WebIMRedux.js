@@ -17,6 +17,8 @@ import { history } from "@/utils"
 import utils from "@/utils"
 import AppDB from "@/utils/AppDB"
 import { I18n } from "react-redux-i18n"
+import RTCChannel from "@/components/webrtc/rtcChannel"
+import WebRTCModal from "@/components/webrtc/WebRTCModal"
 
 import { message } from "antd"
 
@@ -61,6 +63,18 @@ WebIM.conn.listen({
 
         // refresh page
         hash.indexOf(redirectUrl) === -1 && history.push(redirectUrl)
+
+        // console.log(WebIM.call)
+        // if (WebIM.config.isWebRTC && WebIM.WebRTC) {
+        //     console.log("InitWebRTC..........")
+        //     if (WebIM.call) {
+        //         return
+        //     }
+    
+        //     console.log("InitWebRTC end..........")    
+    
+            
+        // }
     },
     onPresence: msg => {
         // console.log("onPresence", msg, store.getState())
@@ -353,6 +367,7 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.LOGOUT_SUCCESS]: logoutSuccess,
     [Types.SIGNIN]: signin
 })
+
 
 /* ------------- Selectors ------------- */
 

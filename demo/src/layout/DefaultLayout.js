@@ -19,6 +19,7 @@ import GroupMemberActions from "@/redux/GroupMemberRedux"
 import MessageActions from "@/redux/MessageRedux"
 import { config } from "@/config"
 
+
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
 const { Header, Content, Footer, Sider, RightSider } = Layout
 
@@ -85,7 +86,7 @@ class DefaultLayout extends Component {
     changeTab(e) {
         const { history, location } = this.props
         const { selectItem, selectTab } = this.state
-        const redirectPath = "/" + [ e.key ].join("/")
+        const redirectPath = "/" + [e.key].join("/")
         if (selectTab == e.key) return
 
         // quite previous chatroom
@@ -100,7 +101,7 @@ class DefaultLayout extends Component {
         console.log("changeItem", e)
         const { history, location, group } = this.props
         const { selectItem, selectTab } = this.state
-        const redirectPath = "/" + [ selectTab, e.key ].join("/")
+        const redirectPath = "/" + [selectTab, e.key].join("/")
         const typeMap = { contact: "chat", group: "groupchat", chatroom: "chatroom", stranger: "stranger" }
 
         // chatroom will push recent messages automatically
@@ -189,16 +190,16 @@ class DefaultLayout extends Component {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
         const { login, rightSiderOffset, multiAV } = this.props
 
-        let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal/> : null
+        let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
 
         return (
             <Layout>
                 <Header className="header">
-                    <HeaderOps title={login.username}/>
+                    <HeaderOps title={login.username} />
                     <HeaderTab
                         collapsed={collapsed}
                         items={headerTabs}
-                        selectedKeys={[ selectTab ]}
+                        selectedKeys={[selectTab]}
                         onClick={this.changeTab}
                     />
                 </Header>
@@ -212,7 +213,7 @@ class DefaultLayout extends Component {
                             left: selectItem && collapsed ? "-100%" : 0
                         }}
                     >
-                        <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[ selectItem ]}
+                        <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[selectItem]}
                         />
                     </div>
                     <Content
@@ -234,9 +235,9 @@ class DefaultLayout extends Component {
                             marginLeft: `${rightSiderOffset}px`
                         }}
                     >
-                        <RightSider roomId={roomId} room={this.state.room} ref="rightSider"/>
+                        <RightSider roomId={roomId} room={this.state.room} ref="rightSider" />
                     </div>
-                    { multiAVModal }
+                    {multiAVModal}
                     {/*<Footer style={{ textAlign: "center" }}>
                      Ant Design ©2016 Created by Ant UED
                      </Footer>*/}

@@ -1,6 +1,6 @@
 var _version = '1.4.13';
-var _code = require('./status').code;
-var _utils = require('./utils').utils;
+var _code = require('./status').code; 
+var _utils = require('./utils').utils; 
 var _msg = require('./message');
 var _message = _msg._msg;
 var _msgHash = {};
@@ -554,8 +554,11 @@ var _loginCallback = function (status, msg, conn) {
         conn.retry && _handleMessageQueue(conn);
         conn.heartBeat();
         conn.isAutoLogin && conn.setPresence();
+        console.log("conn",conn);
+
         try {
             if (conn.unSendMsgArr.length > 0) {
+                console.log("unSendMesArr",conn.unSendMsgArr);
                 for (var i in conn.unSendMsgArr) {
                     var dom = conn.unSendMsgArr[i];
                     conn.sendCommand(dom);
@@ -759,6 +762,7 @@ var connection = function (options) {
     this.orgName = '';
     this.appName = '';
     this.token = '';
+    this.unSendMsgArr = [];
 
     this.dnsArr = ['https://rs.easemob.com', 'https://rsbak.easemob.com', 'http://182.92.174.78', 'http://112.126.66.111']; //http dns server hosts
     this.dnsIndex = 0;   //the dns ip used in dnsArr currently
@@ -1199,6 +1203,7 @@ connection.prototype.attach = function (options) {
 };
 
 connection.prototype.close = function (reason) {
+    this.logOut = true;
     this.stopHeartBeat();
 
     var status = this.context.status;
@@ -1903,6 +1908,11 @@ connection.prototype.sendCommand = function (dom, id) {
     if (this.isOpened()) {
         this.context.stropheConn.send(dom);
     } else {
+        this.unSendMsgArr.push(dom);
+        if(!this.offLineSendConnecting && !this.logOut){
+            this.offLineSendConnecting = true;
+            this.reconnect();
+        }
         this.onError({
             type: _code.WEBIM_CONNCTION_DISCONNECTED,
             reconnect: true
@@ -2366,10 +2376,18 @@ connection.prototype.isClosed = function () {
 connection.prototype.clear = function () {
     var key = this.context.appKey;
     if (this.errorType != _code.WEBIM_CONNCTION_DISCONNECTED) {
-        this.context = {
-            status: _code.STATUS_INIT,
-            appKey: key
-        };
+        // this.context = {
+        //     status: _code.STATUS_INIT,
+        //     appKey: key
+        // };
+        if (this.logOut) {
+            this.unSendMsgArr = [];
+            this.offLineSendConnecting = false;
+            this.context = {
+                status: _code.STATUS_INIT,
+                appKey: key
+            };
+        }
     }
     if (this.intervalId) {
         clearInterval(this.intervalId);
