@@ -165,6 +165,22 @@ class DefaultLayout extends Component {
 
     componentDidMount() {
         // this.setSelectStatus()
+
+        //解决在群组页面进行刷新，获取不到群成员的情况。聊天室要类似处理
+        var reg = /\/group\/\d+\?username=/
+        var hash = location.hash;
+        if(reg.test(hash)){
+
+            var groupId = hash.slice(hash.indexOf("group")+6,hash.indexOf("?"));
+
+            const { group } = this.props;
+            this.setState({ roomId: groupId })
+            const room = _.get(group, `byId.${groupId}`, {})
+            this.setState({ room })
+            this.props.listGroupMemberAsync({ groupId })
+            this.props.getMutedAsync(groupId)
+            this.props.getGroupAdminAsync(groupId)
+        }
     }
 
 
