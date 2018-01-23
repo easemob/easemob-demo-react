@@ -79,7 +79,7 @@ var _Call = {
         })
     },
 
-    inviteConference: function(confrId, pwd, to, _callback){
+    inviteConference: function(confrId, pwd, to, gid, _callback){
         var rt = new RouteTo({
             to: to,
             rtKey: "",
@@ -89,6 +89,7 @@ var _Call = {
             rt, 
             confrId, 
             pwd, 
+            gid,
             function(from, rtcOptions){
                 _callback(from, rtcOptions)
             }

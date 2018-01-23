@@ -137,7 +137,7 @@ class WebRTCModal extends React.Component {
                     message.error(e && e.message ? e.message : "An error occured when calling webrtc")
                 },
                 onInvite: function (from, rtcOption) {
-                    const { confrId, password } = rtcOption
+                    const { confrId, password, gid } = rtcOption
                     const { appkey, xmppURL } = WebIM.config
                     const { avModal, multiAV } = me.props
                     let host = xmppURL.split(".")
@@ -145,15 +145,19 @@ class WebRTCModal extends React.Component {
                     from = from.replace(appkey + '_', "")
                     from = from.replace(host, "")
                     let callback = (host, rtcOption) => {
-                        me.props.setRtcOptions(rtcOption)
+                        me.props.setRtcOptions(rtcOption)                       
                         confirm({
                             title: from + "邀请您进入多人会议",
+                            okText: "确认",
+                            cancelText: "拒绝",
                             onOk() {
                                 if(avModal){
                                     message.info("您正在进行视频通话，不能接受其它邀请")
                                     return
                                 }
                                 me.props.showMultiAVModal()
+                                me.props.setGid(gid);
+
                                 setTimeout(() => {
                                     const pub = new WebIM.EMService.AVPubstream({
                                         constaints: {
@@ -168,7 +172,6 @@ class WebRTCModal extends React.Component {
                                         }
                                     })
                                     const tkt = rtcOption.ticket
-                                    console.log("Ticket: ", tkt)
                                     WebIM.EMService.setup(tkt)
                                     WebIM.EMService.openUserMedia(pub).then(function () {
                                         WebIM.EMService.withpublish(pub).join();
@@ -204,6 +207,7 @@ export default connect(
     }),
     dispatch => ({
         setRtcOptions: (rtfOptions) => dispatch(MultiAVActions.setRtcOptions(rtfOptions)),
-        showMultiAVModal: () => dispatch(MultiAVActions.showModal())
+        showMultiAVModal: () => dispatch(MultiAVActions.showModal()),
+        setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),
     })
 )(WebRTCModal)

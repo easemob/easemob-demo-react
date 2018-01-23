@@ -299,7 +299,7 @@ var _clazz = {
         self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
 
-    invite: function (rt, confrId, password, callback) {
+    invite: function (rt, confrId, password, gid, callback) {
         _logger.debug("reqTkt ...");
 
         var self = this;
@@ -312,7 +312,7 @@ var _clazz = {
 
         confrId && (rtcOptions.data.confrId = confrId); // 格式需要跟雅洁确定
         password && (rtcOptions.data.password = password);
-
+        gid && (rtcOptions.data.gid = gid);
         self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
 
