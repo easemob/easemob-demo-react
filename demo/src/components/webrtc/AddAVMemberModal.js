@@ -73,7 +73,11 @@ class AddAVMemberModal extends React.Component {
                 }, 0)
 
                 const { members } = values
-                me.props.setSelected(members)
+
+                const { groupMember, gid, selected } = this.props
+                
+                this.props.setSelected(members)
+                this.props.setGid(gid);
                 let jids = []
                 const appkey = WebIM.config.appkey, spHost = WebIM.config.xmppURL.split(".")
                 const host = spHost[1] + '.' + spHost[2]
@@ -84,7 +88,7 @@ class AddAVMemberModal extends React.Component {
                 }
                 const { confrId, password } = me.props.confr.rtcOptions
                 for (let jid of jids) {
-                    WebIM.call.inviteConference(confrId, password, jid)
+                    WebIM.call.inviteConference(confrId, password, jid, gid) 
                 }
             }
         })
@@ -189,6 +193,7 @@ export default connect(
     }),
     dispatch => ({
         showMultiAVModal: () => dispatch(MultiAVActions.showModal()),
-        setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected))
+        setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
+        setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),      
     })
 )(Form.create()(AddAVMemberModal))
