@@ -2,7 +2,7 @@ import React from "react"
 import { connect } from "react-redux"
 import WebIM from "@/config/WebIM"
 import Draggable from "react-draggable"
-import { Row, Col } from "antd"
+import { message, Row, Col } from "antd"
 import MutiAVActions from "@/redux/MultiAVRedux"
 import Immutable from "seamless-immutable"
 
@@ -174,10 +174,12 @@ class MultiAVModal extends React.Component {
 
                 onAddMember: function onAddMember(member) {
                     console.log(member.id + " " + (member.nickName || "") + " enter， ext = " + member.ext);
+                    message.success(member.nickName + " 加入群聊.")
                 },
                 onRemoveMember: function onRemoveMember(member) {
                     me.removeVideo(member.nickName)
                     console.log("onRemoveMember:", member.id + " " + (member.nickName || "") + " exit, has members: " + WebIM.EMService.getCurrentMembers().length);
+                    message.error(member.nickName + " 退出群聊.")
                 },
 
                 onAddStream: function onAddStream(stream) {
