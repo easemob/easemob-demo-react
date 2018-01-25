@@ -17,9 +17,11 @@ class MultiAVModal extends React.Component {
             minute: 0,
             second: 0,
             localVideo: {
-                open: false,
-                localStreamId: ""
-            },
+                stream: "",
+                localStreamId: "",
+                openVideo: false,
+                openAudio: false,
+            }, 
             // rv: Array.apply(null, Array(5)).map(() => {
             //     return {
             //         nickName: "",
@@ -31,7 +33,7 @@ class MultiAVModal extends React.Component {
             rv: new Array(5).fill({
                 nickName: "",
                 streamId: "",
-                open: false,
+                openVideo: false,
                 video: <div className="default"></div>
             }),
             rvCount: 0,
@@ -203,8 +205,10 @@ class MultiAVModal extends React.Component {
                             localVideo.srcObject = mediaStream
                         })
                         let lv = {
+                            stream: stream,
                             localStreamId: stream.id,
-                            open: true
+                            openVideo: true,
+                            openAudio: true,
                         }
                         me.setState({
                             localVideo: lv
@@ -233,7 +237,7 @@ class MultiAVModal extends React.Component {
                                     nickName: nickName,
                                     streamId: streamId,
                                     video: video,
-                                    open: true
+                                    openVideo: true
                                 }
                                 rv[rvCount] = elem
                                 ++rvCount
@@ -256,7 +260,7 @@ class MultiAVModal extends React.Component {
                                     nickName: nickName,
                                     streamId: streamId,
                                     video: video,
-                                    open: true
+                                    openVideo: true
                                 }
                                 rv[ifContain] = elem
                                 me.setState({
@@ -309,72 +313,70 @@ class MultiAVModal extends React.Component {
     }
 
     localMic() {
-        console.log("LocalMic......")
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
+        WebIM.EMService.aoff(stream, openAudio, function error (evt) {
+            displayEvent(evt.message());
+            voff.innerHTML = "无像";
+        });
+        this.setState({
+            localVideo: {
+                openAudio: !openAudio,
+                openVideo: openVideo,
+                stream: stream,
+                localStreamId: localStreamId
+            }
+       })
     }
 
-    remoteSound() {
-        console.log("remoteSound")
+    remoteSound(id) {
+        console.log("remoteSound");
+        
     }
 
     localVideo() {
         console.log("LocalVideo")
-        let { open, localStreamId } = this.state.localVideo
-        if (open) {
-            this.refs.local.src = ""
-            WebIM.EMService.hungup(localStreamId, function (evt) {
-                console.log("LocalStreamClosed")
-            })
-            this.setState({
-                localVideo: {
-                    open: false,
-                    localStreamId: localStreamId
-                }
-            })
-        } else {
-            const pub = new WebIM.EMService.AVPubstream({
-                constaints: {
-                    audio: true,
-                    video: true
-                },
-                aoff: 0,
-                voff: 0,
-                name: "video",
-                ext: {
-                    hello: "Hello"
-                }
-            })
-            const tkt = this.props.confr.rtcOptions.ticket
-            WebIM.EMService.openUserMedia(pub).then(function () {
-                WebIM.EMService.push(pub);
-                this.setState({
-                    localVideo: {
-                        open: true,
-                        localStreamId: localStreamId
-                    }
-                })
-            }.bind(this), function fail(evt) {
-                console.error("打开Media失败", evt.message());
-            });
-        }
-    }
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
+        WebIM.EMService.voff(stream, openVideo, function error (evt) {
+            displayEvent(evt.message());
+            voff.innerHTML = "无像";
+        });
+        this.setState({
+            localVideo: {
+                openAudio: openAudio,
+                openVideo: !openVideo,
+                stream: stream,
+                localStreamId: localStreamId
+            }
+       })
+    } 
 
     remoteVideo(id) {
+                
+        // elem.openVideo = !elem.openVideo;
+        // rv[id] = elem
+        // this.setState({
+        //     rv: rv
+        // })
         let rv = _.cloneDeep(this.state.rv)
         let elem = rv[id]
         if (elem.streamId === "") {
             return
         }
-        if (elem.open) {
-            rv[id].open = false
-            WebIM.EMService.hungup(elem.streamId, function (_evt) {
+        // if (elem.openVideo) {
+        //     rv[id].openVideo = false
+        //     WebIM.EMService.hungup(elem.streamId, function (_evt) {
 
-            });
-        } else {
-            WebIM.EMService.subscribe(elem.streamId, function (_evt) {
-                elem.open = true
-                rv[id] = elem
-            })
-        }
+        //     });
+        // } else {
+        //     WebIM.EMService.subscribe(elem.streamId, function (_evt) {
+        //         elem.openVideo = true
+        //         rv[id] = elem
+        //     })
+        // }
+        WebIM.EMService.subscribe(elem.streamId, {subSVideo: !elem.openVideo, subSAudio:true});
+
+        elem.openVideo = !elem.openVideo;
+        rv[id] = elem;
         this.setState({
             rv: rv
         })
@@ -389,7 +391,7 @@ class MultiAVModal extends React.Component {
             groupName = byId[gid] && byId[gid].groupname || "群组名称",
             remoteUsernames = this.state.remoteUsernames
 
-        let rv = this.state.rv
+        let rv = this.state.rv;
         for (let i = rvCount; i < 5; i++) {
             rv[i] = {
                 nickName: "",
@@ -418,15 +420,14 @@ class MultiAVModal extends React.Component {
                             <video ref="local" muted autoPlay />
                             <div className="user-name">
                                 <span>{WebIM.conn.context.userId}</span>
-                                <i className="icon webim icon-s_sound"></i>
+                                {/* <i className="icon webim icon-s_sound"></i> */}
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[0] && rv[0].video}
                             <div className={rv[0].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[0].nickName}</span>
-                                <i className="icon webim icon-s_sound"></i>
-                                <i className={rv[0].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[0].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 0)}
                                 >
                                 </i>
@@ -436,8 +437,7 @@ class MultiAVModal extends React.Component {
                             {rv[1] && rv[1].video}
                             <div className={rv[1].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[1].nickName}</span>
-                                <i className="icon webim icon-s_sound"></i>
-                                <i className={rv[1].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[1].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 1)}
                                 ></i>
                             </div>
@@ -453,8 +453,7 @@ class MultiAVModal extends React.Component {
                             {rv[2] && rv[2].video}
                             <div className={rv[2].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[2].nickName}</span>
-                                <i className="icon webim icon-s_sound"></i>
-                                <i className={rv[2].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[2].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 2)}
                                 ></i>
                             </div>
@@ -463,8 +462,7 @@ class MultiAVModal extends React.Component {
                             {rv[3] && rv[3].video}
                             <div className={rv[3].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[3].nickName}</span>
-                                <i className="icon webim icon-s_sound"></i>
-                                <i className={rv[3].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[3].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 3)}
                                 ></i>
                             </div>
@@ -473,8 +471,7 @@ class MultiAVModal extends React.Component {
                             {rv[4] && rv[4].video}
                             <div className={rv[4].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[4].nickName}</span>
-                                <i className="icon webim icon-s_sound"></i>
-                                <i className={rv[4].open ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[4].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 4)}
                                 ></i>
                             </div>
