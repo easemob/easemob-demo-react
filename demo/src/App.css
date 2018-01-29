@@ -133,7 +133,7 @@ body {
     background-color: rgba(0, 186, 110, 1);
     border-radius: 50%;
     cursor: pointer;
-}
+} 
 
 .multi-webim-rtc .user-name i.camera{
     background-color: rgba(251, 0, 22, 0.6);
@@ -141,6 +141,14 @@ body {
 
 .multi-webim-rtc .user-name i.camera-shut{
     background-color: rgba(251, 0, 22, 1);
+}
+
+.multi-webim-rtc .user-name i.sound{
+    background-color: rgba(0, 186, 110, 0.6);
+}
+
+.multi-webim-rtc .user-name i.sound-shut{
+    background-color: rgba(0, 186, 110, 1);
 }
 
 .multi-webim-rtc .video-divisor {

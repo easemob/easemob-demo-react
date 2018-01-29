@@ -19,6 +19,7 @@ const { Types, Creators } = createActions({
     setGid: ["gid"],
     setRtcOptions: ["rtcOptions"],
     setSelectedMembers: ["selected"],
+    setJoinedMembers: ["joined"],
     resetAll: null,
 
     /* ------async------ */
@@ -53,14 +54,23 @@ export const INITIAL_STATE = Immutable({
         rtcOptions: {}
     },
     localStream: {},
-    selectedMembers: []
+    selectedMembers: [],
+    joinedMembers: []
 })
 
 /* ------ Reducers ------ */
 
 export const setSelectedMembers = (state, {selected}) => {
+    console.log("select_member",selected);
     return state.setIn(["selectedMembers"], selected)
 }
+
+export const setJoinedMembers = (state, {joined}) => {
+    let join = state.getIn(["joinedMembers"]);
+    let join1 = join.concat([joined.nickName]);
+    return state.setIn(["joinedMembers"],join1);
+}
+
 
 export const updateConfrInfo = (state, { pwd, from, rtcOptions }) => {
     let confr = state.getIn(["confr"])
@@ -114,5 +124,6 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.SHOW_CONFR_MODAL]: showConfrModal,
     [Types.CLOSE_CONFR_MODAL]: closeConfrModal,
     [Types.SET_SELECTED_MEMBERS]: setSelectedMembers,
+    [Types.SET_JOINED_MEMBERS]: setJoinedMembers,
     [Types.RESET_ALL]: resetAll
 })
