@@ -6,6 +6,7 @@ import MultiAVActions from "@/redux/MultiAVRedux"
 import { connect } from "react-redux"
 import WebIM from "@/config/WebIM"
 import _ from "lodash"
+import { store } from "@/redux"
 
 const CheckboxGroup = Checkbox.Group
 const FormItem = Form.Item
@@ -22,10 +23,15 @@ class AddAVMemberModal extends React.Component {
         const { groupMember, gid, selected } = this.props
         let gm = groupMember.getIn([gid, "byName"])
         let options = []
+        let joined = this.props.joined
+        const username = store.getState().login.username
         for (var index in gm) {
-            options.push({ label: index, value: index })
+            if(_.indexOf(joined,index) != -1 || index == username){
+                options.push({ label: index, value: index, disabled:true })
+            }else{
+                options.push({ label: index, value: index })
+            }
         }
-
         this.setOptionsEnabled(selected, options)
 
         // this.setState({
@@ -74,21 +80,23 @@ class AddAVMemberModal extends React.Component {
 
                 const { members } = values
 
-                const { groupMember, gid, selected } = this.props
+                const { groupMember, gid, selected, joined } = this.props
+
+                let seleted_members = _.difference(members,joined);
                 
-                this.props.setSelected(members)
+                this.props.setSelected(seleted_members)
                 this.props.setGid(gid);
                 let jids = []
                 const appkey = WebIM.config.appkey, spHost = WebIM.config.xmppURL.split(".")
                 const host = spHost[1] + '.' + spHost[2]
-                if (members) {
-                    for (let elem of members) {
+                if (seleted_members) {
+                    for (let elem of seleted_members) {
                         jids.push(appkey + '_' + elem + '@' + host)
                     }
                 }
                 const { confrId, password } = me.props.confr.rtcOptions
                 for (let jid of jids) {
-                    WebIM.call.inviteConference(confrId, password, jid, gid) 
+                    WebIM.call.inviteConference(confrId, password, jid, gid)
                 }
             }
         })
@@ -97,6 +105,7 @@ class AddAVMemberModal extends React.Component {
     onChange = checkedValues => {
         const len = checkedValues.length
         let options = _.cloneDeep(this.state.options)
+        console.log("options",options);
         if (len >= this.state.maxUsers) {
             this.setState({
                 disabled: true
@@ -117,6 +126,7 @@ class AddAVMemberModal extends React.Component {
                 this.setState({ disabled: false })
             }
         }
+        
         this.setState({
             options: options
         })
@@ -152,12 +162,13 @@ class AddAVMemberModal extends React.Component {
         let options = this.state.options
         const { getFieldDecorator } = this.props.form
         const selected = this.props.selected
+        const joined = this.props.joined
 
         return (
             <Form onSubmit={this.handleSubmit} className="x-add-group">
                 <div className="x-add-group-members">
                     <FormItem>
-                        {getFieldDecorator("members", { initialValue: selected })(
+                        {getFieldDecorator("members", { initialValue: joined })(
                             <CheckboxGroup
                                 style={{ display: "block" }}
                                 options={options}
@@ -189,11 +200,12 @@ export default connect(
         groupMember: entities.groupMember,
         gid: multiAV.gid,
         confr: multiAV.confr,
-        selected: multiAV.selectedMembers
+        selected: multiAV.selectedMembers,
+        joined: multiAV.joinedMembers
     }),
     dispatch => ({
         showMultiAVModal: () => dispatch(MultiAVActions.showModal()),
         setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
-        setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),      
+        setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),
     })
 )(Form.create()(AddAVMemberModal))
