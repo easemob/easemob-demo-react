@@ -90,7 +90,7 @@ var _RtcHandler = {
 
         //if a->b already, c->a/b should be termiated with 'busy' reason
         if (from.indexOf("@") >= 0) {
-            if (self._connectedSid == '' && rtcOptions.op == 102) {
+            if (self._connectedSid == '' && (rtcOptions.op == 102 || rtcOptions.op == 202)) {
                 self._connectedSid = fromSessionId;
             } else {
                 if (self._connectedSid != fromSessionId) {
@@ -164,6 +164,7 @@ var _RtcHandler = {
         rtcOptions.rtcCfg && (typeof rtcOptions.rtcCfg === 'string') && (rtcOptions.rtcCfg = _util.parseJSON(rtcOptions.rtcCfg));
         rtcOptions.rtcCfg2 && (typeof rtcOptions.rtcCfg2 === 'string') && (rtcOptions.rtcCfg2 = _util.parseJSON(rtcOptions.rtcCfg2));
         rtcOptions.WebRTC && (typeof rtcOptions.WebRTC === 'string') && (rtcOptions.WebRTC = _util.parseJSON(rtcOptions.WebRTC));
+        rtcOptions.confrId && (rtcOptions.conferenceId = rtcOptions.confrId)
 
         if (tsxId && self._apiCallbacks[tsxId]) {
             try {
@@ -275,7 +276,7 @@ var _RtcHandler = {
 
         var rtflag = rt.rtflag;
         // rtflag && delete rt.rtflag;
-        rtflag || (rtflag = 1);
+        !isNaN(rtflag) || (rtflag = 1);
 
         options.data || (options.data = {});
         options.data.tsxId = tsxId;

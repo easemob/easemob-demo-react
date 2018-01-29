@@ -54,9 +54,61 @@ var _Call = {
             self._onInitC.apply(self, arguments);
         },
 
+        self.api.onInvite = function(){
+            self.listener.onInvite.apply(self, arguments);
+        },
+
         self.api.onIceConnectionStateChange = function () {
             self.listener.onIceConnectionStateChange.apply(self, arguments);
         }
+    },
+
+    createConference: function(pwd, _callback){
+        var rt = new RouteTo({
+            rtKey: ""
+        })
+        this.api.reqTkt(
+            rt, 
+            true,
+            undefined,
+            pwd, 
+            function(from, rtcOptions){
+            var ticketStr = rtcOptions.ticket
+            rtcOptions.conferenceId = rtcOptions.confrId
+            _callback(from, rtcOptions)
+        })
+    },
+
+    inviteConference: function(confrId, pwd, to, gid, _callback){
+        var rt = new RouteTo({
+            to: to,
+            rtKey: "",
+            rtflag: 0
+        })
+        this.api.invite(
+            rt, 
+            confrId, 
+            pwd, 
+            gid,
+            function(from, rtcOptions){
+                _callback(from, rtcOptions)
+            }
+        );
+    },
+
+    getConferenceTkt: function(confrId, pwd, _callback){
+        var rt = new RouteTo({
+            rtKey: ""
+        });
+        this.api.reqTkt(
+            rt,
+            false,
+            confrId,
+            pwd,
+            function(from, rtcOptions){
+                _callback(from, rtcOptions)
+            }
+        );
     },
 
     makeVideoCall: function (callee, accessSid) {
@@ -135,6 +187,10 @@ var _Call = {
 
         self.switchPattern(options.streamType == "VIDEO" ? "VIDEO" : "VOICE");
         self.pattern._onInitC(from, options, rtkey, tsxId, fromSid);
+    },
+
+    _onInvite: function(){
+
     },
 
     _onGotServerP2PConfig: function (from, rtcOptions) {

@@ -1,0 +1,131 @@
+@CHARSET "UTF-8";
+
+body{
+    /*margin: 0px;*/
+
+    width: 100%;
+    margin: 0 auto;
+}
+
+.header{
+
+}
+
+input[type=button], input[type=submit] {
+    border-radius: 4px;
+}
+
+#container{
+    width: 99%;
+    /* max-width: 900px; */
+    margin: 0 auto;
+}
+
+.header{
+    width: auto;
+    border-radius: 0px;
+}
+
+.header h1{
+    background: none;
+    border-bottom: 0;
+}
+
+.header.join:before{
+    right: 0px;
+}
+
+.header .event{
+    margin-top: 7px;
+    max-height: 130px;
+    display: block;
+
+    overflow-y: auto;
+    overflow-y: hidden;
+}
+
+.header .event p{
+    margin: 0;
+}
+
+#room{
+    width: 100%;
+
+    margin: 7px 0 0 0;
+    height: auto;
+}
+
+.participant{
+    width: 150px;
+    height: 157px;
+
+    float: left;
+
+    margin: 5px 5px 0 0;
+    padding: 0;
+}
+
+.float_div{
+    position: fixed;
+    right: 11px;
+    bottom: 11px;
+    color: red;
+    max-width: 70px;
+}
+.float_div span{
+    width: 100%;
+    position: relative;
+    float: left;
+}
+
+.participant span{
+    white-space: nowrap;
+    float: inherit;
+    width: 100%;
+}
+
+.participant video, .participant.main video{
+    max-height: 80%;
+
+    width: 150px;
+    height: 112px;
+}
+
+.participant a{
+    text-decoration: none;
+}
+.participant a{
+    cursor:pointer;
+}
+
+.participant.big{
+    width: 216px;
+    height: auto;
+    min-height: 207px;
+}
+.participant.big video{
+    width: 100%;
+    /*height: auto;*/
+    max-height: none;
+    min-height: 162px;
+
+    background-color: #404040;
+}
+
+.participant.self{
+    background-color: #62a7d0;
+}
+
+.participant.connected{
+    background-color: #67cca2;
+}
+
+
+.participant.self span{
+    color: #e2065c;
+}
+
+.participant:last-child{
+    margin-bottom: 40px;
+}
+

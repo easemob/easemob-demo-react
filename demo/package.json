@@ -10,6 +10,8 @@
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
     "less-vars-to-js": "^1.1.2",
+    "lodash": "^4.17.4",
+    "react-draggable": "^3.0.3",
     "react-redux-i18n": "^1.9.0",
     "underscore": "^1.8.3"
   },
