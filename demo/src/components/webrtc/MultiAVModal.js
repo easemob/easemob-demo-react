@@ -3,7 +3,7 @@ import { connect } from "react-redux"
 import WebIM from "@/config/WebIM"
 import Draggable from "react-draggable"
 import { message, Row, Col } from "antd"
-import MutiAVActions from "@/redux/MultiAVRedux"
+import MultiAVActions from "@/redux/MultiAVRedux"
 import Immutable from "seamless-immutable"
 
 let _ = require('lodash');
@@ -37,7 +37,7 @@ class MultiAVModal extends React.Component {
                 video: <div className="default"></div>
             }),
             rvCount: 0,
-            toolsColor: ["", "", ""]
+            toolsColor: ["", "", "",""]
         }
         this.closeModal = this.closeModal.bind(this)
         this.loadTime = this.loadTime.bind(this)
@@ -176,7 +176,8 @@ class MultiAVModal extends React.Component {
 
                 onAddMember: function onAddMember(member) {
                     console.log(member.id + " " + (member.nickName || "") + " enter， ext = " + member.ext);
-                    message.success(member.nickName + " 加入群聊.")
+                    message.success(member.nickName + " 加入群聊.");
+                    me.props.setJoinedMembers(member);                    
                 },
                 onRemoveMember: function onRemoveMember(member) {
                     me.removeVideo(member.nickName)
@@ -310,6 +311,10 @@ class MultiAVModal extends React.Component {
         WebIM.EMService.exit()
         this.props.closeModal()
         this.props.resetConfr()
+    }
+
+    addMember(){
+        this.props.showConfrModal();
     }
 
     localMic() {
@@ -483,7 +488,44 @@ class MultiAVModal extends React.Component {
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={4} offset={4}>
+                        {/* add another member */}
+                        <Col span={4} offset={2}>
+                            <div className="tools">
+                                <i className={"icon iconfont webim1-add-member " + toolsColor[3]}
+                                    onMouseOver={(e) => {
+                                        if (toolsColor[3] === "") {
+                                            toolsColor[3] = "i-hover"
+                                            this.setState({
+                                                toolsColor: toolsColor
+                                            })
+                                        }
+                                    }
+                                    }
+
+                                    onClick={(e) => {
+                                        if (toolsColor[3] === "i-hover") {
+                                            toolsColor[3] = "i-act"
+                                        } else {
+                                            toolsColor[3] = ""
+                                        }
+                                        this.addMember();
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
+
+                                    onMouseLeave={(e) => {
+                                        if (toolsColor[3] === "i-hover") {
+                                            toolsColor[3] = ""
+                                        }
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
+                                ></i>
+                            </div>
+                        </Col>
+                        <Col span={4} >
                             <div className="tools">
                                 <i className={"icon webim1 webim1-off-microphone " + toolsColor[0]}
                                     onMouseOver={(e) => {
@@ -614,8 +656,11 @@ export default connect(
         confr: multiAV.confr
     }),
     dispatch => ({
-        closeModal: () => dispatch(MutiAVActions.closeModal()),
-        setLocalStream: (stream) => dispatch(MutiAVActions.setLocalStream(stream)),
-        resetConfr: () => dispatch(MutiAVActions.resetAll())
+        closeModal: () => dispatch(MultiAVActions.closeModal()),
+        setLocalStream: (stream) => dispatch(MultiAVActions.setLocalStream(stream)),
+        resetConfr: () => dispatch(MultiAVActions.resetAll()),
+        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid)),
+        showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
+        setJoinedMembers: (joined) => dispatch(MultiAVActions.setJoinedMembers(joined))
     })
 )(MultiAVModal)
