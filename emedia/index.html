@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="xswitch many to many">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="sample">
+    <meta itemprop="name" content="\samples">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>EMedia</title>
+
+
+    <link rel="stylesheet" href="./demo/stylesheet/style.css" />
+    <link rel="stylesheet" href="./demo/stylesheet/demo.css" />
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+    <style type="text/css">
+
+    </style>
+
+</head>
+
+<body>
+
+<div id="join" class="animate join header">
+    <h1></h1>
+    <textarea style="width: 100%;" rows="5" id="text_tkt" readonly>
+    {
+        "url": "wss://121.41.87.159:8443/ws",
+        "confrId": "MS1000C11",
+        "type": "confr",
+        "memName": "yss001",
+        "hmac": "o9I5CObxxX20JJUepImxFRtSOeg="
+    }
+    </textarea>
+    <span>Console> emedia.__easemob_current_mservice.current</span><br>
+    <span>Console> emedia.LOG_LEVEL=0; emedia.config.version;</span><br>
+    <span>Console> emedia.__easemob_current_mservice.postMessage("RTC12__Of_44M1", "45678");</span>
+    <p id="title_p"></p>
+    <p class="submit">
+        <input type="submit" id="btn_enter" value="加入会议">
+        <input type="submit" id="btn_pub" value="推&nbsp;&nbsp;&nbsp;&nbsp;流">
+        <input type="submit" id="btn_shareDesktop" value="共享桌面">
+        <input type="submit" id="btn_hangup" value="挂&nbsp;&nbsp;&nbsp;&nbsp;断">
+    </p>
+    <div class="event" id="div_events"></div>
+</div>
+
+<div id="float_div" class="float_div">
+    <span id="client"></span>
+    <span id="screen"></span>
+    <span id="document"></span>
+    <span id="self"></span>
+</div>
+
+<div id="container">
+    <div id="wrapper">
+        <div id="room">
+            <div id="participants"></div>
+        </div>
+    </div>
+</div>
+
+<!--webrtc-->
+<script src="./webrtc/dist/EMedia_sdk-dev.js"></script>
+
+<!--demo javascript-->
+<script src="./demo/javascript/dist/demo-dev.js"></script>
+</body>
+</html>
