@@ -5,6 +5,7 @@ import Draggable from "react-draggable"
 import { message, Row, Col } from "antd"
 import MultiAVActions from "@/redux/MultiAVRedux"
 import Immutable from "seamless-immutable"
+import { store } from "@/redux"
 
 let _ = require('lodash');
 
@@ -179,10 +180,13 @@ class MultiAVModal extends React.Component {
                     message.success(member.nickName + " 加入群聊.");
                     me.props.setJoinedMembers(member);                    
                 },
-                onRemoveMember: function onRemoveMember(member) {
+                onRemoveMember: function onRemoveMember(member,reason) {
                     me.removeVideo(member.nickName)
                     console.log("onRemoveMember:", member.id + " " + (member.nickName || "") + " exit, has members: " + WebIM.EMService.getCurrentMembers().length);
-                    message.error(member.nickName + " 退出群聊.")
+                    if( reason !== undefined){
+                        message.warning(member.nickName + " 退出群聊.")
+                    }
+                    me.props.updateJoinedMembers(member);                    
                 },
 
                 onAddStream: function onAddStream(stream) {
@@ -308,8 +312,12 @@ class MultiAVModal extends React.Component {
 
     closeModal() {
         clearInterval(this.state.interval)
+        console.log("11111");
+        console.log("WebIM.EMService",WebIM.EMService)
         WebIM.EMService.exit()
+        console.log("22222")
         this.props.closeModal()
+        console.log("333333")
         this.props.resetConfr()
     }
 
@@ -661,6 +669,7 @@ export default connect(
         resetConfr: () => dispatch(MultiAVActions.resetAll()),
         updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid)),
         showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
-        setJoinedMembers: (joined) => dispatch(MultiAVActions.setJoinedMembers(joined))
+        setJoinedMembers: (joined) => dispatch(MultiAVActions.setJoinedMembers(joined)),
+        updateJoinedMembers: (removed) => dispatch(MultiAVActions.updateJoinedMembers(removed))
     })
 )(MultiAVModal)
