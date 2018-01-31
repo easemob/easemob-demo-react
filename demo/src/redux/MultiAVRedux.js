@@ -20,6 +20,7 @@ const { Types, Creators } = createActions({
     setRtcOptions: ["rtcOptions"],
     setSelectedMembers: ["selected"],
     setJoinedMembers: ["joined"],
+    updateJoinedMembers: ["removed"],
     resetAll: null,
 
     /* ------async------ */
@@ -61,16 +62,22 @@ export const INITIAL_STATE = Immutable({
 /* ------ Reducers ------ */
 
 export const setSelectedMembers = (state, {selected}) => {
-    console.log("select_member",selected);
     return state.setIn(["selectedMembers"], selected)
 }
 
 export const setJoinedMembers = (state, {joined}) => {
     let join = state.getIn(["joinedMembers"]);
-    let join1 = join.concat([joined.nickName]);
-    return state.setIn(["joinedMembers"],join1);
+    let joinCurrent = join.concat([joined.nickName]);
+    return state.setIn(["joinedMembers"],joinCurrent);
 }
 
+export const updateJoinedMembers = (state, {removed}) => {
+    console.log("updateJoinedMembers")
+    let join = state.getIn(["joinedMembers"]);
+    let joinCurrent = _.difference(join,[removed.nickName]);
+    console.log("joinCurrent",joinCurrent)
+    return state.setIn(["joinedMembers"],joinCurrent);
+}
 
 export const updateConfrInfo = (state, { pwd, from, rtcOptions }) => {
     let confr = state.getIn(["confr"])
@@ -125,5 +132,6 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.CLOSE_CONFR_MODAL]: closeConfrModal,
     [Types.SET_SELECTED_MEMBERS]: setSelectedMembers,
     [Types.SET_JOINED_MEMBERS]: setJoinedMembers,
+    [Types.UPDATE_JOINED_MEMBERS]: updateJoinedMembers,
     [Types.RESET_ALL]: resetAll
 })
