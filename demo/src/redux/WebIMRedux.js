@@ -218,9 +218,19 @@ WebIM.conn.listen({
     },
     onTextMessage: message => {
         console.log("onTextMessage", message)
-        store.dispatch(MessageActions.addMessage(message, "txt"))
-        store.dispatch(MessageActions.sendRead(message))
-        const { type, from, to } = message
+        const { from, to } = message 
+        let { type } = message       
+        const rootState = store.getState()
+        const username = _.get(rootState, "login.username", "")
+        const bySelf = from == username
+        // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
+        const chatId = bySelf || type !== "chat" ? to : from
+        if (type === "chat" &&( _.get(rootState,"entities.roster.byName["+chatId+"].subscription")  === "none") ||  !(_.get(rootState,"entities.roster.byName["+chatId+"].subscription"))){
+            type = "stranger";
+            // store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
+        }
+        store.dispatch(MessageActions.addMessage(message, "txt"))        
+        store.dispatch(MessageActions.sendRead(message))        
         switch (type) {
         case "chat":
             store.dispatch(RosterActions.topRoster(from))
@@ -230,6 +240,12 @@ WebIM.conn.listen({
             break
         case "chatroom":
             store.dispatch(ChatRoomActions.topChatroom(to))
+            break
+        case "stranger":
+            // todo: remove chatdata to stranger list
+            store.dispatch(RosterActions.topRoster(from))
+            // store.dispatch(MessageActions.addMessage(message, "txt"))                    
+            // store.dispatch(StrangerActions.topStranger(from))
             break
         default:
             break

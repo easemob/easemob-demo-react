@@ -7,7 +7,8 @@ import { parseFromServer } from "@/redux/MessageRedux"
 
 const { Types, Creators } = createActions({
     updateStrangerMessage: [ "stranger", "message", "bodyType" ],
-    deleteStranger: [ "stranger" ]
+    deleteStranger: [ "stranger" ],
+    topStranger: [ "name" ],
     // ---------------async------------------
 })
 
@@ -17,8 +18,18 @@ export default Creators
 /* ------------- Initial State ------------- */
 
 export const INITIAL_STATE = Immutable({
-    byId: {}
+    byId: {},
+    name: "",
+    stranger: []
 })
+
+export const topStranger = (state, { name }) => {
+    let stranger = state.getIn([ "stranger" ], Immutable([])).asMutable()
+    if (stranger[0] === name) return state // if already top, return directly
+    stranger = _.without(stranger, name)
+    stranger.unshift(name)
+    return state.merge({ stranger })
+} 
 
 /* ------------- Reducers ------------- */
 
@@ -55,7 +66,8 @@ export const deleteStranger = (state, { stranger }) => {
 
 export const reducer = createReducer(INITIAL_STATE, {
     [Types.UPDATE_STRANGER_MESSAGE]: updateStrangerMessage,
-    [Types.DELETE_STRANGER]: deleteStranger
+    [Types.DELETE_STRANGER]: deleteStranger,
+    [Types.TOP_STRANGER]: topStranger
 })
 
 /* ------------- Selectors ------------- */

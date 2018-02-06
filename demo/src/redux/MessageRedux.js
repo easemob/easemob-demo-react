@@ -4,6 +4,7 @@ import _ from "lodash"
 import WebIM from "@/config/WebIM"
 import { store } from "@/redux"
 import AppDB from "@/utils/AppDB"
+import StrangerActions from "@/redux/StrangerRedux"
 
 // roomType true-chatroom | false-group
 // chatType singleChat  | chatRoom- group or chatroom
@@ -474,7 +475,6 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     const username = _.get(rootState, "login.username", "")
     const { id, to, status } = message
     let { type } = message
-    console.log(message)
     // where the message comes from, when from current user, it is null
     const from = message.from || username
     // bySelf is true when sent by current user, otherwise is false
@@ -483,9 +483,10 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     const chatId = bySelf || type !== "chat" ? to : from
 
     // change type as stranger
-    if (type === "chat" && !rootState.entities.roster.byName[chatId]) {
-        type = "stranger"
-    }
+    // if (type === "chat" && !rootState.entities.roster.byName[chatId]) {
+    //     type = "stranger";
+    //     message.type = "stranger";
+    // }
 
     // update message array
     const chatData = state.getIn([ type, chatId ], Immutable([])).asMutable()
