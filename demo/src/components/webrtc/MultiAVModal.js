@@ -412,7 +412,7 @@ class MultiAVModal extends React.Component {
 
         return (
             <Draggable
-                defaultPosition={{ x: 300, y: 200 }}
+                defaultPosition={{ x: 0, y: 0 }}
                 bounds="parent">
                 <div className="multi-webim-rtc">
                     <Row>
@@ -425,15 +425,15 @@ class MultiAVModal extends React.Component {
                             {time}
                         </Col>
                     </Row>
-                    <Row gutter={10}>
-                        <Col span={8} className="gutter-row">
+                    <Row gutter={10} className="multi-webim-rtc-row">
+                        <Col span={12} className="gutter-row">
                             <video ref="local" muted autoPlay />
                             <div className="user-name">
                                 <span>{WebIM.conn.context.userId}</span>
                                 {/* <i className="icon webim icon-s_sound"></i> */}
                             </div>
                         </Col>
-                        <Col span={8} className="gutter-row">
+                        <Col span={12} className="gutter-row">
                             {rv[0] && rv[0].video}
                             <div className={rv[0].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[0].nickName}</span>
@@ -443,7 +443,14 @@ class MultiAVModal extends React.Component {
                                 </i>
                             </div>
                         </Col>
-                        <Col span={8} className="gutter-row">
+                    </Row>
+                    <Row gutter={6}>
+                        <Col span={24} className="gutter-row video-divisor">
+
+                        </Col>
+                    </Row>
+                    <Row gutter={10} className="multi-webim-rtc-row">
+                        <Col span={12} className="gutter-row">
                             {rv[1] && rv[1].video}
                             <div className={rv[1].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[1].nickName}</span>
@@ -452,37 +459,12 @@ class MultiAVModal extends React.Component {
                                 ></i>
                             </div>
                         </Col>
-                    </Row>
-                    <Row gutter={6}>
-                        <Col span={24} className="gutter-row video-divisor">
-
-                        </Col>
-                    </Row>
-                    <Row gutter={10}>
-                        <Col span={8} className="gutter-row">
+                        <Col span={12} className="gutter-row">
                             {rv[2] && rv[2].video}
                             <div className={rv[2].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[2].nickName}</span>
                                 <i className={rv[2].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
                                     onClick={this.remoteVideo.bind(this, 2)}
-                                ></i>
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[3] && rv[3].video}
-                            <div className={rv[3].streamId ? "user-name" : "user-name remote-ajust"}>
-                                <span>{rv[3].nickName}</span>
-                                <i className={rv[3].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                    onClick={this.remoteVideo.bind(this, 3)}
-                                ></i>
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[4] && rv[4].video}
-                            <div className={rv[4].streamId ? "user-name" : "user-name remote-ajust"}>
-                                <span>{rv[4].nickName}</span>
-                                <i className={rv[4].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                    onClick={this.remoteVideo.bind(this, 4)}
                                 ></i>
                             </div>
                         </Col>
