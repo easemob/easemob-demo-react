@@ -3251,6 +3251,7 @@ connection.prototype.createGroup = function (options) {
 // 通过Rest接口创建群组
 connection.prototype.createGroupNew = function (opt) {
     opt.data.owner = this.user;
+    opt.data.invite_need_confirm = false;
     var options = {
         url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/chatgroups',
         dataType: 'json',
@@ -3305,6 +3306,7 @@ connection.prototype.joinGroup = function (opt) {
         + this.appName + '/' + 'chatgroups' + '/' + opt.groupId + '/' + 'apply',
         type: 'POST',
         dataType: 'json',
+        data: JSON.stringify({ message: 'join group' }),    // 后端参数变更，申请入群需要填写入群消息
         headers: {
             'Authorization': 'Bearer ' + this.token,
             'Content-Type': 'application/json'
