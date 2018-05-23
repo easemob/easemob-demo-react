@@ -1,1 +1,1 @@
-module.exports = require('./src/entry')
+module.exports = require('./webrtc/src/entry')

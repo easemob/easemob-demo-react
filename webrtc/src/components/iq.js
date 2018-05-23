@@ -2,7 +2,7 @@
  * IQ Message，IM -> CMServer --> IM
  */
 
-var _util = require('./utils');
+var _util = (require('./utils').default);
 var _logger = _util.logger;
 var API = require('./api');
 var RouteTo = API.RouteTo;
@@ -28,8 +28,8 @@ var _RtcHandler = {
                 try {
                     self.handleRtcMessage(msginfo);
                 } catch (error) {
-                    _logger.error(error.stack || error);
-                    throw error;
+                    _logger.error(error);
+                    //throw error;
                 }
 
                 return true;
@@ -151,10 +151,18 @@ var _RtcHandler = {
             }
 
             for (var i = 0; i < rtcOptions.cands.length; i++) {
-                typeof rtcOptions.cands[i] === 'string' && (rtcOptions.cands[i] = _util.parseJSON(rtcOptions.cands[i]));
+                if(typeof rtcOptions.cands[i] === 'string'){
+                    try{
+                        rtcOptions.cands[i] = _util.parseJSON(rtcOptions.cands[i]);
+                    }catch(e){
+                        rtcOptions.cands[i] = {candidate: rtcOptions.cands[i]}
+                    }
+                }
 
-                rtcOptions.cands[i].sdpMLineIndex = rtcOptions.cands[i].mlineindex;
-                rtcOptions.cands[i].sdpMid = rtcOptions.cands[i].mid;
+                rtcOptions.cands[i].sdpMLineIndex = rtcOptions.cands[i].sdpMLineIndex !== undefined ?
+                    rtcOptions.cands[i].sdpMLineIndex : rtcOptions.cands[i].mlineindex;
+                rtcOptions.cands[i].sdpMid = rtcOptions.cands[i].sdpMid !== undefined ?
+                    rtcOptions.cands[i].sdpMid : rtcOptions.cands[i].mid;
 
                 delete rtcOptions.cands[i].mlineindex;
                 delete rtcOptions.cands[i].mid;
@@ -215,12 +223,16 @@ var _RtcHandler = {
             }
 
             for (var i in cands) {
-                if (cands[i] instanceof RTCIceCandidate) {
+                var cand = cands[i];
+
+                if (cand.candidate !== undefined
+                    && cand.sdpMLineIndex !== undefined
+                    && cand.sdpMid !== undefined) {
                     var _cand = {
                         type: "candidate",
-                        candidate: cands[i].candidate,
-                        mlineindex: cands[i].sdpMLineIndex,
-                        mid: cands[i].sdpMid,
+                        candidate: cand.candidate,
+                        mlineindex: cand.sdpMLineIndex,
+                        mid: cand.sdpMid,
                         // seq: i
                     };
 

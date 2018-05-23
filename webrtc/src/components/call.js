@@ -1,7 +1,7 @@
-var Util = require('./utils');
+var Util = (require('./utils').default);
 var RTCIQHandler = require('./iq');
 var API = require('./api');
-var WebRTC = require('./webrtc');
+var WebRTC = (require('./webrtc').default);
 var CommonPattern = require('./p2p');
 
 var RouteTo = API.RouteTo;

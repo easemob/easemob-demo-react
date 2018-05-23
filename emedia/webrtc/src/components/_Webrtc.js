@@ -89,6 +89,46 @@ var _SDPSection = {
         self.videoSection = self._parseVideoSection(sdp);
     },
 
+    updateVideoSendonly: function () {
+        var self = this;
+
+        if(!self.videoSection){
+            return;
+        }
+
+        self.videoSection = self.videoSection.replace(/sendrecv/g, "sendonly");
+    },
+
+    updateVideoRecvonly: function () {
+        var self = this;
+
+        if(!self.videoSection){
+            return;
+        }
+
+        self.videoSection = self.videoSection.replace(/sendrecv/g, "recvonly");
+    },
+
+    updateAudioSendonly: function () {
+        var self = this;
+
+        if(!self.audioSection){
+            return;
+        }
+
+        self.audioSection = self.audioSection.replace(/sendrecv/g, "sendonly");
+    },
+
+    updateAudioRecvonly: function () {
+        var self = this;
+
+        if(!self.audioSection){
+            return;
+        }
+
+        self.audioSection = self.audioSection.replace(/sendrecv/g, "recvonly");
+    },
+
     updateVCodes: function (vcodes) {
         var self = this;
 
@@ -130,9 +170,9 @@ var _SDPSection = {
             supportVCode && numCodes.push(supportVCode);
         }
         if(numCodes.length == 0){
-            _logger.error("Not found vcodes map", vcodes);
+            _logger.warn("Not found vcodes map", vcodes);
             if(self._webrtc){
-                _logger.error("Not found vcodes map", vcodes, self._webrtc._rtcId, self._webrtc.__id);
+                _logger.warn("Not found vcodes map", vcodes, self._webrtc._rtcId, self._webrtc.__id);
             }
         }
 
@@ -162,9 +202,9 @@ var _SDPSection = {
         fields.splice(3, fields.length - 3, newNumCodes.join(' '));
 
         codeLine = fields.join(' ');
-        _logger.warn(codeLine);
+        _logger.info(codeLine);
         if(self._webrtc){
-            _logger.warn(codeLine, self._webrtc._rtcId, self._webrtc.__id);
+            _logger.debug(codeLine, self._webrtc._rtcId, self._webrtc.__id);
         }
 
         self.videoSection = codeLine + self.videoSection.substring(codeLineLastIndex);
@@ -341,7 +381,7 @@ var SDPSection = function (sdp, webrc) {
 };
 
 
-window.__rtc_globalCount = 0;
+var __rtc_globalCount = emedia.__rtc_globalCount = 0;
 
 /**
  * Abstract
@@ -385,6 +425,12 @@ var _WebRTC = _util.prototypeExtend({
             'OfferToReceiveVideo': true
         }
     },
+
+    /**
+     * offerToReceiveAudio false sendonly, or sendrecv
+     * offerToReceiveVideo false sendonly, or sendrecv
+     *
+     */
     offerOptions: {
         offerToReceiveAudio: true,
         offerToReceiveVideo: true
@@ -404,6 +450,8 @@ var _WebRTC = _util.prototypeExtend({
         self.__tmpLocalCands = [];
         self._rtcPeerConnection = null;
 
+        self.cctx = self.__id;
+
         _logger.info("Webrtc created. rtcId = ", self._rtcId, ", __id = ", self.__id);
     },
 
@@ -421,17 +469,25 @@ var _WebRTC = _util.prototypeExtend({
         self.subArgs = subArgs;
     },
 
+    getReceiversOfPeerConnection: function () {
+        var self = this;
+
+        if(!self._rtcPeerConnection){
+            return;
+        }
+
+        if(self._rtcPeerConnection.iceConnectionState == 'closed'){
+            return;
+        }
+
+        return self._rtcPeerConnection.getReceivers();
+    },
+
     updateRemoteBySubArgs: function (subArgs) {
         var self = this;
 
-        self._remoteStream && self._remoteStream.getVideoTracks().forEach(function (track) {
-            track.enabled = !(self.subArgs && self.subArgs.subSVideo === false);
-            //_logger.debug("video track. enabled ", track.enabled, track);
-        });
-        self._remoteStream && self._remoteStream.getAudioTracks().forEach(function (track) {
-            track.enabled = !(self.subArgs && self.subArgs.subSAudio === false);
-            //_logger.debug("audio track. enabled ", track.enabled, track);
-        });
+        emedia.enableVideoTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSVideo === false));
+        emedia.enableAudioTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSAudio === false));
     },
 
     createRtcPeerConnection: function (iceServerConfig) {
@@ -482,37 +538,79 @@ var _WebRTC = _util.prototypeExtend({
             if(!event.candidate.candidate){
                 throw "Not found candidate. candidate is error, " + event.candidate.candidate;
             }
+
+            var candidate = event.candidate;
+            candidate.cctx = self.cctx;
             if(!self.__setRemoteSDP){
-                (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(event.candidate);
-                _logger.debug('On ICE candidate but tmp buffer caused by not set remote sdp: ', event.candidate.candidate,
+                (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
+                _logger.debug('On ICE candidate but tmp buffer caused by not set remote sdp: ', candidate,
                     self._rtcId, self.__id, "closed:", self.closed);
                 return;
             }else{
-                _logger.debug('On ICE candidate: ', event.candidate.candidate,
-                    self._rtcId, self.__id, "closed:", self.closed);
+                _logger.debug('On ICE candidate: ', candidate, self._rtcId, self.__id, "closed:", self.closed);
             }
-            self.onIceCandidate(event.candidate);
+            self.onIceCandidate(candidate);
+        };
+
+        rtcPeerConnection.onconnectionstatechange = function (event) {
+            _logger.debug("peer connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
+                self._rtcId, self.__id, "closed:", self.closed);
+            self.onIceStateChange(event);
         };
 
         rtcPeerConnection.onicestatechange = function (event) {
-            _logger.debug("ice connect state", self.webRtc.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
+            _logger.debug("ice connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
                 self._rtcId, self.__id, "closed:", self.closed);
             self.onIceStateChange(event);
         };
 
         rtcPeerConnection.oniceconnectionstatechange = function (event) {
+            _logger.debug("ice connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
+                self._rtcId, self.__id, "closed:", self.closed);
             self.onIceStateChange(event);
         };
+
+        if(rtcPeerConnection.ontrack === null){
+            self._onTrack && (rtcPeerConnection.ontrack = function (event) {
+                self._onTrack(event);
+            });
+        }
 
         rtcPeerConnection.onaddstream = function (event) {
             self._onGotRemoteStream(event);
         };
     },
 
+    addTrack: function(tracks, stream){
+        var self = this;
+
+        tracks.forEach(function(track) {
+            self._rtcPeerConnection.addTrack(
+                track,
+                stream
+            );
+        });
+    },
     setLocalStream: function (localStream) {
-        this._localStream = localStream;
-        this._rtcPeerConnection.addStream(localStream);
+        var self = this;
+
+        self._localStream = localStream;
+        if(self._rtcPeerConnection.addTrack){
+            localStream.getTracks().forEach(function(track) {
+                self._rtcPeerConnection.addTrack(
+                    track,
+                    localStream
+                );
+            });
+        }else{
+            self._rtcPeerConnection.addStream(localStream);
+        }
         _logger.debug('Added local stream to RtcPeerConnection', localStream, self._rtcId, self.__id, "closed:", this.closed);
+    },
+
+    removeStream: function (mediaStream) {
+        this._rtcPeerConnection.removeStream(mediaStream);
+        _logger.debug('Remove stream from RtcPeerConnection', mediaStream, self._rtcId, self.__id, "closed:", this.closed);
     },
 
     getLocalStream: function () {
@@ -525,9 +623,21 @@ var _WebRTC = _util.prototypeExtend({
     createOffer: function (onCreateOfferSuccess, onCreateOfferError) {
         var self = this;
 
-        _logger.debug('createOffer start...');
+        _logger.debug('createOffer start...', self.offerOptions);
 
-        return self._rtcPeerConnection.createOffer(self.offerOptions).then(
+        var offerOptions = _util.extend({}, self.offerOptions);
+
+        //offerToReceiveAudio = false时，chrome没有video段；safari却这个块。需要将sendrecv改为sendonly
+        //由于手机没有视频发布时，sdp中有video字段，而 web以offerToReceiveVideo = false去订阅时，导致订阅流中没有video块，会引发重协商。进而导致 始终无法看到对方视频
+        //所以 订阅流时 无论offerToReceiveVideo = false，都生成offer sdp；其中都有video块。即 offerToReceiveVideo = true；但要将sdp修改为recvonly
+        if(self.subArgs){
+            offerOptions = {
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: true
+            }
+        }
+
+        return self._rtcPeerConnection.createOffer(offerOptions).then(
             function (desc) {
                 self.offerDescription = desc;
 
@@ -536,11 +646,34 @@ var _WebRTC = _util.prototypeExtend({
                 //_logger.debug(desc.sdp);
                 //_logger.debug(desc);
 
-                if(self.optimalVideoCodecs && ((typeof self.optimalVideoCodecs === "string") || self.optimalVideoCodecs.length > 0)){
+                var updateVCodes;
+                // if((updateVCodes = (self.optimalVideoCodecs && ((typeof self.optimalVideoCodecs === "string") || self.optimalVideoCodecs.length > 0)))
+                //     || (emedia.isSafari && self.offerOptions && (self.offerOptions.offerToReceiveVideo === false || self.offerOptions.offerToReceiveAudio === false))
+                // ){
+                //     var sdpSection = new SDPSection(desc.sdp, self);
+                //     updateVCodes && sdpSection.updateVCodes(self.optimalVideoCodecs);
+                //     emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoSendonly();
+                //     emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioSendonly();
+                //
+                //     desc.sdp = sdpSection.getUpdatedSDP();
+                // }
+                if((updateVCodes = (self.optimalVideoCodecs && ((typeof self.optimalVideoCodecs === "string") || self.optimalVideoCodecs.length > 0)))
+                    || (self.offerOptions && (self.offerOptions.offerToReceiveVideo === false || self.offerOptions.offerToReceiveAudio === false))
+                ){
                     var sdpSection = new SDPSection(desc.sdp, self);
-                    sdpSection.updateVCodes(self.optimalVideoCodecs);
+                    updateVCodes && sdpSection.updateVCodes(self.optimalVideoCodecs);
+
+                    if(!emedia.isSafari && self.subArgs){ //订阅流
+                        // self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoRecvonly();
+                        // self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioRecvonly();
+                    }else{
+                        emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoSendonly();
+                        emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioSendonly();
+                    }
+
                     desc.sdp = sdpSection.getUpdatedSDP();
                 }
+
                 //_logger.debug(desc.sdp);
                 //_logger.debug(desc);
                 //_logger.debug(JSON.stringify(desc));
@@ -550,6 +683,7 @@ var _WebRTC = _util.prototypeExtend({
                     self.onSetLocalSessionDescriptionSuccess,
                     self.onSetSessionDescriptionError
                 ).then(function () {
+                    desc.cctx = self.cctx;
                     (onCreateOfferSuccess || self.onCreateOfferSuccess)(desc);
                 });
             },
@@ -560,7 +694,7 @@ var _WebRTC = _util.prototypeExtend({
     createPRAnswer: function (onCreatePRAnswerSuccess, onCreatePRAnswerError) {
         var self = this;
 
-        _logger.info(' createPRAnswer start', "closed:", self.closed);
+        _logger.info(' createPRAnswer start', "closed:", self.closed, self.sdpConstraints);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
@@ -590,6 +724,7 @@ var _WebRTC = _util.prototypeExtend({
 
                     _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
 
+                    self.cctx && (desc.cctx = self.cctx);
                     (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess)(desc);
                 });
             },
@@ -600,26 +735,30 @@ var _WebRTC = _util.prototypeExtend({
     createAnswer: function (onCreateAnswerSuccess, onCreateAnswerError) {
         var self = this;
 
-        _logger.info('createAnswer start', "closed:", self.closed);
+        _logger.info('createAnswer start', "closed:", self.closed, self.sdpConstraints);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
         return self._rtcPeerConnection.createAnswer(self.sdpConstraints).then(
             function (desc) {
-                _logger.debug('_____________________Answer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('_____________________Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                 desc.type = 'answer';
 
-                if(emedia.supportPRAnswer){
+                function updateSDP() {
                     var sdpSection = new SDPSection(desc.sdp);
                     var ms = sdpSection.parseMsidSemantic(sdpSection.headerSection);
+                    if(!ms){
+                        return;
+                    }
+
                     if(ms.WMS == '*') {
                         sdpSection.updateHeaderMsidSemantic(ms.WMS = "MS_0000");
                     }
                     var audioSSRC = sdpSection.parseSSRC(sdpSection.audioSection);
                     var videoSSRC = sdpSection.parseSSRC(sdpSection.videoSection);
 
-                    sdpSection.updateAudioSSRCSection(1000, "CHROME0000", ms.WMS, audioSSRC.label || "LABEL_AUDIO_1000");
+                    audioSSRC && sdpSection.updateAudioSSRCSection(1000, "CHROME0000", ms.WMS, audioSSRC.label || "LABEL_AUDIO_1000");
                     if(videoSSRC){
                         sdpSection.updateVideoSSRCSection(2000, "CHROME0000", ms.WMS, videoSSRC.label || "LABEL_VIDEO_2000");
                     }
@@ -628,10 +767,13 @@ var _WebRTC = _util.prototypeExtend({
                     desc.sdp = sdpSection.getUpdatedSDP();
                 }
 
+                if(emedia.supportPRAnswer){
+                    updateSDP();
+                }
 
                 self.__answerDescription = desc;
 
-                _logger.debug('Answer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
                 _logger.debug('setLocalDescription start', self._rtcId, self.__id, "closed:", self.closed);
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
@@ -648,8 +790,9 @@ var _WebRTC = _util.prototypeExtend({
                         desc.sdp = sdpSection.getUpdatedSDP();
                     }
 
-                    _logger.debug('Send Answer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                    _logger.debug('Send Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
 
+                    self.cctx && (desc.cctx = self.cctx);
                     (onCreateAnswerSuccess || self.onCreateAnswerSuccess)(desc);
                 });
             },
@@ -657,7 +800,7 @@ var _WebRTC = _util.prototypeExtend({
         );
     },
 
-    close: function (remainLocalStream) {
+    close: function (remainLocalStream, onlyPeerConnectionClosed) {
         var self = this;
         _logger.warn("webrtc closing", "closed:", self._rtcId, self.__id, self.closed);
 
@@ -665,30 +808,23 @@ var _WebRTC = _util.prototypeExtend({
             return;
         }
 
+        onlyPeerConnectionClosed = (onlyPeerConnectionClosed === true);
 
         self.closed = true;
 
         try {
             self._rtcPeerConnection && self._rtcPeerConnection.close();
         } catch (e) {
-            _logger.error(e);
+            _logger.warn(e);
         } finally {
-
-            // if (!remainLocalStream && self._localStream) {
-            //     self._localStream.getTracks().forEach(function (track) {
-            //         track.stop();
-            //     });
-            //     self._localStream = null;
-            // }
-
             if (self._remoteStream) {
-                self._remoteStream.getTracks().forEach(function (track) {
-                    track.stop();
-                });
+                emedia.stopTracks(self._remoteStream);
             }
             self._remoteStream = null;
 
-            self.onClose && self.onClose();
+            if(!onlyPeerConnectionClosed){
+                self.onClose && self.onClose();
+            }
 
             _logger.warn("webrtc closed. closed:", self._rtcId, self.__id, self.closed);
         }
@@ -716,6 +852,13 @@ var _WebRTC = _util.prototypeExtend({
         for (var i = 0; i < _cands.length; i++) {
             candidate = _cands[i];
 
+            if(candidate.cctx && candidate.cctx != self.cctx){
+                _logger.warn('addIceCandidate fail drop. cctx not equal. ', candidate, self._rtcId, self.__id, "closed:", self.closed);
+                continue;
+            }
+
+            //candidate.candidate = candidate.candidate.replace("172.17.2.130", "10.121.63.1");
+
             self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
                 self.onAddIceCandidateSuccess,
                 self.onAddIceCandidateError
@@ -727,6 +870,18 @@ var _WebRTC = _util.prototypeExtend({
         var self = this;
 
         _logger.debug('setRemoteDescription start. ', desc, self._rtcId, self.__id, "closed:", self.closed);
+
+        // 生成offer的
+        // 会议模式，也是设置的是 pranswer 和 answer 会有服务器传回。
+        // p2p模式下的主叫。此时设置的是 pranswer 和 answer。这个应该有p2p模式下传回。因此，需要如果有的话，需要判断
+        if(self.offerDescription){
+            if(desc.cctx && desc.cctx != self.cctx){
+                _logger.warn('setRemoteDescription fail drop. cctx not equal. ', desc, self._rtcId, self.__id, "closed:", self.closed);
+                return;
+            }
+        }else{//被叫 p2p模式，覆盖
+            desc.cctx && (self.cctx = desc.cctx);
+        }
 
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
         _logger.debug('setRemoteDescription.', desc, "closed:", self.closed);
@@ -772,7 +927,9 @@ var _WebRTC = _util.prototypeExtend({
 
     _onGotRemoteStream: function (event) {
         _logger.debug('onGotRemoteStream.', self._rtcId, self.__id, event);
-        this._remoteStream = event.stream;
+        this._remoteStream = event.stream || event.streams[0];
+        this._remoteStream._rtcId = this._rtcId;
+        this._remoteStream.__rtc_c_id = this.__id;
         this.onGotRemoteStream(this._remoteStream, event);
 
         _logger.debug('received remote stream, you will see the other.', self._rtcId, self.__id, "closed:", this.closed);
