@@ -83,11 +83,11 @@ function promiseApiWrapper(adapter) {
             var pc = self._nativeRTCPeerConnection;
             var args = arguments;
 
-            var isLegacyCall = arguments.length &&
-                typeof arguments[0] === 'function';
+            var isLegacyCall = args.length &&
+                typeof args[0] === 'function';
 
             if (isLegacyCall) {
-                var obj = pc[method](args[0], rgs[1], arguments[2]);
+                var obj = pc[method](args[0], args[1], args[2]);
                 self.iceConnectionState = self._nativeRTCPeerConnection.iceConnectionState;
 
                 return obj;
@@ -107,11 +107,11 @@ function promiseApiWrapper(adapter) {
             var pc = self._nativeRTCPeerConnection;
             var args = arguments;
 
-            var isLegacyCall = arguments.length &&
-                typeof arguments[0] === 'function';
+            var isLegacyCall = args.length &&
+                typeof args[0] === 'function';
 
             if (isLegacyCall) {
-                var obj = pc[method](args[0], rgs[1], arguments[2]);
+                var obj = pc[method](args[0], args[1], args[2]);
                 self.iceConnectionState = self._nativeRTCPeerConnection.iceConnectionState;
 
                 return obj;

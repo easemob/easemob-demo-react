@@ -319,4 +319,18 @@ module.exports = {
     ShareDesktopExtensionNotFound: Error.extend({message: function () {
         return this.execTime() + " ShareDesktopExtensionNotFound: " + "shared desktop plugin required";
     }}),
+
+    OtherDeviceAnswer: Error.extend({message: function () {
+        return this.execTime() + " other device answer, webrtc = " + this.rtcId;
+    }}),
+
+    AudioMixerStreamNotAllowSub: Error.extend({message: function () {
+        return this.execTime() + " audio mixer stream not allow sub, webrtc = " + this.rtcId + ", streamId = " + this.stream.id;
+    }}),
+    AudioMixerStreamNotAllowOnlySubVideo: Error.extend({message: function () {
+            return this.execTime() + " audio mixer stream not allow only sub video, webrtc = " + this.rtcId + ", streamId = " + this.stream.id;
+    }}),
+    AudioMixerStreamRepeatPublish: Error.extend({message: function () {
+        return this.execTime() + " audio mixer stream repeat publish";
+    }})
 };

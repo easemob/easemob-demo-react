@@ -47,6 +47,10 @@ var Message = _util.prototypeExtend({
         subSId && (this.subSId = subSId);
         return this;
     },
+    setMemId: function (memId) {
+        memId && (this.memId = memId);
+        return this;
+    },
     setPubS: function (pubS) {
         pubS && (this.pubS = _util.extend(false, {}, pubS));
 
@@ -56,15 +60,15 @@ var Message = _util.prototypeExtend({
         }
 
         thisPubS && _util.forEach(thisPubS, function (key, value) {
-           if(_util.isPlainObject(value) || typeof value === 'function'){
-               _util.removeAttribute(thisPubS, key);
-           }
+            if(_util.isPlainObject(value) || typeof value === 'function'){
+                _util.removeAttribute(thisPubS, key);
+            }
         });
 
         thisPubS && _util.removeAttribute(thisPubS, "localStream");
         thisPubS && _util.removeAttribute(thisPubS, "_localMediaStream");
         thisPubS && _util.removeAttribute(thisPubS, "_webrtc");
-        
+
         return this;
     },
     setRtcId: function (rtcId) {
@@ -135,7 +139,7 @@ var Message = _util.prototypeExtend({
  *
  */
 
-window.__session_globalCount = 0;
+var __session_globalCount = emedia.__session_globalCount = 0;
 
 function _connect(onConnected, onConnectFail, retry){
     var self = this;
@@ -159,13 +163,13 @@ function _connect(onConnected, onConnectFail, retry){
         }
 
         if(self.sessId && message.sessId != self.sessId){
-            _logger.info("self.sessId && message.sessId != self.sessId", message);
+            _logger.warn("self.sessId && message.sessId != self.sessId", message);
             return;
         }
 
         self.thisWsUri === self._websocket.url && self._websocket.send(JSON.stringify(message));
-        self.thisWsUri === self._websocket.url && _logger.info("Done send: req:", message, self._websocket.url);
-        self.thisWsUri === self._websocket.url || _logger.info("Donot send(url not equal): req:", message, self._websocket.url);
+        self.thisWsUri === self._websocket.url && _logger.debug("Done send: req:", message, self._websocket.url);
+        self.thisWsUri === self._websocket.url || _logger.debug("Donot send(url not equal): req:", message, self._websocket.url);
     }
 
     function notifyNewMessage() {
@@ -199,7 +203,7 @@ function _connect(onConnected, onConnectFail, retry){
             if(__array.length > 0){
                 Array.prototype.push.apply(self._bufferedMessages, __array);
             }
-        //} else if(!retry || !self.online){
+            //} else if(!retry || !self.online){
         } else if(retry === 0 || !self.online){
             var _messageMap = _util.extend(false, {}, self._callbacks);
 
@@ -256,10 +260,10 @@ function _connect(onConnected, onConnectFail, retry){
     }
 
     try {
-        _logger.warn("Connecting", self.thisWsUri, retry);
+        _logger.info("Connecting", self.thisWsUri, retry);
         _websocket = self._websocket = new WebSocket(self.thisWsUri);
     } catch (e) {
-        _logger.error(e);
+        _logger.warn(e);
         connectFail(e);
 
         return;
@@ -268,7 +272,7 @@ function _connect(onConnected, onConnectFail, retry){
     _websocket.onopen = function(evt) {
         var _url = this.url;
         if(_url !== self.thisWsUri){
-            _logger.error("ignore the onopen. caused by websocket url not ", self.thisWsUri, _url);
+            _logger.warn("ignore the onopen. caused by websocket url not ", self.thisWsUri, _url);
             return;
 
         }
@@ -286,7 +290,7 @@ function _connect(onConnected, onConnectFail, retry){
     _websocket.onmessage = function(evt) {
         var _url = this.url;
         if(_url !== self.thisWsUri){
-            _logger.error("ignore recv data. caused by websocket url not ", self.thisWsUri, _url, evt.data);
+            _logger.warn("ignore recv data. caused by websocket url not ", self.thisWsUri, _url, evt.data);
             return;
 
         }
@@ -295,7 +299,7 @@ function _connect(onConnected, onConnectFail, retry){
 
         var data = JSON.parse(evt.data);
         data && data.op == 1001 &&  _logger.debug("recv message: rsp:", data);
-        data && data.op != 1001 &&  _logger.info("recv message: evt:", data);
+        data && data.op != 1001 &&  _logger.debug("recv message: evt:", data);
 
         self.onMessage(data);
     };
@@ -304,7 +308,7 @@ function _connect(onConnected, onConnectFail, retry){
         var _url = this.url;
         _logger.info("Disconnected:", _url, self.thisWsUri, evt);
         if(_url !== self.thisWsUri){
-            _logger.error("ignore onclose. caused by websocket url not ", self.thisWsUri, _url);
+            _logger.warn("ignore onclose. caused by websocket url not ", self.thisWsUri, _url);
             return;
 
         }
@@ -433,7 +437,7 @@ module.exports = _util.prototypeExtend({
 
         window.addEventListener("offline", offline, true);
 
-        _logger.warn("online status = ", self.online);
+        _logger.info("online status = ", self.online);
     },
 
     _nextWsUri: function () {
@@ -486,7 +490,7 @@ module.exports = _util.prototypeExtend({
                 self.notifyNewMessage();
             });
         }
-        
+
         function failed(evt) {
             if(retry <= 0){
                 _logger.warn("Reconnect end. but fail.", evt.url, retry);
@@ -587,7 +591,6 @@ module.exports = _util.prototypeExtend({
         return this._sessionId;
     },
 
-
     newMessage: function(cfg) {
         return new Message(cfg);
     },
@@ -598,6 +601,7 @@ module.exports = _util.prototypeExtend({
                 message.sdp = _util.parseJSON(message.sdp);
             }
             message.sdp.type && ( message.sdp.type =  message.sdp.type.toLowerCase());
+            message.cctx && (message.sdp.cctx = message.cctx);
         }
         if (message && message.cands) {
             if (typeof message.cands === 'string') {
@@ -612,6 +616,8 @@ module.exports = _util.prototypeExtend({
 
                 delete message.cands[i].mlineindex;
                 delete message.cands[i].mid;
+
+                message.cctx && (message.cands[i].cctx = message.cctx);
             }
         }
 
@@ -624,6 +630,7 @@ module.exports = _util.prototypeExtend({
             message.mems = {};
 
             _util.forEach(_mems, function (index, _mem) {
+                _mem.name && (_mem.memName = _mem.name);
                 message.mems[_mem.id] = _mem;
 
                 var acptOps = _mem.acptOps = {};
@@ -640,13 +647,15 @@ module.exports = _util.prototypeExtend({
                     try{
                         message.mems[_mem.id].ext = JSON.parse(_mem.ext);
                     }catch(e){
-                        _logger.error(e);
+                        _logger.debug(e);
                     }
                 }
             })
         }
 
         if (message && message.mem) {
+            message.mem.name && (message.mem.memName = message.mem.name);
+
             var acptOps = message.mem.acptOps = {};
             _util.forEach(emedia.config.baseAcptOps, function (_index, _oper) {
                 acptOps[_oper] = true;
@@ -661,7 +670,7 @@ module.exports = _util.prototypeExtend({
                 try{
                     message.mem.ext = JSON.parse(message.mem.ext);
                 }catch(e){
-                    _logger.error(e);
+                    _logger.debug(e);
                 }
             }
         }
@@ -681,7 +690,7 @@ module.exports = _util.prototypeExtend({
                     try{
                         message.streams[_stream.id].ext = JSON.parse(_stream.ext);
                     }catch(e){
-                        _logger.error(e);
+                        _logger.debug(e);
                     }
                 }
             })
@@ -692,7 +701,7 @@ module.exports = _util.prototypeExtend({
                 try{
                     message.pubS.ext = JSON.parse(message.pubS.ext);
                 }catch(e){
-                    _logger.error(e);
+                    _logger.debug(e);
                 }
             }
         }
@@ -702,13 +711,25 @@ module.exports = _util.prototypeExtend({
             try{
                 message.ext = JSON.parse(message.ext);
             }catch(e){
-                _logger.error(e);
+                _logger.debug(e);
             }
         }
+
+        return message;
     },
 
     onMessage: function(servMessage){
         var self = this;
+
+        function onFunc(servMessage) {
+            var onFunc;
+            var event = servMessage.op;
+            if ((onFunc = self._events[event]) && (onFunc = self[onFunc])) {
+                onFunc.call(self, servMessage);
+            } else {
+                throw "Not supported event = ", servMessage;
+            }
+        }
 
         if(servMessage.op != 1001 && !servMessage.sessId){
             throw "message sessId error. server evt data error";
@@ -718,7 +739,12 @@ module.exports = _util.prototypeExtend({
             throw "message sessId error. server and local not equal";
         }
 
-        self.__modifyMessage(servMessage);
+        if(servMessage.op === 1004){
+            onFunc(servMessage);
+            return;
+        }
+
+        servMessage = self.__modifyMessage(servMessage);
 
         var reqMessage = _util.removeAttribute(self._callbacks, servMessage.tsxId);
         if(reqMessage && reqMessage.op === 200){
@@ -748,27 +774,25 @@ module.exports = _util.prototypeExtend({
             }
         }
 
-
-        self.onEvent(new __event.RecvResponse({request: reqMessage, response: servMessage}));
-
-        if(reqMessage && reqMessage.__callback__){
-            reqMessage.__callback__(servMessage);
+        if(self.owner && self.owner.closed){
+            _logger.warn("self closed. me is " + self.owner.getMemberId() + ", session_id = " + self.getSessionId() + ". drop message", servMessage);
             return;
         }
 
+
+        self.onEvent(new __event.RecvResponse({request: reqMessage, response: servMessage}));
+
+        if(reqMessage && reqMessage.__callback__ && servMessage.op !== 1004){
+            reqMessage.__callback__(servMessage);
+            return;
+        }
 
         if(!servMessage.op || servMessage.op == 1001){
             _logger.trace("Igron message. caused by op not found.", servMessage);
             return;
         }
 
-        var onFunc;
-        var event = servMessage.op;
-        if ((onFunc = self._events[event]) && (onFunc = self[onFunc])) {
-            onFunc(servMessage);
-        } else {
-            throw "Not supported event = ", servMessage;
-        }
+        onFunc(servMessage);
     },
 
     __modifyMessageForPost: function (message) {
@@ -778,6 +802,10 @@ module.exports = _util.prototypeExtend({
             var cands = message.cands;
             for (var i = 0; i < cands.length; i++){
                 var _cand;
+
+                if(i == 0){
+                    cands[i].cctx && (message.cctx = cands[i].cctx);
+                }
 
                 if(typeof cands[i] === "string"){
                     _cand = {
@@ -802,17 +830,19 @@ module.exports = _util.prototypeExtend({
                     };
                 }
 
-                _cands.push(_cand);
+                _cands.push(JSON.stringify(_cand));
             }
 
             message.cands = _cands;
         }
 
-        if (message.sdp && _util.isPlainObject(message.sdp)) {
+        if (message.sdp && (typeof message.sdp !== "string")) {
             var _sdp = {
                 type: message.sdp.type,
                 sdp: message.sdp.sdp
             };
+
+            message.sdp.cctx && (message.cctx = message.sdp.cctx);
 
             message.sdp = _sdp;
 
@@ -824,20 +854,29 @@ module.exports = _util.prototypeExtend({
         //     message.ext = JSON.stringify(message.ext);
         // }
 
+        message.pubS && _util.removeAttribute(message.pubS, "_located");
+        message.pubS && _util.removeAttribute(message.pubS, "mutedMuted");
+        message.pubS && _util.removeAttribute(message.pubS, "mediaStream");
+        message.pubS && _util.removeAttribute(message.pubS, "isRepublished");
+        message.pubS && _util.removeAttribute(message.pubS, "optimalVideoCodecs");
+
+        typeof message.post === "function" && _util.removeAttribute(message, "post");
+
         return message;
     },
 
-    postMessage: function(message, callback) {
+    postMessage: function(message, callback, timeoutMillis) {
         var self = this;
 
         if (!message.tsxId) {
-            message.setTsxId("MSG" + Date.now() + "-" + (__session_globalCount++));
+            message.tsxId = ("MSG" + Date.now() + "-" + (__session_globalCount++));
         }
 
         if(message.memId){
             var _mem = self.owner._cacheMembers[message.memId];
 
             if(!_mem){
+                _logger.warn("Member not found at local. memberId = " + message.memId, message);
                 callback && callback({op: 1001, tsxId: message.tsxId, result: -507, msg: " member not found at local. memberId = " + message.memId});
                 return;
             }
@@ -852,6 +891,7 @@ module.exports = _util.prototypeExtend({
                 var _reqOp = reqOps[index];
 
                 if(!_mem.acptOps[_reqOp]){
+                    _logger.warn("Member not accept op " + _reqOp + ", " + message.memId, message);
                     callback && callback({op: 1001, tsxId: message.tsxId, result: -507, msg: " member not accept op " + _reqOp + ", " + message.memId});
                     return;
                 }
@@ -860,15 +900,23 @@ module.exports = _util.prototypeExtend({
         _util.removeAttribute(message, '_reqOps');
 
         if (self._sessionId && self._sessionId != message.sessId) {
+            _logger.warn("sessionId not excepted. self._sessionId = " + self._sessionId, message);
             callback && callback({op: 1001, tsxId: message.tsxId, result: -9527, msg: "sessionId not excepted."});
             return;
         }
         if (self.closed) {
+            _logger.warn("session closed.", message);
             callback && callback({op: 1001, tsxId: message.tsxId, result: -9527, msg: "session closed"});
             return;
         }
 
-        self.__modifyMessageForPost(message);
+        var oldMessage = _util.extend({}, message);
+        message = self.__modifyMessageForPost(message);
+        if(!message){
+            _logger.warn("Message drop. callback success.", message);
+            callback && callback({op: 1001, tsxId: oldMessage.tsxId, result: 0, msg: "Message drop. callback success."});
+            return;
+        }
 
         if(message.op === 200){ // enter 放在首位
             self._bufferedMessages.unshift(message);
@@ -886,12 +934,24 @@ module.exports = _util.prototypeExtend({
         } else {
             self._bufferedMessages.push(message);
         }
-        self._callbacks[message.tsxId] =  _util.extend(message, {
-            __callback__: callback
-        });
 
+        callback && (self._callbacks[message.tsxId] =  _util.extend(message, {
+            __callback__: callback.bind(self.owner)
+        }));
 
         self.notifyNewMessage && self.notifyNewMessage();
+
+        if(timeoutMillis && callback){
+            setTimeout(function () {
+                var message = self._callbacks[message.tsxId];
+
+                if(message && message.__callback__){
+                    message.__callback__({op: 1001, tsxId: oldMessage.tsxId, result: -408, msg: "Message request timeout."});
+                }
+
+                _util.removeAttribute(self._callbacks, message.tsxId);
+            }, timeoutMillis);
+        }
     },
 
     close: function (reason) {

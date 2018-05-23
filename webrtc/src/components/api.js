@@ -1,7 +1,7 @@
 /**
  * API
  */
-var _util = require('./utils');
+var _util = (require('./utils').default);
 var _logger = _util.logger;
 
 

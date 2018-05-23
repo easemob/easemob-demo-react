@@ -1,4 +1,4 @@
-var Util = require('./components/utils');
+var Util = (require('./components/utils').default);
 var Call = require('./components/call');
 
 window.WebIM = typeof WebIM !== 'undefined' ? WebIM : {};
@@ -18,8 +18,9 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 /**
  * 判断是否支持pranswer
  */
-if (/Chrome/.test(navigator.userAgent)) {
-    WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
+if (/Firefox/.test(navigator.userAgent)) {
+    //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
+    WebIM.WebRTC.supportPRAnswer = false;
+}else{
+    WebIM.WebRTC.supportPRAnswer = true;
 }
-
-//WebIM.WebRTC.supportPRAnswer = false;
