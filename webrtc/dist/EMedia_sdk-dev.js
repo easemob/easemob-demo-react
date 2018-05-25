@@ -17717,3 +17717,5 @@ module.exports = _util.prototypeExtend({
 
 /***/ })
 /******/ ]);
+//3.0.0_Git.9ef7ddd
+console && console.warn('EMedia version', '3.0.0_Git.9ef7ddd');

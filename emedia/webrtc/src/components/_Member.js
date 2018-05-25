@@ -122,19 +122,19 @@ module.exports = _util.prototypeExtend({
         var webrtc = new WebRTC({
             //iceServerConfig: iceServerConfig,
 
-            onIceStateChange: function(event){
-                var state = event.target.iceConnectionState;
+            onIceStateChange: function(iceState){
+                var state = iceState;
 
                 _logger.debug("evt.target ice state", state);
 
                 if(state == 'failed'){
-                    self.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: event}));
-                    webrtc.onEvent && webrtc.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: event}));
+                    self.onEvent(new __event.ICEConnectFail({webrtc: webrtc}));
+                    webrtc.onEvent && webrtc.onEvent(new __event.ICEConnectFail({webrtc: webrtc}));
 
                     return;
                 }
                 if(state == 'connected'){
-                    self.onEvent(new __event.ICEConnected({webrtc: webrtc, event: event}));
+                    self.onEvent(new __event.ICEConnected({webrtc: webrtc}));
                     webrtc.onEvent = null;
 
                     return;
@@ -152,7 +152,7 @@ module.exports = _util.prototypeExtend({
                     return;
                 }
 
-                self._onIceStateChange && self._onIceStateChange(webrtc, event);
+                self._onIceStateChange && self._onIceStateChange(webrtc, iceState);
             },
 
             onIceCandidate: function (candidate) { //event.candidate
@@ -253,11 +253,11 @@ module.exports = _util.prototypeExtend({
 
     },
 
-    _onIceStateChange: function(webrtc, webrtcEvent){
+    _onIceStateChange: function(webrtc, rtcState){
         var self = this;
 
-        _logger.info(webrtc.getRtcId(), webrtcEvent);
-        self.onEvent(new __event.ICEChanage({webrtc: webrtc, event: webrtcEvent, state: webrtcEvent.target.iceConnectionState}));
+        _logger.info(webrtc.getRtcId(), rtcState);
+        self.onEvent(new __event.ICEChanage({webrtc: webrtc, state: rtcState}));
     },
 
     _onIceCandidate: function (webrtc, cand) { //event.candidate

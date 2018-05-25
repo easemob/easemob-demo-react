@@ -599,6 +599,8 @@ var Handler = _util.prototypeExtend({
 
         _util.forEach(self._cacheStreams, function (sid, stream) {
             if(stream.rtcId == webrtc.getRtcId()){
+                stream.finalVCodeChoices = webrtc.finalVCodeChoices;
+
                 if(self._maybeNotExistStreams[sid]){
                     _util.removeAttribute(self._maybeNotExistStreams, stream.id);
                     self._linkedStreams[sid] = stream;

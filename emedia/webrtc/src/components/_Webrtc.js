@@ -44,38 +44,41 @@ var _logger = _util.tagLogger("Webrtc");
 
 var __event = require('./event');
 
+var SDPUtils = require('sdp'); //希望使用 SDPUtils 取代 SDPSection
+
 var _SDPSection = {
     headerSection: null,
 
     audioSection: null,
     videoSection: null,
 
-    _parseHeaderSection: function (sdp) {
-        var index = sdp.indexOf('m=audio');
+    _parseHeaderSection: function (sdp, audioIndex, videoIndex) {
+        var index = audioIndex;
+
+        if(videoIndex === -1){ //保持不变
+        }else if(audioIndex === -1){
+            index = videoIndex;
+        }else{
+            index = Math.min(audioIndex, videoIndex);
+        }
+
         if (index >= 0) {
             return sdp.slice(0, index);
         }
-
-        index = sdp.indexOf('m=video');
-        if (index >= 0) {
-            return sdp.slice(0, index);
-        }
-
         return sdp;
     },
 
-    _parseAudioSection: function (sdp) {
-        var index = sdp.indexOf('m=audio');
+    _parseAudioSection: function (sdp, audioIndex, videoIndex) {
+        var index = audioIndex;
         if (index >= 0) {
-            var endIndex = sdp.indexOf('m=video');
-            return sdp.slice(index, endIndex < 0 ? sdp.length : endIndex);
+            return sdp.slice(index, videoIndex < index ? sdp.length : videoIndex);
         }
     },
 
-    _parseVideoSection: function (sdp) {
-        var index = sdp.indexOf('m=video');
+    _parseVideoSection: function (sdp, audioIndex, videoIndex) {
+        var index = videoIndex;
         if (index >= 0) {
-            return sdp.slice(index);
+            return sdp.slice(index, audioIndex < index ? sdp.length : audioIndex);
         }
     },
 
@@ -84,9 +87,12 @@ var _SDPSection = {
 
         self._preSDP = sdp;
 
-        self.headerSection = self._parseHeaderSection(sdp);
-        self.audioSection = self._parseAudioSection(sdp);
-        self.videoSection = self._parseVideoSection(sdp);
+        var audioIndex = self._preAudioIndex = sdp.indexOf('m=audio');
+        var videoIndex = self._preVideoIndex = sdp.indexOf('m=video');
+
+        self.headerSection = self._parseHeaderSection(sdp, audioIndex, videoIndex);
+        self.audioSection = self._parseAudioSection(sdp, audioIndex, videoIndex);
+        self.videoSection = self._parseVideoSection(sdp, audioIndex, videoIndex);
     },
 
     updateVideoSendonly: function () {
@@ -156,12 +162,12 @@ var _SDPSection = {
 
         //H264
         //if(/Firefox/.test(navigator.userAgent) || /Chrome/.test(navigator.userAgent)){ //a=fmtp:126 profile-level-id=42e01f;level-asymmetry-allowed=1;packetization-mode=1
-            var h264_regexp = /a=fmtp:(\d+) .*profile-level-id=42e01f;?.*/ig;
-            var h264_arr = self._parseLine(self.videoSection, h264_regexp);
+        var h264_regexp = /a=fmtp:(\d+) .*profile-level-id=42e01f;?.*/ig;
+        var h264_arr = self._parseLine(self.videoSection, h264_regexp);
 
-            if(h264_arr && h264_arr.length >= 2){
-                vcodeMap['H264'] = h264_arr[1];
-            }
+        if(h264_arr && h264_arr.length >= 2){
+            vcodeMap['H264'] = h264_arr[1];
+        }
         //}
 
         var numCodes = []
@@ -288,14 +294,21 @@ var _SDPSection = {
         self.videoSection && (self.videoSection = self.videoSection + self.ssrcSection(ssrc, cname, msid, label))
     },
 
-    getUpdatedSDP: function () {
+    getUpdatedSDP: function (audioVideo) {
         var self = this;
 
         var sdp = "";
 
         self.headerSection && (sdp += self.headerSection);
-        self.audioSection && (sdp += self.audioSection);
-        self.videoSection && (sdp += self.videoSection);
+
+        if(audioVideo === true
+            || (audioVideo === undefined && self._preAudioIndex < self._preVideoIndex)){
+            self.audioSection && (sdp += self.audioSection);
+            self.videoSection && (sdp += self.videoSection);
+        }else{
+            self.videoSection && (sdp += self.videoSection);
+            self.audioSection && (sdp += self.audioSection);
+        }
 
         return sdp;
     },
@@ -379,6 +392,20 @@ var SDPSection = function (sdp, webrc) {
     this._webrtc = webrc;
     this.spiltSection(sdp);
 };
+
+SDPSection.isAudioVideo = function (sdp) {
+    var audioIndex = sdp.indexOf('m=audio');
+    var videoIndex = sdp.indexOf('m=video');
+
+    return audioIndex < videoIndex;
+}
+
+SDPSection.isVideoPreAudio = function (sdp) {
+    var audioIndex = sdp.indexOf('m=audio');
+    var videoIndex = sdp.indexOf('m=video');
+
+    return audioIndex >= 0 && videoIndex>=0 && videoIndex < audioIndex;
+}
 
 
 var __rtc_globalCount = emedia.__rtc_globalCount = 0;
@@ -492,11 +519,12 @@ var _WebRTC = _util.prototypeExtend({
 
     createRtcPeerConnection: function (iceServerConfig) {
         var self = this;
-        _logger.debug('begin create RtcPeerConnection ......', self._rtcId, self.__id, "closed:", self.closed);
+        _logger.debug('begin create RtcPeerConnection ......', self._rtcId, self.__id,  self.closed);
 
         iceServerConfig || (iceServerConfig = self.iceServerConfig);
 
-        if (iceServerConfig){ //reduce icecandidate number:add default value
+        if (iceServerConfig || emedia.isEdge){ //reduce icecandidate number:add default value
+            iceServerConfig || (iceServerConfig = {});
             !iceServerConfig.iceServers && (iceServerConfig.iceServers = []);
 
             iceServerConfig.rtcpMuxPolicy = "require";
@@ -522,7 +550,7 @@ var _WebRTC = _util.prototypeExtend({
         //     recvVideo: true,
         //     relayOnly: false,
         // };
-        _logger.debug('RtcPeerConnection config:', iceServerConfig, self._rtcId, self.__id, "closed:", self.closed);
+        _logger.debug('RtcPeerConnection config:', iceServerConfig, self._rtcId, self.__id,  self.closed);
 
         var rtcPeerConnection = self._rtcPeerConnection = new RTCPeerConnection(iceServerConfig);
         rtcPeerConnection.__peerId = self._rtcId;
@@ -544,31 +572,27 @@ var _WebRTC = _util.prototypeExtend({
             if(!self.__setRemoteSDP){
                 (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
                 _logger.debug('On ICE candidate but tmp buffer caused by not set remote sdp: ', candidate,
-                    self._rtcId, self.__id, "closed:", self.closed);
+                    self._rtcId, self.__id,  self.closed);
                 return;
             }else{
-                _logger.debug('On ICE candidate: ', candidate, self._rtcId, self.__id, "closed:", self.closed);
+                _logger.debug('On ICE candidate: ', candidate, self._rtcId, self.__id,  self.closed);
             }
             self.onIceCandidate(candidate);
         };
 
-        rtcPeerConnection.onconnectionstatechange = function (event) {
-            _logger.debug("peer connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
-                self._rtcId, self.__id, "closed:", self.closed);
-            self.onIceStateChange(event);
-        };
+        function stateChange(event) {
+            _logger.info("states: conn", (rtcPeerConnection.connectionState || rtcPeerConnection.iceConnectionState),
+                ", ice", rtcPeerConnection.iceConnectionState, "@", self._rtcId, self.__id,  self.closed);
+            self.onIceStateChange(rtcPeerConnection.iceConnectionState);
+        }
 
-        rtcPeerConnection.onicestatechange = function (event) {
-            _logger.debug("ice connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
-                self._rtcId, self.__id, "closed:", self.closed);
-            self.onIceStateChange(event);
-        };
-
-        rtcPeerConnection.oniceconnectionstatechange = function (event) {
-            _logger.debug("ice connect state", self.iceConnectionState(), "evt.target state", event.target.iceConnectionState,
-                self._rtcId, self.__id, "closed:", self.closed);
-            self.onIceStateChange(event);
-        };
+        rtcPeerConnection.onconnectionstatechange = stateChange.bind(self);
+        rtcPeerConnection.onicestatechange =  stateChange.bind(self);
+        rtcPeerConnection.oniceconnectionstatechange =  stateChange.bind(self);
+        rtcPeerConnection.onsignalingstatechange = function (event) {
+            _logger.info("states: signaling", rtcPeerConnection.signalingState,
+                "@", self._rtcId, self.__id,  self.closed);
+        }
 
         if(rtcPeerConnection.ontrack === null){
             self._onTrack && (rtcPeerConnection.ontrack = function (event) {
@@ -605,12 +629,12 @@ var _WebRTC = _util.prototypeExtend({
         }else{
             self._rtcPeerConnection.addStream(localStream);
         }
-        _logger.debug('Added local stream to RtcPeerConnection', localStream, self._rtcId, self.__id, "closed:", this.closed);
+        _logger.debug('Added local stream to RtcPeerConnection', localStream, self._rtcId, self.__id,  this.closed);
     },
 
     removeStream: function (mediaStream) {
         this._rtcPeerConnection.removeStream(mediaStream);
-        _logger.debug('Remove stream from RtcPeerConnection', mediaStream, self._rtcId, self.__id, "closed:", this.closed);
+        _logger.debug('Remove stream from RtcPeerConnection', mediaStream, self._rtcId, self.__id,  this.closed);
     },
 
     getLocalStream: function () {
@@ -641,9 +665,16 @@ var _WebRTC = _util.prototypeExtend({
             function (desc) {
                 self.offerDescription = desc;
 
-                //_logger.debug('Offer ', desc, "closed:", self.closed);//_logger.debug('from \n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id, "closed:", self.closed, self.optimalVideoCodecs);
-                //_logger.debug(desc.sdp);
+                if(emedia.isEdge){
+                    desc.sdp = desc.sdp.replace(/profile-level-id=[^;]+/, "profile-level-id=42e01f");
+                }
+
+                //需要交换 cand answer
+                self.fireFoxOfferVideoPreAudio = emedia.isFirefox && SDPSection.isVideoPreAudio(desc.sdp);
+
+                //_logger.debug('Offer ', desc,  self.closed);//_logger.debug('from \n' + desc.sdp);
+                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed, self.optimalVideoCodecs);
+                //_logger.debug("offer.1", desc.sdp);
                 //_logger.debug(desc);
 
                 var updateVCodes;
@@ -674,33 +705,33 @@ var _WebRTC = _util.prototypeExtend({
                     desc.sdp = sdpSection.getUpdatedSDP();
                 }
 
-                //_logger.debug(desc.sdp);
+                //_logger.debug("offer.2", desc.sdp);
                 //_logger.debug(desc);
                 //_logger.debug(JSON.stringify(desc));
 
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
-                    self.onSetLocalSessionDescriptionSuccess,
-                    self.onSetSessionDescriptionError
+                    self._onSetLocalSessionDescriptionSuccess.bind(self),
+                    self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     desc.cctx = self.cctx;
                     (onCreateOfferSuccess || self.onCreateOfferSuccess)(desc);
                 });
             },
-            (onCreateOfferError || self.onCreateSessionDescriptionError)
+            (onCreateOfferError || self._onCreateSessionDescriptionError.bind(self))
         );
     },
 
     createPRAnswer: function (onCreatePRAnswerSuccess, onCreatePRAnswerError) {
         var self = this;
 
-        _logger.info(' createPRAnswer start', "closed:", self.closed, self.sdpConstraints);
+        _logger.info(' createPRAnswer start',  self.closed, self.sdpConstraints);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
         return self._rtcPeerConnection.createAnswer(self.sdpConstraints).then(
             function (desc) {
-                _logger.debug('_____________PRAnswer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('_____________PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                 desc.type = "pranswer";
                 desc.sdp = desc.sdp.replace(/a=recvonly/g, 'a=inactive');
@@ -708,12 +739,12 @@ var _WebRTC = _util.prototypeExtend({
 
                 self.__prAnswerDescription = desc;
 
-                _logger.debug('inactive PRAnswer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id, "closed:", self.closed);
+                _logger.debug('inactive PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed);
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
-                    self.onSetLocalSuccess,
-                    self.onSetSessionDescriptionError
+                    self._onSetLocalSessionDescriptionSuccess.bind(self),
+                    self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     var sdpSection = new SDPSection(desc.sdp);
                     sdpSection.updateHeaderMsidSemantic("MS_0000");
@@ -722,26 +753,26 @@ var _WebRTC = _util.prototypeExtend({
 
                     desc.sdp = sdpSection.getUpdatedSDP();
 
-                    _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                    _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
                     (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess)(desc);
                 });
             },
-            (onCreatePRAnswerError || self.onCreateSessionDescriptionError)
+            (onCreatePRAnswerError || self._onCreateSessionDescriptionError.bind(self))
         );
     },
 
     createAnswer: function (onCreateAnswerSuccess, onCreateAnswerError) {
         var self = this;
 
-        _logger.info('createAnswer start', "closed:", self.closed, self.sdpConstraints);
+        _logger.info('createAnswer start',  self.closed, self.sdpConstraints);
         // Since the 'remote' side has no media stream we need
         // to pass in the right constraints in order for it to
         // accept the incoming offer of audio and video.
         return self._rtcPeerConnection.createAnswer(self.sdpConstraints).then(
             function (desc) {
-                _logger.debug('_____________________Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('_____________________Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                 desc.type = 'answer';
 
@@ -773,12 +804,12 @@ var _WebRTC = _util.prototypeExtend({
 
                 self.__answerDescription = desc;
 
-                _logger.debug('Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id, "closed:", self.closed);
+                _logger.debug('Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
+                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed);
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
-                    self.onSetLocalSuccess,
-                    self.onSetSessionDescriptionError
+                    self._onSetLocalSessionDescriptionSuccess.bind(self),
+                    self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     if(emedia.supportPRAnswer){
                         var sdpSection = new SDPSection(desc.sdp);
@@ -790,19 +821,19 @@ var _WebRTC = _util.prototypeExtend({
                         desc.sdp = sdpSection.getUpdatedSDP();
                     }
 
-                    _logger.debug('Send Answer ', self._rtcId, self.__id, "closed:", self.closed);//_logger.debug('from :\n' + desc.sdp);
+                    _logger.debug('Send Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
                     (onCreateAnswerSuccess || self.onCreateAnswerSuccess)(desc);
                 });
             },
-            (onCreateAnswerError || self.onCreateSessionDescriptionError)
+            (onCreateAnswerError || self._onCreateSessionDescriptionError.bind(self))
         );
     },
 
     close: function (remainLocalStream, onlyPeerConnectionClosed) {
         var self = this;
-        _logger.warn("webrtc closing", "closed:", self._rtcId, self.__id, self.closed);
+        _logger.warn("webrtc closing",  self._rtcId, self.__id, self.closed);
 
         if(self.closed){
             return;
@@ -837,7 +868,7 @@ var _WebRTC = _util.prototypeExtend({
             return;
         }
 
-        _logger.debug('Add ICE candidate: ', candidate, self._rtcId, self.__id, "closed:", self.closed);
+        _logger.debug('Add ICE candidate: ', candidate, self._rtcId, self.__id,  self.closed);
 
         var _cands = _util.isArray(candidate) ? candidate : [];
         !_util.isArray(candidate) && _cands.push(candidate);
@@ -845,7 +876,7 @@ var _WebRTC = _util.prototypeExtend({
         if(!self.__setRemoteSDP){
             Array.prototype.push.apply((self.__tmpRemoteCands || (self.__tmpRemoteCands = {})), _cands);
 
-            _logger.debug('Add ICE candidate but tmp buffer caused by not set remote sdp: ', candidate, self._rtcId, self.__id, "closed:", self.closed);
+            _logger.debug('Add ICE candidate but tmp buffer caused by not set remote sdp: ', candidate, self._rtcId, self.__id,  self.closed);
             return;
         }
 
@@ -853,15 +884,21 @@ var _WebRTC = _util.prototypeExtend({
             candidate = _cands[i];
 
             if(candidate.cctx && candidate.cctx != self.cctx){
-                _logger.warn('addIceCandidate fail drop. cctx not equal. ', candidate, self._rtcId, self.__id, "closed:", self.closed);
+                _logger.warn('addIceCandidate fail drop. cctx not equal. ', candidate, self._rtcId, self.__id,  self.closed);
                 continue;
             }
 
             //candidate.candidate = candidate.candidate.replace("172.17.2.130", "10.121.63.1");
+            if(self.fireFoxOfferVideoPreAudio === true){
+                //candidate.sdpMid = "sdparta_0";
+                var oldLineIndex = candidate.sdpMLineIndex;
+                candidate.sdpMLineIndex = parseInt(candidate.sdpMid.replace(/[^0-9]*/, ''));
+                _logger.warn("Firefox sdp section video pre audio, sdp mline index update ", oldLineIndex, "->", candidate.sdpMLineIndex);
+            }
 
             self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
                 self.onAddIceCandidateSuccess,
-                self.onAddIceCandidateError
+                self._onAddIceCandidateError.bind(self)
             );
         }
     },
@@ -869,45 +906,53 @@ var _WebRTC = _util.prototypeExtend({
     setRemoteDescription: function (desc) {
         var self = this;
 
-        _logger.debug('setRemoteDescription start. ', desc, self._rtcId, self.__id, "closed:", self.closed);
+        _logger.debug('setRemoteDescription start. ', desc, self._rtcId, self.__id,  self.closed);
 
         // 生成offer的
         // 会议模式，也是设置的是 pranswer 和 answer 会有服务器传回。
         // p2p模式下的主叫。此时设置的是 pranswer 和 answer。这个应该有p2p模式下传回。因此，需要如果有的话，需要判断
         if(self.offerDescription){
             if(desc.cctx && desc.cctx != self.cctx){
-                _logger.warn('setRemoteDescription fail drop. cctx not equal. ', desc, self._rtcId, self.__id, "closed:", self.closed);
+                _logger.warn('setRemoteDescription fail drop. cctx not equal. ', desc, self._rtcId, self.__id,  self.closed);
                 return;
+            }
+
+            if(self.fireFoxOfferVideoPreAudio === true){
+                //_logger.debug("Remote sdp.1", desc.sdp);
+
+                var sdpSection = new SDPSection(desc.sdp, self);
+                desc.sdp = sdpSection.getUpdatedSDP(false);
+                _logger.info("Remote sdp.2. switch audio video", desc.sdp);
             }
         }else{//被叫 p2p模式，覆盖
             desc.cctx && (self.cctx = desc.cctx);
         }
 
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
-        _logger.debug('setRemoteDescription.', desc, "closed:", self.closed);
+        _logger.debug('setRemoteDescription.', desc,  self.closed);
 
-        desc = new RTCSessionDescription(desc);
+        desc = self.__remoteDescription = new RTCSessionDescription(desc);
 
         return self._rtcPeerConnection.setRemoteDescription(desc).then(
             function() {
                 self.__setRemoteSDP = true;
-                self.onSetRemoteSuccess.apply(self, arguments);
+                self._onSetRemoteSuccess.apply(self, arguments);
 
                 if(self.__tmpLocalCands && self.__tmpLocalCands.length > 0){
-                    _logger.debug('After setRemoteDescription. send cands', self._rtcId, self.__id, "closed:", self.closed);
+                    _logger.debug('After setRemoteDescription. send cands', self._rtcId, self.__id,  self.closed);
                     self.onIceCandidate(self.__tmpLocalCands);
 
                     self.__tmpLocalCands = [];
                 }
 
                 if(self.__tmpRemoteCands && self.__tmpRemoteCands.length > 0){
-                    _logger.debug('After setRemoteDescription. add tmp cands', self._rtcId, self.__id, "closed:", self.closed);
+                    _logger.debug('After setRemoteDescription. add tmp cands', self._rtcId, self.__id,  self.closed);
                     self.addIceCandidate(self.__tmpRemoteCands);
 
                     self.__tmpRemoteCands = [];
                 }
             },
-            self.onSetSessionDescriptionError
+            self._onSetSessionDescriptionError.bind(self)
         );
     },
 
@@ -926,65 +971,109 @@ var _WebRTC = _util.prototypeExtend({
     },
 
     _onGotRemoteStream: function (event) {
+        var self = this;
+
         _logger.debug('onGotRemoteStream.', self._rtcId, self.__id, event);
         this._remoteStream = event.stream || event.streams[0];
         this._remoteStream._rtcId = this._rtcId;
         this._remoteStream.__rtc_c_id = this.__id;
         this.onGotRemoteStream(this._remoteStream, event);
 
-        _logger.debug('received remote stream, you will see the other.', self._rtcId, self.__id, "closed:", this.closed);
+        _logger.debug('received remote stream, you will see the other.', self._rtcId, self.__id,  this.closed);
+    },
+
+    _onSetRemoteSuccess: function () {
+        _logger.info('onSetRemoteSuccess success', this._rtcId, this.__id);
+        this.onSetRemoteSuccess.apply(this, arguments);
+
+        if(this.offerDescription && this.__remoteDescription && this.__remoteDescription.sdp){
+            this._onAnswerCodes(this.__remoteDescription.sdp);
+        }
+    },
+
+    _onAnswerCodes: function (sdp) {
+        var self = this;
+        var section = new SDPSection(sdp, this);
+        if(section.videoSection){
+            var rtpParams = SDPUtils.parseRtpParameters(section.videoSection);
+
+            if(!rtpParams.codecs || rtpParams.codecs.length === 0){
+                _logger.info("not found any video codes. @ ", self._rtcId, self.__id);
+                return;
+            }
+
+            var vcodes = [];
+            _util.forEach(rtpParams.codecs, function (_i, _param) {
+                vcodes.push(_param.name);
+            });
+
+            self.finalVCodeChoices = vcodes;
+
+            self.onVCodeChoices && self.onVCodeChoices(vcodes);
+        }
     },
 
     onSetRemoteSuccess: function () {
-        _logger.info('onSetRemoteSuccess complete', self._rtcId);
-    },
-
-    onSetLocalSuccess: function () {
-        _logger.info('setLocalDescription complete', self._rtcId);
     },
 
     onAddIceCandidateSuccess: function () {
-        _logger.debug('addIceCandidate success', self._rtcId);
+        _logger.debug('addIceCandidate success', this._rtcId, this.__id);
     },
 
+    _onAddIceCandidateError: function (error) {
+        _logger.error('failed to add ICE Candidate: ' + error.toString(), this._rtcId, this.__id);
+        this.onAddIceCandidateError(error);
+    },
     onAddIceCandidateError: function (error) {
-        _logger.debug('failed to add ICE Candidate: ' + error.toString(), self._rtcId);
     },
 
     onIceCandidate: function (candidate) {
-        _logger.debug('onIceCandidate : ICE candidate: \n' + candidate, self._rtcId);
+        _logger.debug('onIceCandidate : ICE candidate: \n' + candidate, this._rtcId, this.__id);
     },
 
-    onIceStateChange: function (event) {
-        _logger.debug('onIceStateChange : ICE state change event: ', self._rtcId);
+    onIceStateChange: function (state) {
+        _logger.debug('onIceStateChange : ICE state ', state);
     },
 
+    _onCreateSessionDescriptionError: function (error) {
+        _logger.error('Failed to create session description: ' + error.toString(), this._rtcId, this.__id);
+        this.onCreateSessionDescriptionError(error);
+    },
     onCreateSessionDescriptionError: function (error) {
-        _logger.error('Failed to create session description: ' + error.toString(), self._rtcId);
     },
 
     onCreateOfferSuccess: function (desc) {
-        _logger.debug('create offer success', self._rtcId);
+        _logger.debug('create offer success', this._rtcId, this.__id);
     },
 
     onCreatePRAnswerSuccess: function (desc) {
-        _logger.debug('create answer success', self._rtcId);
+        _logger.debug('create answer success', this._rtcId, this.__id);
     },
 
     onCreateAnswerSuccess: function (desc) {
-        _logger.debug('create answer success', self._rtcId);
+        _logger.debug('create answer success', this._rtcId, this.__id);
     },
 
+    _onSetSessionDescriptionError: function (error) {
+        _logger.error('onSetSessionDescriptionError : Failed to set session description: ' + error.toString(), this._rtcId, this.__id);
+        this.onSetSessionDescriptionError(error);
+    },
     onSetSessionDescriptionError: function (error) {
-        _logger.error('onSetSessionDescriptionError : Failed to set session description: ' + error.toString(), self._rtcId);
     },
+    _onSetLocalSessionDescriptionSuccess: function () {
+        _logger.debug('onSetLocalSessionDescriptionSuccess : setLocalDescription complete', this._rtcId, this.__id);
+        this.onSetLocalSessionDescriptionSuccess();
 
+        if(this.__answerDescription && this.__answerDescription.sdp){
+            this._onAnswerCodes(this.__answerDescription.sdp);
+        }
+    },
     onSetLocalSessionDescriptionSuccess: function () {
-        _logger.debug('onSetLocalSessionDescriptionSuccess : setLocalDescription complete', self._rtcId);
+
     },
 
     onGotRemoteStream: function(remoteStream){
-        _logger.debug("Got remote stream. ", remoteStream, self._rtcId);
+        _logger.debug("Got remote stream. ", remoteStream, this._rtcId, this.__id);
     }
 });
 

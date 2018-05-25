@@ -208,7 +208,7 @@ class MultiAVModal extends React.Component {
                     if (located) {
                         let localVideo = me.refs.local
                         stream.ifMediaStream(function (mediaStream) {
-                            localVideo.srcObject = mediaStream
+                            attachMediaStream(localVideo, mediaStream)
                         })
                         let lv = {
                             stream: stream,
@@ -275,7 +275,6 @@ class MultiAVModal extends React.Component {
                             })
                         }
                     }
-                    console.error("onUpdateStream")
                     console.log("Update stream: " + stream.id + " located: " + stream.located() + " webrtc: " + (stream.rtcId || "--"));
                 },
                 onNetworkWeak: function onNetworkWeak() {
