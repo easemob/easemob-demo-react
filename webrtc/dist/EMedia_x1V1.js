@@ -62,29 +62,79 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/DATA/WORK.HOME/projects/CO./EASEMOB_2016.05.03~/EMedia";
+/******/ 	__webpack_require__.p = "/Users/yangss/Downloads/webim.git/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */,
-/* 1 */,
-/* 2 */,
-/* 3 */,
-/* 4 */
+/* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(5);
+module.exports = __webpack_require__(1);
 
 
 /***/ }),
-/* 5 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//console.  emedia.__easemob_current_mservice.current
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var Util = (__webpack_require__(2).default);
+var Call = __webpack_require__(32);
+
+var emedia = __webpack_require__(3);
+
+window.WebIM = typeof WebIM !== 'undefined' ? WebIM : {};
+WebIM.WebRTC = WebIM.WebRTC || {};
+WebIM.WebRTC.Call = Call;
+WebIM.WebRTC.Util = Util;
+
+if (typeof module === 'object' && typeof module.exports === 'object') {
+    module.exports = WebIM.WebRTC;
+} else if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
+        return WebIM.WebRTC;
+    }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+}
+
+
+/**
+ * 判断是否支持pranswer
+ */
+if (/Firefox/.test(navigator.userAgent)) {
+    //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
+    WebIM.WebRTC.supportPRAnswer = false;
+}else{
+    WebIM.WebRTC.supportPRAnswer = true;
+}
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var easemob_emedia__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var easemob_emedia__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(easemob_emedia__WEBPACK_IMPORTED_MODULE_0__);
+
+/* harmony default export */ __webpack_exports__["default"] = (easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["util"]);
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(4)
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//3.0.0_Git.3891cea
+console && console.warn('EMedia version', '3.0.0_Git.3891cea');
 
 window.emedia = window.emedia || {};
 
@@ -105,11 +155,11 @@ window.emedia = window.emedia || {};
     return emedia;
 }));
 
-var util = emedia.util = __webpack_require__(6);
+var util = emedia.util = __webpack_require__(5);
 
 
 (function requireWebrtcAdapter() {
-    var adapter = __webpack_require__(7);
+    var adapter = __webpack_require__(6);
     emedia.browser = adapter.__browser; // firefox chrome safari IE
     emedia.browserVersion = adapter.__browserVersion;
 })();
@@ -293,23 +343,23 @@ emedia.hasEnabledTracks = function (mediaStream) {
 };
 
 
-var Service = __webpack_require__(10);
-var __event = __webpack_require__(12);
+var Service = __webpack_require__(9);
+var __event = __webpack_require__(11);
 
-emedia.Webrtc = __webpack_require__(15);
+emedia.Webrtc = __webpack_require__(14);
 
 emedia.Service = Service;
-emedia.P2P = __webpack_require__(24);
+emedia.P2P = __webpack_require__(23);
 // var cloneService = util.extend({}, Service).extend(Service);
 emedia.XService = emedia.P2P(Service);
 
-emedia.ctrl = __webpack_require__(25);
-emedia.CompositeCanvas = __webpack_require__(31);
+emedia.ctrl = __webpack_require__(24);
+emedia.CompositeCanvas = __webpack_require__(30);
 
 emedia.pannel || (emedia.pannel = {});
-emedia.pannel.DefaultMouseTrack = __webpack_require__(21);
-emedia.pannel.MouseTrack = __webpack_require__(22);
-emedia.pannel.KeyboardTrack = __webpack_require__(32);
+emedia.pannel.DefaultMouseTrack = __webpack_require__(20);
+emedia.pannel.MouseTrack = __webpack_require__(21);
+emedia.pannel.KeyboardTrack = __webpack_require__(31);
 
 emedia.event = __event;
 
@@ -381,7 +431,7 @@ emedia.config({
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports) {
 
 /*
@@ -1032,7 +1082,7 @@ module.exports = new Util();
 
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var adapter;
@@ -1052,14 +1102,14 @@ if (!!document.documentMode) { // Detect IE (6-11)
         webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     }
 
-    adapter = __webpack_require__(8);
+    adapter = __webpack_require__(7);
 
     adapter.__browser = webrtcDetectedBrowser;
     adapter.__browserVersion = webrtcDetectedVersion;
 
     //adapter = require('./Temasys.wrapper'); //6.0.3
 }else{
-    adapter = __webpack_require__(9); //6.0.3
+    adapter = __webpack_require__(8); //6.0.3
 }
 
 
@@ -1135,7 +1185,7 @@ module.exports = adapter;
 
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports) {
 
 if (typeof Promise === 'undefined') {
@@ -1292,7 +1342,7 @@ function _export(plugin) {
 module.exports = plugin;
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports) {
 
 //6.2.0
@@ -6586,26 +6636,26 @@ module.exports = plugin;
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //Service 类，会创建session(me), 并且将current属性设置为 me; 以后方法需要此值
 
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Service");
 
 
-var Session = __webpack_require__(11);
+var Session = __webpack_require__(10);
 
 
-var Attendee = __webpack_require__(13);
+var Attendee = __webpack_require__(12);
 
-var __event = __webpack_require__(12);
-var EventHandler = __webpack_require__(19);
+var __event = __webpack_require__(11);
+var EventHandler = __webpack_require__(18);
 
-var __Desktop = __webpack_require__(20);
+var __Desktop = __webpack_require__(19);
 
 var __desktop = new __Desktop({
     onExtLoaded: function () {
@@ -6613,9 +6663,9 @@ var __desktop = new __Desktop({
     }
 });
 
-var __Stream = __webpack_require__(17);
+var __Stream = __webpack_require__(16);
 
-var DefaultMouseTrack = __webpack_require__(21);
+var DefaultMouseTrack = __webpack_require__(20);
 
 /**
  * {
@@ -8299,14 +8349,14 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Sess");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
 var __url_seqno = 0;
 
@@ -9290,11 +9340,11 @@ module.exports = _util.prototypeExtend({
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.logger;
 
 
@@ -9631,17 +9681,17 @@ module.exports = {
 };
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Me");
 
-var Member = __webpack_require__(14);
+var Member = __webpack_require__(13);
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
-var Stream = __webpack_require__(17);
+var Stream = __webpack_require__(16);
 
 /**
  * 未体现 member 使用了 session。
@@ -10832,16 +10882,16 @@ module.exports = Attendee;
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Member");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
-var WebRTC = __webpack_require__(15);
+var WebRTC = __webpack_require__(14);
 
 /**
  * 未体现 Member 使用了 session。
@@ -11553,7 +11603,7 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -11597,12 +11647,12 @@ module.exports = _util.prototypeExtend({
 
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Webrtc");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
-var SDPUtils = __webpack_require__(16); //希望使用 SDPUtils 取代 SDPSection
+var SDPUtils = __webpack_require__(15); //希望使用 SDPUtils 取代 SDPSection
 
 var _SDPSection = {
     headerSection: null,
@@ -12082,6 +12132,7 @@ var _WebRTC = _util.prototypeExtend({
         iceServerConfig || (iceServerConfig = self.iceServerConfig);
 
         if (iceServerConfig || emedia.isEdge){ //reduce icecandidate number:add default value
+            iceServerConfig || (iceServerConfig = {});
             !iceServerConfig.iceServers && (iceServerConfig.iceServers = []);
 
             iceServerConfig.rtcpMuxPolicy = "require";
@@ -12638,7 +12689,7 @@ module.exports = _WebRTC;
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13328,12 +13379,12 @@ if (true) {
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 
-var SoundMeter = __webpack_require__(18);
+var SoundMeter = __webpack_require__(17);
 
 /**
  * {
@@ -13679,7 +13730,7 @@ module.exports = _util.prototypeExtend({ //type 0 AVpub 1 Desktop 2 Sub
 });
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13748,14 +13799,14 @@ SoundMeter.prototype.stop = function() {
 module.exports = SoundMeter;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Handler");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
 
 /**
@@ -14503,14 +14554,14 @@ module.exports = Handler;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Desktop");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
 
 window.__shareDesktopMessageCount__ = 0;
@@ -14627,13 +14678,13 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("DefaultTrack");
 
-var MouseTrack = __webpack_require__(22);
+var MouseTrack = __webpack_require__(21);
 
 function zoomCanvas(canvas, width, height) {
     var canvasContext = canvas.getContext("2d");
@@ -14791,13 +14842,13 @@ module.exports = DefaultMouseTrack = MouseTrack.extend({
 });
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("MouseTrack");
 
-var MouseTrigger = __webpack_require__(23);
+var MouseTrigger = __webpack_require__(22);
 
 module.exports = _util.prototypeExtend({
     _scale: 1,
@@ -14926,10 +14977,10 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("MouseTrigger");
 
 var BTN = {
@@ -15001,13 +15052,13 @@ module.exports = _util.prototypeExtend({
 module.exports.BTN = BTN;
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("AddonsP2P");
 
-var __event = __webpack_require__(12);
+var __event = __webpack_require__(11);
 
 /**
  *
@@ -15761,27 +15812,27 @@ var addonsService = function (Service, Session, Attendee) {
 
 
 module.exports = function (Service) {
-    var _Session = Service.prototype.Session || __webpack_require__(11);
+    var _Session = Service.prototype.Session || __webpack_require__(10);
     var Session = addonsSession(_Session.extend({}));
 
-    var _Attendee = Service.prototype.Attendee || __webpack_require__(13);
+    var _Attendee = Service.prototype.Attendee || __webpack_require__(12);
     var Attendee = addonsAttendee(_Attendee.extend({}));
 
     return addonsService(Service, Session, Attendee);
 };
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("PannelVideo");
 
-var Mouse = __webpack_require__(26);
-var Keyboard = __webpack_require__(27);
-var MouseTrack = __webpack_require__(22);
-var MouseTrigger = __webpack_require__(23);
-var TotalBuffer = __webpack_require__(28);
+var Mouse = __webpack_require__(25);
+var Keyboard = __webpack_require__(26);
+var MouseTrack = __webpack_require__(21);
+var MouseTrigger = __webpack_require__(22);
+var TotalBuffer = __webpack_require__(27);
 
 
 function overrideOnRemoveMember(service){
@@ -16743,14 +16794,14 @@ module.exports = {
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Mouse");
 
 
-var MouseTrigger = __webpack_require__(23);
+var MouseTrigger = __webpack_require__(22);
 
 /**
  * { target:
@@ -16962,10 +17013,10 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Keyboard");
 
 module.exports = _util.prototypeExtend({
@@ -17048,16 +17099,16 @@ module.exports = _util.prototypeExtend({
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("TotalBuffer");
 
-var EventBuffer = __webpack_require__(29);
-var TrackBuffer = __webpack_require__(30);
+var EventBuffer = __webpack_require__(28);
+var TrackBuffer = __webpack_require__(29);
 
-var MouseTrigger = __webpack_require__(23);
+var MouseTrigger = __webpack_require__(22);
 
 module.exports = _util.prototypeExtend({
     trackBufferSize: 100,
@@ -17176,10 +17227,10 @@ module.exports = _util.prototypeExtend({
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("EventBuffer");
 
 
@@ -17269,10 +17320,10 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("TrackBuffer");
 
 
@@ -17445,10 +17496,10 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("CompositeCanvas");
 
 function SimpleCanvasRenderingContext2D() {
@@ -17698,10 +17749,10 @@ CompositeCanvas.compositeVideoOverCanvas = function(compositeCanvasTag, video, c
 module.exports = CompositeCanvas;
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _util = __webpack_require__(6);
+var _util = __webpack_require__(5);
 var _logger = _util.tagLogger("Keyboard");
 
 
@@ -17715,7 +17766,1914 @@ module.exports = _util.prototypeExtend({
     }
 });
 
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Util = (__webpack_require__(2).default);
+var RTCIQHandler = __webpack_require__(33);
+var API = __webpack_require__(34);
+var WebRTC = (__webpack_require__(35).default);
+var CommonPattern = __webpack_require__(36);
+
+var RouteTo = API.RouteTo;
+var Api = API.Api;
+var _logger = Util.logger;
+
+
+var _Call = {
+    api: null,
+    caller: '',
+    connection: null,
+
+    pattern: null,
+
+    listener: {
+        onAcceptCall: function (from, options) {
+        },
+
+        onRinging: function (caller) {
+        },
+
+        onTermCall: function () {
+        },
+
+        onIceConnectionStateChange: function (iceState) {
+        }
+    },
+
+    mediaStreamConstaints: {
+        audio: true,
+        video: true
+    },
+
+    init: function () {
+        var self = this;
+
+        if (typeof self.connection === "undefined") {
+            throw "Caller need a instance of Easemob.im.Connection"
+        }
+
+        self.api = self.api || new Api({
+                imConnection: self.connection,
+
+                rtcHandler: new RTCIQHandler({
+                    imConnection: self.connection
+                })
+            });
+
+        self.api.onInitC = function () {
+            self._onInitC.apply(self, arguments);
+        },
+
+        self.api.onInvite = function(){
+            self.listener.onInvite.apply(self, arguments);
+        },
+
+        self.api.onIceConnectionStateChange = function () {
+            self.listener.onIceConnectionStateChange.apply(self, arguments);
+        }
+    },
+
+    createConference: function(pwd, _callback){
+        var rt = new RouteTo({
+            rtKey: ""
+        })
+        this.api.reqTkt(
+            rt, 
+            true,
+            undefined,
+            pwd, 
+            function(from, rtcOptions){
+            var ticketStr = rtcOptions.ticket
+            rtcOptions.conferenceId = rtcOptions.confrId
+            _callback(from, rtcOptions)
+        })
+    },
+
+    inviteConference: function(confrId, pwd, to, gid, _callback){
+        var rt = new RouteTo({
+            to: to,
+            rtKey: "",
+            rtflag: 0
+        })
+        this.api.invite(
+            rt, 
+            confrId, 
+            pwd, 
+            gid,
+            function(from, rtcOptions){
+                _callback(from, rtcOptions)
+            }
+        );
+    },
+
+    getConferenceTkt: function(confrId, pwd, _callback){
+        var rt = new RouteTo({
+            rtKey: ""
+        });
+        this.api.reqTkt(
+            rt,
+            false,
+            confrId,
+            pwd,
+            function(from, rtcOptions){
+                _callback(from, rtcOptions)
+            }
+        );
+    },
+
+    makeVideoCall: function (callee, accessSid) {
+        var self = this;
+
+        var mediaStreamConstaints = {};
+        Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
+        self.mediaStreamConstaints.video = true;
+
+        this.call(callee, mediaStreamConstaints, accessSid);
+    },
+
+    makeVoiceCall: function (callee, accessSid) {
+        console.log('ScareCrow');
+        var self = this;
+
+        var mediaStreamConstaints = {};
+        Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
+        self.mediaStreamConstaints.video = false;
+
+        self.call(callee, mediaStreamConstaints, accessSid);
+    },
+
+    acceptCall: function () {
+        var self = this;
+        self.pattern.accept();
+    },
+
+    endCall: function (callee) {
+        var self = this;
+        self.caller = '';
+        self.pattern.termCall();
+    },
+
+    call: function (callee, mediaStreamConstaints, accessSid) {
+        var self = this;
+        this.callee = this.api.jid(callee);
+
+        var rt = new RouteTo({
+            rtKey: "",
+            sid: accessSid,
+
+            success: function (result) {
+                _logger.debug("iq to server success", result);
+            },
+            fail: function (error) {
+                _logger.debug("iq to server error", error);
+                self.onError(error);
+            }
+        });
+
+        this.api.reqP2P(
+            rt,
+            mediaStreamConstaints.video ? 1 : 0,
+            mediaStreamConstaints.audio ? 1 : 0,
+            this.api.jid(callee),
+            function (from, rtcOptions) {
+                if (rtcOptions.online == "0") {
+                    self.listener.onError({message: "callee is not online!"});
+                    return;
+                }
+                self._onGotServerP2PConfig(from, rtcOptions);
+                self.pattern.initC(self.mediaStreamConstaints, accessSid);
+            });
+    },
+
+    _onInitC: function (from, options, rtkey, tsxId, fromSid) {
+        var self = this;
+
+        self.callee = from;
+        self._rtcCfg = options.rtcCfg;
+        self._WebRTCCfg = options.WebRTC;
+
+        self.sessId = options.sessId;
+        self.rtcId = options.rtcId;
+
+        self.switchPattern(options.streamType == "VIDEO" ? "VIDEO" : "VOICE");
+        self.pattern._onInitC(from, options, rtkey, tsxId, fromSid);
+    },
+
+    _onInvite: function(){
+
+    },
+
+    _onGotServerP2PConfig: function (from, rtcOptions) {
+        var self = this;
+
+        if (rtcOptions.result == 0) {
+            self._p2pConfig = rtcOptions;
+            self._rtcCfg = rtcOptions.rtcCfg;
+            self._rtcCfg2 = rtcOptions.rtcCfg2;
+
+            self.sessId = rtcOptions.sessId;
+            self.rtcId = "Channel_webIM";
+
+            self._rtKey = self._rtkey = rtcOptions.rtKey || rtcOptions.rtkey;
+            self._rtFlag = self._rtflag = rtcOptions.rtFlag || rtcOptions.rtflag;
+
+            self._WebRTCCfg = rtcOptions.WebRTC;
+            self.admtok = rtcOptions.admtok;
+            self.tkt = rtcOptions.tkt;
+
+
+            self.switchPattern(self.mediaStreamConstaints.audio && self.mediaStreamConstaints.video ? "VIDEO" : "VOICE");
+        } else {
+            //
+        }
+    },
+
+    switchPattern: function (streamType) {
+        var self = this;
+
+        (!self._WebRTCCfg) && (self.pattern = new CommonPattern({
+            callee: self.callee,
+
+            _p2pConfig: self._p2pConfig,
+            _rtcCfg: self._rtcCfg,
+            _rtcCfg2: self._rtcCfg2,
+
+            _rtKey: self._rtKey || self._rtkey,
+            _rtFlag: self._rtFlag || self._rtflag,
+
+            _sessId: self.sessId,
+            _rtcId: self.rtcId,
+
+            webRtc: new WebRTC({
+                streamType: streamType,
+                onGotLocalStream: self.listener.onGotLocalStream,
+                onGotRemoteStream: self.listener.onGotRemoteStream,
+                onError: self.listener.onError
+            }),
+
+            api: self.api,
+
+            onAcceptCall: (self.listener && self.listener.onAcceptCall) || function () {
+
+            },
+            onRinging: (self.listener && self.listener.onRinging) || function () {
+
+            },
+            onTermCall: (self.listener && self.listener.onTermCall) || function () {
+
+            },
+            onOtherUserOpenVoice: (self.listener && self.listener.onOtherUserOpenVoice) || function () {
+
+            },
+            onOtherUserOpenVideo: (self.listener && self.listener.onOtherUserOpenVideo) || function () {
+
+            }
+        }));
+    }
+};
+
+
+module.exports = function (initConfigs) {
+    Util.extend(true, this, _Call, initConfigs || {});
+
+    this.init();
+};
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * IQ Message，IM -> CMServer --> IM
+ */
+
+var _util = (__webpack_require__(2).default);
+var _logger = _util.logger;
+var API = __webpack_require__(34);
+var RouteTo = API.RouteTo;
+
+var CONFERENCE_XMLNS = "urn:xmpp:media-conference";
+
+
+var _RtcHandler = {
+    _apiCallbacks: {},
+
+    imConnection: null,
+
+    _connectedSid: '',
+
+
+    init: function () {
+        var self = this;
+
+        var _conn = self.imConnection;
+
+        _conn.registerConfrIQHandler = function(){
+            var handleConferenceIQ = function (msginfo) {
+                try {
+                    self.handleRtcMessage(msginfo);
+                } catch (error) {
+                    _logger.error(error);
+                    //throw error;
+                }
+
+                return true;
+            };
+
+            _conn.addHandler(handleConferenceIQ, CONFERENCE_XMLNS, 'iq', "set");
+            _conn.addHandler(handleConferenceIQ, CONFERENCE_XMLNS, 'iq', "get");
+
+            _logger.warn("Conference iq handler. registered.");
+        }
+    },
+
+    handleRtcMessage: function (msginfo) {
+        var self = this;
+
+        var id = msginfo.getAttribute('id');
+        var from = msginfo.getAttribute('from') || '';
+
+        // remove resource
+        from.lastIndexOf("/") >= 0 && (from = from.substring(0, from.lastIndexOf("/")));
+
+
+        var rtkey = msginfo.getElementsByTagName('rtkey')[0].innerHTML;
+
+        var fromSessionId = msginfo.getElementsByTagName('sid')[0].innerHTML;
+
+        (self._fromSessionID || (self._fromSessionID = {}))[from] = fromSessionId;
+
+        var contentTags = msginfo.getElementsByTagName('content');
+
+
+
+        var contentString = contentTags[0].innerHTML;
+
+        var content = _util.parseJSON(contentString);
+
+        var rtcOptions = content;
+
+        var streamType = msginfo.getElementsByTagName('stream_type')[0].innerHTML; //VOICE, VIDEO
+
+        if(streamType == ""){
+            streamType = "VOICE";
+        }
+
+        rtcOptions.streamType = streamType;
+
+        if(rtcOptions.op == 102){
+            self.singalStreamType = streamType;
+        }
+
+
+        var tsxId = content.tsxId;
+
+        self.ctx = content.ctx;
+
+        _logger.debug("Recv [op = " + rtcOptions.op + "] [tsxId=" + tsxId + "]\r\n json :", msginfo);
+
+
+        //if a->b already, c->a/b should be termiated with 'busy' reason
+        if (from.indexOf("@") >= 0) {
+            if (self._connectedSid == '' && (rtcOptions.op == 102 || rtcOptions.op == 202)) {
+                self._connectedSid = fromSessionId;
+            } else {
+                if (self._connectedSid != fromSessionId) {
+                    _logger.debug("Error recv [op = " + rtcOptions.op + "] [tsxId=" + tsxId + "]. caused by _connectedSid != fromSessionId :",
+                        self._connectedSid, fromSessionId);
+
+                    //onInitC
+                    if (rtcOptions.op == 102) {
+                        var rt = new RouteTo({
+                            to: from,
+                            rtKey: rtkey,
+                            sid: fromSessionId,
+                            success: function (result) {
+                                _logger.debug("iq to server success", result);
+                            },
+                            fail: function (error) {
+                                _logger.debug("iq to server error", error);
+                                self.onError(error);
+                            }
+                        });
+
+                        var options = {
+                            data: {
+                                op: 107,
+                                sessId: rtcOptions.sessId,
+                                rtcId: rtcOptions.rtcId,
+                                reason: 'busy'
+
+                            },
+                            reason: 'busy'
+                        };
+                        self.sendRtcMessage(rt, options)
+                    }
+                    return;
+                }
+            }
+        }
+
+        //onTermC
+        if (rtcOptions.op == 107) {
+            self._connectedSid = '';
+            self._fromSessionID = {};
+
+            var reasonObj = msginfo.getElementsByTagName('reason');
+            //var endReason = msginfo.getElementsByTagName('reason')[0].innerHTML;
+            reasonObj && reasonObj.length > 0 && (rtcOptions.reason = reasonObj[0].innerHTML);
+        }
+
+        if (rtcOptions.sdp) {
+            if (typeof rtcOptions.sdp === 'string') {
+                rtcOptions.sdp = _util.parseJSON(rtcOptions.sdp);
+            }
+            rtcOptions.sdp.type && (rtcOptions.sdp.type = rtcOptions.sdp.type.toLowerCase());
+        }
+        if (rtcOptions.cands) {
+            if (typeof rtcOptions.cands === 'string') {
+                rtcOptions.cands = _util.parseJSON(rtcOptions.cands);
+            }
+
+            for (var i = 0; i < rtcOptions.cands.length; i++) {
+                if(typeof rtcOptions.cands[i] === 'string'){
+                    try{
+                        rtcOptions.cands[i] = _util.parseJSON(rtcOptions.cands[i]);
+                    }catch(e){
+                        rtcOptions.cands[i] = {candidate: rtcOptions.cands[i]}
+                    }
+                }
+
+                rtcOptions.cands[i].sdpMLineIndex = rtcOptions.cands[i].sdpMLineIndex !== undefined ?
+                    rtcOptions.cands[i].sdpMLineIndex : rtcOptions.cands[i].mlineindex;
+                rtcOptions.cands[i].sdpMid = rtcOptions.cands[i].sdpMid !== undefined ?
+                    rtcOptions.cands[i].sdpMid : rtcOptions.cands[i].mid;
+
+                delete rtcOptions.cands[i].mlineindex;
+                delete rtcOptions.cands[i].mid;
+            }
+        }
+
+        rtcOptions.rtcCfg && (typeof rtcOptions.rtcCfg === 'string') && (rtcOptions.rtcCfg = _util.parseJSON(rtcOptions.rtcCfg));
+        rtcOptions.rtcCfg2 && (typeof rtcOptions.rtcCfg2 === 'string') && (rtcOptions.rtcCfg2 = _util.parseJSON(rtcOptions.rtcCfg2));
+        rtcOptions.WebRTC && (typeof rtcOptions.WebRTC === 'string') && (rtcOptions.WebRTC = _util.parseJSON(rtcOptions.WebRTC));
+        rtcOptions.confrId && (rtcOptions.conferenceId = rtcOptions.confrId)
+
+        if (tsxId && self._apiCallbacks[tsxId]) {
+            try {
+                self._apiCallbacks[tsxId].callback && self._apiCallbacks[tsxId].callback(from, rtcOptions);
+            } catch (err) {
+                throw err;
+            } finally {
+                delete self._apiCallbacks[tsxId]
+            }
+        } else {
+            self.onRecvRtcMessage(from, rtcOptions, rtkey, tsxId, fromSessionId);
+        }
+
+        return true;
+    },
+
+
+    onRecvRtcMessage: function (from, rtcOptions, rtkey, tsxId, fromSessionId) {
+        _logger.debug(' form : ' + from + " \r\n json :" + _util.stringifyJSON(rtcJSON));
+    },
+
+    convertRtcOptions: function (options) {
+        var sdp = options.data.sdp;
+        if (sdp) {
+            var _sdp = {
+                type: sdp.type,
+                sdp: sdp.sdp
+            };
+
+            sdp = _sdp;
+
+            sdp.type = sdp.type.toUpperCase();
+            sdp = _util.stringifyJSON(sdp);
+
+            options.data.sdp = sdp;
+        }
+
+
+        var cands = options.data.cands;
+
+        if (cands) {
+            if (_util.isArray(cands)) {
+
+            } else {
+                var _cands = [];
+                _cands.push(cands);
+                cands = _cands;
+            }
+
+            for (var i in cands) {
+                var cand = cands[i];
+
+                if (cand.candidate !== undefined
+                    && cand.sdpMLineIndex !== undefined
+                    && cand.sdpMid !== undefined) {
+                    var _cand = {
+                        type: "candidate",
+                        candidate: cand.candidate,
+                        mlineindex: cand.sdpMLineIndex,
+                        mid: cand.sdpMid,
+                        // seq: i
+                    };
+
+                    cands[i] = _util.stringifyJSON(_cand);
+                }
+            }
+
+            options.data.cands = cands;
+        } else {
+            // options.data.cands = [];
+        }
+
+        var rtcCfg = options.data.rtcCfg;
+        if (rtcCfg) {
+            typeof rtcCfg !== 'string' && (options.data.rtcCfg = _util.stringifyJSON(rtcCfg));
+        }
+
+        var _webrtc = options.data.WebRTC;
+        if (_webrtc) {
+            typeof _webrtc !== 'string' && (options.data.WebRTC = _util.stringifyJSON(_webrtc));
+        }
+    },
+
+    /**
+     * rt: { id: , to: , rtKey: , rtflag: , sid: , tsxId: , type: , }
+     *
+     * rtcOptions: { data : { op : 'reqP2P', video : 1, audio : 1, peer :
+     * curChatUserId, //appKey + "_" + curChatUserId + "@" + this.domain, } }
+     *
+     */
+    sendRtcMessage: function (rt, options, callback) {
+        var self = this;
+
+        var _conn = self.imConnection;
+
+        var tsxId = rt.tsxId || _conn.getUniqueId();
+
+        var to = rt.to || _conn.domain;
+
+        var sid = rt.sid || self._fromSessionID && self._fromSessionID[to];
+        //sid = sid || ((self._fromSessionID || (self._fromSessionID = {}))[to] = _conn.getUniqueId("CONFR_"));
+        sid = sid || _conn.getUniqueId("CONFR_");
+        (self._fromSessionID || (self._fromSessionID = {}))[to] = sid;
+
+        if (to.indexOf("@") >= 0) {
+            if (self._connectedSid == '' && options.data.op == 102) {
+                self._connectedSid = sid;
+            }
+        }
+        var rtKey = rt.rtKey || rt.rtkey;
+        // rtKey && delete rt.rtKey;
+        rtKey || (rtKey = "");
+
+        var rtflag = rt.rtflag;
+        // rtflag && delete rt.rtflag;
+        !isNaN(rtflag) || (rtflag = 1);
+
+        options.data || (options.data = {});
+        options.data.tsxId = tsxId;
+
+        self.ctx && (options.data.ctx = self.ctx);
+        self.convertRtcOptions(options);
+
+        var streamType = options.streamType || self.singalStreamType || "VIDEO"; // "VIDEO"; //VOICE, VIDEO
+        if (options.data.op == 102) {
+            self.singalStreamType = streamType;
+        }
+
+
+        var id = rt.id || _conn.getUniqueId("CONFR_");
+        var iq = $iq({
+            // xmlns: CONFERENCE_XMLNS,
+            id: id,
+            to: to,
+            from: _conn.context.jid,
+            type: rt.type || "get"
+        }).c("query", {
+            xmlns: CONFERENCE_XMLNS
+        }).c("MediaReqExt").c('rtkey').t(rtKey)
+            .up().c('rtflag').t(rtflag)
+            .up().c('stream_type').t(streamType)
+            .up().c('sid').t(sid)
+            .up().c('content').t(_util.stringifyJSON(options.data));
+
+        if (options.data.op == 107 && options.reason) {
+            iq.up().c('reason').t(options.reason);
+        }
+        _logger.debug("Send [op = " + options.data.op + "] : \r\n", iq.tree());
+
+
+        callback && (
+            self._apiCallbacks[tsxId] = {
+                callback: callback
+            }
+        );
+
+        var completeFn = function (result) {
+                rt.success(result);
+            } || function (result) {
+                _logger.debug("send result. op:" + options.data.op + ".", result);
+            };
+
+        var errFn = function (ele) {
+                rt.fail(ele);
+            } || function (ele) {
+                _logger.debug(ele);
+            };
+
+        _conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
+
+        //onTermC
+        if (options.data.op == 107 && self._connectedSid) {
+            if (!rt.sid || self._connectedSid == rt.sid) {
+                self._connectedSid = '';
+                self._fromSessionID = {};
+            }
+        }
+    }
+};
+
+
+var RTCIQHandler = function (initConfigs) {
+    _util.extend(true, this, _RtcHandler, initConfigs || {});
+
+    this.init();
+};
+module.exports = RTCIQHandler;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * API
+ */
+var _util = (__webpack_require__(2).default);
+var _logger = _util.logger;
+
+
+var _RouteTo = {
+    // to : null,
+    // rtKey: null,
+    rtFlag: 1,
+
+    success: function (result) {
+
+    },
+    fail: function (error) {
+
+    }
+};
+
+var RouteTo = function (extendCfg) {
+    if (this instanceof RouteTo) {
+        var self = this;
+        _util.extend(true, self, _RouteTo, extendCfg || {});
+
+    } else {
+        var sub = function (extendCfg) {
+            var self = this;
+            _util.extend(true, self, extendCfg || {});
+        };
+
+        _util.extend(true, sub.prototype, _RouteTo, extendCfg || {});
+
+        return sub;
+    }
+};
+exports.RouteTo = RouteTo;
+
+
+var _clazz = {
+    imConnection: null,
+    // webRtc: null,
+
+    rtcHandler: null,
+
+    events: {
+        '0': 'onReqP2P',
+        '1': 'onNewCfr',
+        '2': 'onDelCfr',
+        '3': 'onReqTkt',
+
+        '100': 'onPing',
+        '101': 'onPong',
+        '102': 'onInitC',
+        '103': 'onReqC',
+        '104': 'onAcptC',
+        '105': 'onTcklC',
+        '106': 'onAnsC',
+        '107': 'onTermC',
+
+        // '200' : 'onEnter',
+        // '201' : 'onExit',
+        '202' : 'onInvite',
+        // '203' : 'onGetMems',
+
+        // '205' : 'onSubC',
+        // '206' : 'onUsubC',
+
+        '300': 'onEvEnter',
+        '301': 'onEvExit',
+        '302': 'onEvPub',
+        '303': 'onEvUnpub',
+        '304': 'onEvMems',
+        '204': 'onEvClose',
+        '400': 'onStreamControl',
+        '401': 'onEvJoin',
+
+        'onServerError': 'onServerError'
+    },
+
+    register: function (listener) {
+        if (typeof listener === "object") {
+            for (var event in listener) {
+                this.bind(event, listener[event]);
+            }
+        }
+    },
+
+    bind: function (event, func) {
+        var self = this;
+
+        var onFunc;
+        if ((onFunc = self.events[event])) {
+            self[onFunc] = func;
+        } else {
+            onFunc = self.events[event] = 'on_' + event;
+            self[onFunc] = func;
+        }
+    },
+
+    jid: function (shortUserName) {
+        if(/^.+#.+_.+@.+$/g.test(shortUserName)){
+            return shortUserName;
+        }
+        // if (shortUserName.indexOf(this.imConnection.context.appKey) >= 0) {
+        //     return shortUserName;
+        // }
+        return this.imConnection.context.appKey + "_" + shortUserName + "@" + this.imConnection.domain;
+    },
+
+    /**
+     * ReqP2P 0
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param video
+     *            1 0
+     * @param audio
+     *            1 0
+     * @param peer
+     *
+     */
+    reqP2P: function (rt, video, audio, peer, callback) {
+        _logger.debug("req p2p ...");
+
+
+        var rtcOptions = {
+            data: {
+                op: 0,
+                video: video,
+                audio: audio,
+                peer: peer // appKey + "_" + curChatUserId + "@" + this.domain,
+            }
+        };
+
+        this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * NewCfr 1
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param reqTkt
+     *            1 null
+     * @param password
+     *            string null
+     *
+     */
+    newCfr: function (rt, reqTkt, password, callback) {
+        _logger.debug("newCfr ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 1
+            }
+        };
+
+        reqTkt && (rtcOptions.data.reqTkt = reqTkt);
+        password && (rtcOptions.data.password = password);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * Enter 200
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param reqMembers !=
+     *            0 members
+     * @param tkt
+     * @param nonce
+     * @param digest
+     *
+     */
+    enter: function (rt, WebRTCId, reqMembers, tkt, nonce, digest, callback) {
+        _logger.debug("enter ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 200
+            }
+        };
+
+        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        reqMembers && (rtcOptions.data.reqMembers = reqMembers);
+        tkt && (rtcOptions.data.tkt = tkt);
+        nonce && (rtcOptions.data.nonce = nonce);
+        digest && (rtcOptions.data.digest = digest);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * Ping 100
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     *
+     */
+    ping: function (rt, sessId, callback) {
+        _logger.debug("ping ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 100
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * 通知对方 我已经关闭/打开 麦卡，摄像头
+     *
+     * PAUSE_VOICE(0, 0), RESUME_VOICE(1, 1), PAUSE_VIDEO(2, 2), RESUME_VIDEO(3, 3)
+     *
+     *
+     * @param rt
+     * @param sessId
+     * @param rtcId
+     * @param controlType
+     * @param callback
+     */
+    streamControl: function (rt, sessId, rtcId, controlType, callback) {
+        _logger.debug("streamControl ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 400
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        (typeof controlType !== 'undefined' &&  controlType != null ) && (rtcOptions.data.controlType = controlType);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * ReqTkt 3
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param success(from,
+     *            rtcOptions)
+     *
+     */
+    reqTkt: function (rt, isCreate, confrId, password, callback) {
+        _logger.debug("reqTkt ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 3
+            }
+        };
+
+        isCreate && (rtcOptions.data.isCreate = isCreate);
+        confrId && (rtcOptions.data.confrId = confrId);
+        password && (rtcOptions.data.password = password);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    invite: function (rt, confrId, password, gid, callback) {
+        _logger.debug("reqTkt ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op:  202
+            }
+        };
+
+        confrId && (rtcOptions.data.confrId = confrId); // 格式需要跟雅洁确定
+        password && (rtcOptions.data.password = password);
+        gid && (rtcOptions.data.gid = gid);
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * InitC 102
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param tkt
+     * @param sessId
+     * @param rtcId
+     * @param pubS
+     *            {name: streamName, video:1, audio:1, type: 0}
+     * @param subS
+     *            {memId: , rtcId: }
+     * @param sdp
+     *            sdp:sdpstring
+     * @param cands [ ]
+     *
+     */
+    initC: function (rt, streamType, WebRTCId, tkt, sessId, rtcId, pubS, subS, sdp, cands, rtcCfg, WebRTC, callback) {
+        _logger.debug("initC ...");
+
+
+        var rtcOptions = {
+            data: {
+                op: 102
+            }
+        };
+
+        rtcOptions.streamType = streamType || "VIDEO";
+
+        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        tkt && (rtcOptions.data.tkt = tkt);
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        pubS && (rtcOptions.data.pubS = pubS);
+        subS && (rtcOptions.data.subS = subS);
+        sdp && (rtcOptions.data.sdp = sdp);
+        cands && (rtcOptions.data.cands = cands);
+        rtcCfg && (rtcOptions.data.rtcCfg = rtcCfg);
+        WebRTC && (rtcOptions.data.WebRTC = WebRTC);
+
+        this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * TcklC 105
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     * @param cands
+     * @param success(from,
+     *            rtcOptions)
+     *
+     */
+    tcklC: function (rt, sessId, rtcId, sdp, cands, callback) {
+        _logger.debug("tcklC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 105
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        sdp && (rtcOptions.data.sdp = sdp);
+        cands && (rtcOptions.data.cands = cands);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * AnsC 106
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     * @param sdp
+     * @param cands
+     *
+     */
+    ansC: function (rt, sessId, rtcId, sdp, cands, callback, enableVoice, enableVideo) {
+        _logger.debug("ansC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 106
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        sdp && (rtcOptions.data.sdp = sdp);
+        cands && (rtcOptions.data.cands = cands);
+
+        enableVoice === false && (rtcOptions.data.enableVoice = enableVoice);
+        enableVideo === false && (rtcOptions.data.enableVideo = enableVideo);
+
+
+
+        // rtcOptions.data.enableVoice = false;
+        // rtcOptions.data.enableVideo = false;
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * AcptC 104
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     * @param sdp
+     * @param ans
+     *            1
+     *
+     */
+    acptC: function (rt, sessId, rtcId, sdp, cands, ans, callback, enableVoice, enableVideo) {
+        _logger.debug("acptC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 104
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        sdp && (rtcOptions.data.sdp = sdp);
+        cands && (rtcOptions.data.cands = cands);
+        ans && (rtcOptions.data.ans = ans);
+
+        enableVoice === false && (rtcOptions.data.enableVoice = enableVoice);
+        enableVideo === false && (rtcOptions.data.enableVideo = enableVideo);
+
+        // rtcOptions.data.enableVoice = false;
+        // rtcOptions.data.enableVideo = false;
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * GetMems 203
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param sessId
+     * @param success(from,
+     *            rtcOptions)
+     *
+     */
+    getMems: function (rt, WebRTCId, sessId, callback) {
+        _logger.debug("getMems ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 203
+            }
+        };
+
+        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        sessId && (rtcOptions.data.sessId = sessId);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * SubC 205
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     * @param subS
+     *            {memId:m001, rtcId:r001}
+     *
+     */
+    subC: function (rt, sessId, rtcId, subS, callback) {
+        _logger.debug("subC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 205
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        subS && (rtcOptions.data.subS = subS);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * UsubC 206
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     *
+     */
+    usubC: function (rt, sessId, rtcId, callback) {
+        _logger.debug("usubC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 206
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * TermC 107
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param sessId
+     * @param rtcId
+     * @param reason
+     *               "ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
+     *               "decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
+     *
+     */
+    termC: function (rt, sessId, rtcId, reason, callback) {
+        _logger.debug("termC ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 107
+            }
+        };
+
+        sessId && (rtcOptions.data.sessId = sessId);
+        rtcId && (rtcOptions.data.rtcId = rtcId);
+        reason && (rtcOptions.reason = reason);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * Exit 201
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param sessId
+     * @param success(from,
+     *            rtcOptions)
+     *
+     */
+    exit: function (rt, WebRTCId, sessId, callback) {
+        _logger.debug("exit ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 201
+            }
+        };
+
+        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        sessId && (rtcOptions.data.sessId = sessId);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    /**
+     * DelCfr 2
+     *
+     * @param rt
+     *            {to: , rtKey: , rtflag: , success(result), fail(error)}
+     *
+     * @param callback(from, rtcOptions)
+     *
+     *
+     * @param WebRTCId
+     * @param admtok
+     * @param success(from,
+     *            rtcOptions)
+     *
+     */
+    delCfr: function (rt, WebRTCId, admtok, callback) {
+        _logger.debug("delCfr ...");
+
+        var self = this;
+
+        var rtcOptions = {
+            data: {
+                op: 2
+            }
+        };
+
+        WebRTCId && (rtcOptions.data.WebRTCId = WebRTCId);
+        admtok && (rtcOptions.data.admtok = admtok);
+
+        self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    }
+};
+
+exports.Api = function (initConfigs) {
+    var self = this;
+
+    _util.extend(true, this, _clazz, initConfigs || {});
+
+
+    function _onRecvRtcMessage(from, rtcOptions, rtkey, tsxId, fromSessionId) {
+        if (rtcOptions.result != 0 && self['onServerError']) {
+            self['onServerError'].call(self, from, rtcOptions, rtkey, tsxId, fromSessionId);
+        } else {
+            var onFunction;
+
+            if (self.events[rtcOptions.op] && (onFunction = self[self.events[rtcOptions.op]])) {
+                onFunction.call(self, from, rtcOptions, rtkey, tsxId, fromSessionId);
+            } else {
+                _logger.info("can not handle(recvRtcMessage) the op: " + rtcOptions.op, rtcOptions);
+            }
+        }
+    }
+
+    this.rtcHandler.onRecvRtcMessage = _onRecvRtcMessage;
+};
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var easemob_emedia__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var easemob_emedia__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(easemob_emedia__WEBPACK_IMPORTED_MODULE_0__);
+
+
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.AVPubstream = easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype.AVPubstream;
+
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype._openCamera = function(){
+    easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype._openCamera.apply(this, arguments);
+}
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.__getUserMedia = function(){
+    easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype.__getUserMedia.apply(this, arguments);
+}
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.__controlStream = function(){
+    easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype.__controlStream.apply(this, arguments);
+}
+
+//callback (rtc, stream)
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.createMedia = function(constaints, callback){
+    var self = this;
+
+    var pubS = new self.AVPubstream({
+        constaints: constaints,
+        aoff: 0,
+        voff: 0
+    });
+
+    var openUserMedia = easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype.openUserMedia.bind(this);
+    openUserMedia(pubS).then(function (_service, stream) {
+        callback && callback(self, stream)
+    }, function fail(evt) {
+        easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["util"].logger.debug('[WebRTC-API] getUserMedia() error: ', evt);
+        self.onError(evt);
+    });
+}
+
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setLocalVideoSrcObject = function (stream) {
+    var self = this;
+
+    self._localStream = stream;
+
+    self.onGotLocalStream(stream, this.streamType);
+    self.setLocalStream(stream);
+
+    easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["util"].logger.debug('[WebRTC-API] you can see yourself !');
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"]);
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * P2P
+ */
+var _util = (__webpack_require__(2).default);
+var RouteTo = __webpack_require__(34).RouteTo;
+var _logger = _util.logger;
+
+
+var P2PRouteTo = RouteTo({
+    success: function (result) {
+        _logger.debug("iq to server success", result);
+    },
+    fail: function (error) {
+        _logger.debug("iq to server error", error);
+    }
+});
+
+
+var CommonPattern = {
+    _pingIntervalId: null,
+    _p2pConfig: null,
+    _rtcCfg: null,
+    _rtcCfg2: null,
+    _rtKey: null,
+    _rtFlag: null,
+
+
+    webRtc: null,
+    api: null,
+
+    callee: null,
+
+
+    isCaller: false,
+    accepted: false,
+
+    setLocalSDP: false,
+    setRemoteSDP: false,
+
+    hangup: false,
+
+
+    init: function () {
+        var self = this;
+
+        self.api.onPing = function () {
+            self._onPing.apply(self, arguments);
+        };
+        self.api.onTcklC = function () {
+            self._onTcklC.apply(self, arguments);
+        };
+        self.api.onAcptC = function () {
+            self._onAcptC.apply(self, arguments);
+        };
+        self.api.onAnsC = function () {
+            self._onAnsC.apply(self, arguments);
+        };
+        self.api.onTermC = function () {
+            self._onTermC.apply(self, arguments);
+        };
+        self.api.onEvJoin = function() {
+            self._onEvJoin.apply(self, arguments);
+        };
+        self.api.onStreamControl = function() {
+            self._onStreamControl.apply(self, arguments);
+        };
+        self.webRtc.onIceCandidate = function () {
+            self._onIceCandidate.apply(self, arguments);
+        };
+        self.webRtc.onIceStateChange = function () {
+            self._onIceStateChange.apply(self, arguments);
+        };
+    },
+
+    _ping: function () {
+        var self = this;
+
+        var index = 0;
+
+        function ping() {
+            var rt = new P2PRouteTo({
+                to: self.callee,
+                rtKey: self._rtKey
+            });
+
+            self.api.ping(rt, self._sessId, function (from, rtcOptions) {
+                _logger.debug("ping result", rtcOptions);
+
+            });
+            // self.api.streamControl(rt, self._sessId, "rtcId", (index++) % 4, function (from, rtcOptions) {
+            //     _logger.debug("streamControl result", rtcOptions);
+            //
+            // });
+        }
+
+        self._pingIntervalId = window.setInterval(ping, 50000);
+    },
+
+    _onPing: function (from, options, rtkey, tsxId, fromSid) {
+        _logger.debug('_onPing from', fromSid);
+    },
+
+    initC: function (mediaStreamConstaints, accessSid) {
+        var self = this;
+        self.sid = accessSid;
+
+        self.isCaller = true;
+        self.accepted = false;
+        self.setLocalSDP = false;
+        self.setRemoteSDP = false;
+        self.hangup = false;
+
+        self.streamType = mediaStreamConstaints.audio && mediaStreamConstaints.video ? "VIDEO" : "VOICE";
+
+        self.createLocalMedia(mediaStreamConstaints);
+    },
+
+    createLocalMedia: function (mediaStreamConstaints) {
+        var self = this;
+
+        this.webRtc.createMedia(mediaStreamConstaints, function (webrtc, stream) {
+            self.webRtc.createRtcPeerConnection(self._rtcCfg);
+
+            webrtc.setLocalVideoSrcObject(stream);
+
+            self.webRtc.createOffer(function (offer) {
+                self._onGotWebRtcOffer(offer);
+            });
+        });
+    },
+
+    _onGotWebRtcOffer: function (offer) {
+        var self = this;
+
+        var rt = new P2PRouteTo({
+            sid: self.sid,
+            to: self.callee,
+            rtKey: self._rtKey
+        });
+
+        self.api.initC(rt, self.streamType, null, null, self._sessId, self._rtcId, null, null, offer, null, self._rtcCfg2, null, function (from, rtcOptions) {
+            _logger.debug("initc result", rtcOptions);
+        });
+
+        self.setLocalSDP = true;
+
+        self._ping();
+    },
+
+    _onAcptC: function (from, options) {
+        var self = this;
+
+        if (options.ans && options.ans == 1) {
+            _logger.info("[WebRTC-API] _onAcptC : 104, ans = 1, it is a answer. will onAcceptCall");
+            self.onAcceptCall(from, options, options.enableVoice !== false, options.enableVideo !== false);
+            self._onAnsC(from, options);
+        } else if (!WebIM.WebRTC.supportPRAnswer) {
+            _logger.info("[WebRTC-API] _onAcptC : not supported pranswer. drop it. will onAcceptCall");
+
+            self.setRemoteSDP = false;
+            self._handRecvCandsOrSend(from, options);
+
+            self.onAcceptCall(from, options, options.enableVoice !== false, options.enableVideo !== false);
+        } else {
+            _logger.info("[WebRTC-API] _onAcptC : recv pranswer. ");
+
+            if (options.sdp || options.cands) {
+                // options.sdp && (options.sdp.type = "pranswer");
+                options.sdp && self.webRtc.setRemoteDescription(options.sdp);
+
+                self.setRemoteSDP = true;
+                self._handRecvCandsOrSend(from, options);
+
+                self.onAcceptCall(from, options, options.enableVoice !== false, options.enableVideo !== false);
+            }
+        }
+    },
+
+    _onEvJoin: function (from, options, rtkey, tsxId, fromSid) {
+        var self = this;
+
+        _logger.debug('_onEvJoin from', fromSid, from);
+
+        self.onAcceptCall(from, options, options.enableVoice !== false, options.enableVideo !== false);
+    },
+
+    onAcceptCall: function (from, options, enableVoice, enableVideo) {
+
+    },
+
+    __onVoiceOrVideo: function(from, options, fromSid){
+        var self = this;
+
+        options.enableVoice === false ? (self.onOtherUserOpenVoice(from, false)) : (self.onOtherUserOpenVoice(from, true));
+        options.enableVideo === false ? (self.onOtherUserOpenVideo(from, false)) : (self.onOtherUserOpenVideo(from, true));
+    },
+
+    /*
+     * { verison : MSYNC_V1, compress_algorimth : 0, command : SYNC, payload : { meta : { id : 2326, to : easemob-demo#chatdemoui_xyj002@easemob.com, ns : CONFERENCE, payload : { session_id : xyj0011494320598055, operation : MEDIA_REQUEST, peer_name : xyj001, route_flag : 1, route_key : --X--, content : {"op":400,"callVersion":"2.0.0","sessId":"128542826909667328","rtcId":"Channel1494320598056","tsxId":"1494320622866-6","controlType":0}, control_type : PAUSE_VOICE } } } }
+     * PAUSE_VOICE(0, 0), RESUME_VOICE(1, 1), PAUSE_VIDEO(2, 2), RESUME_VIDEO(3, 3)
+     *
+     */
+    _onStreamControl: function (from, options, rtkey, tsxId, fromSid){
+        var self = this;
+        var controlType = options.controlType;
+
+        controlType === 0 && (self.onOtherUserOpenVoice(from, false));
+        controlType === 1 && (self.onOtherUserOpenVoice(from, true));
+        controlType === 2 && (self.onOtherUserOpenVideo(from, false));
+        controlType === 3 && (self.onOtherUserOpenVideo(from, true));
+
+        self.onStreamControl(from, options, rtkey, tsxId, fromSid);
+    },
+    onStreamControl: function (from, options, rtkey, tsxId, fromSid){
+
+    },
+
+    onOtherUserOpenVoice: function (from, opened){
+        _logger.debug("from open:", opened, " voice .", from)
+    },
+    onOtherUserOpenVideo: function (from, opened){
+        _logger.debug("from open:", opened, " voideo .", from)
+    },
+
+
+    _onAnsC: function (from, options) { // answer
+        var self = this;
+
+        _logger.info("[WebRTC-API] _onAnsC : recv answer. ");
+
+        self.accepted = true;
+
+        options.sdp && self.webRtc.setRemoteDescription(options.sdp);
+
+        self.setRemoteSDP = true;
+        self._handRecvCandsOrSend(from, options);
+
+
+        self.__onVoiceOrVideo(from, options);
+    },
+
+
+    _onInitC: function (from, options, rtkey, tsxId, fromSid) {
+        var self = this;
+
+        self.isCaller = false;
+        self.accepted = false;
+        self.setLocalSDP = false;
+        self.setRemoteSDP = false;
+        self.hangup = false;
+
+        self.callee = from;
+        self._rtcCfg2 = options.rtcCfg;
+        self._rtKey = rtkey;
+        self._tsxId = tsxId;
+        self._fromSid = fromSid;
+
+        self._rtcId = options.rtcId;
+        self._sessId = options.sessId;
+
+        self.streamType = options.streamType;
+
+        self.webRtc.createRtcPeerConnection(self._rtcCfg2);
+
+        options.sdp && _logger.debug(options.sdp.sdp);
+
+        options.sdp && (self.webRtc.setRemoteDescription(options.sdp).then(function () {
+
+            self.setRemoteSDP = true;
+            self._handRecvCandsOrSend(from, options);
+
+            /*
+             * chrome 版本 大于 50时，可以使用pranswer。
+             * 小于50 不支持pranswer，此时处理逻辑是，直接进入振铃状态
+             *
+             */
+            if (WebIM.WebRTC.supportPRAnswer) {
+                self.webRtc.createPRAnswer(function (prAnswer) {
+                    self._onGotWebRtcPRAnswer(prAnswer);
+
+                    setTimeout(function () { //由于 chrome 在 pranswer时，ice状态只是 checking，并不能像sdk那样 期待 connected 振铃；所以目前改为 发送完pranswer后，直接振铃
+                        _logger.info("[WebRTC-API] onRinging : after send pranswer. ", self.callee);
+                        self.onRinging(self.callee, self.streamType);
+                    }, 500);
+                });
+            } else {
+                setTimeout(function () {
+                    _logger.info("[WebRTC-API] onRinging : After iniC, cause by: not supported pranswer. ", self.callee);
+                    self.onRinging(self.callee, self.streamType);
+                }, 500)
+                self._ping();
+            }
+        }));
+    },
+
+
+    _onGotWebRtcPRAnswer: function (prAnswer) {
+        var self = this;
+
+        var rt = new P2PRouteTo({
+            //tsxId: self._tsxId,
+            to: self.callee,
+            rtKey: self._rtKey
+        });
+
+        //self.api.acptC(rt, self._sessId, self._rtcId, prAnswer, null, 1);
+        self.api.acptC(rt, self._sessId, self._rtcId, prAnswer);
+
+        self.setLocalSDP = true;
+        self._handRecvCandsOrSend();
+
+        self._ping();
+    },
+
+    onRinging: function (caller, streamType) {
+    },
+
+    accept: function () {
+        var self = this;
+
+        function createAndSendAnswer() {
+            _logger.info("createAndSendAnswer : ...... ");
+
+            self.webRtc.createAnswer(function (answer) {
+                var rt = new P2PRouteTo({
+                    //tsxId: self._tsxId,
+                    to: self.callee,
+                    rtKey: self._rtKey
+                });
+
+                if (WebIM.WebRTC.supportPRAnswer) {
+                    self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                } else {
+                    self.api.acptC(rt, self._sessId, self._rtcId, answer, null, 1);
+                }
+
+                if (!WebIM.WebRTC.supportPRAnswer) {
+                    self.setLocalSDP = true;
+                }
+                self._handRecvCandsOrSend();
+
+                self.accepted = true;
+            });
+        }
+
+        var constaints = {
+            audio: true
+        };
+        if(self.streamType == "VIDEO"){
+            constaints.video = true;
+        }
+
+        self.webRtc.createMedia(constaints, function (webrtc, stream) {
+            webrtc.setLocalVideoSrcObject(stream);
+
+            createAndSendAnswer();
+        });
+    },
+
+    _handRecvCandsOrSend: function (from, options) {
+        var self = this;
+
+        setTimeout(function () {
+            self._onTcklC(from, options);
+        }, 50);
+
+        setTimeout(function () {
+            self._onIceCandidate();
+        }, 50);
+    },
+
+    _onTcklC: function (from, options) { // setRemoteSDP，才可以添加 添加 对方 cands
+        var self = this;
+
+        // options.sdp && self.webRtc.setRemoteDescription(options.sdp);
+
+        if (self.setRemoteSDP) {
+            _logger.info("[WebRTC-API] recv and add cands.");
+
+            self._recvCands && self._recvCands.length > 0 && self.webRtc.addIceCandidate(self._recvCands);
+            self._recvCands && self._recvCands.length > 0 && (self._recvCands = []);
+            options && options.cands && self.webRtc.addIceCandidate(options.cands);
+        } else if (options && options.cands && options.cands.length > 0) {
+            for (var i = 0; i < options.cands.length; i++) {
+                (self._recvCands || (self._recvCands = [])).push(options.cands[i]);
+            }
+            _logger.debug("[_onTcklC] temporary memory[recv] ice candidate. util setRemoteSDP = true");
+        }
+    },
+
+    _onIceStateChange: function (iceState) {
+        var self = this;
+        _logger.debug("[WebRTC-API] ice state is " + iceState);
+
+
+        if(iceState === "closed"){
+            self.setLocalSDP = false;
+            self.setRemoteSDP = false;
+        }
+
+        self.api.onIceConnectionStateChange(iceState);
+    },
+
+    _onIceCandidate: function (_candidate) { //在本地sdp set 发送完成后，发送 cands
+        var self = this;
+
+        if (self.setLocalSDP) {
+            function sendIceCandidate(candidate) {
+                _logger.debug("send ice candidate...");
+
+                var rt = new P2PRouteTo({
+                    to: self.callee,
+                    rtKey: self._rtKey
+                });
+
+                if (candidate) {
+                    self.api.tcklC(rt, self._sessId, self._rtcId, null, candidate);
+                }
+            }
+
+            if (self._cands && self._cands.length > 0) {
+
+                sendIceCandidate(self._cands);
+
+                self._cands = [];
+            }
+            _candidate && sendIceCandidate(_candidate);
+        } else {
+            _candidate && (self._cands || (self._cands = [])).push(_candidate);
+            _logger.debug("[_onIceCandidate] temporary memory[send] ice candidate. util setLocalSDP = true");
+        }
+    },
+
+
+    termCall: function (reason) {
+        var self = this;
+
+        self._pingIntervalId && window.clearInterval(self._pingIntervalId);
+
+        var rt = new P2PRouteTo({
+            to: self.callee,
+            rtKey: self._rtKey
+        });
+
+        var sendReason;
+        reason || (!self.isCaller && !self.accepted && (sendReason = 'decline')) || (sendReason = 'success');
+
+        self.hangup || self.api.termC(rt, self._sessId, self._rtcId, sendReason);
+
+        self.webRtc.close();
+
+        self.hangup = true;
+
+        self.setLocalSDP = false;
+        self.setRemoteSDP = false;
+
+        self.onTermCall(reason);
+    },
+
+    /**
+     *
+     * @param from
+     * @param options
+     * @param options.reason
+     *               "ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
+     *               "decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
+     * @private
+     */
+    _onTermC: function (from, options) {
+        _logger.debug("[_onTermC] options.reason = " + options.reason);
+
+        var self = this;
+
+        self.hangup = true;
+
+        self.setLocalSDP = false;
+        self.setRemoteSDP = false;
+
+        self.termCall(options.reason);
+
+    },
+
+    onTermCall: function () {
+        //to be overwrited by call.listener.onTermCall
+    }
+};
+
+module.exports = function (initConfigs) {
+    var self = this;
+
+    _util.extend(true, this, CommonPattern, initConfigs || {});
+
+    self.init();
+};
+
+/**
+ * TODO: Conference
+ */
+
+
 /***/ })
 /******/ ]);
-//3.0.0_Git.9ef7ddd
-console && console.warn('EMedia version', '3.0.0_Git.9ef7ddd');
