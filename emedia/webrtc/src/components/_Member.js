@@ -30,6 +30,8 @@ module.exports = _util.prototypeExtend({
         self._ices = {};
 
         self.supportVCodes = {};
+
+        self.audioMixers = {};
     },
 
     reflushSupportVCodes: function (vcodes) {
@@ -91,7 +93,7 @@ module.exports = _util.prototypeExtend({
     },
 
     getMemberId: function () {
-        return this._memberId;
+        return this._memberId || this.id;
     },
 
     /**
@@ -104,25 +106,35 @@ module.exports = _util.prototypeExtend({
      *
      * @param iceServerConfig
      */
-    createWebrtc: function(webrtcCfg){
+    createWebrtc: function(webrtcCfg, rebuildCount){
         var self = this;
+
+        webrtcCfg || (webrtcCfg = {});
+
+        _util.extend(webrtcCfg, {_rebuildCount: (rebuildCount || 0)});
+
+        if(self._service.useRTCCfg === true && self.__rtc_cfg){ //优先使用 __rtc_cfg
+            webrtcCfg.iceServerConfig = _util.extend(true, {}, self.__rtc_cfg);
+        }else if(_util.isPlainObject(self._service.useRTCCfg)){
+            webrtcCfg.iceServerConfig = _util.extend(true, {}, self._service.useRTCCfg);
+        }
 
         var webrtc = new WebRTC({
             //iceServerConfig: iceServerConfig,
 
-            onIceStateChange: function(event){
-                var state = event.target.iceConnectionState;
+            onIceStateChange: function(iceState){
+                var state = iceState;
 
                 _logger.debug("evt.target ice state", state);
 
                 if(state == 'failed'){
-                    self.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: event}));
-                    webrtc.onEvent && webrtc.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: event}));
+                    self.onEvent(new __event.ICEConnectFail({webrtc: webrtc}));
+                    webrtc.onEvent && webrtc.onEvent(new __event.ICEConnectFail({webrtc: webrtc}));
 
                     return;
                 }
                 if(state == 'connected'){
-                    self.onEvent(new __event.ICEConnected({webrtc: webrtc, event: event}));
+                    self.onEvent(new __event.ICEConnected({webrtc: webrtc}));
                     webrtc.onEvent = null;
 
                     return;
@@ -140,7 +152,7 @@ module.exports = _util.prototypeExtend({
                     return;
                 }
 
-                self._onIceStateChange && self._onIceStateChange(webrtc, event);
+                self._onIceStateChange && self._onIceStateChange(webrtc, iceState);
             },
 
             onIceCandidate: function (candidate) { //event.candidate
@@ -157,25 +169,23 @@ module.exports = _util.prototypeExtend({
             onAddIceCandidateError: function (err) {
                 self.onEvent(new __event.AddIceCandError({webrtc: webrtc, event: err}))
             },
-
             onSetSessionDescriptionError: function (error) {
-                _logger.error('onSetSessionDescriptionError : Failed to set session description: ' + error.toString());
+                _logger.warn('onSetSessionDescriptionError : Failed to set session description: ' + error.toString());
                 self.onEvent && self.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: error}));
             },
             onCreateSessionDescriptionError: function (error) {
-                _logger.error('Failed to create session description: ' + error.toString());
+                _logger.warn('Failed to create session description: ' + error.toString());
                 self.onEvent && self.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: error}));
             },
             // onSetLocalSessionDescriptionSuccess: function (error) {
             //     _logger.debug('onSetLocalSessionDescriptionSuccess : setLocalDescription complete: ' + error.toString());
             //     self.onEvent && self.onEvent(new __event.ICEConnectFail({webrtc: webrtc, event: error}));
             // },
-        }, webrtcCfg || {});
+        }, webrtcCfg);
 
         (self._ices || (self._ices = {}));
         if(self._ices[webrtc.getRtcId()]){
-            //throw "Webrtc id exsits at ices. it is " + webrtc.getRtcId();
-            self.closeWebrtc(webrtc.getRtcId(), true, false);
+            self._howDoWebrtcWhenCrtExsitsWebrtc(webrtc);
         }
         self._ices[webrtc.getRtcId()] = webrtc;
         self._ices[webrtc.__id] = webrtc;
@@ -184,6 +194,13 @@ module.exports = _util.prototypeExtend({
         _logger.debug("create rtc ", webrtc);
 
         return webrtc;
+    },
+
+    _howDoWebrtcWhenCrtExsitsWebrtc: function (webrtc) {
+        var self = this;
+
+        //throw "Webrtc id exsits at ices. it is " + webrtc.getRtcId();
+        self.closeWebrtc(webrtc.getRtcId(), true, false);
     },
 
     connect: function (suceess, fail) {
@@ -198,20 +215,37 @@ module.exports = _util.prototypeExtend({
         return self._session.connected();
     },
 
-    newMessage: function (cfg) {
+    newMessage: function message (cfg) {
         var self = this;
-        return self._session.newMessage(cfg || {});
+
+        var message = self._session.newMessage(cfg);
+        message.post = function (callback, timeoutMillis) {
+            self.postMessage(this, callback, timeoutMillis)
+        };
+
+        return message;
     },
 
-    postMessage: function(message, callback){
+    message: function (cfg) {
+        var self = this;
+
+        var message = self._session.newMessage(cfg);
+        message.post = function (callback, timeoutMillis) {
+            self.postMessage(this, callback, timeoutMillis)
+        };
+
+        return message;
+    },
+
+    postMessage: function(message, callback, timeoutMillis){
         var self = this;
 
         try {
-            message.sessId || message.setSessId(self._session._sessionId);
-            self._session.postMessage(message, callback);
+            message.sessId || (message.sessId = self._session._sessionId);
+            self._session.postMessage(message, callback, timeoutMillis);
         } catch (e){
             callback && callback({op: 1001, tsxId: message.tsxId, result: -9527, msg: "post message. exception"});
-            _logger.error(e);
+            _logger.warn(e);
         }
     },
 
@@ -219,11 +253,11 @@ module.exports = _util.prototypeExtend({
 
     },
 
-    _onIceStateChange: function(webrtc, webrtcEvent){
+    _onIceStateChange: function(webrtc, rtcState){
         var self = this;
 
-        _logger.info(webrtc.getRtcId(), webrtcEvent);
-        self.onEvent(new __event.ICEChanage({webrtc: webrtc, event: webrtcEvent, state: webrtcEvent.target.iceConnectionState}));
+        _logger.info(webrtc.getRtcId(), rtcState);
+        self.onEvent(new __event.ICEChanage({webrtc: webrtc, state: rtcState}));
     },
 
     _onIceCandidate: function (webrtc, cand) { //event.candidate
@@ -285,7 +319,7 @@ module.exports = _util.prototypeExtend({
             try{
                 rspSuccess && rspSuccess();
             }catch(e){
-                _logger.error(e);
+                _logger.warn(e);
             }
 
             rsp.sdp && self.ansC(webrtc.getRtcId(), rsp.sdp, rsp.cands)
@@ -313,6 +347,44 @@ module.exports = _util.prototypeExtend({
         });
     },
 
+    _ansCAndPubstream: function(webrtc, stream, sdp, rspFail, rspSuccess){
+        var self = this;
+
+        var ansC = self.newMessage()
+            .setOp(106)
+            .setRtcId(webrtc.getRtcId())
+            .setSdp(sdp);
+
+        webrtc.subArgs && _util.extend(ansC, webrtc.subArgs);
+
+        if(stream && stream.located()){
+            stream = _util.extend({}, stream);
+            _util.removeAttribute(stream, "mutedMuted");
+            _util.removeAttribute(stream, "_located");
+
+            ansC.setPubS(stream);
+        }
+
+        self.postMessage(ansC, function (rsp) {
+            if(rsp.result != 0){
+                self.onEvent(new __event.RspFail({request: ansC, response: rsp}));
+                rspFail && rspFail(new __event.RspFail({request: ansC, response: rsp, hidden: rsp.retrying === true}));
+
+                return;
+            }
+
+            if(stream && !stream.id && rsp.streamId){
+                stream.id = rsp.streamId;
+            }
+
+            try{
+                rspSuccess && rspSuccess();
+            }catch(e){
+                _logger.warn(e);
+            }
+        });
+    },
+
     _ansC: function (webrtc, sdp, rspFail) {
         var self = this;
 
@@ -334,9 +406,10 @@ module.exports = _util.prototypeExtend({
     _termC: function (webrtc, endReason, rspFail) {
         var self = this;
 
+        var rtcId = (typeof webrtc === "string") ? webrtc : webrtc.getRtcId();
         var termC = self.newMessage()
             .setOp(107)
-            .setRtcId(webrtc.getRtcId())
+            .setRtcId(rtcId)
             .setEndReason(endReason);
 
         self.postMessage(termC, function (rsp) {
@@ -386,6 +459,16 @@ module.exports = _util.prototypeExtend({
         });
     },
 
+    answerCall: function(rtcId, stream, rspFail, rspSuccess){
+        var self = this;
+
+        var webrtc = self._ices[rtcId];
+
+        webrtc.createAnswer(function(sdp){
+            self._ansCAndPubstream && self._ansCAndPubstream(webrtc, stream, sdp, rspFail, rspSuccess);
+        });
+    },
+
     answer: function(rtcId, rspFail){
         var self = this;
 
@@ -421,14 +504,27 @@ module.exports = _util.prototypeExtend({
         }
 
         var webrtc = self._ices[rtcId];
-        webrtc.addIceCandidate(cands);
+        webrtc && webrtc.addIceCandidate(cands);
     },
 
     closeWebrtc: function(rtcId, remainLocalStream, serverClosed){
         var self = this;
-
-
         var webrtc = self._ices[rtcId];
+
+        _util.forEach(self._cacheStreams, function (sid, _stream) {
+            if(_stream.rtcId === rtcId && !_stream.located()){
+                try{
+                    var soundMeter = _util.removeAttribute(self._mediaMeters, sid);
+                    soundMeter && soundMeter._finally();
+                }catch(e){
+                    _logger.warn(e);
+                }
+            }
+
+            if(_stream.rtcId === rtcId && _stream.type === 2){
+                _util.removeAttribute(self.audioMixers, _stream.id);
+            }
+        });
 
         if(!webrtc || webrtc.closed){
             _logger.warn("Webrtc not exsits or closed", webrtc && webrtc.closed);
@@ -437,21 +533,22 @@ module.exports = _util.prototypeExtend({
                 webrtc && _util.forEach(self._cacheStreams, function (sid, _stream) {
                     if(_stream.rtcId === rtcId){
                         delete self._linkedStreams[sid];
+                        _logger.warn("Webrtc close, remvoe from _linkedStreams", sid);
                     }
                 });
             }
 
+            serverClosed || (self._termC(rtcId, 0));
+
             return;
         }
-
-
 
         if(self._records){
             function _stopRecord(_stream) {
                 try{
                     self.stopRecord(_stream);
                 } catch (e){
-                    _logger.error(e);
+                    _logger.warn(e);
                 } finally {
                     _util.removeAttribute(self._records, _stream.id);
                 }
@@ -475,21 +572,17 @@ module.exports = _util.prototypeExtend({
                 webrtc && _util.forEach(self._cacheStreams, function (sid, _stream) {
                     if(_stream.rtcId === rtcId){
                         if(_stream.located()){
-                            // _stream.type !== 1 && _stream._localMediaStream && _stream._localMediaStream.getTracks().forEach(function (track) {
-                            //     track.stop();
-                            // });
-                            _stream._localMediaStream && _stream._localMediaStream.getTracks().forEach(function (track) {
-                                track.stop();
-                            });
+                            emedia.stopTracks(_stream._localMediaStream);
 
                             self._cacheStreams[sid] && self._linkedStreams[sid] && self.onRemoveStream(_stream);
 
                             delete self._cacheStreams[sid];
-                            _logger.info("Remove stream", sid, ". from cache");
+                            _logger.info("Webrtc close. Remove stream", sid, ". from cache");
                         }
 
                         if(serverClosed){
                             delete self._linkedStreams[sid];
+                            _logger.info("Webrtc close. Remove stream", sid, ". from _linkedStreams");
                         }
                     }
                 });
@@ -572,9 +665,7 @@ module.exports = _util.prototypeExtend({
         try{
             _util.forEach(self._cacheStreams || {}, function (sid, _stream) {
                 if(_stream.located() && _stream._localMediaStream){
-                    _stream._localMediaStream.getTracks().forEach(function (track) {
-                        track.stop();
-                    });
+                    emedia.stopTracks(_stream._localMediaStream);
                 }
             });
 
