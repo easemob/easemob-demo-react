@@ -579,7 +579,7 @@ var _WebRTC = _util.prototypeExtend({
             }
             self.onIceCandidate(candidate);
         };
-
+        
         function stateChange(event) {
             _logger.info("states: conn", (rtcPeerConnection.connectionState || rtcPeerConnection.iceConnectionState),
                 ", ice", rtcPeerConnection.iceConnectionState, "@", self._rtcId, self.__id,  self.closed);

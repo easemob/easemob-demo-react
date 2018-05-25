@@ -12082,6 +12082,7 @@ var _WebRTC = _util.prototypeExtend({
         iceServerConfig || (iceServerConfig = self.iceServerConfig);
 
         if (iceServerConfig || emedia.isEdge){ //reduce icecandidate number:add default value
+            iceServerConfig || (iceServerConfig = {});
             !iceServerConfig.iceServers && (iceServerConfig.iceServers = []);
 
             iceServerConfig.rtcpMuxPolicy = "require";
@@ -17717,3 +17718,5 @@ module.exports = _util.prototypeExtend({
 
 /***/ })
 /******/ ]);
+//3.0.0_Git.3891cea
+console && console.warn('EMedia version', '3.0.0_Git.3891cea');
