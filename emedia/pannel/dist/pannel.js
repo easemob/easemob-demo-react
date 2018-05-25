@@ -66,7 +66,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 33);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -740,13 +740,14 @@ module.exports = new Util();
 /* 17 */,
 /* 18 */,
 /* 19 */,
-/* 20 */
+/* 20 */,
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
 var _logger = _util.tagLogger("DefaultTrack");
 
-var MouseTrack = __webpack_require__(21);
+var MouseTrack = __webpack_require__(22);
 
 function zoomCanvas(canvas, width, height) {
     var canvasContext = canvas.getContext("2d");
@@ -904,13 +905,13 @@ module.exports = DefaultMouseTrack = MouseTrack.extend({
 });
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
 var _logger = _util.tagLogger("MouseTrack");
 
-var MouseTrigger = __webpack_require__(22);
+var MouseTrigger = __webpack_require__(23);
 
 module.exports = _util.prototypeExtend({
     _scale: 1,
@@ -1039,7 +1040,7 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
@@ -1114,16 +1115,16 @@ module.exports = _util.prototypeExtend({
 module.exports.BTN = BTN;
 
 /***/ }),
-/* 23 */,
 /* 24 */,
-/* 25 */
+/* 25 */,
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
 var _logger = _util.tagLogger("Mouse");
 
 
-var MouseTrigger = __webpack_require__(22);
+var MouseTrigger = __webpack_require__(23);
 
 /**
  * { target:
@@ -1335,7 +1336,7 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
@@ -1421,16 +1422,16 @@ module.exports = _util.prototypeExtend({
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
 var _logger = _util.tagLogger("TotalBuffer");
 
-var EventBuffer = __webpack_require__(28);
-var TrackBuffer = __webpack_require__(29);
+var EventBuffer = __webpack_require__(29);
+var TrackBuffer = __webpack_require__(30);
 
-var MouseTrigger = __webpack_require__(22);
+var MouseTrigger = __webpack_require__(23);
 
 module.exports = _util.prototypeExtend({
     trackBufferSize: 100,
@@ -1549,7 +1550,7 @@ module.exports = _util.prototypeExtend({
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
@@ -1642,7 +1643,7 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
@@ -1818,8 +1819,8 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 30 */,
-/* 31 */
+/* 31 */,
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var _util = __webpack_require__(6);
@@ -1837,14 +1838,14 @@ module.exports = _util.prototypeExtend({
 });
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(33);
+module.exports = __webpack_require__(34);
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var emedia = window.emedia = window.emedia || {};
@@ -1868,18 +1869,18 @@ var pannel = emedia.pannel = {};
 }));
 
 
-pannel.Mouse = __webpack_require__(25);
-pannel.MouseTrigger = __webpack_require__(22);
-pannel.Keyboard = __webpack_require__(26);
+pannel.Mouse = __webpack_require__(26);
+pannel.MouseTrigger = __webpack_require__(23);
+pannel.Keyboard = __webpack_require__(27);
 
-pannel.KeyboardTrack = __webpack_require__(31);
-pannel.MouseTrack = __webpack_require__(21);
-pannel.DefaultMouseTrack = __webpack_require__(20);
+pannel.KeyboardTrack = __webpack_require__(32);
+pannel.MouseTrack = __webpack_require__(22);
+pannel.DefaultMouseTrack = __webpack_require__(21);
 
-pannel.TrackBuffer = __webpack_require__(29);
-pannel.EventBuffer = __webpack_require__(28);
+pannel.TrackBuffer = __webpack_require__(30);
+pannel.EventBuffer = __webpack_require__(29);
 
-pannel.TotalBuffer = __webpack_require__(27);
+pannel.TotalBuffer = __webpack_require__(28);
 
 pannel.util = __webpack_require__(6);
 pannel.logger = pannel.util.tagLogger("Pannel");

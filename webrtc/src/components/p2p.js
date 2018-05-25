@@ -388,17 +388,17 @@ var CommonPattern = {
         }
     },
 
-    _onIceStateChange: function (event) {
+    _onIceStateChange: function (iceState) {
         var self = this;
-        event && _logger.debug("[WebRTC-API] " + self.webRtc.iceConnectionState() + " |||| ice state is " + event.target.iceConnectionState);
+        _logger.debug("[WebRTC-API] ice state is " + iceState);
 
 
-        if(event && event.target.iceConnectionState == "closed"){
+        if(iceState === "closed"){
             self.setLocalSDP = false;
             self.setRemoteSDP = false;
         }
 
-        self.api.onIceConnectionStateChange(self.webRtc.iceConnectionState());
+        self.api.onIceConnectionStateChange(iceState);
     },
 
     _onIceCandidate: function (_candidate) { //在本地sdp set 发送完成后，发送 cands

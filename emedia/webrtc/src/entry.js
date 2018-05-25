@@ -1,4 +1,5 @@
 //console.  emedia.__easemob_current_mservice.current
+
 window.emedia = window.emedia || {};
 
 ;(function (root, factory) {
@@ -231,8 +232,9 @@ emedia.LOG_LEVEL = 0;
 emedia.isFirefox = 'firefox' === emedia.browser;
 emedia.isChrome = 'chrome' === emedia.browser;
 emedia.isSafari = 'safari' === emedia.browser;
+emedia.isEdge = 'edge' === emedia.browser;
 
-emedia.isWebRTC = (emedia.isFirefox || emedia.isChrome || emedia.isSafari) && /^https\:$/.test(window.location.protocol);
+emedia.isWebRTC = window.RTCPeerConnection && /^https\:$/.test(window.location.protocol);
 
 /**
  * 判断是否支持pranswer
