@@ -1,7 +1,7 @@
 /**
  * P2P
  */
-var _util = require('./utils');
+var _util = (require('./utils').default);
 var RouteTo = require('./api').RouteTo;
 var _logger = _util.logger;
 
@@ -119,9 +119,9 @@ var CommonPattern = {
         var self = this;
 
         this.webRtc.createMedia(mediaStreamConstaints, function (webrtc, stream) {
-            webrtc.setLocalVideoSrcObject(stream);
-
             self.webRtc.createRtcPeerConnection(self._rtcCfg);
+
+            webrtc.setLocalVideoSrcObject(stream);
 
             self.webRtc.createOffer(function (offer) {
                 self._onGotWebRtcOffer(offer);
@@ -388,20 +388,20 @@ var CommonPattern = {
         }
     },
 
-    _onIceStateChange: function (event) {
+    _onIceStateChange: function (iceState) {
         var self = this;
-        event && _logger.debug("[WebRTC-API] " + self.webRtc.iceConnectionState() + " |||| ice state is " + event.target.iceConnectionState);
+        _logger.debug("[WebRTC-API] ice state is " + iceState);
 
 
-        if(event && event.target.iceConnectionState == "closed"){
+        if(iceState === "closed"){
             self.setLocalSDP = false;
             self.setRemoteSDP = false;
         }
 
-        self.api.onIceConnectionStateChange(self.webRtc.iceConnectionState());
+        self.api.onIceConnectionStateChange(iceState);
     },
 
-    _onIceCandidate: function (event) { //在本地sdp set 发送完成后，发送 cands
+    _onIceCandidate: function (_candidate) { //在本地sdp set 发送完成后，发送 cands
         var self = this;
 
         if (self.setLocalSDP) {
@@ -424,9 +424,9 @@ var CommonPattern = {
 
                 self._cands = [];
             }
-            event && event.candidate && sendIceCandidate(event.candidate);
+            _candidate && sendIceCandidate(_candidate);
         } else {
-            event && event.candidate && (self._cands || (self._cands = [])).push(event.candidate);
+            _candidate && (self._cands || (self._cands = [])).push(_candidate);
             _logger.debug("[_onIceCandidate] temporary memory[send] ice candidate. util setLocalSDP = true");
         }
     },

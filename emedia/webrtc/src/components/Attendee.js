@@ -34,6 +34,7 @@ var Attendee = Member.extend({
 
         self._cacheMembers = {};
         self._cacheStreams = {};
+        self._mediaMeters = {};
 
         self._linkedStreams = {};
         self._maybeNotExistStreams = {}; //与self._streams结构相同，用 存储 断网时，ice fail的stream对象。这个对象可能不存在了
@@ -41,8 +42,13 @@ var Attendee = Member.extend({
         self._records = {};
 
         self._ices = {};
+        self.audioMixers = {};
 
         self.closed = false;
+
+        self._nextStreamSeqno = 0;
+
+        self.getMediaMeterIntervalMillis = self.getMediaMeterIntervalMillis || emedia.config.getMediaMeterIntervalMillis;
     },
 
     getCurrentMembers: function () {
@@ -60,12 +66,14 @@ var Attendee = Member.extend({
     newStream: function(cfg){
         var attendee = this;
 
-        var _Stream = Stream.extend({
+        return new Stream(cfg, {
             __init__: function () {
                 var self = this;
 
                 self.rtcId || (self._webrtc && (self.rtcId = self._webrtc.getRtcId()));
                 self._webrtc || (self.rtcId && (self._webrtc = attendee._ices[self.rtcId]));
+
+                self.__create_id = attendee._nextStreamSeqno++;
 
                 if(self.memId && !self.owner){
                     self.owner = _util.extend({}, attendee._cacheMembers[self.memId]);
@@ -75,8 +83,6 @@ var Attendee = Member.extend({
                 }
             }
         });
-
-        return new _Stream(cfg);
     },
 
     getConfrId: function(){
@@ -84,11 +90,11 @@ var Attendee = Member.extend({
     },
     isCaller: function () {
         var self = this;
-        return self.isP2P() && self.ticket.caller == self.name;
+        return self.isP2P() && self.ticket.caller == self.ticket.memName;
     },
     isCallee: function () {
         var self = this;
-        return self.isP2P() && self.ticket.callee == self.name;
+        return self.isP2P() && self.ticket.callee == self.ticket.memName;
     },
     isP2P: function () {
         var self = this;
@@ -157,8 +163,15 @@ var Attendee = Member.extend({
 
             joined && joined(rsp.memId);
 
-            self.onMembers(rsp.cver, rsp.mems);
-            self.onStreams(rsp.cver, rsp.streams);
+            try{
+                self.__rtc_cfg = rsp.rtcCfg;
+                if(typeof rsp.rtcCfg === 'string'){
+                    self.__rtc_cfg = JSON.parse(rsp.rtcCfg);
+                }
+            }finally {
+                self.onMembers(rsp.cver, rsp.mems);
+                self.onStreams(rsp.cver, rsp.streams);
+            }
         }
 
         function onConnected() {
@@ -217,11 +230,7 @@ var Attendee = Member.extend({
                     self.onEvent(_event_);
                     joinError && joinError(_event_);
                 } finally {
-                    if (openedStream) {
-                        openedStream.getTracks().forEach(function (track) {
-                            track.stop();
-                        });
-                    }
+                    emedia.stopTracks(openedStream);
 
                     webrtc && self.closeWebrtc(webrtc.getRtcId());
                 }
@@ -254,6 +263,7 @@ var Attendee = Member.extend({
                 stream.rtcId = webrtc.getRtcId();
                 stream._webrtc = webrtc;
                 stream.id = rsp.streamId;
+                stream.csrc = rsp.csrc;
                 stream.owner = {id: rsp.memId, nickName: self.nickName, name: self.sysUserId, ext: self.extObj};
 
                 stream.optimalVideoCodecs = optimalVideoCodecs;
@@ -264,8 +274,22 @@ var Attendee = Member.extend({
                 rsp.sdp && self.ansC(webrtc.getRtcId(), rsp.sdp);
                 rsp.cands && self.tcklC(webrtc.getRtcId(), rsp.cands)
 
-                self.onMembers(rsp.cver, rsp.mems);
-                self.onStreams(rsp.cver, rsp.streams);
+                try{
+                    self.__rtc_cfg = rsp.rtcCfg;
+                    if(typeof rsp.rtcCfg === 'string'){
+                        self.__rtc_cfg = JSON.parse(rsp.rtcCfg);
+                    }
+                    if(self.__rtc_cfg && self.__rtc_cfg.iceServers && self.__rtc_cfg.iceServers.length > 0){
+                        _logger.warn("Server rsp one rtc cfg. publish will republish");
+
+                        self._service && setTimeout(function () {
+                            self._service._republish(stream);
+                        }, 200);
+                    }
+                }finally {
+                    self.onMembers(rsp.cver, rsp.mems);
+                    self.onStreams(rsp.cver, rsp.streams);
+                }
             }
 
             function onConnected() {
@@ -273,7 +297,19 @@ var Attendee = Member.extend({
 
                 var stream = pubS.localStream;
 
-                webrtc = self.createWebrtc({_rtcId: pubS.rtcId, optimalVideoCodecs: optimalVideoCodecs});
+                var offerOptions;
+                if(pubS.type === 2){
+                    offerOptions = {
+                        offerToReceiveAudio: true,
+                        offerToReceiveVideo: false
+                    }
+                }
+
+                webrtc = self.createWebrtc({
+                    _rtcId: pubS.rtcId,
+                    optimalVideoCodecs: optimalVideoCodecs,
+                    offerOptions: offerOptions
+                }, pubS.iceRebuildCount);
                 self.setLocalStream(stream, webrtc.getRtcId());
 
                 self.doOffer(webrtc.getRtcId(), function (sdp) {
@@ -339,15 +375,17 @@ var Attendee = Member.extend({
                 _event_.hidden || (onPushError && onPushError(_event_));
             } finally {
                 if (openedStream && _event_.hidden !== true) {
-                    openedStream.getTracks().forEach(function (track) {
-                        track.stop();
-                    });
+                    emedia.stopTracks(openedStream);
                 }
 
                 webrtc && self.closeWebrtc(webrtc.getRtcId(), _event_.hidden === true);
             }
         }
 
+        if(!pubS.rtcId && pubS.type === 2 && !emedia.config.allowRepeatAudioMixerPublish && self._service.hasAudioMixers()){
+            _onPushError(new __event.AudioMixerStreamRepeatPublish());
+            return;
+        }
 
         var optimalVideoCodecs = pubS.optimalVideoCodecs || self.getOptimalVideoCodecs();
 
@@ -364,16 +402,21 @@ var Attendee = Member.extend({
             stream._webrtc = webrtc;
             stream.rtcId = webrtc.getRtcId();
             stream.id = rsp.streamId;
+            stream.csrc = rsp.csrc;
             stream.owner = {id: self.getMemberId(), nickName: self.nickName, name: self.sysUserId, ext: self.extObj};
 
             stream.optimalVideoCodecs = optimalVideoCodecs;
 
-            self.onEvent(new __event.PushSuccess({stream: stream, hidden: true})); //ice重连成功后 会 再次 onEvent PushSuccess
-            pushed && pushed(stream);
+            stream.id && (stream.type === 2) && (self.audioMixers[stream.id] = stream);
 
+            try{
+                self.onEvent(new __event.PushSuccess({stream: stream, hidden: true})); //ice重连成功后 会 再次 onEvent PushSuccess
+            } finally {
+                rsp.sdp && self.ansC(webrtc.getRtcId(), rsp.sdp);
+                rsp.cands && self.tcklC(webrtc.getRtcId(), rsp.cands);
 
-            rsp.sdp && self.ansC(webrtc.getRtcId(), rsp.sdp);
-            rsp.cands && self.tcklC(webrtc.getRtcId(), rsp.cands)
+                pushed && pushed(stream);
+            }
         }
 
         function pub(pubS) {
@@ -381,7 +424,20 @@ var Attendee = Member.extend({
 
             var stream = pubS.localStream;
 
-            webrtc = self.createWebrtc({_rtcId: pubS.rtcId, optimalVideoCodecs: optimalVideoCodecs});
+            var offerOptions;
+            if(pubS.type === 2){
+                offerOptions = {
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: false
+                }
+            }
+
+            webrtc = self.createWebrtc({
+                _rtcId: pubS.rtcId,
+                optimalVideoCodecs: optimalVideoCodecs,
+                offerOptions: offerOptions
+            }, pubS.iceRebuildCount);
+
             self.setLocalStream(stream, webrtc.getRtcId());
 
             self.doOffer(webrtc.getRtcId(), function (sdp) {
@@ -404,6 +460,7 @@ var Attendee = Member.extend({
     isSafari: function () {
         return /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
     },
+
     isSafariButNotPushStream: function () {
         var self = this;
 
@@ -422,6 +479,7 @@ var Attendee = Member.extend({
 
         return false;
     },
+
     createWebrtcAndSubscribeStream: function (streamId, callbacks, iceServerConfig, subArgs) {
         var self = this;
 
@@ -432,10 +490,10 @@ var Attendee = Member.extend({
 
         //var stream = self.newStream(subStream);
         var stream = subStream;
-        subArgs = subArgs || stream.subArgs || {subSVideo: true, subSAudio: true};
+        subArgs = subArgs || stream.subArgs || {subSVideo: true, subSAudio: (subStream.type !== 2)}; //混音自动订阅不要订阅音频
 
         function _onSubFail(evt) {
-            _logger.error("sub stream error", streamId, evt);
+            _logger.warn("sub stream error", streamId, evt);
 
             preSubArgs && stream._webrtc && stream._webrtc.setSubArgs(preSubArgs);
             preSubArgs && (stream.subArgs = preSubArgs);
@@ -476,14 +534,15 @@ var Attendee = Member.extend({
 
         var preSubArgs = stream.subArgs;
 
+        var withoutVideo = !(stream.vcodes && stream.vcodes.length > 0);
+
         var offerOptions = {
-            offerToReceiveAudio: (emedia.isSafari ? (subArgs.subSAudio) : true),
-            offerToReceiveVideo: (emedia.isSafari ? (subArgs.subSVideo && !stream.voff) : true),
+            offerToReceiveAudio: true,
+            offerToReceiveVideo: (subArgs.subSVideo && withoutVideo)
         };
 
         if(!offerOptions.offerToReceiveAudio && !offerOptions.offerToReceiveVideo){
-            _logger.error("offerToReceiveAudio == false and offerToReceiveVideo == false");
-            console.error("offerToReceiveAudio == false and offerToReceiveVideo == false");
+            _logger.warn("offerToReceiveAudio == false and offerToReceiveVideo == false");
         }
 
         var webrtc = self.createWebrtc({
@@ -500,7 +559,7 @@ var Attendee = Member.extend({
                 callbacks.onGotRemote && callbacks.onGotRemote(stream);
                 self.onEvent && self.onEvent(evt);
             }
-        });
+        }, stream.iceRebuildCount);
         var rtcId = webrtc.getRtcId();
 
         _logger.warn(rtcId, " sub stream ", streamId, optimalVideoCodecs);
@@ -668,6 +727,16 @@ var Attendee = Member.extend({
             });
         }
 
+        var hasOtherDevices;
+        _util.forEach(self._cacheMembers, function (_memId, _member) {
+            if(!hasOtherDevices && _memId != mem.id && mem.memName === _member.memName){
+                hasOtherDevices = true;
+            }
+        });
+
+        if(hasOtherDevices){
+            return;
+        }
         self.onAddMember(mem);
     },
 
@@ -700,7 +769,7 @@ var Attendee = Member.extend({
                 self.onEvent(new __event.Hangup({reason: reason, self: {id: self._memberId}}));
                 self.onMeExit && self.onMeExit(reason);
 
-                _logger.error(e);
+                _logger.warn(e);
             }
 
             return;
@@ -724,6 +793,11 @@ var Attendee = Member.extend({
 
         if(!self._cacheMembers[memId]) throw "No found member. when pub";
 
+        // if(pubS.type === 2){ //强制 aoff = 1
+        //     pubS._1_aoff = pubS.aoff;
+        //     pubS.aoff = self._service.hasAudioMixers() ? 0 : 1;
+        // }
+
         var newStream = self.newStream(pubS);
         var _stream = self._cacheStreams[pubS.id];
 
@@ -743,10 +817,11 @@ var Attendee = Member.extend({
         }
 
         var stream = newStream;
+
         stream.owner = self._cacheMembers[memId];
         self._cacheStreams[pubS.id] = stream;
 
-        self.onAddStream(self.newStream(stream));
+        self._onAddStream(self.newStream(stream));
 
         if(self.autoSub){
             if(self.isSafariButNotPushStream()){
@@ -757,10 +832,11 @@ var Attendee = Member.extend({
 
             self.createWebrtcAndSubscribeStream(pubS.id, {
                 onGotRemote: function(stream) {
-                    //self.onAddStream(stream);
                 }
-            })
+            }); //, undefined, subArgs
         }
+
+        return stream;
     },
 
     onUnpub: function(cver, memId, sId){
@@ -785,27 +861,22 @@ var Attendee = Member.extend({
     __getWebrtcFor: function (pubStreamId) {
         var self = this;
 
-        var webrtc = self._cacheStreams[pubStreamId]._webrtc;
+        var webrtc = self._cacheStreams[pubStreamId] && self._cacheStreams[pubStreamId]._webrtc;
         return webrtc && webrtc.getRtcId();
     },
     _getWebrtc: function (pubStreamId) {
         var self = this;
 
-        var webrtc = self._cacheStreams[pubStreamId]._webrtc;
+        var webrtc = self._cacheStreams[pubStreamId] && self._cacheStreams[pubStreamId]._webrtc;
         return webrtc;
     },
 
     _updateRemoteStream: function (stream, remoteMediaStream) {
-        remoteMediaStream && remoteMediaStream.getAudioTracks().forEach(function (track) {
-            track.enabled = !stream.aoff && !(stream.subArgs && stream.subArgs.subSAudio === false);
-        });
-
-        remoteMediaStream && remoteMediaStream.getVideoTracks().forEach(function (track) {
-            track.enabled = !stream.voff && !(stream.subArgs && stream.subArgs.subSVideo === false);
-        });
+        emedia.enableAudioTracks(remoteMediaStream, !stream.aoff && !(stream.subArgs && stream.subArgs.subSAudio === false));
+        emedia.enableVideoTracks(remoteMediaStream, !stream.voff && !(stream.subArgs && stream.subArgs.subSVideo === false));
     },
 
-    onStreamControl: function(cver, streamId, voff, aoff){
+    onStreamControl: function(cver, streamId, voff, aoff, sver){
         var self = this;
 
         var stream = self._cacheStreams[streamId];
@@ -821,6 +892,7 @@ var Attendee = Member.extend({
         self.onUpdateStream && self.onUpdateStream(stream, new stream.Update({voff: voff, aoff: aoff}));
 
         cver && (self._cver = cver);
+        sver && (stream.sver = sver);
     },
 
     aoff: function(pubS, _aoff, callback){
@@ -900,7 +972,7 @@ var Attendee = Member.extend({
         var self = this;
 
         var removedMembers = [];
-        _util.forEach(self._cacheStreams, function (_memberId, _member) {
+        _util.forEach(self._cacheMembers, function (_memberId, _member) {
             members[_memberId] || removedMembers.push(_member);
         });
         _util.forEach(removedMembers, function (_index, _member) {
@@ -933,6 +1005,11 @@ var Attendee = Member.extend({
 
         var addStreams = [];
         _util.forEach(streams, function (_pubSId, stream) {
+            // if(stream.type === 2){ //强制 aoff = 1
+            //     stream._1_aoff = stream.aoff;
+            //     stream.aoff = self._service.hasAudioMixers() ? 0 : 1;
+            // }
+
             if(stream.memId != self.getMemberId()){
                 self._cacheStreams[_pubSId] || addStreams.push(stream);
             }
@@ -964,7 +1041,7 @@ var Attendee = Member.extend({
 
         var unpubStreams = [];
         _util.forEach(self._cacheStreams, function (_pubSId, _stream) {
-            if(_stream.memId === member.id){
+            if((_stream.memId || (_stream.owner && _stream.owner.id)) === member.id){
                 unpubStreams.push(_stream);
             }
         });
@@ -975,7 +1052,24 @@ var Attendee = Member.extend({
 
         _util.removeAttribute(self._cacheMembers, member.id);
 
+        var hasOtherDevices;
+        _util.forEach(self._cacheMembers, function (_memId, _member) {
+            if(!hasOtherDevices && _memId != member.id && member.memName === _member.memName){
+                hasOtherDevices = true;
+            }
+        });
+
+        if(hasOtherDevices){
+            return;
+        }
+
         self.onRemoveMember && self.onRemoveMember(member, reason);
+    },
+
+
+    _onAddStream: function(stream){
+        var self = this;
+        self.onAddStream(stream);
     },
 
     _onRemovePubstream: function(member, stream){
@@ -985,13 +1079,30 @@ var Attendee = Member.extend({
             return;
         }
 
-        var _rtcId = self.unsubscribeStream(stream.id);
-        var rmStream = _util.removeAttribute(self._cacheStreams, stream.id);
+        function finallyDo(stream) {
+            if(stream.type === 2){
+                _util.removeAttribute(self.audioMixers, stream.id);
 
-        if(self.onRemoveStream){
-            var stream = self.newStream(stream);
+                if(stream.remotePlayAudioObject){
+                    document.body.removeChild(stream.remotePlayAudioObject);
+                }
+            }
 
-            self.onRemoveStream(stream);
+            var _rtcId = self.unsubscribeStream(stream.id);
+            var rmStream = _util.removeAttribute(self._cacheStreams, stream.id);
+
+            if(self.onRemoveStream){
+                var stream = self.newStream(stream);
+
+                self.onRemoveStream(stream);
+            }
+        }
+
+        try{
+            var soundMeter = _util.removeAttribute(self._mediaMeters, stream.id);
+            soundMeter && soundMeter._finally();
+        } finally {
+            finallyDo(stream);
         }
     },
 
@@ -999,7 +1110,7 @@ var Attendee = Member.extend({
     _onRepublishStream: function (_stream) {
         var self = this;
 
-        if(self._ices[_stream.rtcId] && !self._maybeNotExistStreams[_stream.id]){
+        if((self._ices[_stream.rtcId] || emedia.subscribed(_stream)) && !self._maybeNotExistStreams[_stream.id]){
             var _rtcId = self.unsubscribeStream(_stream.id);
 
             self.createWebrtcAndSubscribeStream(_stream.id, {
@@ -1007,10 +1118,12 @@ var Attendee = Member.extend({
                     //self.onUpdateStream(_stream);
                 }
             });
+        }else{
+            self.onUpdateStream(_stream);
         }
     },
 
-    _onRecvRemoteMessage: function (fromMemId, args) {
+    _onRecvRemoteMessage: function (fromMemId, args, evt) {
         var self = this;
 
         _logger.debug("Recv remote message", fromMemId, args);
@@ -1022,7 +1135,34 @@ var Attendee = Member.extend({
         }catch(e){
         }
 
-        self.onRecvRemoteMessage && self.onRecvRemoteMessage(fromMember || fromMemId, argsObject || args);
+        self.onRecvRemoteMessage && self.onRecvRemoteMessage(fromMember || fromMemId, argsObject || args, evt);
+    },
+
+    _onSoundChanage: function (member, stream, meterData) {
+        if(emedia.config._printSoundData){
+            _logger.info("Stream id " + stream.id + ", meter " + (meterData && (meterData.instant.toFixed(2)
+                + " " + meterData.slow.toFixed(2)
+                + " " + meterData.clip.toFixed(2)
+                + " " + (meterData.trackAudioLevel || "--")
+                + " " + (meterData.trackTotalAudioEnergy || "--"))));
+        }
+
+        meterData || (meterData = {
+            instant: 0,
+            slow: 0,
+            clip: 0
+        });
+
+        var self = this;
+
+        if(meterData.instant === 0){
+            meterData.instant = meterData.trackAudioLevel || meterData.trackTotalAudioEnergy || 0;
+        }
+
+        self.onSoundChanage(member, stream, meterData);
+        if(self._service._judgeTalking(meterData)){
+            self.onTalking(member, stream, meterData);
+        }
     },
 
     onAddMember: function(member){
@@ -1031,7 +1171,6 @@ var Attendee = Member.extend({
     onRemoveMember: function(member, reason){
 
     },
-
     onAddStream: function(stream){ //stream undefined 表明 autoSub属性 空或false. autoSub = true时，自动订阅
 
     },
@@ -1039,9 +1178,16 @@ var Attendee = Member.extend({
 
     },
     onUpdateStream: function (stream, update) {
-        
+
     },
     onRecvRemoteMessage: function (fromMember, argsObject) {
+
+    },
+
+    onSoundChanage: function (member, stream, meterData) {
+
+    },
+    onTalking: function (member, stream, meterData) {
 
     }
 });

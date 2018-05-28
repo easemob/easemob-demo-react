@@ -20,7 +20,7 @@ var Handler = _util.prototypeExtend({
     onEvent: function(evt){
         var self = this;
 
-        evt && _logger.warn("[EVT]", evt.message(), evt.hidden || "");
+        evt && _logger.info("[EVT]", evt.message(), evt.hidden || "");
 
         if(evt instanceof __event.ServerRefuseEnter){
             evt.failed && evt.failed === -95270 && (evt.failed = -9527);
@@ -30,7 +30,7 @@ var Handler = _util.prototypeExtend({
             try{
                 self.handleEvent(evt);
             }catch(e){
-                _logger.error(e);
+                _logger.warn(e);
             }
         }
 
@@ -86,15 +86,20 @@ var Handler = _util.prototypeExtend({
                 return;
             }
 
-
             if(self.isSafari()){
                 emedia._isSafariYetPushedStream = true;
             }
 
             try{
-                _stream && (_stream.mediaStream = _stream.getMediaStream());
+                //_stream && (_stream.mediaStream = _stream.getMediaStream());
                 _stream && self.onUpdateStream(_stream,
-                    new _stream.Update({voff: _stream.voff, aoff: _stream.aoff, mediaStream: _stream.mediaStream}));
+                    new _stream.Update({voff: _stream.voff, aoff: _stream.aoff, mediaStream: _stream.getMediaStream()}));
+
+                // _util.forEach(self._cacheStreams, function (_pubSId, _stream) {
+                //     if(_stream.type === 2){
+                //         self.onStreamControl(undefined, _pubSId, _stream.voff, _stream._1_aoff);
+                //     }
+                // });
             } finally {
                 if(self.isSafari()){
                     _util.forEach(self._cacheStreams, function (_sid, _stream) {
@@ -111,6 +116,7 @@ var Handler = _util.prototypeExtend({
         } else if(evt instanceof __event.PushFail){
             if(evt.hidden !== true){
                 var _removeStream = _util.removeAttribute(self._linkedStreams, evt.stream.id);
+                _logger.warn("PushFail remove from _linkedStreams", evt.stream.id, _removeStream);
 
                 if(_removeStream){
                     var _stream = self.newStream(evt.stream);
@@ -120,15 +126,16 @@ var Handler = _util.prototypeExtend({
         } else if(evt instanceof __event.SubFail){
             if(evt.hidden !== true){
                 delete self._linkedStreams[evt.stream.id];
+                _logger.warn("SubFail remove from _linkedStreams", evt.stream.id);
 
                 var _stream = self.newStream(evt.stream);
                 _stream.rtcId = undefined;
                 _stream._webrtc = undefined;
-                _stream.mediaStream = null;
+                _stream.mediaStream = undefined;
 
                 self.onUpdateStream(_stream, new _stream.Update(_stream));
             }
-        } else if(evt instanceof  __event.SubFailNotSupportVCodes){
+        } else if(evt instanceof __event.SubFailNotSupportVCodes){
             // Server发现 此订阅时 不支持视频视频编码。或者 推送流 打开视频时，并不是所有的订阅端 都支持此视频编码
             // Server保持这个channel，客户端自行处理
 
@@ -138,7 +145,7 @@ var Handler = _util.prototypeExtend({
             try{
                 self.onNotSupportPublishVideoCodecs && self.onNotSupportPublishVideoCodecs(stream);
             }catch (e){
-                _logger.error(e);
+                _logger.warn(e);
             }
 
             // var streamId = stream.id;
@@ -191,17 +198,12 @@ var Handler = _util.prototypeExtend({
         var request = evt.request;
         var response = evt.response;
 
-        // if(!request && response.result !== 0 && response.op === 1001 && !response.tsxId){
-        //     _logger.error("Exit. server error. rspMessage tsxId undefined. when response = ", response);
-        //     self.onServerRefuseEnter({failed: response.result, msg: "rspMessage tsxId undefined"});
-        //
-        //     return;
-        // }
+        if(request && response
+            && request.op !== 200
+            && request.op !== 1002
+            && response.result !== 0){
 
-        //_logger.debug("Server recv request = ", request, response);
-        if(request && response && request.op !== 200 && response.result !== 0){
-            _logger.error("Server refuse. when request = ", request);
-
+            _logger.warn("Server refuse. when request = ", request);
 
             var failed = evt.failed;
             switch (failed){
@@ -283,6 +285,188 @@ var Handler = _util.prototypeExtend({
                 }
             }, self.getCopyIntervalMillis);
         }
+
+        if(self.getMediaMeterIntervalMillis && self.getMediaMeterIntervalMillis > 0){
+            self._intervalGetMediaMeters();
+        }
+    },
+
+    _intervalGetMediaMeters: function () {
+        var self = this;
+
+        function _start() {
+            self.__getMediaMetersIntervalFlag && emedia.cancelAnimationFrame(self.__getMediaMetersIntervalFlag);
+
+            if(!self.getMediaMeterIntervalMillis){
+                _logger.warn("Ontalking closed. please use getMediaMeterIntervalMillis");
+                return;
+            }
+            self.__getMediaMetersIntervalFlag = emedia.requestAnimationFrame(function (time) {
+                if(typeof emedia.AudioContext === 'function'){
+                    self._flushMediaMetersByAudioContext.apply(self);
+                }
+
+                !(self.closed !== false) && _start();
+            }, self.getMediaMeterIntervalMillis);
+        }
+        _start();
+    },
+
+    _flushMediaMetersByAudioContext: function () {
+        var self = this;
+
+        _util.forEach(self._cacheStreams, function (_sid, _stream){
+            self._updateMetersOrNewOne.call(self, _sid, _stream);
+        });
+
+        var delStreamSoundMeters = [];
+        _util.forEach(self._mediaMeters, function (_sid, streamSoundMeter){
+            var _stream = self._cacheStreams[_sid];
+            _stream && self._updateMetersOrNewOne.call(self, _sid, _stream);
+            _stream || delStreamSoundMeters.push(_sid);
+        });
+
+        _util.forEach(delStreamSoundMeters, function (index, _sid) {
+            _util.removeAttribute(self._mediaMeters, _sid);
+        })
+    },
+
+    _updateMetersOrNewOne: function (_sid, _stream) {
+        var self = this;
+
+        var metersData;
+
+        var streamSoundMeter = self._mediaMeters[_sid];
+
+        if(_stream.type === 2 && !_stream.located() && (!_stream.subArgs || !_stream.subArgs.subSAudio)) {
+            var pubAudioMixersStream = self._oneAudioMixers();
+            if (!pubAudioMixersStream) {
+                streamSoundMeter && streamSoundMeter._finally();
+                _util.removeAttribute(self._mediaMeters, _sid);
+                self._onSoundChanage.call(self, _stream.owner, _stream);
+
+                return;
+            }
+        }
+
+        if(streamSoundMeter
+            && streamSoundMeter._streamCreateId === _stream.__create_id
+            && streamSoundMeter.__mediaSoundMeter.__worked){
+
+            streamSoundMeter.onSoundMeters(function (metersData) {
+                self._onSoundChanage.call(self, _stream.owner, _stream, metersData);
+            });
+
+            return streamSoundMeter;
+        }
+
+        if((streamSoundMeter && (streamSoundMeter._streamCreateId !== _stream.__create_id || streamSoundMeter.__mediaSoundMeter.__worked))){
+            streamSoundMeter && streamSoundMeter._finally();
+            _util.removeAttribute(self._mediaMeters, _sid);
+            self._onSoundChanage.call(self, _stream.owner, _stream);
+        }
+
+        if(_stream.aoff){
+            return;
+        }
+
+        streamSoundMeter = self._newMediaMeters(_stream);
+        if(streamSoundMeter){
+            self._mediaMeters[_sid] && (self._mediaMeters[_sid]._finally());
+            self._mediaMeters[_sid] = streamSoundMeter;
+        }
+
+        return streamSoundMeter;
+    },
+
+    _newAudioContext: function () {
+        var self = this;
+
+        if(!emedia.__usingWebAudio){
+            return;
+        }
+
+        return emedia.__audioContext;
+    },
+
+    _newMediaMeters: function (_stream) {
+        var self = this;
+
+        var mediaStream;
+        if(_stream.type === 2
+            && _stream.subArgs
+            && _stream.subArgs.subSAudio
+            && _stream._webrtc
+            && _stream._webrtc.getRemoteStream()){
+            var soundMeter = new _stream.StreamSoundMeter({
+                _stream: _stream,
+                _mediaStream: _stream._webrtc.getRemoteStream(),
+                _webrtc: _stream._webrtc,
+                __audioContext: self._newAudioContext()
+            });
+
+            return soundMeter;
+        }
+
+        if(_stream.type === 2 && _stream.located()){
+            var soundMeter = new _stream.StreamSoundMeter({
+                _stream: _stream,
+                _mediaStream: _stream._localMediaStream,
+                __audioContext: self._newAudioContext()
+            });
+
+            return soundMeter;
+        }
+
+        if(_stream.type === 2 && !_stream.located()){
+            var pubAudioMixersStream = self._oneAudioMixers();
+            if(!pubAudioMixersStream || !pubAudioMixersStream._webrtc || pubAudioMixersStream._webrtc.closed){
+                return;
+            }
+
+            if(pubAudioMixersStream
+                && (pubAudioMixersStream._remoteMediaSoundMeters === undefined || !pubAudioMixersStream._remoteMediaSoundMeters.__worked)
+                && pubAudioMixersStream._webrtc
+                && pubAudioMixersStream._webrtc.getRemoteStream()){
+                pubAudioMixersStream._remoteMediaSoundMeters = new pubAudioMixersStream.MediaSoundMeter({
+                    _mediaStream: pubAudioMixersStream._webrtc.getRemoteStream(),
+                    __audioContext: self._newAudioContext()
+                });
+            }
+
+            if(!pubAudioMixersStream._remoteMediaSoundMeters){
+                return;
+            }
+
+            var soundMeter = new _stream.StreamSoundMeter({
+                _stream: _stream,
+                _webrtc: pubAudioMixersStream._webrtc,
+                __mediaSoundMeter: pubAudioMixersStream._remoteMediaSoundMeters
+            });
+
+            return soundMeter;
+        }
+
+        if(!_stream.aoff && (mediaStream = _stream.getMediaStream())){
+            var soundMeter = new _stream.StreamSoundMeter({
+                _stream: _stream,
+                _mediaStream: mediaStream,
+                __audioContext: self._newAudioContext()
+            });
+
+            return soundMeter;
+        }
+    },
+
+    _oneAudioMixers: function () {
+        var self = this;
+
+        for(var sid in self.audioMixers) {
+            var stream = self.audioMixers[sid];
+            if(stream.located()){
+                return stream;
+            }
+        }
     },
 
     onWSClose: function () {
@@ -359,18 +543,29 @@ var Handler = _util.prototypeExtend({
                 }else{
                     var recording = self._records[problemStream.id];
 
-                    _logger.info("ice fail. webrtc = ", webrtc.getRtcId(), " will rebuild. remain local stream. ", problemStream.id);
+                    if(problemStream._localMediaStream){
+                        _logger.info("ice fail. webrtc = ", webrtc.getRtcId(), " will rebuild. remain local stream. ", problemStream.id);
+                    }else{
+                        _logger.info("ice fail. webrtc = ", webrtc.getRtcId(), " will rebuild.", problemStream.id);
+                    }
+
                     self.closeWebrtc(webrtc.getRtcId(), true);
 
                     if(recording){
                         self._records[problemStream.id] = recording;
                     }
 
-                    setTimeout(function () {
-                        self.iceRebuild(problemStream);
-                    }, emedia.config.iceRebuildIntervalMillis);
+                    (function (problemStream) {
+                        setTimeout(function () {
+                            self.iceRebuild(problemStream);
+                        }, emedia.config.iceRebuildIntervalMillis);
+                    })(problemStream);
 
-                    _logger.info("ice fail. webrtc = ", webrtc.getRtcId(), " will rebuild. problem stream is ", problemStream.id);
+                    _logger.info("ice fail. webrtc = ", webrtc.getRtcId(), " will rebuilding. problem stream is ", problemStream.id);
+                }
+
+                if(stream.type === 2){
+                    _util.removeAttribute(self.audioMixers, stream.id);
                 }
             }
         }
@@ -378,12 +573,6 @@ var Handler = _util.prototypeExtend({
 
     onICEClosed: function (webrtc) {
         var self = this;
-
-        // _util.forEach(self._linkedStreams, function (streamId, _stream) {
-        //     if(_stream.rtcId == webrtc.getRtcId() &&_util.removeAttribute(self._linkedStreams, _stream.id)){
-        //         _logger.info("ice closed. closed webrtc = ", webrtc.getRtcId(), "remove linked stream = ", _stream.id);
-        //     }
-        // });
 
         if(webrtc.closed){
             _logger.warn("Webrtc will be removed. by __id = ", webrtc.__id, ", rtcId = ", webrtc.getRtcId());
@@ -410,6 +599,8 @@ var Handler = _util.prototypeExtend({
 
         _util.forEach(self._cacheStreams, function (sid, stream) {
             if(stream.rtcId == webrtc.getRtcId()){
+                stream.finalVCodeChoices = webrtc.finalVCodeChoices;
+
                 if(self._maybeNotExistStreams[sid]){
                     _util.removeAttribute(self._maybeNotExistStreams, stream.id);
                     self._linkedStreams[sid] = stream;
@@ -430,6 +621,10 @@ var Handler = _util.prototypeExtend({
                     stream.located() && self.onEvent(new __event.PushSuccess({stream: stream}));
                     stream.located() || self.onEvent(new __event.SubSuccess({stream: stream}));
                 }
+
+                if(stream.type === 2){
+                    self.audioMixers[stream.id] = stream;
+                }
             }
         });
     },
@@ -439,12 +634,18 @@ var Handler = _util.prototypeExtend({
 
         var streams = [];
         _util.forEach(self._cacheStreams, function (sid, _stream) {
-            if (_stream.rtcId == webrtc.getRtcId() && !_stream.located()) {
-                var _stream = self.newStream(_stream);
-                _stream.mediaStream = _stream.getMediaStream();
+            if (_stream.rtcId == webrtc.getRtcId() && (!_stream.located() || _stream.type === 2)) {
+                var mediaStream = webrtc.getRemoteStream();
+                self._updateRemoteStream(_stream, mediaStream);
 
-                self._updateRemoteStream(_stream, _stream.mediaStream);
-                self.onUpdateStream(_stream, new _stream.Update({mediaStream: _stream.mediaStream}));
+                if(_stream.onGotRemoteMediaStream){
+                    _stream.onGotRemoteMediaStream.call(_stream, mediaStream);
+                }else{
+                    var _stream = self.newStream(_stream);
+                    _stream.mediaStream = webrtc.getRemoteStream();
+
+                    self.onUpdateStream(_stream, new _stream.Update({mediaStream: _stream.mediaStream}));
+                }
             }
         });
     },
@@ -472,6 +673,8 @@ var Handler = _util.prototypeExtend({
             _logger.info("ice rebuild fail. it yet closed. stream is ", stream.id, stream.rtcId);
             _util.removeAttribute(self._maybeNotExistStreams, stream.id);
             _util.removeAttribute(self._linkedStreams, stream.id);
+            _logger.warn("iceRebuild, remvoe from _linkedStreams", stream.id);
+
             return;
         }
 
@@ -526,7 +729,7 @@ var Handler = _util.prototypeExtend({
 
         self.postMessage(copyMessage, function (rsp) {
             if(rsp.result != 0){
-                _logger.error("Get copy fail. result = ", rsp.result);
+                _logger.warn("Get copy fail. result = ", rsp.result);
 
                 return;
             }
