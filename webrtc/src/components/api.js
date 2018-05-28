@@ -1,7 +1,7 @@
 /**
  * API
  */
-var _util = require('./utils');
+var _util = (require('./utils').default);
 var _logger = _util.logger;
 
 
@@ -360,6 +360,8 @@ var _clazz = {
         cands && (rtcOptions.data.cands = cands);
         rtcCfg && (rtcOptions.data.rtcCfg = rtcCfg);
         WebRTC && (rtcOptions.data.WebRTC = WebRTC);
+
+        rtcOptions.data.expr = emedia.isFirefox || emedia.isEdge ? 0 : 1; //Firefox 和 Edge不希望sdk回复 pranswer
 
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },

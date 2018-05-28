@@ -116,12 +116,14 @@ var Logger = function (tag) {
         'FATAL'
     ]
 
-    this.log = function () {
+    this._log = function () {
         var level = arguments[0];
 
         level = arguments[0] = LogLevelName[level];
 
-        console.log.apply(console, arguments);
+        if(console && level){
+            (console[level.toLowerCase()] || console.warn).apply(console, arguments);
+        }
     };
 
     function callLog(level, args) {
@@ -132,39 +134,43 @@ var Logger = function (tag) {
         var _args = [];
 
         _args.push(level);
-        _args.push(tag || "");
+        tag && _args.push(tag);
 
         for (var i = 0; i < args.length; i++) {
-            _args.push(args[i]);
+            _args.push(args[i] && args[i]._toString ? args[i]._toString.call(args[i]) : args[i]);
         }
 
         //_args.caller && _args.push(_args.caller);
 
-        self.log.apply(self, _args);
+        self._log.apply(self, _args);
+    };
+
+    this.log = function () {
+        this._log && callLog(LogLevel.INFO, arguments)
     };
 
     this.trace = function () {
-        this.log && callLog(LogLevel.TRACE, arguments)
+        this._log && callLog(LogLevel.TRACE, arguments)
     };
 
     this.debug = function () {
-        this.log && callLog(LogLevel.DEBUG, arguments)
+        this._log && callLog(LogLevel.DEBUG, arguments)
     };
 
     this.info = function () {
-        this.log && callLog(LogLevel.INFO, arguments)
+        this._log && callLog(LogLevel.INFO, arguments)
     };
 
     this.warn = function () {
-        this.log && callLog(LogLevel.WARN, arguments)
+        this._log && callLog(LogLevel.WARN, arguments)
     };
 
     this.error = function () {
-        this.log && callLog(LogLevel.ERROR, arguments)
+        this._log && callLog(LogLevel.ERROR, arguments)
     };
 
     this.fatal = function () {
-        this.log && callLog(LogLevel.FATAL, arguments)
+        this._log && callLog(LogLevel.FATAL, arguments)
     };
 }
 
@@ -334,6 +340,10 @@ Util.prototype.extend = function () {
 }
 
 Util.prototype.removeAttribute = function (elem, key) {
+    if(elem === null || elem === undefined){
+        return;
+    }
+
     var obj = elem[key];
 
     delete elem[key];
@@ -341,6 +351,45 @@ Util.prototype.removeAttribute = function (elem, key) {
     return obj;
 }
 
+Util.prototype.prototypeExtend_000 = Util.prototype.classExtend = function(){
+    var self = this;
+
+    function _Obj__(){
+        for(var i = 0; i < arguments.length; i++){
+            var cfg = arguments[i] || {};
+            self.extend(true, this, cfg);
+        }
+
+        this.__init__ && this.__init__.apply(this, arguments);
+    }
+
+    var lastConstructor;
+
+    for(var i = 0; i < arguments.length; i++){
+        var cfg = arguments[i] || {};
+
+        if(typeof cfg === "function"){
+            if(lastConstructor){
+                cfg.constructor = lastConstructor;
+                cfg.__proto__ = lastConstructor.prototype;
+            }else{
+                lastConstructor = cfg;
+            }
+        }else{
+            self.extend(true, _Obj__.prototype, cfg);
+        }
+    }
+
+    lastConstructor && (_Obj__.prototype.__proto__ = lastConstructor.prototype);
+    lastConstructor && (_Obj__.prototype.constructor = lastConstructor);
+
+    _Obj__.extend || (_Obj__.extend = function (_prototypeExtend) {
+        return self.prototypeExtend(_Obj__, _prototypeExtend);
+    });
+
+    return _Obj__;
+}
+
 Util.prototype.prototypeExtend = Util.prototype.classExtend = function(){
     var self = this;
 
@@ -350,7 +399,7 @@ Util.prototype.prototypeExtend = Util.prototype.classExtend = function(){
             self.extend(true, this, cfg);
         }
 
-        this.__init__ && this.__init__();
+        this.__init__ && this.__init__.apply(this, arguments);
     }
 
     for(var i = 0; i < arguments.length; i++){
@@ -368,36 +417,6 @@ Util.prototype.prototypeExtend = Util.prototype.classExtend = function(){
 
     return _Obj__;
 }
-
-/*
-Util.prototype.prototypeExtend = Util.prototype.classExtend = function(){
-    var self = this;
-
-    function _Obj__(){
-        for(var i = 0; i < arguments.length; i++){
-            var cfg = arguments[i] || {};
-            self.extend(true, this, cfg);
-        }
-
-        this.__init__ && this.__init__();
-    }
-
-    for(var i = 0; i < arguments.length; i++){
-        var cfg = arguments[i] || {};
-        if(typeof cfg === "function"){
-            cfg = cfg.prototype;
-        }
-
-        self.extend(true, _Obj__.prototype, cfg);
-    }
-
-    _Obj__.extend || (_Obj__.extend = function (_prototypeExtend) {
-        return self.prototypeExtend(_Obj__, _prototypeExtend);
-    });
-
-    return _Obj__;
-}
-*/
 
 /**
  * get local cache
@@ -487,6 +506,23 @@ Util.prototype.parseURL = function (name) {
  * @param obj
  */
 Util.prototype.forEach = function (obj, func){
+    if(!obj){
+        return;
+    }
+
+    if(this.isArray(obj) && obj.length === 0){
+        return;
+    }
+    if(obj.length !== undefined && obj.length === 0){
+        return;
+    }
+    if(obj.length){
+        for(var i = 0; i < obj.length; i++){
+            func(i, obj[i]);
+        }
+        return;
+    }
+
     if(!obj || this.isEmptyObject(obj)){
         return;
     }
@@ -500,5 +536,110 @@ Util.prototype.forEach = function (obj, func){
     }
 }
 
+Util.prototype.isInt = function(n){
+    return Number(n) === n && n % 1 === 0;
+}
+
+Util.prototype.isFloat = function(n){
+    return Number(n) === n && n % 1 !== 0;
+}
+
+Util.prototype.list = function () {
+    var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
+    return args;
+}
+
+Util.prototype.addEvent = function (element, name, func) {
+    if (element.attachEvent)
+        return element.attachEvent("on" + name, func);
+    if (element.addEventListener)
+        return element.addEventListener(name, func, false);
+    throw "Handler could not be attached";
+}
+
+Util.prototype.removeEvent = function (element, name, func) {
+    if (element.detachEvent)
+        return element.detachEvent("on" + name, func);
+    if (element.removeEventListener)
+        return element.removeEventListener(name, func, false);
+    throw "Handler could not be removed";
+}
+
+Util.prototype.stopEvent = function (event) {
+    event.stopPropagation ? event.stopPropagation() : event.cancelBubble = true;
+    event.preventDefault ? event.preventDefault() : event.returnValue = false;
+}
+
+Util.prototype.getDomPageRect = function(element) {
+    var domRect = element.getBoundingClientRect();
+    return {
+        x: domRect.left + (window.pageXOffset || window.document.documentElement.scrollLeft),
+        y: domRect.top + (window.pageYOffset || window.document.documentElement.scrollTop),
+        width: domRect.width || element.offsetWidth,
+        height: domRect.height || element.offsetHeight
+    }
+}
+
+Util.prototype.getEventElementXY = function(event, element, scale) {
+    event = (event || window.event);
+
+    var touch = event.changedTouches ? event.changedTouches[0] : (event.touches ? event.touches[0] : event);
+
+    var pageX, pageY;
+    if(touch.pageX != undefined && touch.pageY != undefined){
+        pageX = touch.pageX;
+        pageY = touch.pageY;
+    }else if(touch.clientX != undefined && touch.clientY != undefined){
+        pageX = touch.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        pageY = touch.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
+
+    var elementPageXY = this.getDomPageRect(element);
+
+    var relativeX = pageX - elementPageXY.x;
+    var relativeY = pageY - elementPageXY.y;
+
+    (scale === 0 || scale == undefined) && (scale = 1);
+    return {
+        x: Math.round(Math.max(Math.min(relativeX, elementPageXY.width - 1), 0) / scale),
+        y: Math.round(Math.max(Math.min(relativeY, elementPageXY.height - 1), 0) / scale),
+        width: Math.round(elementPageXY.width / scale),
+        height: Math.round(elementPageXY.height / scale),
+
+        realX: relativeX,
+        realY: relativeY
+    }
+}
+
+Util.prototype.layoutEngine = (function () {
+    var engine = {
+        presto: !!window.opera,
+        trident: !!window.ActiveXObject && (window.XMLHttpRequest ? document.querySelectorAll ? 6 : 5 : 4),
+        webkit: function() {
+            try {
+                return !navigator.taintEnabled && (i.Features.xpath ? i.Features.query ? 525 : 420 : 419)
+            } catch (e) {
+                return !1
+            }
+        }(),
+        gecko: !(!document.getBoxObjectFor && null == window.mozInnerScreenX) && (document.getElementsByClassName ? 19 : 18)
+    };
+
+    engine.webkit && (engine.webkit = function(e) {
+        var n = (navigator.userAgent.match(/WebKit\/([0-9\.]*) /) || ["", e])[1];
+        return parseFloat(n, 10);
+    }(engine));
+
+    return engine;
+})();
+
+
+Util.prototype.targetDOM = ( typeof HTMLElement === 'object' ) ?
+    function(obj){
+        return obj instanceof HTMLElement;
+    } :
+    function(obj){
+        return obj && typeof obj === 'object' && obj.nodeType === 1 && typeof obj.nodeName === 'string';
+    };
 
 module.exports = new Util();
