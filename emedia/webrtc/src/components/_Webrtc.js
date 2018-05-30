@@ -558,8 +558,14 @@ var _WebRTC = _util.prototypeExtend({
 
 
         rtcPeerConnection.onicecandidate = function (event) {
+            var candidate = event.candidate;
+
             //reduce icecandidate number: don't deal with tcp, udp only
-            if (event.type == "icecandidate" && ((event.candidate == null) || / tcp /.test(event.candidate.candidate))) {
+            if (event.type == "icecandidate"
+                && ((!event.candidate)
+                    || (typeof event.candidate.protocol === 'string' && event.candidate.protocol.toLowerCase() === 'tcp')
+                    || / TCP /.test(event.candidate.candidate))) {
+                _logger.debug("On ICE candidate: drop ", candidate, self._rtcId, self.__id,  self.closed);
                 return;
             }
 
@@ -567,7 +573,6 @@ var _WebRTC = _util.prototypeExtend({
                 throw "Not found candidate. candidate is error, " + event.candidate.candidate;
             }
 
-            var candidate = event.candidate;
             candidate.cctx = self.cctx;
             if(!self.__setRemoteSDP){
                 (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
@@ -715,7 +720,7 @@ var _WebRTC = _util.prototypeExtend({
                     self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     desc.cctx = self.cctx;
-                    (onCreateOfferSuccess || self.onCreateOfferSuccess)(desc);
+                    (onCreateOfferSuccess || self.onCreateOfferSuccess.bind(self))(desc);
                 });
             },
             (onCreateOfferError || self._onCreateSessionDescriptionError.bind(self))
@@ -756,7 +761,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess)(desc);
+                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreatePRAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -824,7 +829,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess)(desc);
+                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreateAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -897,7 +902,7 @@ var _WebRTC = _util.prototypeExtend({
             }
 
             self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
-                self.onAddIceCandidateSuccess,
+                self.onAddIceCandidateSuccess.bind(self),
                 self._onAddIceCandidateError.bind(self)
             );
         }
