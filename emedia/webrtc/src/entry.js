@@ -1,5 +1,7 @@
-//3.0.0_Git.3891cea
-console && console.warn('EMedia version', '3.0.0_Git.3891cea');
+//console.  emedia.__easemob_current_mservice.current
+
+//3.0.0_Git.741a55b
+console && console.warn('EMedia version', '3.0.0_Git.741a55b');
 
 window.emedia = window.emedia || {};
 
@@ -76,6 +78,7 @@ emedia.config({
 
     ctrlCheckIntervalMillis: 10 * 1000,
     ctrlTimeoutMillis: 30 * 1000
+    //wsorigin
 });
 
 

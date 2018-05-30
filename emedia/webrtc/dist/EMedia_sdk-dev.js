@@ -162,6 +162,7 @@ emedia.config({
 
     ctrlCheckIntervalMillis: 10 * 1000,
     ctrlTimeoutMillis: 30 * 1000
+    //wsorigin
 });
 
 
@@ -8748,6 +8749,26 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         var url = self.ticket.url;
+
+        if(url.startsWith('/')){ //通过地址栏 补齐url
+            if(emedia.config.wsorigin){
+                url = emedia.config.wsorigin + url;
+            }else{
+                var href = window.location.href;
+                var proto = href.startsWith("https") ? "wss://" : "ws://";
+
+                var startIndex = href.indexOf("://") + 3;
+                var endIndex = href.indexOf("/", startIndex);
+                var wsorigin = href.substring(startIndex, endIndex);
+
+                url = proto + wsorigin + url;
+            }
+
+            _logger.warn("websocket url. update. {} -> {}", self.ticket.url, url);
+        } if(emedia.config.wsorigin){
+            _logger.warn("emedia.config.wsorigin invalidate. causeby server url {}", url);
+        }
+
         if(url.indexOf("?") >= 0){
             url += "&" + __url_seqno++;
         }else{
@@ -12116,8 +12137,14 @@ var _WebRTC = _util.prototypeExtend({
 
 
         rtcPeerConnection.onicecandidate = function (event) {
+            var candidate = event.candidate;
+
             //reduce icecandidate number: don't deal with tcp, udp only
-            if (event.type == "icecandidate" && ((event.candidate == null) || / tcp /.test(event.candidate.candidate))) {
+            if (event.type == "icecandidate"
+                && ((!event.candidate)
+                    || (typeof event.candidate.protocol === 'string' && event.candidate.protocol.toLowerCase() === 'tcp')
+                    || / TCP /.test(event.candidate.candidate))) {
+                _logger.debug("On ICE candidate: drop ", candidate, self._rtcId, self.__id,  self.closed);
                 return;
             }
 
@@ -12125,7 +12152,6 @@ var _WebRTC = _util.prototypeExtend({
                 throw "Not found candidate. candidate is error, " + event.candidate.candidate;
             }
 
-            var candidate = event.candidate;
             candidate.cctx = self.cctx;
             if(!self.__setRemoteSDP){
                 (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
@@ -12273,7 +12299,7 @@ var _WebRTC = _util.prototypeExtend({
                     self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     desc.cctx = self.cctx;
-                    (onCreateOfferSuccess || self.onCreateOfferSuccess)(desc);
+                    (onCreateOfferSuccess || self.onCreateOfferSuccess.bind(self))(desc);
                 });
             },
             (onCreateOfferError || self._onCreateSessionDescriptionError.bind(self))
@@ -12314,7 +12340,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess)(desc);
+                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreatePRAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -12382,7 +12408,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess)(desc);
+                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreateAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -12455,7 +12481,7 @@ var _WebRTC = _util.prototypeExtend({
             }
 
             self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
-                self.onAddIceCandidateSuccess,
+                self.onAddIceCandidateSuccess.bind(self),
                 self._onAddIceCandidateError.bind(self)
             );
         }
@@ -15461,14 +15487,14 @@ var addonsAttendee = function (Attendee) {
 
             var preSubArgs = stream.subArgs;
 
+            var withoutVideo = !(stream.vcodes && stream.vcodes.length > 0);
             var offerOptions = {
-                offerToReceiveAudio: (emedia.isSafari ? (subArgs.subSAudio) : true),
-                offerToReceiveVideo: (emedia.isSafari ? (subArgs.subSVideo && !stream.voff) : true),
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: (subArgs.subSVideo && withoutVideo)
             };
 
             if(!offerOptions.offerToReceiveAudio && !offerOptions.offerToReceiveVideo){
                 _logger.warn("offerToReceiveAudio == false and offerToReceiveVideo == false");
-                //console.error("offerToReceiveAudio == false and offerToReceiveVideo == false");
             }
 
             var webrtc = self.createWebrtc({
@@ -17718,5 +17744,5 @@ module.exports = _util.prototypeExtend({
 
 /***/ })
 /******/ ]);
-//3.0.0_Git.3891cea
-console && console.warn('EMedia version', '3.0.0_Git.3891cea');
+//3.0.0_Git.741a55b
+console && console.warn('EMedia version', '3.0.0_Git.741a55b');

@@ -62,7 +62,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/yangss/Downloads/webim.git/webrtc";
+/******/ 	__webpack_require__.p = "/Users/DATA/WORK.HOME/projects/CO./EASEMOB_2016.05.03~/webim.1.git/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -133,8 +133,10 @@ module.exports = __webpack_require__(4)
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//3.0.0_Git.3891cea
-console && console.warn('EMedia version', '3.0.0_Git.3891cea');
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//console.  emedia.__easemob_current_mservice.current
+
+//3.0.0_Git.741a55b
+console && console.warn('EMedia version', '3.0.0_Git.741a55b');
 
 window.emedia = window.emedia || {};
 
@@ -212,6 +214,7 @@ emedia.config({
 
     ctrlCheckIntervalMillis: 10 * 1000,
     ctrlTimeoutMillis: 30 * 1000
+    //wsorigin
 });
 
 
@@ -8798,6 +8801,26 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         var url = self.ticket.url;
+
+        if(url.startsWith('/')){ //通过地址栏 补齐url
+            if(emedia.config.wsorigin){
+                url = emedia.config.wsorigin + url;
+            }else{
+                var href = window.location.href;
+                var proto = href.startsWith("https") ? "wss://" : "ws://";
+
+                var startIndex = href.indexOf("://") + 3;
+                var endIndex = href.indexOf("/", startIndex);
+                var wsorigin = href.substring(startIndex, endIndex);
+
+                url = proto + wsorigin + url;
+            }
+
+            _logger.warn("websocket url. update. {} -> {}", self.ticket.url, url);
+        } if(emedia.config.wsorigin){
+            _logger.warn("emedia.config.wsorigin invalidate. causeby server url {}", url);
+        }
+
         if(url.indexOf("?") >= 0){
             url += "&" + __url_seqno++;
         }else{
@@ -12166,8 +12189,14 @@ var _WebRTC = _util.prototypeExtend({
 
 
         rtcPeerConnection.onicecandidate = function (event) {
+            var candidate = event.candidate;
+
             //reduce icecandidate number: don't deal with tcp, udp only
-            if (event.type == "icecandidate" && ((event.candidate == null) || / tcp /.test(event.candidate.candidate))) {
+            if (event.type == "icecandidate"
+                && ((!event.candidate)
+                    || (typeof event.candidate.protocol === 'string' && event.candidate.protocol.toLowerCase() === 'tcp')
+                    || / TCP /.test(event.candidate.candidate))) {
+                _logger.debug("On ICE candidate: drop ", candidate, self._rtcId, self.__id,  self.closed);
                 return;
             }
 
@@ -12175,7 +12204,6 @@ var _WebRTC = _util.prototypeExtend({
                 throw "Not found candidate. candidate is error, " + event.candidate.candidate;
             }
 
-            var candidate = event.candidate;
             candidate.cctx = self.cctx;
             if(!self.__setRemoteSDP){
                 (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
@@ -12323,7 +12351,7 @@ var _WebRTC = _util.prototypeExtend({
                     self._onSetSessionDescriptionError.bind(self)
                 ).then(function () {
                     desc.cctx = self.cctx;
-                    (onCreateOfferSuccess || self.onCreateOfferSuccess)(desc);
+                    (onCreateOfferSuccess || self.onCreateOfferSuccess.bind(self))(desc);
                 });
             },
             (onCreateOfferError || self._onCreateSessionDescriptionError.bind(self))
@@ -12364,7 +12392,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess)(desc);
+                    (onCreatePRAnswerSuccess || self.onCreatePRAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreatePRAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -12432,7 +12460,7 @@ var _WebRTC = _util.prototypeExtend({
                     _logger.debug('Send Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
 
                     self.cctx && (desc.cctx = self.cctx);
-                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess)(desc);
+                    (onCreateAnswerSuccess || self.onCreateAnswerSuccess.bind(self))(desc);
                 });
             },
             (onCreateAnswerError || self._onCreateSessionDescriptionError.bind(self))
@@ -12505,7 +12533,7 @@ var _WebRTC = _util.prototypeExtend({
             }
 
             self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
-                self.onAddIceCandidateSuccess,
+                self.onAddIceCandidateSuccess.bind(self),
                 self._onAddIceCandidateError.bind(self)
             );
         }
@@ -15511,14 +15539,14 @@ var addonsAttendee = function (Attendee) {
 
             var preSubArgs = stream.subArgs;
 
+            var withoutVideo = !(stream.vcodes && stream.vcodes.length > 0);
             var offerOptions = {
-                offerToReceiveAudio: (emedia.isSafari ? (subArgs.subSAudio) : true),
-                offerToReceiveVideo: (emedia.isSafari ? (subArgs.subSVideo && !stream.voff) : true),
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: (subArgs.subSVideo && withoutVideo)
             };
 
             if(!offerOptions.offerToReceiveAudio && !offerOptions.offerToReceiveVideo){
                 _logger.warn("offerToReceiveAudio == false and offerToReceiveVideo == false");
-                //console.error("offerToReceiveAudio == false and offerToReceiveVideo == false");
             }
 
             var webrtc = self.createWebrtc({
@@ -18776,6 +18804,8 @@ var _clazz = {
         cands && (rtcOptions.data.cands = cands);
         rtcCfg && (rtcOptions.data.rtcCfg = rtcCfg);
         WebRTC && (rtcOptions.data.WebRTC = WebRTC);
+
+        rtcOptions.data.expr = emedia.isFirefox || emedia.isEdge ? 0 : 1; //Firefox 和 Edge不希望sdk回复 pranswer
 
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
