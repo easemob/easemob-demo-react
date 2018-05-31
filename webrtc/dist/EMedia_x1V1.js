@@ -135,8 +135,8 @@ module.exports = __webpack_require__(4)
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//console.  emedia.__easemob_current_mservice.current
 
-//3.0.0_Git.741a55b
-console && console.warn('EMedia version', '3.0.0_Git.741a55b');
+//3.0.0_Git.73c0704
+console && console.warn('EMedia version', '3.0.0_Git.73c0704');
 
 window.emedia = window.emedia || {};
 
@@ -11839,9 +11839,9 @@ var _SDPSection = {
         fields.splice(3, fields.length - 3, newNumCodes.join(' '));
 
         codeLine = fields.join(' ');
-        _logger.info(codeLine);
+        //_logger.info(codeLine);
         if(self._webrtc){
-            _logger.debug(codeLine, self._webrtc._rtcId, self._webrtc.__id);
+            _logger.warn(codeLine, self._webrtc._rtcId, self._webrtc.__id);
         }
 
         self.videoSection = codeLine + self.videoSection.substring(codeLineLastIndex);
@@ -12110,7 +12110,7 @@ var _WebRTC = _util.prototypeExtend({
 
         self.cctx = self.__id;
 
-        _logger.info("Webrtc created. rtcId = ", self._rtcId, ", __id = ", self.__id);
+        _logger.info("Webrtc created.", self._rtcId, self.__id);
     },
 
     getRtcId: function(){
@@ -12150,7 +12150,7 @@ var _WebRTC = _util.prototypeExtend({
 
     createRtcPeerConnection: function (iceServerConfig) {
         var self = this;
-        _logger.debug('begin create RtcPeerConnection ......', self._rtcId, self.__id,  self.closed);
+        _logger.debug('begin create peer connection ......', self._rtcId, self.__id,  self.closed);
 
         iceServerConfig || (iceServerConfig = self.iceServerConfig);
 
@@ -12181,7 +12181,7 @@ var _WebRTC = _util.prototypeExtend({
         //     recvVideo: true,
         //     relayOnly: false,
         // };
-        _logger.debug('RtcPeerConnection config:', iceServerConfig, self._rtcId, self.__id,  self.closed);
+        _logger.info('create pc, set config:', iceServerConfig, self._rtcId, self.__id,  self.closed);
 
         var rtcPeerConnection = self._rtcPeerConnection = new RTCPeerConnection(iceServerConfig);
         rtcPeerConnection.__peerId = self._rtcId;
@@ -12193,27 +12193,27 @@ var _WebRTC = _util.prototypeExtend({
 
             //reduce icecandidate number: don't deal with tcp, udp only
             if (event.type == "icecandidate"
-                && ((!event.candidate)
-                    || (typeof event.candidate.protocol === 'string' && event.candidate.protocol.toLowerCase() === 'tcp')
-                    || / TCP /.test(event.candidate.candidate))) {
-                _logger.debug("On ICE candidate: drop ", candidate, self._rtcId, self.__id,  self.closed);
+                && ((!candidate)
+                    || (typeof candidate.protocol === 'string' && candidate.protocol.toLowerCase() === 'tcp')
+                    || / TCP /.test(candidate.candidate))) {
+                _logger.debug("On ICE candidate: drop", candidate, self._rtcId, self.__id,  self.closed);
                 return;
             }
 
-            if(!event.candidate.candidate){
+            if(!candidate.candidate){
                 throw "Not found candidate. candidate is error, " + event.candidate.candidate;
             }
 
             candidate.cctx = self.cctx;
             if(!self.__setRemoteSDP){
                 (self.__tmpLocalCands || (self.__tmpLocalCands = {})).push(candidate);
-                _logger.debug('On ICE candidate but tmp buffer caused by not set remote sdp: ', candidate,
+                _logger.debug('On ICE candidate ok: but tmp buffer caused by not set remote sdp: ', candidate,
                     self._rtcId, self.__id,  self.closed);
                 return;
             }else{
-                _logger.debug('On ICE candidate: ', candidate, self._rtcId, self.__id,  self.closed);
+                _logger.debug('On ICE candidate ok: ', candidate, self._rtcId, self.__id,  self.closed);
             }
-            self.onIceCandidate(candidate);
+            self._onIceCandidate(candidate);
         };
         
         function stateChange(event) {
@@ -12226,8 +12226,7 @@ var _WebRTC = _util.prototypeExtend({
         rtcPeerConnection.onicestatechange =  stateChange.bind(self);
         rtcPeerConnection.oniceconnectionstatechange =  stateChange.bind(self);
         rtcPeerConnection.onsignalingstatechange = function (event) {
-            _logger.info("states: signaling", rtcPeerConnection.signalingState,
-                "@", self._rtcId, self.__id,  self.closed);
+            _logger.info("states: signaling", rtcPeerConnection.signalingState, "@", self._rtcId, self.__id,  self.closed);
         }
 
         if(rtcPeerConnection.ontrack === null){
@@ -12245,32 +12244,27 @@ var _WebRTC = _util.prototypeExtend({
         var self = this;
 
         tracks.forEach(function(track) {
-            self._rtcPeerConnection.addTrack(
-                track,
-                stream
-            );
+            self._rtcPeerConnection.addTrack(track, stream);
         });
     },
     setLocalStream: function (localStream) {
         var self = this;
 
         self._localStream = localStream;
+
         if(self._rtcPeerConnection.addTrack){
             localStream.getTracks().forEach(function(track) {
-                self._rtcPeerConnection.addTrack(
-                    track,
-                    localStream
-                );
+                self._rtcPeerConnection.addTrack(track, localStream);
             });
         }else{
             self._rtcPeerConnection.addStream(localStream);
         }
-        _logger.debug('Added local stream to RtcPeerConnection', localStream, self._rtcId, self.__id,  this.closed);
+        _logger.debug('Added local stream to RtcPeerConnection', localStream, self._rtcId, self.__id, this.closed);
     },
 
     removeStream: function (mediaStream) {
         this._rtcPeerConnection.removeStream(mediaStream);
-        _logger.debug('Remove stream from RtcPeerConnection', mediaStream, self._rtcId, self.__id,  this.closed);
+        _logger.debug('Remove stream from RtcPeerConnection', mediaStream, self._rtcId, self.__id, this.closed);
     },
 
     getLocalStream: function () {
@@ -12304,26 +12298,14 @@ var _WebRTC = _util.prototypeExtend({
                 if(emedia.isEdge){
                     desc.sdp = desc.sdp.replace(/profile-level-id=[^;]+/, "profile-level-id=42e01f");
                 }
-
-                //需要交换 cand answer
-                self.fireFoxOfferVideoPreAudio = emedia.isFirefox && SDPSection.isVideoPreAudio(desc.sdp);
-
-                //_logger.debug('Offer ', desc,  self.closed);//_logger.debug('from \n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed, self.optimalVideoCodecs);
-                //_logger.debug("offer.1", desc.sdp);
-                //_logger.debug(desc);
+                if(emedia.isFirefox){
+                    //需要交换 cand answer
+                    self.fireFoxOfferVideoPreAudio = SDPSection.isVideoPreAudio(desc.sdp);
+                }
+                desc.sdp = desc.sdp.replace(/m=video 0/g, "m=video 9");
+                _logger.warn("setLocalDescription. modify offer. if 'm=video 0' -> 'm=video 9'; if H264, 'profile-level-id=42e01f'", self._rtcId, self.__id);
 
                 var updateVCodes;
-                // if((updateVCodes = (self.optimalVideoCodecs && ((typeof self.optimalVideoCodecs === "string") || self.optimalVideoCodecs.length > 0)))
-                //     || (emedia.isSafari && self.offerOptions && (self.offerOptions.offerToReceiveVideo === false || self.offerOptions.offerToReceiveAudio === false))
-                // ){
-                //     var sdpSection = new SDPSection(desc.sdp, self);
-                //     updateVCodes && sdpSection.updateVCodes(self.optimalVideoCodecs);
-                //     emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoSendonly();
-                //     emedia.isSafari && self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioSendonly();
-                //
-                //     desc.sdp = sdpSection.getUpdatedSDP();
-                // }
                 if((updateVCodes = (self.optimalVideoCodecs && ((typeof self.optimalVideoCodecs === "string") || self.optimalVideoCodecs.length > 0)))
                     || (self.offerOptions && (self.offerOptions.offerToReceiveVideo === false || self.offerOptions.offerToReceiveAudio === false))
                 ){
@@ -12341,11 +12323,7 @@ var _WebRTC = _util.prototypeExtend({
                     desc.sdp = sdpSection.getUpdatedSDP();
                 }
 
-                //_logger.debug("offer.2", desc.sdp);
-                //_logger.debug(desc);
-                //_logger.debug(JSON.stringify(desc));
-
-
+                _logger.debug('setLocalDescription start', desc, self._rtcId, self.__id,  self.closed, self.optimalVideoCodecs);
                 self._rtcPeerConnection.setLocalDescription(desc).then(
                     self._onSetLocalSessionDescriptionSuccess.bind(self),
                     self._onSetSessionDescriptionError.bind(self)
@@ -12376,7 +12354,7 @@ var _WebRTC = _util.prototypeExtend({
                 self.__prAnswerDescription = desc;
 
                 _logger.debug('inactive PRAnswer ', desc.sdp, self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed);
+                _logger.debug('setLocalDescription start', desc, self._rtcId, self.__id,  self.closed);
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
                     self._onSetLocalSessionDescriptionSuccess.bind(self),
@@ -12441,7 +12419,7 @@ var _WebRTC = _util.prototypeExtend({
                 self.__answerDescription = desc;
 
                 _logger.debug('Answer ', self._rtcId, self.__id,  self.closed);//_logger.debug('from :\n' + desc.sdp);
-                _logger.debug('setLocalDescription start', self._rtcId, self.__id,  self.closed);
+                _logger.debug('setLocalDescription start', desc, self._rtcId, self.__id,  self.closed);
 
                 self._rtcPeerConnection.setLocalDescription(desc).then(
                     self._onSetLocalSessionDescriptionSuccess.bind(self),
@@ -12542,7 +12520,7 @@ var _WebRTC = _util.prototypeExtend({
     setRemoteDescription: function (desc) {
         var self = this;
 
-        _logger.debug('setRemoteDescription start. ', desc, self._rtcId, self.__id,  self.closed);
+        _logger.debug('setRemoteDescription start. ', self._rtcId, self.__id,  self.closed);
 
         // 生成offer的
         // 会议模式，也是设置的是 pranswer 和 answer 会有服务器传回。
@@ -12565,7 +12543,8 @@ var _WebRTC = _util.prototypeExtend({
         }
 
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
-        _logger.debug('setRemoteDescription.', desc,  self.closed);
+        _logger.warn('setRemoteDescription. firefox: switch audio video; UDP/TLS/RTP/SAVPF -> RTP/SAVPF', self._rtcId, self.__id);
+        _logger.debug('setRemoteDescription.', desc, self._rtcId, self.__id);
 
         desc = self.__remoteDescription = new RTCSessionDescription(desc);
 
@@ -12576,7 +12555,7 @@ var _WebRTC = _util.prototypeExtend({
 
                 if(self.__tmpLocalCands && self.__tmpLocalCands.length > 0){
                     _logger.debug('After setRemoteDescription. send cands', self._rtcId, self.__id,  self.closed);
-                    self.onIceCandidate(self.__tmpLocalCands);
+                    self._onIceCandidate(self.__tmpLocalCands);
 
                     self.__tmpLocalCands = [];
                 }
@@ -12663,8 +12642,11 @@ var _WebRTC = _util.prototypeExtend({
     onAddIceCandidateError: function (error) {
     },
 
+    _onIceCandidate: function (candidate) {
+        _logger.debug('onIceCandidate:', candidate, this._rtcId, this.__id);
+        this.onIceCandidate(candidate);
+    },
     onIceCandidate: function (candidate) {
-        _logger.debug('onIceCandidate : ICE candidate: \n' + candidate, this._rtcId, this.__id);
     },
 
     onIceStateChange: function (state) {
