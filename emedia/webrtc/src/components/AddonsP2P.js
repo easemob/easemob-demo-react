@@ -454,14 +454,14 @@ var addonsAttendee = function (Attendee) {
 
             var preSubArgs = stream.subArgs;
 
+            var withoutVideo = !(stream.vcodes && stream.vcodes.length > 0);
             var offerOptions = {
-                offerToReceiveAudio: (emedia.isSafari ? (subArgs.subSAudio) : true),
-                offerToReceiveVideo: (emedia.isSafari ? (subArgs.subSVideo && !stream.voff) : true),
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: (subArgs.subSVideo && withoutVideo)
             };
 
             if(!offerOptions.offerToReceiveAudio && !offerOptions.offerToReceiveVideo){
                 _logger.warn("offerToReceiveAudio == false and offerToReceiveVideo == false");
-                //console.error("offerToReceiveAudio == false and offerToReceiveVideo == false");
             }
 
             var webrtc = self.createWebrtc({

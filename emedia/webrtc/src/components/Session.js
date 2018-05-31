@@ -444,6 +444,26 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         var url = self.ticket.url;
+
+        if(url.startsWith('/')){ //通过地址栏 补齐url
+            if(emedia.config.wsorigin){
+                url = emedia.config.wsorigin + url;
+            }else{
+                var href = window.location.href;
+                var proto = href.startsWith("https") ? "wss://" : "ws://";
+
+                var startIndex = href.indexOf("://") + 3;
+                var endIndex = href.indexOf("/", startIndex);
+                var wsorigin = href.substring(startIndex, endIndex);
+
+                url = proto + wsorigin + url;
+            }
+
+            _logger.warn("websocket url. update. {} -> {}", self.ticket.url, url);
+        } if(emedia.config.wsorigin){
+            _logger.warn("emedia.config.wsorigin invalidate. causeby server url {}", url);
+        }
+
         if(url.indexOf("?") >= 0){
             url += "&" + __url_seqno++;
         }else{
