@@ -1,7 +1,7 @@
 //console.  emedia.__easemob_current_mservice.current
 
-//3.0.0_Git.741a55b
-console && console.warn('EMedia version', '3.0.0_Git.741a55b');
+//3.0.0_Git.73c0704
+console && console.warn('EMedia version', '3.0.0_Git.73c0704');
 
 window.emedia = window.emedia || {};
 
