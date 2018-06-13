@@ -510,11 +510,20 @@ var _WebRTC = _util.prototypeExtend({
         return self._rtcPeerConnection.getReceivers();
     },
 
-    updateRemoteBySubArgs: function (subArgs) {
+    updateRemoteBySubArgs: function () {
         var self = this;
+
+        if(!self.subArgs){
+            return;
+        }
+        if(!self._remoteStream){
+            return;
+        }
 
         emedia.enableVideoTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSVideo === false));
         emedia.enableAudioTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSAudio === false));
+
+        _logger.info("enable tracks remote stream", self._remoteStream, self._rtcId, self.__id,  self.closed);
     },
 
     createRtcPeerConnection: function (iceServerConfig) {
@@ -584,11 +593,15 @@ var _WebRTC = _util.prototypeExtend({
             }
             self._onIceCandidate(candidate);
         };
-        
+
         function stateChange(event) {
             _logger.info("states: conn", (rtcPeerConnection.connectionState || rtcPeerConnection.iceConnectionState),
                 ", ice", rtcPeerConnection.iceConnectionState, "@", self._rtcId, self.__id,  self.closed);
-            self.onIceStateChange(rtcPeerConnection.iceConnectionState);
+            try {
+                self.onIceStateChange(rtcPeerConnection.iceConnectionState);
+            }finally{
+
+            }
         }
 
         rtcPeerConnection.onconnectionstatechange = stateChange.bind(self);
@@ -916,7 +929,7 @@ var _WebRTC = _util.prototypeExtend({
         }
 
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
-        _logger.warn('setRemoteDescription. firefox: switch audio video; UDP/TLS/RTP/SAVPF -> RTP/SAVPF', self._rtcId, self.__id);
+        _logger.warn('setRemoteDescription. UDP/TLS/RTP/SAVPF -> RTP/SAVPF; if firefox: switch audio video;', self._rtcId, self.__id);
         _logger.debug('setRemoteDescription.', desc, self._rtcId, self.__id);
 
         desc = self.__remoteDescription = new RTCSessionDescription(desc);
@@ -965,6 +978,9 @@ var _WebRTC = _util.prototypeExtend({
         this._remoteStream = event.stream || event.streams[0];
         this._remoteStream._rtcId = this._rtcId;
         this._remoteStream.__rtc_c_id = this.__id;
+
+        self.updateRemoteBySubArgs();
+
         this.onGotRemoteStream(this._remoteStream, event);
 
         _logger.debug('received remote stream, you will see the other.', self._rtcId, self.__id,  this.closed);

@@ -1,6 +1,6 @@
 //console.  emedia.__easemob_current_mservice.current
-//3.0.0_Git.84893f6
-console && console.warn('EMedia version', '3.0.0_Git.84893f6');
+//3.0.0_Git.f6ca116
+console && console.warn('EMedia version', '3.0.0_Git.f6ca116');
 window.emedia = window.emedia || {};
 
 ;(function (root, factory) {
@@ -175,13 +175,13 @@ emedia.stopTracks = function (_stream) {
 
 emedia.enableVideoTracks = function (_stream, enabled) {
     _stream && _stream.getVideoTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 
 emedia.enableAudioTracks = function (_stream, enabled) {
     _stream && _stream.getAudioTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 

@@ -445,6 +445,14 @@ module.exports = _util.prototypeExtend({
 
         var url = self.ticket.url;
 
+        // var hostname = window.location.hostname;
+        // if(hostname.endsWith("paic.com.cn")){ //pingan.com.cn -> paic.com.cn
+        //     url = url.replace("pingan.com.cn", "paic.com.cn");
+        // }else if(hostname.endsWith("pingan.com.cn")){ // paic.com.cn -> pingan.com.cn
+        //     url = url.replace("paic.com.cn", "pingan.com.cn");
+        // }
+        // _logger.warn("ticket url modifiy. ", hostname, url);
+
         if(url.startsWith('/')){ //通过地址栏 补齐url
             if(emedia.config.wsorigin){
                 url = emedia.config.wsorigin + url;
