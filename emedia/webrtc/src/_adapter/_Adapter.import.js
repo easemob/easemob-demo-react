@@ -22,7 +22,7 @@ if (!!document.documentMode) { // Detect IE (6-11)
 
     //adapter = require('./Temasys.wrapper'); //6.0.3
 }else{
-    adapter = require('./adapter'); //6.0.3
+    adapter = require('./adapter'); //6.2.0
 }
 
 

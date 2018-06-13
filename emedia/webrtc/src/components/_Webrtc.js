@@ -879,10 +879,14 @@ var _WebRTC = _util.prototypeExtend({
                 _logger.warn("Firefox sdp section video pre audio, sdp mline index update ", oldLineIndex, "->", candidate.sdpMLineIndex);
             }
 
-            self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
-                self.onAddIceCandidateSuccess.bind(self),
-                self._onAddIceCandidateError.bind(self)
-            );
+            if(candidate.candidate && candidate.candidate !== ""){
+                self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
+                    self.onAddIceCandidateSuccess.bind(self),
+                    self._onAddIceCandidateError.bind(self)
+                );
+            }else{
+                _logger.warn("Add ICE candidate fail. drop it ", candidate, self._rtcId, self.__id,  self.closed);
+            }
         }
     },
 

@@ -1068,6 +1068,9 @@ var Attendee = Member.extend({
 
 
     _onAddStream: function(stream){
+        _logger.info("add stream ", stream.id);
+        _logger.debug("add stream ", stream);
+
         var self = this;
         self.onAddStream(stream);
     },

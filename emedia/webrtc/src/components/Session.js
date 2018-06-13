@@ -460,7 +460,7 @@ module.exports = _util.prototypeExtend({
             }
 
             _logger.warn("websocket url. update. {} -> {}", self.ticket.url, url);
-        } if(emedia.config.wsorigin){
+        }else if(emedia.config.wsorigin){
             _logger.warn("emedia.config.wsorigin invalidate. causeby server url {}", url);
         }
 
@@ -808,7 +808,7 @@ module.exports = _util.prototypeExtend({
         }
 
         if(!servMessage.op || servMessage.op == 1001){
-            _logger.trace("Igron message. caused by op not found.", servMessage);
+            _logger.debug("Igron message. caused by op not found.", servMessage);
             return;
         }
 
