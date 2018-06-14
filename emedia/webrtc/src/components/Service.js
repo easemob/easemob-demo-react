@@ -458,7 +458,7 @@ module.exports = _util.prototypeExtend({
     },
 
     exit: function (closeMyConfrIfICrtConfr) {
-        _logger.info("User click exit ", closeMyConfrIfICrtConfr);
+        _logger.warn("User click exit ", closeMyConfrIfICrtConfr);
         this.current && this.current.exit(closeMyConfrIfICrtConfr);
     },
 

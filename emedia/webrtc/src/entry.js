@@ -1,8 +1,6 @@
 //console.  emedia.__easemob_current_mservice.current
-
-//3.0.0_Git.73c0704
-console && console.warn('EMedia version', '3.0.0_Git.73c0704');
-
+//3.0.0_Git.f6ca116
+console && console.warn('EMedia version', '3.0.0_Git.f6ca116');
 window.emedia = window.emedia || {};
 
 ;(function (root, factory) {
@@ -77,7 +75,9 @@ emedia.config({
     disableTrack: false,
 
     ctrlCheckIntervalMillis: 10 * 1000,
-    ctrlTimeoutMillis: 30 * 1000
+    ctrlTimeoutMillis: 30 * 1000,
+
+    _printDebugStats: false,
     //wsorigin
 });
 
@@ -85,7 +85,7 @@ emedia.config({
 emedia.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 if(emedia.config.getMediaMeterIntervalMillis){
-    //https://stackoverflow.com/questions/46363048/onaudioprocess-not-called-on-ios11/46534088#46534088
+    // https://stackoverflow.com/questions/46363048/onaudioprocess-not-called-on-ios11/46534088#46534088
     // There are two problems.
     // The main one is that Safari on iOS 11 seems to automatically suspend new AudioContext's that aren't created in response to a tap.
     // You can resume() them, but only in response to a tap.
@@ -175,13 +175,13 @@ emedia.stopTracks = function (_stream) {
 
 emedia.enableVideoTracks = function (_stream, enabled) {
     _stream && _stream.getVideoTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 
 emedia.enableAudioTracks = function (_stream, enabled) {
     _stream && _stream.getAudioTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 
@@ -227,6 +227,8 @@ emedia.pannel || (emedia.pannel = {});
 emedia.pannel.DefaultMouseTrack = require('../../pannel/src/components/DefaultTrack');
 emedia.pannel.MouseTrack = require('../../pannel/src/components/MouseTrack');
 emedia.pannel.KeyboardTrack = require('../../pannel/src/components/KeyboardTrack');
+
+emedia.PCStats = require('./components/PCStats');
 
 emedia.event = __event;
 

@@ -82,7 +82,7 @@ var Handler = _util.prototypeExtend({
             var _stream = self.newStream(evt.stream);
 
             if(evt.hidden && !self._maybeNotExistStreams[evt.stream.id] && !_stream.isRepublished){
-                self.onAddStream(_stream);
+                self._onAddStream(_stream);
                 return;
             }
 
