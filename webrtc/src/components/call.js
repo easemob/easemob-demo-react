@@ -236,6 +236,10 @@ var _Call = {
 
             webRtc: new WebRTC({
                 streamType: streamType,
+                subArgs:{
+                    subSVideo: "VIDEO" === streamType,
+                    subSAudio: true
+                },
                 onGotLocalStream: self.listener.onGotLocalStream,
                 onGotRemoteStream: self.listener.onGotRemoteStream,
                 onError: self.listener.onError
