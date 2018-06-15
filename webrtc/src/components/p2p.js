@@ -329,7 +329,16 @@ var CommonPattern = {
                 });
 
                 if (WebIM.WebRTC.supportPRAnswer) {
-                    self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    if(self.webRtc.isConnected()){
+                        _logger.debug("[WebRTC-API] ice connected, may send answer");
+                        self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    }else{
+                        _logger.debug("[WebRTC-API] ice state not connected, send answer waiting.");
+                        self.webRtc._hookWhenICEReady = function () {
+                            _logger.debug("[WebRTC-API] ice connected, send answer");
+                            self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                        }
+                    }
                 } else {
                     self.api.acptC(rt, self._sessId, self._rtcId, answer, null, 1);
                 }
@@ -392,6 +401,10 @@ var CommonPattern = {
         var self = this;
         _logger.debug("[WebRTC-API] ice state is " + iceState);
 
+        if(self.webRtc.isConnected()){ //出发hook
+            self.webRtc._hookWhenICEReady && self.webRtc._hookWhenICEReady();
+            self.webRtc._hookWhenICEReady = undefined;
+        }
 
         if(iceState === "closed"){
             self.setLocalSDP = false;
