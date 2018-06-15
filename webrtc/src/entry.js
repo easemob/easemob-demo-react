@@ -28,4 +28,4 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 // }
 WebIM.WebRTC.supportPRAnswer = emedia.supportPRAnswer;
 
-console && console.warn('Webrtc version', 'Git.5149147');
+console && console.warn('Webrtc version', 'Git.e4f0006');
