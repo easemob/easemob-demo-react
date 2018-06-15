@@ -47,17 +47,21 @@ Webrtc.prototype.setRemoteDescription = function (desc) {
     var self = this;
 
     if(self.streamType === "VOICE"){ //将remote sdp中 video中改为 a=mid:video -》 a=sendrecv|a=sendonly--recvonly
-        var videoSectionIndex = desc.sdp.indexOf("m=video");
-        var audioSectionIndex = desc.sdp.indexOf("m=audio");
-        var end = audioSectionIndex > videoSectionIndex ? audioSectionIndex : desc.sdp.length;
+        function videoSectionReplace(regx, use) {
+            var videoSectionIndex = desc.sdp.indexOf("m=video");
+            var audioSectionIndex = desc.sdp.indexOf("m=audio");
+            var end = audioSectionIndex > videoSectionIndex ? audioSectionIndex : desc.sdp.length;
 
-        desc.sdp = desc.sdp.replace(/a=sendrecv|a=sendonly/g, function (match, offset, string) {
-            if(offset >= videoSectionIndex && offset < end){
-                return "a=recvonly";
-            }else{
-                return match;
-            }
-        });
+            desc.sdp = desc.sdp.replace(regx, function (match, offset, string) {
+                if(offset >= videoSectionIndex && offset < end){
+                    return use;
+                }else{
+                    return match;
+                }
+            });
+        }
+
+        videoSectionReplace(/a=sendrecv|a=sendonly/g, "a=inactive");
     }
     return _setRemoteDescription.call(self, desc);
 }
