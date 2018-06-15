@@ -81,7 +81,7 @@ module.exports = __webpack_require__(1);
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var Util = (__webpack_require__(2).default);
-var Call = __webpack_require__(32);
+var Call = __webpack_require__(33);
 
 var emedia = __webpack_require__(3);
 
@@ -134,10 +134,8 @@ module.exports = __webpack_require__(4)
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//console.  emedia.__easemob_current_mservice.current
-
-//3.0.0_Git.73c0704
-console && console.warn('EMedia version', '3.0.0_Git.73c0704');
-
+//3.0.0_Git.f6ca116
+console && console.warn('EMedia version', '3.0.0_Git.f6ca116');
 window.emedia = window.emedia || {};
 
 ;(function (root, factory) {
@@ -213,7 +211,9 @@ emedia.config({
     disableTrack: false,
 
     ctrlCheckIntervalMillis: 10 * 1000,
-    ctrlTimeoutMillis: 30 * 1000
+    ctrlTimeoutMillis: 30 * 1000,
+
+    _printDebugStats: false,
     //wsorigin
 });
 
@@ -221,7 +221,7 @@ emedia.config({
 emedia.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 if(emedia.config.getMediaMeterIntervalMillis){
-    //https://stackoverflow.com/questions/46363048/onaudioprocess-not-called-on-ios11/46534088#46534088
+    // https://stackoverflow.com/questions/46363048/onaudioprocess-not-called-on-ios11/46534088#46534088
     // There are two problems.
     // The main one is that Safari on iOS 11 seems to automatically suspend new AudioContext's that aren't created in response to a tap.
     // You can resume() them, but only in response to a tap.
@@ -311,13 +311,13 @@ emedia.stopTracks = function (_stream) {
 
 emedia.enableVideoTracks = function (_stream, enabled) {
     _stream && _stream.getVideoTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 
 emedia.enableAudioTracks = function (_stream, enabled) {
     _stream && _stream.getAudioTracks().forEach(function (track) {
-        track.enabled = enabled;
+        track.enabled === enabled || (track.enabled = enabled);
     });
 };
 
@@ -363,6 +363,8 @@ emedia.pannel || (emedia.pannel = {});
 emedia.pannel.DefaultMouseTrack = __webpack_require__(20);
 emedia.pannel.MouseTrack = __webpack_require__(21);
 emedia.pannel.KeyboardTrack = __webpack_require__(31);
+
+emedia.PCStats = __webpack_require__(32);
 
 emedia.event = __event;
 
@@ -1112,7 +1114,7 @@ if (!!document.documentMode) { // Detect IE (6-11)
 
     //adapter = require('./Temasys.wrapper'); //6.0.3
 }else{
-    adapter = __webpack_require__(8); //6.0.3
+    adapter = __webpack_require__(8); //6.2.0
 }
 
 
@@ -7102,7 +7104,7 @@ module.exports = _util.prototypeExtend({
     },
 
     exit: function (closeMyConfrIfICrtConfr) {
-        _logger.info("User click exit ", closeMyConfrIfICrtConfr);
+        _logger.warn("User click exit ", closeMyConfrIfICrtConfr);
         this.current && this.current.exit(closeMyConfrIfICrtConfr);
     },
 
@@ -8802,6 +8804,14 @@ module.exports = _util.prototypeExtend({
 
         var url = self.ticket.url;
 
+        // var hostname = window.location.hostname;
+        // if(hostname.endsWith("paic.com.cn")){ //pingan.com.cn -> paic.com.cn
+        //     url = url.replace("pingan.com.cn", "paic.com.cn");
+        // }else if(hostname.endsWith("pingan.com.cn")){ // paic.com.cn -> pingan.com.cn
+        //     url = url.replace("paic.com.cn", "pingan.com.cn");
+        // }
+        // _logger.warn("ticket url modifiy. ", hostname, url);
+
         if(url.startsWith('/')){ //通过地址栏 补齐url
             if(emedia.config.wsorigin){
                 url = emedia.config.wsorigin + url;
@@ -8817,7 +8827,7 @@ module.exports = _util.prototypeExtend({
             }
 
             _logger.warn("websocket url. update. {} -> {}", self.ticket.url, url);
-        } if(emedia.config.wsorigin){
+        }else if(emedia.config.wsorigin){
             _logger.warn("emedia.config.wsorigin invalidate. causeby server url {}", url);
         }
 
@@ -9165,7 +9175,7 @@ module.exports = _util.prototypeExtend({
         }
 
         if(!servMessage.op || servMessage.op == 1001){
-            _logger.trace("Igron message. caused by op not found.", servMessage);
+            _logger.debug("Igron message. caused by op not found.", servMessage);
             return;
         }
 
@@ -10777,6 +10787,9 @@ var Attendee = Member.extend({
 
 
     _onAddStream: function(stream){
+        _logger.info("add stream ", stream.id);
+        _logger.debug("add stream ", stream);
+
         var self = this;
         self.onAddStream(stream);
     },
@@ -12141,11 +12154,20 @@ var _WebRTC = _util.prototypeExtend({
         return self._rtcPeerConnection.getReceivers();
     },
 
-    updateRemoteBySubArgs: function (subArgs) {
+    updateRemoteBySubArgs: function () {
         var self = this;
+
+        if(!self.subArgs){
+            return;
+        }
+        if(!self._remoteStream){
+            return;
+        }
 
         emedia.enableVideoTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSVideo === false));
         emedia.enableAudioTracks(self._remoteStream, !(self.subArgs && self.subArgs.subSAudio === false));
+
+        _logger.info("enable tracks remote stream", self._remoteStream, self._rtcId, self.__id,  self.closed);
     },
 
     createRtcPeerConnection: function (iceServerConfig) {
@@ -12215,11 +12237,15 @@ var _WebRTC = _util.prototypeExtend({
             }
             self._onIceCandidate(candidate);
         };
-        
+
         function stateChange(event) {
             _logger.info("states: conn", (rtcPeerConnection.connectionState || rtcPeerConnection.iceConnectionState),
                 ", ice", rtcPeerConnection.iceConnectionState, "@", self._rtcId, self.__id,  self.closed);
-            self.onIceStateChange(rtcPeerConnection.iceConnectionState);
+            try {
+                self.onIceStateChange(rtcPeerConnection.iceConnectionState);
+            }finally{
+
+            }
         }
 
         rtcPeerConnection.onconnectionstatechange = stateChange.bind(self);
@@ -12510,10 +12536,14 @@ var _WebRTC = _util.prototypeExtend({
                 _logger.warn("Firefox sdp section video pre audio, sdp mline index update ", oldLineIndex, "->", candidate.sdpMLineIndex);
             }
 
-            self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
-                self.onAddIceCandidateSuccess.bind(self),
-                self._onAddIceCandidateError.bind(self)
-            );
+            if(candidate.candidate && candidate.candidate !== ""){
+                self._rtcPeerConnection.addIceCandidate(new RTCIceCandidate(candidate)).then(
+                    self.onAddIceCandidateSuccess.bind(self),
+                    self._onAddIceCandidateError.bind(self)
+                );
+            }else{
+                _logger.warn("Add ICE candidate fail. drop it ", candidate, self._rtcId, self.__id,  self.closed);
+            }
         }
     },
 
@@ -12543,7 +12573,7 @@ var _WebRTC = _util.prototypeExtend({
         }
 
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
-        _logger.warn('setRemoteDescription. firefox: switch audio video; UDP/TLS/RTP/SAVPF -> RTP/SAVPF', self._rtcId, self.__id);
+        _logger.warn('setRemoteDescription. UDP/TLS/RTP/SAVPF -> RTP/SAVPF; if firefox: switch audio video;', self._rtcId, self.__id);
         _logger.debug('setRemoteDescription.', desc, self._rtcId, self.__id);
 
         desc = self.__remoteDescription = new RTCSessionDescription(desc);
@@ -12592,6 +12622,9 @@ var _WebRTC = _util.prototypeExtend({
         this._remoteStream = event.stream || event.streams[0];
         this._remoteStream._rtcId = this._rtcId;
         this._remoteStream.__rtc_c_id = this.__id;
+
+        self.updateRemoteBySubArgs();
+
         this.onGotRemoteStream(this._remoteStream, event);
 
         _logger.debug('received remote stream, you will see the other.', self._rtcId, self.__id,  this.closed);
@@ -13896,7 +13929,7 @@ var Handler = _util.prototypeExtend({
             var _stream = self.newStream(evt.stream);
 
             if(evt.hidden && !self._maybeNotExistStreams[evt.stream.id] && !_stream.isRepublished){
-                self.onAddStream(_stream);
+                self._onAddStream(_stream);
                 return;
             }
 
@@ -17780,11 +17813,364 @@ module.exports = _util.prototypeExtend({
 /* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var _util = __webpack_require__(5);
+var _logger = _util.tagLogger("PCStats");
+
+/**
+ * outbound-rtp
+ *  bytesSent
+ *  packetsSent
+ *  qpSum
+ *  pliCount
+ * inbound-rtp
+ *  bytesReceived
+ *  framesDecoded
+ *  packetsLost
+ *  packetsReceived
+ *  pliCount
+ * track
+ *  framesDecoded
+ *  framesReceived
+ *  framesDropped
+ * transport
+ *  bytesReceived
+ *  bytesSent
+ * candidate-pair
+ *  bytesReceived
+ *  bytesSent
+ *  totalRoundTripTime
+ *  requestsReceived
+ *  responsesSent
+ *  requestsSent
+ *  responsesReceived
+ * local-candidate
+ *  networkType
+ *  protocol
+ *  port
+ * remote-candidate
+ *  ip
+ * codec
+ *  clockRate
+ *  mimeType
+ *
+ *
+ */
+
+var PCStats;
+module.exports = PCStats = _util.prototypeExtend({
+    //_webrtc:
+    //_stream:
+
+    __init__: function () {
+        if(!this._webrtc){
+            this._stream && (this._webrtc = this._stream._webrtc);
+        }
+
+        this.samplesDatas = {};
+        this.gatherResults = {};
+
+        this._bysamples = {};
+        if(this._inbound_ !== false){
+            this._bysamples["inbound-rtp"] = ["bytesReceived", "framesDecoded", "packetsLost", "packetsReceived", "pliCount"];
+        }
+        if(this._outbound_ !== false){
+            this._bysamples["outbound-rtp"] = ["bytesSent", "packetsSent", "qpSum", "pliCount"];
+        }
+    },
+
+    onGatherResult: function (trackId, type, subtype, data) {
+        _logger.info(trackId, type, subtype, data);
+    },
+
+    stats: function (selector) {
+        if(!this._webrtc || !this._webrtc._rtcPeerConnection){
+            _logger.warn("not found webrtc or peer connection").
+            return;
+        }
+
+        return this._webrtc._rtcPeerConnection.getStats(selector);
+    },
+
+    statsOfTrack: function (selector) {
+        if(!selector instanceof window.MediaStreamTrack){
+            throw "selector not a MediaStreamTrack";
+        }
+
+        return this.stats(selector);
+    },
+
+    audioTrack: function (mediaStream) {
+        var tracks = mediaStream && mediaStream.getAudioTracks();
+        return tracks && tracks.length ? tracks[0] : undefined;
+    },
+
+    videoTrack: function (mediaStream) {
+        var tracks = mediaStream && mediaStream.getVideoTracks();
+        return tracks && tracks.length ? tracks[0] : undefined;
+    },
+
+    // samplingTrack: function (track) {
+    //     var self = this;
+    //
+    //     var trackId = track.id;
+    //     this.statsOfTrack(track).then(function(_stats){
+    //         self._trackSamples[trackId] || (self._trackSamples[trackId] = []);
+    //
+    //         var statsParms = self._trackSamples[trackId];
+    //
+    //         _stats.forEach(function(_stat, name){
+    //             var samplings = _bysamples[_stat.type];
+    //
+    //             var tmp;
+    //             if(samplings && samplings.length){
+    //                 var statParms = (tmp || (tmp = {}))[_stat.type] = {type:_stat.type, timestamp: _stat.timestamp};
+    //
+    //                 samplings.forEach(function(_param){
+    //                     statParms[_param] = _stat[_param];
+    //                 });
+    //             }
+    //             tmp && statsParms.push(tmp);
+    //         });
+    //     });
+    // },
+
+    gatherTrack: function (track, mediaType) {
+        var self = this;
+
+        mediaType = track.kind || mediaType;
+        mediaType = mediaType && mediaType.toLowerCase();
+
+        var trackId = track.id;
+        this.statsOfTrack(track).then(function(_stats){
+            self.samplesDatas[trackId] || (self.samplesDatas[trackId] = {});
+
+            var statsParms = self.samplesDatas[trackId];
+
+            _stats.forEach(function(_stat, name){
+                var samplings = self._bysamples[_stat.type];
+
+                var statMediaType = _stat.mediaType
+                    || (name.indexOf("ideo") >= 0 && "video")
+                    || (name.indexOf("udio") >= 0 && "audio")
+                    || undefined;
+
+                if(samplings && samplings.length){
+                    if(emedia.config._printDebugStats === true){
+                        _logger.debug(name, _stat, track, statMediaType, mediaType);
+                    }
+
+                    if(!statMediaType || statMediaType === mediaType){
+                        var tmp = statsParms[_stat.type] || (statsParms[_stat.type] = {});
+
+                        samplings.forEach(function(_param){
+                            var items = (tmp[_param] || (tmp[_param] = []));
+
+                            var item = {timestamp: _stat.timestamp, kind: _stat.mediaType || track.kind || mediaType};
+                            item[_param] = _stat[_param];
+                            items.push(item);
+                        });
+                    }
+                }
+            });
+        });
+    },
+
+    gatherWebrtcMediaStream: function (_mediaStream, type) {
+        var self = this;
+
+        if(!type){
+            _mediaStream.getTracks().forEach(function (track) {
+                self.gatherTrack(track);
+            });
+            return;
+        }
+
+        if("audio" === type.toLowerCase()){
+            _mediaStream.getAudioTracks().forEach(function (track) {
+                self.gatherTrack(track, track.kind || type.toLowerCase());
+            });
+            return;
+        }
+
+        if("video" === type.toLowerCase()){
+            _mediaStream.getVideoTracks().forEach(function (track) {
+                self.gatherTrack(track, track.kind || type.toLowerCase());
+            });
+            return;
+        }
+    },
+
+    gatherWebrtc: function () {
+        this._webrtc._localStream && this.gatherWebrtcMediaStream(this._webrtc._localStream);
+        this._webrtc._remoteStream && this.gatherWebrtcMediaStream(this._webrtc._remoteStream);
+    },
+
+    _gather_inbound_rtp_pliCount: function (dataArray) {
+        var data = dataArray.shift();
+        return data.pliCount;
+    },
+
+    _gather: function (type, subtype, dataArray) {
+        type = type.replace(/[^\w]/g, "_");
+        subtype = subtype.replace(/[^\w]/g, "_");
+
+        var func = _util.list("_gather", type, subtype).join("_");
+        if(typeof this[func] === "function"){
+            return this[func](dataArray);
+        }
+
+        var count = 3;
+        if(dataArray.length < count){
+            return 0;
+        }
+
+        var data = dataArray[count - 1][subtype] - dataArray[0][subtype];
+        var time = dataArray[count - 1].timestamp - dataArray[0].timestamp;
+
+        dataArray.shift();
+
+        return (time === 0) ? 0 : (parseFloat(data * 1000 / time).toFixed(2));
+    },
+
+    _statsCount: function () {
+        var self = this;
+
+        function gatherByTrack() {
+            _util.forEach(self.samplesDatas, function (trackId, _samples) {
+                var trackGathers = self.gatherResults[trackId] = self.gatherResults[trackId] || {};
+                gatherByType(trackId, trackGathers, _samples);
+            });
+        }
+
+        function gatherByType(trackId, trackGathers, _trackSamples) {
+            _util.forEach(_trackSamples, function (type, _data) {
+                var typeGathers = (trackGathers[type] || (trackGathers[type] = {}));
+                gatherBySubtype(trackId, typeGathers, type, _data);
+            });
+        }
+
+        function gatherBySubtype(trackId, typeGathers, type, _data) {
+            _util.forEach(_data, function (subtype, dataArray) {
+                var result = typeGathers[subtype] = self._gather(type, subtype, dataArray);
+                self.onGatherResult(trackId, type, subtype, result);
+            });
+        }
+
+        gatherByTrack();
+    },
+
+    gather: function () {
+        this.gatherWebrtc();
+        this._statsCount();
+    },
+
+    intervalGather: function (intervalMillis) {
+        this._intervalId && clearInterval(this._intervalId);
+        this._intervalId = setInterval(this.gather.bind(this), intervalMillis || 1000);
+    },
+
+    stopIntervalGather: function () {
+        this._intervalId && clearInterval(this._intervalId);
+    }
+});
+
+var statsMap = {};
+var echo = PCStats.echo = function(easemobStreams){
+    _util.forEach(easemobStreams, function (_k, _stream) {
+        if(!statsMap[_stream.id]
+            && _stream._webrtc
+            && !_stream._webrtc.closed
+            && _stream.getMediaStream()){
+
+            var pcstats;
+            statsMap[_stream.id] = pcstats = new PCStats({_webrtc: _stream._webrtc});
+            pcstats._mediaStream = _stream.getMediaStream();
+        }else if(statsMap[_stream.id] && (!_stream._webrtc || _stream._webrtc.closed || !_stream.getMediaStream())){
+            _util.removeAttribute(statsMap, _stream.id);
+        }
+    });
+
+    var clearStats = [];
+    _util.forEach(statsMap, function (_sid, stats) {
+        if(!easemobStreams || !easemobStreams[_sid]){
+            clearStats.push(_sid);
+        }else{
+            stats.gatherWebrtcMediaStream(stats._mediaStream);
+            stats._statsCount();
+        }
+    })
+
+    _util.forEach(clearStats, function (_index, _sid) {
+        _util.removeAttribute(statsMap, _sid);
+    });
+}
+
+PCStats.intervalEcho = function(easemobStreams, intervalMillis){
+    return setInterval(function () {
+        echo(easemobStreams);
+    }, intervalMillis)
+}
+
+
+_util.forEach(["inbound", "outbound"], function (_typeIndex, gatherType) {
+    _util.forEach(["Audio", "Video"], function (_trackTypeIndex, trackType) {
+        (function (gatherType, trackType) {
+            var gatherTrack;
+            PCStats[gatherType + trackType] = gatherTrack = function (easemobStream, onNotify, intervalMillis) {
+                intervalId && clearInterval(intervalId);
+
+                var intervalId = setInterval(function () {
+                    var pcstats = gatherTrack[easemobStream.id];
+                    if(!pcstats
+                        && easemobStream
+                        && easemobStream._webrtc
+                        && !easemobStream._webrtc.closed
+                        && easemobStream.getMediaStream()){
+
+                        gatherTrack[easemobStream.id] = pcstats = new PCStats({
+                            _webrtc: easemobStream._webrtc,
+                            _inbound_: gatherType === "inbound",
+                            _outbound_: gatherType === "outbound"
+                        });
+                        onNotify && (pcstats.onGatherResult = onNotify);
+                        pcstats._mediaStream = easemobStream.getMediaStream();
+
+                    } else if(pcstats
+                        && (!easemobStream
+                            || !easemobStream._webrtc
+                            || easemobStream._webrtc.closed
+                            || !easemobStream.getMediaStream()
+                            || !pcstats._mediaStream
+                            || pcstats._mediaStream.id !== easemobStream.getMediaStream().id
+                        )){
+                        _util.removeAttribute(gatherTrack, easemobStream.id);
+                        pcstats = null;
+                    }
+
+                    if(!pcstats){
+                        intervalId && clearInterval(intervalId);
+                        return;
+                    }
+
+                    pcstats.gatherWebrtcMediaStream(pcstats._mediaStream, trackType);
+                    pcstats._statsCount();
+                }, intervalMillis);
+
+                return intervalId;
+            }
+        })(gatherType, trackType);
+    });
+})
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var Util = (__webpack_require__(2).default);
-var RTCIQHandler = __webpack_require__(33);
-var API = __webpack_require__(34);
-var WebRTC = (__webpack_require__(35).default);
-var CommonPattern = __webpack_require__(36);
+var RTCIQHandler = __webpack_require__(34);
+var API = __webpack_require__(35);
+var WebRTC = (__webpack_require__(36).default);
+var CommonPattern = __webpack_require__(37);
 
 var RouteTo = API.RouteTo;
 var Api = API.Api;
@@ -18018,6 +18404,10 @@ var _Call = {
 
             webRtc: new WebRTC({
                 streamType: streamType,
+                subArgs:{
+                    subSVideo: "VIDEO" === streamType,
+                    subSAudio: true
+                },
                 onGotLocalStream: self.listener.onGotLocalStream,
                 onGotRemoteStream: self.listener.onGotRemoteStream,
                 onError: self.listener.onError
@@ -18053,7 +18443,7 @@ module.exports = function (initConfigs) {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -18062,7 +18452,7 @@ module.exports = function (initConfigs) {
 
 var _util = (__webpack_require__(2).default);
 var _logger = _util.logger;
-var API = __webpack_require__(34);
+var API = __webpack_require__(35);
 var RouteTo = API.RouteTo;
 
 var CONFERENCE_XMLNS = "urn:xmpp:media-conference";
@@ -18421,7 +18811,7 @@ module.exports = RTCIQHandler;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -19130,7 +19520,7 @@ exports.Api = function (initConfigs) {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19181,17 +19571,42 @@ easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setLocalVideoSrc
     easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["util"].logger.debug('[WebRTC-API] you can see yourself !');
 }
 
+var _setRemoteDescription = easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setRemoteDescription;
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setRemoteDescription = function (desc) {
+    var self = this;
+
+    if(self.streamType === "VOICE"){ //将remote sdp中 video中改为 a=mid:video -》 a=sendrecv|a=sendonly--recvonly
+        function videoSectionReplace(regx, use) {
+            var videoSectionIndex = desc.sdp.indexOf("m=video");
+            var audioSectionIndex = desc.sdp.indexOf("m=audio");
+            var end = audioSectionIndex > videoSectionIndex ? audioSectionIndex : desc.sdp.length;
+
+            desc.sdp = desc.sdp.replace(regx, function (match, offset, string) {
+                if(offset >= videoSectionIndex && offset < end){
+                    return use;
+                }else{
+                    return match;
+                }
+            });
+        }
+
+        videoSectionReplace(/a=sendrecv|a=sendonly/g, "a=inactive");
+    }
+    return _setRemoteDescription.call(self, desc);
+}
+
+
 /* harmony default export */ __webpack_exports__["default"] = (easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"]);
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
  * P2P
  */
 var _util = (__webpack_require__(2).default);
-var RouteTo = __webpack_require__(34).RouteTo;
+var RouteTo = __webpack_require__(35).RouteTo;
 var _logger = _util.logger;
 
 
