@@ -26,3 +26,6 @@ if (/Firefox/.test(navigator.userAgent)) {
 }else{
     WebIM.WebRTC.supportPRAnswer = true;
 }
+
+
+console && console.warn('Webrtc version', 'Git.5149147');
