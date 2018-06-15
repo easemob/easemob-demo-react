@@ -17,15 +17,15 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 }
 
 
-/**
- * 判断是否支持pranswer
- */
-if (/Firefox/.test(navigator.userAgent)) {
-    //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
-    WebIM.WebRTC.supportPRAnswer = false;
-}else{
-    WebIM.WebRTC.supportPRAnswer = true;
-}
-
+// /**
+//  * 判断是否支持pranswer
+//  */
+// if (/Firefox/.test(navigator.userAgent)) {
+//     //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
+//     WebIM.WebRTC.supportPRAnswer = false;
+// }else{
+//     WebIM.WebRTC.supportPRAnswer = true;
+// }
+WebIM.WebRTC.supportPRAnswer = emedia.supportPRAnswer;
 
 console && console.warn('Webrtc version', 'Git.5149147');

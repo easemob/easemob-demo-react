@@ -262,6 +262,9 @@ var CommonPattern = {
 
         self.webRtc.createRtcPeerConnection(self._rtcCfg2);
 
+        self.callerNotPranswer = (options.expr === 0);
+        _logger.warn("caller not pranswer ", self.callerNotPranswer);
+
         options.sdp && _logger.debug(options.sdp.sdp);
 
         options.sdp && (self.webRtc.setRemoteDescription(options.sdp).then(function () {
@@ -329,7 +332,16 @@ var CommonPattern = {
                 });
 
                 if (WebIM.WebRTC.supportPRAnswer) {
-                    self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    if(self.webRtc.isConnected() || self.callerNotPranswer){
+                        _logger.info("[WebRTC-API] ice connected or caller not pranswer, may send answer");
+                        self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    }else{
+                        _logger.info("[WebRTC-API] ice state not connected, send answer waiting.");
+                        self.webRtc._hookWhenICEReady = function () {
+                            _logger.info("[WebRTC-API] ice connected, send answer");
+                            self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                        }
+                    }
                 } else {
                     self.api.acptC(rt, self._sessId, self._rtcId, answer, null, 1);
                 }
@@ -392,6 +404,10 @@ var CommonPattern = {
         var self = this;
         _logger.debug("[WebRTC-API] ice state is " + iceState);
 
+        if(self.webRtc.isConnected()){ //出发hook
+            self.webRtc._hookWhenICEReady && self.webRtc._hookWhenICEReady();
+            self.webRtc._hookWhenICEReady = undefined;
+        }
 
         if(iceState === "closed"){
             self.setLocalSDP = false;
