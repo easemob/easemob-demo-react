@@ -24,6 +24,7 @@ Webrtc.prototype.createMedia = function(constaints, callback){
 
     var openUserMedia = Service.prototype.openUserMedia.bind(this);
     openUserMedia(pubS).then(function (_service, stream) {
+        WebIM.__alreadyOpenMedias.push(stream);
         callback && callback(self, stream)
     }, function fail(evt) {
         util.logger.debug('[WebRTC-API] getUserMedia() error: ', evt);
