@@ -27,7 +27,6 @@ const { Types, Creators } = createActions({
     updateConfrInfoAsync: (gid) => {
         return (dispatch, getState) => {
             dispatch(Creators.setGid(gid))
-
             var pwd = Math.random().toString(36).substr(2);
             pwd = "";
             emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd).then(function (confr) {
