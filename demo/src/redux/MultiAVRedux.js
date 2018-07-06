@@ -27,7 +27,8 @@ const { Types, Creators } = createActions({
     updateConfrInfoAsync: (gid) => {
         return (dispatch, getState) => {
             dispatch(Creators.setGid(gid))
-            const pwd = Math.random().toString(36).substr(2)
+            var pwd = Math.random().toString(36).substr(2);
+            //pwd = "";
             WebIM.call.createConference(pwd, function (from, rtcOptions) {
                 dispatch(Creators.updateConfrInfo(pwd, from, rtcOptions))
             })

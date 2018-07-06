@@ -234,6 +234,16 @@ WebIM.conn.listen({
         switch (type) {
         case "chat":
             store.dispatch(RosterActions.topRoster(from))
+            //新的会议要求消息，使用text message实现
+            if(WebIM && WebIM.call && message && message.ext && message.ext.conferenceId){
+                var options = {
+                    confrId: message.ext.conferenceId,
+                    password: message.ext.password,
+                    gid: message.ext.inviter,
+                    inviter: message.ext.inviter
+                }
+                WebIM.call.listener.onInvite(from, options);
+            }
             break
         case "groupchat":
             store.dispatch(GroupActions.topGroup(to))

@@ -256,6 +256,20 @@ var _RtcHandler = {
         }
     },
 
+    getShortId: function (jid) {
+        var begin;
+        if((begin = (jid.indexOf('_') + 1)) < 1){
+            begin = 0;
+        }
+
+        var end;
+        if((end = jid.indexOf('@', -1)) < 0){
+            end = jid.length;
+        }
+
+        return jid.substring(begin, end);
+    },
+
     /**
      * rt: { id: , to: , rtKey: , rtflag: , sid: , tsxId: , type: , }
      *
@@ -341,7 +355,9 @@ var _RtcHandler = {
                 _logger.debug(ele);
             };
 
-        _conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
+        if(options.data.op != 202){
+            _conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
+        }
 
         //onTermC
         if (options.data.op == 107 && self._connectedSid) {
@@ -349,6 +365,36 @@ var _RtcHandler = {
                 self._connectedSid = '';
                 self._fromSessionID = {};
             }
+        }
+
+        if (options.data.op == 202){
+            var msg = _util.list("Invite", self.getShortId(to), "join conference:", options.data.confrId).join(" ");
+            var id = _conn.getUniqueId("CONFR_INVITE");                 // 生成本地消息id
+            var inviteMessage = $msg({
+                xmlns: 'jabber:client',
+                id: id,
+                type: 'chat',
+                to: to,
+                from: _conn.context.jid
+            }).c('body').t(JSON.stringify({
+                data: msg,
+                bodies:[
+                    {
+                        msg: msg,
+                        type: "txt"
+                    }
+                ],
+                ext: {
+                    conferenceId: options.data.confrId,
+                    password: options.data.password,
+                    msg_extension: {
+                        group_id: options.data.gid,
+                        inviter: self.getShortId(_conn.context.jid)
+                    }
+                }
+            }));
+
+            _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
         }
     }
 };

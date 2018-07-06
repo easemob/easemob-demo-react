@@ -57,18 +57,13 @@ class AddAVMemberModal extends React.Component {
 
                 /* ------ 3 ------ */
                 setTimeout(() => {
-                    const pub = new WebIM.EMService.AVPubstream({
+                    const pub = new WebIM.EMService.AudioMixerPubstream({
                         constaints: {
-                            audio: true,
-                            video: true
+                            video : true,
                         },
-                        aoff: 0,
-                        voff: 0,
-                        name: "video",
-                        ext: {
-                            hello: "Hello"
-                        }
-                    })
+
+                        aoff: 0
+                    });
                     const tkt = this.props.confr.rtcOptions.ticket
                     WebIM.EMService.setup(tkt)
                     WebIM.EMService.openUserMedia(pub).then(function () {

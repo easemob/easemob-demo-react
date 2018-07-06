@@ -176,6 +176,7 @@ class MultiAVModal extends React.Component {
                 },
 
                 onAddMember: function onAddMember(member) {
+                    member.nickName || (member.nickName = member.memName);
                     console.log(member.id + " " + (member.nickName || "") + " enter， ext = " + member.ext);
                     message.success(member.nickName + " 加入群聊.");
                     me.props.setJoinedMembers(member);                    

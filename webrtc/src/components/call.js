@@ -73,9 +73,9 @@ var _Call = {
             undefined,
             pwd, 
             function(from, rtcOptions){
-            var ticketStr = rtcOptions.ticket
-            rtcOptions.conferenceId = rtcOptions.confrId
-            _callback(from, rtcOptions)
+                var ticketStr = rtcOptions.ticket
+                rtcOptions.conferenceId = rtcOptions.confrId
+                _callback && _callback(from, rtcOptions)
         })
     },
 
@@ -91,7 +91,7 @@ var _Call = {
             pwd, 
             gid,
             function(from, rtcOptions){
-                _callback(from, rtcOptions)
+                _callback && _callback(from, rtcOptions)
             }
         );
     },
@@ -106,7 +106,7 @@ var _Call = {
             confrId,
             pwd,
             function(from, rtcOptions){
-                _callback(from, rtcOptions)
+                _callback && _callback(from, rtcOptions)
             }
         );
     },
