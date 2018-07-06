@@ -159,17 +159,12 @@ class WebRTCModal extends React.Component {
                                 me.props.setGid(gid);
 
                                 setTimeout(() => {
-                                    const pub = new WebIM.EMService.AVPubstream({
+                                    const pub = new WebIM.EMService.AudioMixerPubstream({
                                         constaints: {
-                                            audio: true,
-                                            video: true
+                                            video : true,
                                         },
-                                        aoff: 0,
-                                        voff: 0,
-                                        name: "video",
-                                        ext: {
-                                            hello: "Hello"
-                                        }
+
+                                        aoff: 0
                                     })
                                     const tkt = rtcOption.ticket
                                     WebIM.EMService.setup(tkt)
