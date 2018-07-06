@@ -8,6 +8,8 @@ WebIM.WebRTC = WebIM.WebRTC || {};
 WebIM.WebRTC.Call = Call;
 WebIM.WebRTC.Util = Util;
 
+WebIM.__alreadyOpenMedias = [];
+
 if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = WebIM.WebRTC;
 } else if (typeof define === 'function' && define.amd) {

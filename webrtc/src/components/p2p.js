@@ -448,7 +448,7 @@ var CommonPattern = {
     },
 
 
-    termCall: function (reason) {
+    __termCall1: function (reason) {
         var self = this;
 
         self._pingIntervalId && window.clearInterval(self._pingIntervalId);
@@ -471,6 +471,26 @@ var CommonPattern = {
         self.setRemoteSDP = false;
 
         self.onTermCall(reason);
+    },
+
+    termCall: function (reason) {
+        var self = this;
+        try{
+            self.__termCall1(reason);
+        }finally{
+            if(WebIM.__alreadyOpenMedias && WebIM.__alreadyOpenMedias.length > 0){
+                for(var index in WebIM.__alreadyOpenMedias){
+                    var stream = WebIM.__alreadyOpenMedias[index];
+                    try{
+                        emedia.stopTracks(stream);
+                    }catch(e){
+
+                    }
+                }
+
+                WebIM.__alreadyOpenMedias = [];
+            }
+        }
     },
 
     /**
