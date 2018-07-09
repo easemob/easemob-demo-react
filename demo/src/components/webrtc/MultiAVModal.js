@@ -176,7 +176,20 @@ class MultiAVModal extends React.Component {
                 },
 
                 onAddMember: function onAddMember(member) {
-                    member.nickName || (member.nickName = member.memName);
+                    function getShortId(jid) {
+                        var begin;
+                        if((begin = (jid.indexOf('_') + 1)) < 1){
+                            begin = 0;
+                        }
+
+                        var end;
+                        if((end = jid.indexOf('@', -1)) < 0){
+                            end = jid.length;
+                        }
+
+                        return jid.substring(begin, end);
+                    }
+                    member.nickName || (member.nickName = getShortId(member.memName));
                     console.log(member.id + " " + (member.nickName || "") + " enter， ext = " + member.ext);
                     message.success(member.nickName + " 加入群聊.");
                     me.props.setJoinedMembers(member);                    
