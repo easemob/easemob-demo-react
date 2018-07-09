@@ -391,7 +391,9 @@ var _RtcHandler = {
                         group_id: options.data.gid,
                         inviter: self.getShortId(_conn.context.jid)
                     }
-                }
+                },
+                from: self.getShortId(_conn.context.jid),
+                to: self.getShortId(to)
             }));
 
             _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
