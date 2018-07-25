@@ -90,6 +90,8 @@ WebIM.WebRTC = WebIM.WebRTC || {};
 WebIM.WebRTC.Call = Call;
 WebIM.WebRTC.Util = Util;
 
+WebIM.__alreadyOpenMedias = [];
+
 if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = WebIM.WebRTC;
 } else if (true) {
@@ -100,16 +102,18 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 }
 
 
-/**
- * 判断是否支持pranswer
- */
-if (/Firefox/.test(navigator.userAgent)) {
-    //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
-    WebIM.WebRTC.supportPRAnswer = false;
-}else{
-    WebIM.WebRTC.supportPRAnswer = true;
-}
+// /**
+//  * 判断是否支持pranswer
+//  */
+// if (/Firefox/.test(navigator.userAgent)) {
+//     //WebIM.WebRTC.supportPRAnswer = (navigator.userAgent.split("Chrome/")[1].split(".")[0] >= 50) ? true : false;
+//     WebIM.WebRTC.supportPRAnswer = false;
+// }else{
+//     WebIM.WebRTC.supportPRAnswer = true;
+// }
+WebIM.WebRTC.supportPRAnswer = emedia.supportPRAnswer;
 
+console && console.warn('Webrtc version', 'Git.e4f0006');
 
 /***/ }),
 /* 2 */
@@ -18241,9 +18245,9 @@ var _Call = {
             undefined,
             pwd, 
             function(from, rtcOptions){
-            var ticketStr = rtcOptions.ticket
-            rtcOptions.conferenceId = rtcOptions.confrId
-            _callback(from, rtcOptions)
+                var ticketStr = rtcOptions.ticket
+                rtcOptions.conferenceId = rtcOptions.confrId
+                _callback && _callback(from, rtcOptions)
         })
     },
 
@@ -18259,7 +18263,7 @@ var _Call = {
             pwd, 
             gid,
             function(from, rtcOptions){
-                _callback(from, rtcOptions)
+                _callback && _callback(from, rtcOptions)
             }
         );
     },
@@ -18274,7 +18278,7 @@ var _Call = {
             confrId,
             pwd,
             function(from, rtcOptions){
-                _callback(from, rtcOptions)
+                _callback && _callback(from, rtcOptions)
             }
         );
     },
@@ -18704,6 +18708,20 @@ var _RtcHandler = {
         }
     },
 
+    getShortId: function (jid) {
+        var begin;
+        if((begin = (jid.indexOf('_') + 1)) < 1){
+            begin = 0;
+        }
+
+        var end;
+        if((end = jid.indexOf('@', -1)) < 0){
+            end = jid.length;
+        }
+
+        return jid.substring(begin, end);
+    },
+
     /**
      * rt: { id: , to: , rtKey: , rtflag: , sid: , tsxId: , type: , }
      *
@@ -18789,7 +18807,9 @@ var _RtcHandler = {
                 _logger.debug(ele);
             };
 
-        _conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
+        if(options.data.op != 202){
+            _conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
+        }
 
         //onTermC
         if (options.data.op == 107 && self._connectedSid) {
@@ -18797,6 +18817,38 @@ var _RtcHandler = {
                 self._connectedSid = '';
                 self._fromSessionID = {};
             }
+        }
+
+        if (options.data.op == 202){
+            var msg = _util.list("Invite", self.getShortId(to), "join conference:", options.data.confrId).join(" ");
+            var id = _conn.getUniqueId("CONFR_INVITE");                 // 生成本地消息id
+            var inviteMessage = $msg({
+                xmlns: 'jabber:client',
+                id: id,
+                type: 'chat',
+                to: to,
+                from: _conn.context.jid
+            }).c('body').t(JSON.stringify({
+                data: msg,
+                bodies:[
+                    {
+                        msg: msg,
+                        type: "txt"
+                    }
+                ],
+                ext: {
+                    conferenceId: options.data.confrId,
+                    password: options.data.password,
+                    msg_extension: {
+                        group_id: options.data.gid,
+                        inviter: self.getShortId(_conn.context.jid)
+                    }
+                },
+                from: self.getShortId(_conn.context.jid),
+                to: self.getShortId(to)
+            }));
+
+            _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
         }
     }
 };
@@ -19177,7 +19229,7 @@ var _clazz = {
         rtcCfg && (rtcOptions.data.rtcCfg = rtcCfg);
         WebRTC && (rtcOptions.data.WebRTC = WebRTC);
 
-        rtcOptions.data.expr = emedia.isFirefox || emedia.isEdge ? 0 : 1; //Firefox 和 Edge不希望sdk回复 pranswer
+        rtcOptions.data.expr = !emedia.supportPRAnswer ? 0 : 1; //Firefox 和 Edge不希望sdk回复 pranswer
 
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
@@ -19542,20 +19594,71 @@ easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.__controlStream 
 }
 
 //callback (rtc, stream)
-easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.createMedia = function(constaints, callback){
+var createMedia;
+easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.createMedia = createMedia = function(constaints, callback){
     var self = this;
 
+    var mediaStream = new MediaStream();
+
+    function __callback() {
+        if(--__callback.count === 0){
+            WebIM.__alreadyOpenMedias.push(mediaStream);
+            callback && callback(self, mediaStream);
+        }
+    }
+
+    function __cloneTrack(destStream) {
+        destStream && destStream.getTracks().forEach(function(track) {
+            mediaStream.addTrack(track);
+        });
+    }
+
+    var audio = !constaints || constaints.audio;
+    var video = !constaints || constaints.video;
+
+    if(!audio && !video){
+        __callback.count = 0;
+        return __callback();
+    }
+
+    if(!!audio && !!video){ //两个true
+        __callback.count = 2;
+        createMedia.call(this, {video: constaints.video, audio: false}, function (obj, stream) {
+            __cloneTrack(stream);
+            __callback();
+        });
+        createMedia.call(this, {video: false, audio: constaints.audio}, function (obj, stream) {
+            __cloneTrack(stream);
+            __callback();
+        });
+
+        return;
+    }
+
+    __callback.count = 1;
+
     var pubS = new self.AVPubstream({
-        constaints: constaints,
-        aoff: 0,
-        voff: 0
+        constaints: constaints
     });
 
     var openUserMedia = easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Service"].prototype.openUserMedia.bind(this);
     openUserMedia(pubS).then(function (_service, stream) {
-        callback && callback(self, stream)
+        __cloneTrack(stream);
+        __callback();
     }, function fail(evt) {
+        __callback();
         easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["util"].logger.debug('[WebRTC-API] getUserMedia() error: ', evt);
+
+        if(typeof evt.message === 'function'){
+            evt.message = evt.message();
+        }else if(typeof evt.message === 'string' && evt.message !== ""){
+            evt.message = evt.message;
+        }else{
+            evt.message = "open media error. " + evt.name;
+        }
+
+        evt.message = evt.message + " when get " + (video ? "carma" : "microphone");
+
         self.onError(evt);
     });
 }
@@ -19866,6 +19969,9 @@ var CommonPattern = {
 
         self.webRtc.createRtcPeerConnection(self._rtcCfg2);
 
+        self.callerNotPranswer = (options.expr === 0);
+        _logger.warn("caller not pranswer ", self.callerNotPranswer);
+
         options.sdp && _logger.debug(options.sdp.sdp);
 
         options.sdp && (self.webRtc.setRemoteDescription(options.sdp).then(function () {
@@ -19933,7 +20039,16 @@ var CommonPattern = {
                 });
 
                 if (WebIM.WebRTC.supportPRAnswer) {
-                    self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    if(self.webRtc.isConnected() || self.callerNotPranswer){
+                        _logger.info("[WebRTC-API] ice connected or caller not pranswer, may send answer");
+                        self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                    }else{
+                        _logger.info("[WebRTC-API] ice state not connected, send answer waiting.");
+                        self.webRtc._hookWhenICEReady = function () {
+                            _logger.info("[WebRTC-API] ice connected, send answer");
+                            self.api.ansC(rt, self._sessId, self._rtcId, answer);
+                        }
+                    }
                 } else {
                     self.api.acptC(rt, self._sessId, self._rtcId, answer, null, 1);
                 }
@@ -19996,6 +20111,10 @@ var CommonPattern = {
         var self = this;
         _logger.debug("[WebRTC-API] ice state is " + iceState);
 
+        if(self.webRtc.isConnected()){ //出发hook
+            self.webRtc._hookWhenICEReady && self.webRtc._hookWhenICEReady();
+            self.webRtc._hookWhenICEReady = undefined;
+        }
 
         if(iceState === "closed"){
             self.setLocalSDP = false;
@@ -20036,7 +20155,7 @@ var CommonPattern = {
     },
 
 
-    termCall: function (reason) {
+    __termCall1: function (reason) {
         var self = this;
 
         self._pingIntervalId && window.clearInterval(self._pingIntervalId);
@@ -20059,6 +20178,26 @@ var CommonPattern = {
         self.setRemoteSDP = false;
 
         self.onTermCall(reason);
+    },
+
+    termCall: function (reason) {
+        var self = this;
+        try{
+            self.__termCall1(reason);
+        }finally{
+            if(WebIM.__alreadyOpenMedias && WebIM.__alreadyOpenMedias.length > 0){
+                for(var index in WebIM.__alreadyOpenMedias){
+                    var stream = WebIM.__alreadyOpenMedias[index];
+                    try{
+                        emedia.stopTracks(stream);
+                    }catch(e){
+
+                    }
+                }
+
+                WebIM.__alreadyOpenMedias = [];
+            }
+        }
     },
 
     /**
