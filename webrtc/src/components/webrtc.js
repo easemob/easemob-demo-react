@@ -32,6 +32,76 @@ Webrtc.prototype.createMedia = function(constaints, callback){
     });
 }
 
+var createMedia;
+//Webrtc.prototype.createMedia =
+    createMedia = function(constaints, callback){
+    var self = this;
+
+    var mediaStream = new MediaStream();
+
+    function __callback() {
+        if(--__callback.count === 0){
+            WebIM.__alreadyOpenMedias.push(mediaStream);
+            callback && callback(self, mediaStream);
+        }
+    }
+
+    function __cloneTrack(destStream) {
+        destStream && destStream.getTracks().forEach(function(track) {
+            mediaStream.addTrack(track);
+        });
+    }
+
+    var audio = !constaints || constaints.audio;
+    var video = !constaints || constaints.video;
+
+    if(!audio && !video){
+        __callback.count = 0;
+        return __callback();
+    }
+
+    if(!!audio && !!video){ //两个true
+        __callback.count = 2;
+        createMedia.call(this, {video: constaints.video, audio: false}, function (obj, stream) {
+            __cloneTrack(stream);
+            __callback();
+        });
+        createMedia.call(this, {video: false, audio: constaints.audio}, function (obj, stream) {
+            __cloneTrack(stream);
+            __callback();
+        });
+
+        return;
+    }
+
+    __callback.count = 1;
+
+    var pubS = new self.AVPubstream({
+        constaints: constaints
+    });
+
+    var openUserMedia = Service.prototype.openUserMedia.bind(this);
+    openUserMedia(pubS).then(function (_service, stream) {
+        __cloneTrack(stream);
+        __callback();
+    }, function fail(evt) {
+        __callback();
+        util.logger.debug('[WebRTC-API] getUserMedia() error: ', evt);
+
+        if(typeof evt.message === 'function'){
+            evt.message = evt.message();
+        }else if(typeof evt.message === 'string' && evt.message !== ""){
+            evt.message = evt.message;
+        }else{
+            evt.message = "open media error. " + evt.name;
+        }
+
+        evt.message = evt.message + " when get " + (video ? "carma" : "microphone");
+
+        self.onError(evt);
+    });
+}
+
 Webrtc.prototype.setLocalVideoSrcObject = function (stream) {
     var self = this;
 
