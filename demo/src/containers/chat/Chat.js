@@ -509,7 +509,7 @@ class Chat extends React.Component {
                         {/*<TextArea rows={2} />*/}
                     </div>
                 </div>
-                <WebRTCModal collapsed={collapsed} visible={showWebRTC} />
+                {/* <WebRTCModal collapsed={collapsed} visible={showWebRTC} /> */}
                 <ModalComponent
                     width={460}
                     /* title={I18n.t("addAFriend")} */

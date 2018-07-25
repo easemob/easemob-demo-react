@@ -18,6 +18,7 @@ import GroupActions from "@/redux/GroupRedux"
 import GroupMemberActions from "@/redux/GroupMemberRedux"
 import MessageActions from "@/redux/MessageRedux"
 import { config } from "@/config"
+import WebRTCModal from "@/components/webrtc/WebRTCModal"
 
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
@@ -231,6 +232,14 @@ class DefaultLayout extends Component {
                     >
                         <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[selectItem]}
                         />
+                    </div>
+                    <div className="x-layout-video"
+                        style={{
+                            position: "absolute",
+                            zIndex: "100"
+                        }}
+                    >
+                        <WebRTCModal collapsed={false} visible={true} />
                     </div>
                     <Content
                         className="x-layout-chat"
