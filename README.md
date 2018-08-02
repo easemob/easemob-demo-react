@@ -9,10 +9,9 @@ WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 
 1. 初始化安装
 	- 在/demo下执行 `npm i`
-2. 如果需要同时编辑sdk  `cd sdk && npm link && cd .. && npm link easemob-websdk`
 
-3. 如果需要同时编辑webrtc `cd webrtc && npm link && cd .. && npm link easemob-webrtc`
-4. 如果需要同时编辑emedia `cd emedia && npm link && cd .. && npm link easemob-emedia`
+2. 如果需要同时编辑webrtc `cd webrtc && npm link && cd .. && npm link easemob-webrtc`
+3. 如果需要同时编辑emedia `cd emedia && npm link && cd .. && npm link easemob-emedia`
 
 4. 运行demo
 	- `cd demo && npm start` （requires node@>=6）
