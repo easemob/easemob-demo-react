@@ -1,3 +1,9 @@
 language: node_js
-before_script:
-  - cd demo
+node_js: stable
+install: true
+script:
+- chmod 755 ./travis.sh
+- "./travis.sh"
+env:
+  global:
+    - secure: "dLoqONm8TDA1rNluFU+kAeu/xKpPevvA/N4/mL88pd8vNV2A8UnzOofjrSfruvsHFtmk28H3n81hLZddL0rH7njnd6Cp6hyGsKMGyO8W4zcrb1VWie5Dv5t+WuC/c0at8zu2ik/7z/FAC/Xr5BRmuujtphG/rz14O3wviikXRSXqhrmThqjFDjHK3EwbRtC9ZjswudfwtF41GASi6biZS7jrufu3b/YCgEMYad9/EldcbcMQnIDKZoCUum5u2qI3Mov6d0SFrhnhcsBRbijiVkh4zkdgKW/Gc25O66scw+OyXFpiJE13vKHy8Q2+ut+06V2eU5dpOcC//ijQeBBk1tUqT0trzgRcIrQfK7j9nCYCHssg2egtMJuiIXPwMNR9OmAGQTV5se+h2OSfRs5VyCgrAGi5LuDUCBjnz+I8r/AFlQGbZrBt0f8DQzDmjmHvGorKavIU+xvxkS0z4CnXyZd92KE8HCFkFB7dCytPZW7JIhBkEQIy6gBCXL4xMzhNPWc7bFbFNohHuEP1+StIvJIJDtlCUyoLG7X3GAaKDHtwx9EMiGghbdVIM9jbczFg6e/M9EOhtgb4olsr+NDTt5FpJPSP8zHWh5UI60MAuUWiwJ4Hp94AnmC+NzZ0MOcFhkcwvAwYdlSol24J4sYl3ntQL+scQRs5IoBAFHTg3UQ="
