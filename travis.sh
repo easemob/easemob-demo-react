@@ -41,8 +41,11 @@ upload(){
     echo -e "\nZIP files...\n"
 	zip -r $TRAVIS_TAG.zip chatdemo-webim
     
-    echo -e "\nUPLOAD ZIP...\n"
-	curl -v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v=$TRAVIS_TAG -F p=zip -F file=@$TRAVIS_TAG.zip -u ${nexus_auth} https://hk.nexus.op.easemob.com/nexus/service/local/artifact/maven/content
+    UPLOAD_PARAMS="-v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v="$TRAVIS_TAG" -F p=zip -F file=@"$TRAVIS_TAG".zip -u "${nexus_auth}
+    UPLOAD_URL="https://hk.nexus.op.easemob.com/nexus/service/local/artifact/maven/content"
+    echo -e "\nUPLOAD ZIP..."
+    echo -e $UPLOAD_PARAMS"\n"$UPLOAD_URL"\n"
+	curl $UPLOAD_PARAMS $UPLOAD_URL
 }
 
 
