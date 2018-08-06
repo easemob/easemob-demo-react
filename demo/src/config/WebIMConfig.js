@@ -14,10 +14,10 @@
 function getApiUrl(){
     var url = ""
     if(window.location.href.indexOf("webim-h5.easemob.com") !== -1){
-        url = "a1.easemob.com"
+        url = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
     }
     else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
-        url = "a1-hsb.easemob.com"
+        url = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
     }
     return url
 }
