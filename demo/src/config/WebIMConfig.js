@@ -11,6 +11,17 @@
 //     protocol: "https"
 // }
 
+function getApiUrl(){
+    var url = ""
+    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1){
+        url = "a1.easemob.com"
+    }
+    else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
+        url = "a1-hsb.easemob.com"
+    }
+    return url
+}
+
 var config = {
     /*
      * XMPP server
@@ -23,7 +34,7 @@ var config = {
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     // ios must be https!!! by lwz
     // apiURL: "https://a1.easemob.com",
-    apiURL: (window.location.protocol === "https:" ? "https://a1.easemob.com" : "http://a1-hsb.easemob.com"),
+    apiURL: getApiUrl(),
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//172.17.3.155:8080',
     /*
      * Application AppKey
