@@ -7,9 +7,9 @@
  */
 
 // for react native
-var location = {
-    protocol: "https"
-}
+// var location = {
+//     protocol: "https"
+// }
 
 var config = {
     /*
@@ -22,7 +22,8 @@ var config = {
      */
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     // ios must be https!!! by lwz
-    apiURL: "https://a1.easemob.com",
+    // apiURL: "https://a1.easemob.com",
+    apiURL: (window.location.protocol === "https:" ? "https://a1.easemob.com" : "http://a1-hsb.easemob.com"),
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//172.17.3.155:8080',
     /*
      * Application AppKey
