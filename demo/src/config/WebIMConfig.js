@@ -20,7 +20,7 @@ function getUrl(){
     }
     else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
         apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-        xmppUrl = "10.81.8.250:5280"
+        xmppUrl = "im-api-hsb.easemob.com"
     }
     return {
         apiUrl: apiUrl,
