@@ -14,14 +14,13 @@
 function getUrl(){
     var apiUrl = ""
     var xmppUrl = ""
-    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1){
+    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1){
         apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
         xmppUrl = "im-api.easemob.com"
     }
     else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
         apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-        // xmppUrl = "im-api-hsb.easemob.com"
-        xmppUrl = "im-api.easemob.com"
+        xmppUrl = "im-api-hsb.easemob.com"
     }
     return {
         apiUrl: apiUrl,
