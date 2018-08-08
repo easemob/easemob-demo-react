@@ -28,7 +28,7 @@ packing(){
     echo -e "\nLINK [EMEDIA] DONE.\n"
 
     cd ./demo
-    npm run build
+    TRAVIS=true TAG_NAME=$TRAVIS_TAG npm run build
     cd ../
     echo -e "\nBUILD DONE.\n"
 }
