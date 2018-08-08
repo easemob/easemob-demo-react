@@ -13,7 +13,7 @@ const paths = require("./paths")
 
 const tmpVersion = "local_" + (Math.floor(Math.random() * 1e6)).toString()
 const VERSION = process.env.TAG_NAME || tmpVersion		// webpack 不让传自定义参数
-
+console.log(process.env)
 function resolve(dir) {
     return path.join(__dirname, "..", dir)
 }
