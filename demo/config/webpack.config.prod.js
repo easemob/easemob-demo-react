@@ -11,6 +11,8 @@ const eslintFormatter = require("react-dev-utils/eslintFormatter")
 const ModuleScopePlugin = require("react-dev-utils/ModuleScopePlugin")
 const paths = require("./paths")
 const getClientEnvironment = require("./env")
+const tmpVersion = "local_" + (Math.floor(Math.random() * 1e6)).toString()
+const VERSION = process.env.TAG_NAME || tmpVersion		// webpack 不让传自定义参数
 
 function resolve(dir) {
 	return path.join(__dirname, "..", dir)
@@ -292,6 +294,7 @@ module.exports = {
 			template: paths.appHtml,
 			chunks: ['WebIMConfig', 'index'],
 			chunksSortMode: 'manual',
+			version: VERSION,
 			minify: {
 				removeComments: true,
 				collapseWhitespace: true,

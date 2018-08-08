@@ -13,7 +13,6 @@ const paths = require("./paths")
 
 const tmpVersion = "local_" + (Math.floor(Math.random() * 1e6)).toString()
 const VERSION = process.env.TAG_NAME || tmpVersion		// webpack 不让传自定义参数
-console.log(process.env)
 function resolve(dir) {
     return path.join(__dirname, "..", dir)
 }
@@ -27,7 +26,6 @@ const publicPath = "/"
 const publicUrl = ""
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl)
-
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
