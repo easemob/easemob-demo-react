@@ -33,7 +33,7 @@ Webrtc.prototype.createMedia = function(constaints, callback){
 }
 
 var createMedia;
-//Webrtc.prototype.createMedia =
+Webrtc.prototype.createMedia =
     createMedia = function(constaints, callback){
     var self = this;
 
