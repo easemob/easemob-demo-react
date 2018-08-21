@@ -30,7 +30,7 @@ const { Types, Creators } = createActions({
 
             var pwd = Math.random().toString(36).substr(2);
             pwd = "";
-            emedia.handler.createConference(emedia.handler.ConfrType.COMMUNICATION_MIX, pwd).then(function (confr) {
+            emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd).then(function (confr) {
                 dispatch(Creators.updateConfrInfo(confr));
             });
         }
@@ -38,7 +38,7 @@ const { Types, Creators } = createActions({
 
     setRtcOptionsAsync: (confrId, password) => {
         return (dispatch, getState) => {
-            emedia.handler.getConferenceTkt(confrId, password).then(function (confr) {
+            emedia.mgr.getConferenceTkt(confrId, password).then(function (confr) {
                 dispatch(Creators.updateConfrInfo(confr));
             });
         }
