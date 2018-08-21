@@ -114,7 +114,7 @@ class MultiAVModal extends React.Component {
     }
 
     initEmedia() {
-        if (WebIM.EMServise) {
+        if (WebIM.EMService) {
             return
         }
         let me = this
