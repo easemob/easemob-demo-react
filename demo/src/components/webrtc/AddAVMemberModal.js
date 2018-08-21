@@ -64,7 +64,7 @@ class AddAVMemberModal extends React.Component {
 
                         aoff: 0
                     });
-                    const tkt = this.props.confr.rtcOptions.ticket
+                    const tkt = this.props.confr.ticket
                     WebIM.EMService.setup(tkt)
                     WebIM.EMService.openUserMedia(pub).then(function () {
                         WebIM.EMService.withpublish(pub).join();
@@ -89,7 +89,7 @@ class AddAVMemberModal extends React.Component {
                         jids.push(appkey + '_' + elem + '@' + host)
                     }
                 }
-                const { confrId, password } = me.props.confr.rtcOptions
+                const { confrId, password } = me.props.confr
                 for (let jid of jids) {
                     WebIM.call.inviteConference(confrId, password, jid, gid)
                 }

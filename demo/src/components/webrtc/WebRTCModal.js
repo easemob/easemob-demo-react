@@ -4,6 +4,7 @@ import WebIM from "@/config/WebIM"
 import RTCChannel from "@/components/webrtc/rtcChannel"
 import { message, Modal } from "antd"
 import MultiAVActions from "@/redux/MultiAVRedux"
+import Creators from "../../redux/MultiAVRedux";
 
 const confirm = Modal.confirm
 
@@ -144,8 +145,9 @@ class WebRTCModal extends React.Component {
                     host = "@" + host[1] + "." + host[2]
                     from = from.replace(appkey + '_', "")
                     from = from.replace(host, "")
-                    let callback = (host, rtcOption) => {
-                        me.props.setRtcOptions(rtcOption)                       
+                    let callback = (confr) => {
+                        debugger
+                        me.props.setRtcOptions(confr)
                         confirm({
                             title: from + "邀请您进入多人会议",
                             okText: "确认",
@@ -166,7 +168,7 @@ class WebRTCModal extends React.Component {
 
                                         aoff: 0
                                     })
-                                    const tkt = rtcOption.ticket
+                                    const tkt = confr.ticket
                                     WebIM.EMService.setup(tkt)
                                     WebIM.EMService.openUserMedia(pub).then(function () {
                                         WebIM.EMService.withpublish(pub).join();
@@ -180,7 +182,9 @@ class WebRTCModal extends React.Component {
                             }
                         })
                     }
-                    WebIM.call.getConferenceTkt(confrId, password, callback)
+                    emedia.handler.getConferenceTkt(confrId, password).then(function (confr) {
+                        callback(confr);
+                    });
                 }
             }
         })
