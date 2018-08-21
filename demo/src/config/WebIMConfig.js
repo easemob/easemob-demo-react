@@ -47,7 +47,8 @@ var config = {
     /*
      * Application AppKey
      */
-    appkey: "easemob-demo#chatdemoui",
+    //appkey: "easemob-demo#chatdemoui",
+    appkey: "easemob-demo#1212",
     /*
      * Whether to use HTTPS
      * @parameter {Boolean} true or false
@@ -74,7 +75,7 @@ var config = {
      * Whether to console.log in strophe.log()
      * @parameter {Boolean} true or false
      */
-    isDebug: false,
+    isDebug: true,
     /**
      * Whether to show logs in strophe
      * @parameter {Boolean} true or false
