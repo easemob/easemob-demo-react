@@ -5511,7 +5511,7 @@ emedia.config({
 });
 emedia.config({
     clientType: 'WEB',
-    version: '3.0.0',
+    version: '2.0.1',
 
     userAgent: navigator.userAgent,
 
@@ -32669,3 +32669,5 @@ emedia.chooseElectronDesktopMedia = function (sources, accessApproved, accessDen
 /***/ })
 /******/ ]);
 });
+//2.0.1_Git.354b4e0
+console && console.warn('EMedia version', '2.0.1_Git.354b4e0');
