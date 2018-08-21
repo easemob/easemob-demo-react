@@ -146,7 +146,6 @@ class WebRTCModal extends React.Component {
                     from = from.replace(appkey + '_', "")
                     from = from.replace(host, "")
                     let callback = (confr) => {
-                        debugger
                         me.props.setRtcOptions(confr)
                         confirm({
                             title: from + "邀请您进入多人会议",
@@ -182,7 +181,7 @@ class WebRTCModal extends React.Component {
                             }
                         })
                     }
-                    emedia.handler.getConferenceTkt(confrId, password).then(function (confr) {
+                    emedia.mgr.getConferenceTkt(confrId, password).then(function (confr) {
                         callback(confr);
                     });
                 }
