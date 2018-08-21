@@ -294,7 +294,7 @@ var _clazz = {
 
         isCreate && (rtcOptions.data.isCreate = isCreate);
         confrId && (rtcOptions.data.confrId = confrId);
-        password && (rtcOptions.data.password = password);
+        typeof password === "string" && (rtcOptions.data.password = password);
 
         self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
@@ -311,7 +311,7 @@ var _clazz = {
         };
 
         confrId && (rtcOptions.data.confrId = confrId); // 格式需要跟雅洁确定
-        password && (rtcOptions.data.password = password);
+        typeof password === "string" && (rtcOptions.data.password = password);
         gid && (rtcOptions.data.gid = gid);
         self.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },

@@ -15,9 +15,9 @@ const { Types, Creators } = createActions({
     closeConfrModal: null,
     showModal: null,
     closeModal: null,
-    updateConfrInfo: ["pwd", "from", "rtcOptions"],
+    updateConfrInfo: ["confr"],
     setGid: ["gid"],
-    setRtcOptions: ["rtcOptions"],
+    setRtcOptions: ["confr"],
     setSelectedMembers: ["selected"],
     setJoinedMembers: ["joined"],
     updateJoinedMembers: ["removed"],
@@ -27,20 +27,20 @@ const { Types, Creators } = createActions({
     updateConfrInfoAsync: (gid) => {
         return (dispatch, getState) => {
             dispatch(Creators.setGid(gid))
+
             var pwd = Math.random().toString(36).substr(2);
             pwd = "";
-            WebIM.call.createConference(pwd, function (from, rtcOptions) {
-                dispatch(Creators.updateConfrInfo(pwd, from, rtcOptions))
-            })
+            emedia.handler.createConference(emedia.handler.ConfrType.COMMUNICATION_MIX, pwd).then(function (confr) {
+                dispatch(Creators.updateConfrInfo(confr));
+            });
         }
     },
 
     setRtcOptionsAsync: (confrId, password) => {
         return (dispatch, getState) => {
-            let callback = (from, rtcOptions) => {
-                dispatch(Creators.setRtcOptions(rtcOptions))
-            };
-            WebIM.call.getConferenceTkt(confrId, password, callback)
+            emedia.handler.getConferenceTkt(confrId, password).then(function (confr) {
+                dispatch(Creators.updateConfrInfo(confr));
+            });
         }
     }
 })
@@ -51,9 +51,11 @@ export const INITIAL_STATE = Immutable({
     confrModal: false,
     gid: "",
     confr: {
+        ticket: "",
+        roleToken: "",
+        confrId: "",
         password: "",
-        from: "",
-        rtcOptions: {}
+        type: ""
     },
     localStream: {},
     selectedMembers: [],
@@ -80,11 +82,7 @@ export const updateJoinedMembers = (state, {removed}) => {
     return state.setIn(["joinedMembers"],joinCurrent);
 }
 
-export const updateConfrInfo = (state, { pwd, from, rtcOptions }) => {
-    let confr = state.getIn(["confr"])
-    confr = confr.setIn(["password"], pwd)
-    confr = confr.setIn(["from"], from)
-    confr = confr.setIn(["rtcOptions"], rtcOptions)
+export const updateConfrInfo = (state, { confr }) => {
     return state.setIn(["confr"], confr)
 }
 
@@ -110,8 +108,8 @@ export const setGid = (state, { gid }) => {
     return state.setIn(["gid"], gid)
 }
 
-export const setRtcOptions = (state, { rtcOptions }) => {
-    return state.setIn(["confr", "rtcOptions"], rtcOptions)
+export const setRtcOptions = (state, { confr }) => {
+    return state.setIn(["confr"], confr)
 }
 
 export const resetAll = (state) => {
