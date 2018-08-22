@@ -254,8 +254,8 @@ class MultiAVModal extends React.Component {
                             rvCount: me.state.rvCount
                         })
                     });
-                    emedia.mgr.streamBindVideo(stream, video);
-                    emedia.mgr.subscribe(member, stream, true, true);
+                    //emedia.mgr.streamBindVideo(stream, video);
+                    emedia.mgr.subscribe(member, stream, true, true, video);
                 }
             }
         };
@@ -266,7 +266,7 @@ class MultiAVModal extends React.Component {
 
     closeModal() {
         clearInterval(this.state.interval)
-        WebIM.EMService.exit()
+        WebIM.EMService.exitConference();
         this.props.closeModal()
         this.props.resetConfr()
     }
@@ -276,19 +276,13 @@ class MultiAVModal extends React.Component {
     }
 
     localMic() {
+        let localVideo = this.refs.local
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
-        WebIM.EMService.aoff(stream, openAudio, function error (evt) {
-            displayEvent(evt.message());
-            voff.innerHTML = "无像";
-        });
-        this.setState({
-            localVideo: {
-                openAudio: !openAudio,
-                openVideo: openVideo,
-                stream: stream,
-                localStreamId: localStreamId
-            }
-       })
+        if(openAudio){
+            emedia.mgr.triggerPauseAudio(localVideo);
+        }else{
+            emedia.mgr.triggerResumeAudio(localVideo);
+        }
     }
 
     remoteSound(id) {
@@ -297,52 +291,28 @@ class MultiAVModal extends React.Component {
     }
 
     localVideo() {
-        console.log("LocalVideo")
+        let localVideo = this.refs.local
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
-        WebIM.EMService.voff(stream, openVideo, function error (evt) {
-            displayEvent(evt.message());
-            voff.innerHTML = "无像";
-        });
-        this.setState({
-            localVideo: {
-                openAudio: openAudio,
-                openVideo: !openVideo,
-                stream: stream,
-                localStreamId: localStreamId
-            }
-       })
+        if(openVideo){
+            emedia.mgr.triggerPauseVideo(localVideo);
+        }else{
+            emedia.mgr.triggerResumeVideo(localVideo);
+        }
     } 
 
     remoteVideo(id) {
-                
-        // elem.openVideo = !elem.openVideo;
-        // rv[id] = elem
-        // this.setState({
-        //     rv: rv
-        // })
         let rv = _.cloneDeep(this.state.rv)
         let elem = rv[id]
         if (elem.streamId === "") {
             return
         }
-        // if (elem.openVideo) {
-        //     rv[id].openVideo = false
-        //     WebIM.EMService.hungup(elem.streamId, function (_evt) {
 
-        //     });
-        // } else {
-        //     WebIM.EMService.subscribe(elem.streamId, function (_evt) {
-        //         elem.openVideo = true
-        //         rv[id] = elem
-        //     })
-        // }
-        WebIM.EMService.subscribe(elem.streamId, {subSVideo: !elem.openVideo, subSAudio:true});
-
-        elem.openVideo = !elem.openVideo;
-        rv[id] = elem;
-        this.setState({
-            rv: rv
-        })
+        let video = this.refs["rv_" + id];
+        if(elem.openVideo){
+            emedia.mgr.triggerPauseVideo(video);
+        }else{
+            emedia.mgr.triggerResumeVideo(video);
+        }
     }
 
     render() {
