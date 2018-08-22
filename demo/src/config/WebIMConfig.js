@@ -47,8 +47,7 @@ var config = {
     /*
      * Application AppKey
      */
-    //appkey: "easemob-demo#chatdemoui",
-    appkey: "easemob-demo#1212",
+    appkey: "easemob-demo#chatdemoui",
     /*
      * Whether to use HTTPS
      * @parameter {Boolean} true or false
