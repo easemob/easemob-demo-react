@@ -160,19 +160,13 @@ class WebRTCModal extends React.Component {
                                 me.props.setGid(gid);
 
                                 setTimeout(() => {
-                                    const pub = new WebIM.EMService.AudioMixerPubstream({
-                                        constaints: {
-                                            video : true,
-                                        },
-
-                                        aoff: 0
-                                    })
-                                    const tkt = confr.ticket
-                                    WebIM.EMService.setup(tkt)
-                                    WebIM.EMService.openUserMedia(pub).then(function () {
-                                        WebIM.EMService.withpublish(pub).join();
-                                    }, function fail(evt) {
-                                        console.error("打开Media失败", evt.message());
+                                    const tkt = confr.ticket;
+                                    WebIM.EMService.joinConferenceWithTicket(confr.confrId, tkt, "user ext field").then(function () {
+                                        WebIM.EMService.publish({audio: true, video: true}, "user ext field").catch(function (e) {
+                                            console.error(e);
+                                        });
+                                    }).catch(function (e) {
+                                        console.error(e);
                                     });
                                 }, 0)
                             },
