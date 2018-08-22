@@ -157,7 +157,7 @@ var Channel = React.createClass({
         var video = this.refs.remoteVideo
 
         var hasVideo = this.props.remoteStream.getVideoTracks()[0] && this.props.remoteStream.getVideoTracks()[0].enabled
-        var hasAudio = this.props.remoteStream.getAudioTracks()[0].enabled
+        var hasAudio = this.props.remoteStream.getAudioTracks()[0] && this.props.remoteStream.getAudioTracks()[0].enabled
 
         if (hasVideo) { //video + voice
             this.remote_width = video.videoWidth
@@ -198,7 +198,7 @@ var Channel = React.createClass({
 
         if (!this.state.localFullRemoteCorner) {
             var hasVideo = this.props.remoteStream.getVideoTracks()[0] && this.props.remoteStream.getVideoTracks()[0].enabled
-            var hasAudio = this.props.remoteStream.getAudioTracks()[0].enabled
+            var hasAudio = this.props.remoteStream.getAudioTracks()[0] && this.props.remoteStream.getAudioTracks()[0].enabled
 
             if (hasVideo) { //video + voice
                 this.remote_width = this.props.collapsed ? video.videoWidth / 2 : video.videoWidth

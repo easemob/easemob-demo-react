@@ -4,6 +4,7 @@ import WebIM from "@/config/WebIM"
 import RTCChannel from "@/components/webrtc/rtcChannel"
 import { message, Modal } from "antd"
 import MultiAVActions from "@/redux/MultiAVRedux"
+import Creators from "../../redux/MultiAVRedux";
 
 const confirm = Modal.confirm
 
@@ -144,8 +145,8 @@ class WebRTCModal extends React.Component {
                     host = "@" + host[1] + "." + host[2]
                     from = from.replace(appkey + '_', "")
                     from = from.replace(host, "")
-                    let callback = (host, rtcOption) => {
-                        me.props.setRtcOptions(rtcOption)                       
+                    let callback = (confr) => {
+                        me.props.setRtcOptions(confr)
                         confirm({
                             title: from + "邀请您进入多人会议",
                             okText: "确认",
@@ -159,19 +160,13 @@ class WebRTCModal extends React.Component {
                                 me.props.setGid(gid);
 
                                 setTimeout(() => {
-                                    const pub = new WebIM.EMService.AudioMixerPubstream({
-                                        constaints: {
-                                            video : true,
-                                        },
-
-                                        aoff: 0
-                                    })
-                                    const tkt = rtcOption.ticket
-                                    WebIM.EMService.setup(tkt)
-                                    WebIM.EMService.openUserMedia(pub).then(function () {
-                                        WebIM.EMService.withpublish(pub).join();
-                                    }, function fail(evt) {
-                                        console.error("打开Media失败", evt.message());
+                                    const tkt = confr.ticket;
+                                    WebIM.EMService.joinConferenceWithTicket(confr.confrId, tkt, "user ext field").then(function () {
+                                        WebIM.EMService.publish({audio: true, video: true}, "user ext field").catch(function (e) {
+                                            console.error(e);
+                                        });
+                                    }).catch(function (e) {
+                                        console.error(e);
                                     });
                                 }, 0)
                             },
@@ -180,7 +175,9 @@ class WebRTCModal extends React.Component {
                             }
                         })
                     }
-                    WebIM.call.getConferenceTkt(confrId, password, callback)
+                    emedia.mgr.getConferenceTkt(confrId, password).then(function (confr) {
+                        callback(confr);
+                    });
                 }
             }
         })

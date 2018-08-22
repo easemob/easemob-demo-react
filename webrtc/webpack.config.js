@@ -4,7 +4,7 @@ path = require('path');
 module.exports = {
     mode: 'none',
     entry: {
-        './dist/EMedia_x1V1': ['./src/entry']
+        './dist/EMedia_x1v1': ['./src/entry']
     },
     output: {
         path: __dirname,

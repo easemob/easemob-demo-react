@@ -74,7 +74,7 @@ var config = {
      * Whether to console.log in strophe.log()
      * @parameter {Boolean} true or false
      */
-    isDebug: false,
+    isDebug: true,
     /**
      * Whether to show logs in strophe
      * @parameter {Boolean} true or false

@@ -57,21 +57,15 @@ class AddAVMemberModal extends React.Component {
 
                 /* ------ 3 ------ */
                 setTimeout(() => {
-                    const pub = new WebIM.EMService.AudioMixerPubstream({
-                        constaints: {
-                            video : true,
-                        },
-
-                        aoff: 0
+                    const tkt = this.props.confr.ticket
+                    WebIM.EMService.joined(this.props.confr.confrId) || WebIM.EMService.joinConferenceWithTicket(this.props.confr.confrId, tkt, "user ext field").then(function () {
+                        WebIM.EMService.publish({audio: true, video: true}, "user ext field").catch(function (e) {
+                            console.error(e);
+                        });
+                    }).catch(function (e) {
+                        console.error(e);
                     });
-                    const tkt = this.props.confr.rtcOptions.ticket
-                    WebIM.EMService.setup(tkt)
-                    WebIM.EMService.openUserMedia(pub).then(function () {
-                        WebIM.EMService.withpublish(pub).join();
-                    }, function fail(evt) {
-                        console.error("打开Media失败", evt.message());
-                    });
-                }, 0)
+                }, 0);
 
                 const { members } = values
 
@@ -89,7 +83,7 @@ class AddAVMemberModal extends React.Component {
                         jids.push(appkey + '_' + elem + '@' + host)
                     }
                 }
-                const { confrId, password } = me.props.confr.rtcOptions
+                const { confrId, password } = me.props.confr
                 for (let jid of jids) {
                     WebIM.call.inviteConference(confrId, password, jid, gid)
                 }
