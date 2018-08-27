@@ -44,6 +44,15 @@ class MultiAVModal extends React.Component {
         this.loadTime = this.loadTime.bind(this)
     }
 
+    componentWillUnmount(){
+        WebIM.EMService.onConferenceExit = undefined;
+        WebIM.EMService.onMemberJoined = undefined;
+        WebIM.EMService.onMemberExited = undefined;
+        WebIM.EMService.onRoleChanged = undefined;
+        WebIM.EMService.onStreamAdded = undefined;
+        WebIM.EMService.onStreamRemoved = undefined;
+    }
+
     componentDidMount() {
         let me = this
         if (WebIM.config.isWebRTC && WebIM.WebRTC) {
@@ -114,9 +123,6 @@ class MultiAVModal extends React.Component {
     }
 
     initEmedia() {
-        if (WebIM.EMService) {
-            return
-        }
         let me = this;
 
         WebIM.EMService = emedia.mgr;
@@ -206,7 +212,10 @@ class MultiAVModal extends React.Component {
                     }
                     me.setState({
                         localVideo: lv
-                    })
+                    });
+
+                    console.warn(stream.id, "voff:", this.getAttribute("voff"));
+                    console.warn(stream.id, "aoff:", this.getAttribute("aoff"));
                 });
                 emedia.mgr.streamBindVideo(stream, localVideo);
 
@@ -252,7 +261,10 @@ class MultiAVModal extends React.Component {
                         me.setState({
                             rv: rv,
                             rvCount: me.state.rvCount
-                        })
+                        });
+
+                        console.warn(streamId, "voff:", this.getAttribute("voff"));
+                        console.warn(streamId, "aoff:", this.getAttribute("aoff"));
                     });
                     //emedia.mgr.streamBindVideo(stream, video);
                     emedia.mgr.subscribe(member, stream, true, true, video);
