@@ -7,7 +7,7 @@ import MultiAVActions from "@/redux/MultiAVRedux"
 import Immutable from "seamless-immutable"
 import { store } from "@/redux"
 
-let _ = require('lodash');
+let _ = require("lodash")
 
 class MultiAVModal extends React.Component {
     constructor(props) {
@@ -22,7 +22,7 @@ class MultiAVModal extends React.Component {
                 localStreamId: "",
                 openVideo: false,
                 openAudio: false,
-            }, 
+            },
             // rv: Array.apply(null, Array(5)).map(() => {
             //     return {
             //         nickName: "",
@@ -38,19 +38,19 @@ class MultiAVModal extends React.Component {
                 video: <div className="default"></div>
             }),
             rvCount: 0,
-            toolsColor: ["", "", "",""]
+            toolsColor: [ "", "", "","" ]
         }
         this.closeModal = this.closeModal.bind(this)
         this.loadTime = this.loadTime.bind(this)
     }
 
     componentWillUnmount(){
-        WebIM.EMService.onConferenceExit = undefined;
-        WebIM.EMService.onMemberJoined = undefined;
-        WebIM.EMService.onMemberExited = undefined;
-        WebIM.EMService.onRoleChanged = undefined;
-        WebIM.EMService.onStreamAdded = undefined;
-        WebIM.EMService.onStreamRemoved = undefined;
+        WebIM.EMService.onConferenceExit = undefined
+        WebIM.EMService.onMemberJoined = undefined
+        WebIM.EMService.onMemberExited = undefined
+        WebIM.EMService.onRoleChanged = undefined
+        WebIM.EMService.onStreamAdded = undefined
+        WebIM.EMService.onStreamRemoved = undefined
     }
 
     componentDidMount() {
@@ -88,26 +88,26 @@ class MultiAVModal extends React.Component {
         const n2s = (n) => {
             let s = ""
             if (n >= 0 && n < 10) {
-                s = '0' + n
+                s = "0" + n
             } else {
-                s = n + ''
+                s = n + ""
             }
             return s
         }
         let str = ""
         let hs = n2s(hour), ms = n2s(minute), ss = n2s(second)
-        str = hs + ':' + ms + ':' + ss
+        str = hs + ":" + ms + ":" + ss
         return str
     }
 
     removeVideo(nickName) {
         let rv = this.state.rv, temp = [], rvCount = this.state.rvCount
-        for (let [index, elem] of rv.entries()) {
+        for (let [ index, elem ] of rv.entries()) {
             if (elem.nickName === nickName) {
                 for (let i = index; i < 4; i++) {
                     rv[i] = rv[i + 1]
                 }
-                break;
+                break
             }
         }
         rv[4] = {
@@ -123,72 +123,72 @@ class MultiAVModal extends React.Component {
     }
 
     initEmedia() {
-        let me = this;
+        let me = this
 
-        WebIM.EMService = emedia.mgr;
+        WebIM.EMService = emedia.mgr
         WebIM.EMService.onConferenceExit = function(reason, failed){
-            reason = reason || 0;
+            reason = reason || 0
             switch (reason) {
-                case 0:
-                    reason = "正常挂断";
-                    break;
-                case 1:
-                    reason = "没响应";
-                    break;
-                case 2:
-                    reason = "服务器拒绝";
-                    break;
-                case 3:
-                    reason = "对方忙";
-                    break;
-                case 4:
-                    reason = "失败,可能是网络或服务器拒绝";
-                    if (failed === -9527) {
-                        reason = "失败,网络原因";
-                    }
-                    if (failed === -500) {
-                        reason = "Ticket失效";
-                    }
-                    if (failed === -502) {
-                        reason = "Ticket过期";
-                    }
-                    if (failed === -504) {
-                        reason = "链接已失效";
-                    }
-                    if (failed === -508) {
-                        reason = "会议无效";
-                    }
-                    break;
-                case 5:
-                    reason = "不支持";
-                    break;
-                case 10:
-                    reason = "其他设备登录";
-                    break;
-                case 11:
-                    reason = "会议关闭";
-                    break;
+            case 0:
+                reason = "正常挂断"
+                break
+            case 1:
+                reason = "没响应"
+                break
+            case 2:
+                reason = "服务器拒绝"
+                break
+            case 3:
+                reason = "对方忙"
+                break
+            case 4:
+                reason = "失败,可能是网络或服务器拒绝"
+                if (failed === -9527) {
+                    reason = "失败,网络原因"
+                }
+                if (failed === -500) {
+                    reason = "Ticket失效"
+                }
+                if (failed === -502) {
+                    reason = "Ticket过期"
+                }
+                if (failed === -504) {
+                    reason = "链接已失效"
+                }
+                if (failed === -508) {
+                    reason = "会议无效"
+                }
+                break
+            case 5:
+                reason = "不支持"
+                break
+            case 10:
+                reason = "其他设备登录"
+                break
+            case 11:
+                reason = "会议关闭"
+                break
             }
-            console.log("Hangup reason " + (reason || 0));
-        };
+            console.log("Hangup reason " + (reason || 0))
+        }
 
         WebIM.EMService.onMemberJoined = function(member){
-            message.success(member.name + " 加入群聊.");
-            me.props.setJoinedMembers(member);
-        };
+            message.success(member.name + " 加入群聊.")
+            me.props.setJoinedMembers(member)
+        }
         WebIM.EMService.onMemberExited = function(member, reason){
-            me.removeVideo(member.name);
+            me.removeVideo(member.name)
 
             //用户主动挂断时，不提示退出群聊
             if( reason !== undefined){
                 message.warning(member.name + " 退出群聊.")
             }
-            me.props.updateJoinedMembers(member);
-        };
+            me.props.updateJoinedMembers(member)
+        }
 
         WebIM.EMService.onRoleChanged = function(role){ // emedia.mgr.Role
             //TODO 在直播模式下，如果变为主播，请上麦 publish stream
-        };
+        }
         WebIM.EMService.onStreamAdded = function(member, stream){
             const located = stream.located()
             if (located) {
@@ -212,12 +212,12 @@ class MultiAVModal extends React.Component {
                     }
                     me.setState({
                         localVideo: lv
-                    });
+                    })
 
-                    console.warn(stream.id, "voff:", this.getAttribute("voff"));
-                    console.warn(stream.id, "aoff:", this.getAttribute("aoff"));
-                });
-                emedia.mgr.streamBindVideo(stream, localVideo);
+                    console.warn(stream.id, "voff:", this.getAttribute("voff"))
+                    console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
+                })
+                emedia.mgr.streamBindVideo(stream, localVideo)
 
             } else {
                 let remoteVideos = me.state.remoteVideos
@@ -226,7 +226,7 @@ class MultiAVModal extends React.Component {
                 const nickName = member.name,
                     streamId = stream.id
                 const contains = (nickName, arr) => {
-                    for (let [index, elem] of arr.entries()) {
+                    for (let [ index, elem ] of arr.entries()) {
                         if (elem.nickName === nickName) {
                             return index
                         }
@@ -236,15 +236,15 @@ class MultiAVModal extends React.Component {
 
                 const ifContain = contains(nickName, rv)
                 if (ifContain === false) {
-                    var index = rvCount++;
-                    let video = me.refs["rv_" + index];
+                    var index = rvCount++
+                    let video = me.refs["rv_" + index]
                     const elem = {
                         nickName: nickName,
                         streamId: streamId,
                         openVideo: true,
                         video: rv[index].video
                     }
-                    rv[index] = elem;
+                    rv[index] = elem
                     me.setState({
                         rv: rv,
                         rvCount: rvCount
@@ -257,60 +257,60 @@ class MultiAVModal extends React.Component {
                             openVideo: constaints.video,
                             video: rv[index].video
                         }
-                        rv[index] = elem;
+                        rv[index] = elem
                         me.setState({
                             rv: rv,
                             rvCount: me.state.rvCount
-                        });
+                        })
 
-                        console.warn(streamId, "voff:", this.getAttribute("voff"));
-                        console.warn(streamId, "aoff:", this.getAttribute("aoff"));
-                    });
+                        console.warn(streamId, "voff:", this.getAttribute("voff"))
+                        console.warn(streamId, "aoff:", this.getAttribute("aoff"))
+                    })
                     //emedia.mgr.streamBindVideo(stream, video);
-                    emedia.mgr.subscribe(member, stream, true, true, video);
+                    emedia.mgr.subscribe(member, stream, true, true, video)
                 }
             }
-        };
+        }
         WebIM.EMService.onStreamRemoved = function(member, stream){
 
-        };
+        }
     }
 
     closeModal() {
         clearInterval(this.state.interval)
-        WebIM.EMService.exitConference();
+        WebIM.EMService.exitConference()
         this.props.closeModal()
         this.props.resetConfr()
     }
 
     addMember(){
-        this.props.showConfrModal();
+        this.props.showConfrModal()
     }
 
     localMic() {
         let localVideo = this.refs.local
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         if(openAudio){
-            emedia.mgr.triggerPauseAudio(localVideo);
+            emedia.mgr.triggerPauseAudio(localVideo)
         }else{
-            emedia.mgr.triggerResumeAudio(localVideo);
+            emedia.mgr.triggerResumeAudio(localVideo)
         }
     }
 
     remoteSound(id) {
-        console.log("remoteSound");
-        
+        console.log("remoteSound")
+
     }
 
     localVideo() {
         let localVideo = this.refs.local
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo;
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         if(openVideo){
-            emedia.mgr.triggerPauseVideo(localVideo);
+            emedia.mgr.triggerPauseVideo(localVideo)
         }else{
-            emedia.mgr.triggerResumeVideo(localVideo);
+            emedia.mgr.triggerResumeVideo(localVideo)
         }
-    } 
+    }
 
     remoteVideo(id) {
         let rv = _.cloneDeep(this.state.rv)
@@ -319,11 +319,11 @@ class MultiAVModal extends React.Component {
             return
         }
 
-        let video = this.refs["rv_" + id];
+        let video = this.refs["rv_" + id]
         if(elem.openVideo){
-            emedia.mgr.triggerPauseVideo(video);
+            emedia.mgr.triggerPauseVideo(video)
         }else{
-            emedia.mgr.triggerResumeVideo(video);
+            emedia.mgr.triggerResumeVideo(video)
         }
     }
 
@@ -336,9 +336,9 @@ class MultiAVModal extends React.Component {
             groupName = byId[gid] && byId[gid].groupname || "群组名称",
             remoteUsernames = this.state.remoteUsernames
 
-        let rv = this.state.rv;
+        let rv = this.state.rv
         for (let i = rvCount; i < 5; i++) {
-            let ref_ = "rv_" + i;
+            let ref_ = "rv_" + i
             rv[i] = {
                 nickName: "",
                 streamId: "",
@@ -374,7 +374,7 @@ class MultiAVModal extends React.Component {
                             <div className={rv[0].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[0].nickName}</span>
                                 <i className={rv[0].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                   onClick={this.remoteVideo.bind(this, 0)}
+                                    onClick={this.remoteVideo.bind(this, 0)}
                                 >
                                 </i>
                             </div>
@@ -384,7 +384,7 @@ class MultiAVModal extends React.Component {
                             <div className={rv[1].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[1].nickName}</span>
                                 <i className={rv[1].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                   onClick={this.remoteVideo.bind(this, 1)}
+                                    onClick={this.remoteVideo.bind(this, 1)}
                                 ></i>
                             </div>
                         </Col>
@@ -400,7 +400,7 @@ class MultiAVModal extends React.Component {
                             <div className={rv[2].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[2].nickName}</span>
                                 <i className={rv[2].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                   onClick={this.remoteVideo.bind(this, 2)}
+                                    onClick={this.remoteVideo.bind(this, 2)}
                                 ></i>
                             </div>
                         </Col>
@@ -409,7 +409,7 @@ class MultiAVModal extends React.Component {
                             <div className={rv[3].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[3].nickName}</span>
                                 <i className={rv[3].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                   onClick={this.remoteVideo.bind(this, 3)}
+                                    onClick={this.remoteVideo.bind(this, 3)}
                                 ></i>
                             </div>
                         </Col>
@@ -418,7 +418,7 @@ class MultiAVModal extends React.Component {
                             <div className={rv[4].streamId ? "user-name" : "user-name remote-ajust"}>
                                 <span>{rv[4].nickName}</span>
                                 <i className={rv[4].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
-                                   onClick={this.remoteVideo.bind(this, 4)}
+                                    onClick={this.remoteVideo.bind(this, 4)}
                                 ></i>
                             </div>
                         </Col>
@@ -433,108 +433,108 @@ class MultiAVModal extends React.Component {
                         <Col span={4} offset={2}>
                             <div className="tools">
                                 <i className={"icon iconfont webim1-add-member " + toolsColor[3]}
-                                   onMouseOver={(e) => {
-                                       if (toolsColor[3] === "") {
-                                           toolsColor[3] = "i-hover"
-                                           this.setState({
-                                               toolsColor: toolsColor
-                                           })
-                                       }
-                                   }
-                                   }
+                                    onMouseOver={(e) => {
+                                        if (toolsColor[3] === "") {
+                                            toolsColor[3] = "i-hover"
+                                            this.setState({
+                                                toolsColor: toolsColor
+                                            })
+                                        }
+                                    }
+                                    }
 
-                                   onClick={(e) => {
-                                       if (toolsColor[3] === "i-hover") {
-                                           toolsColor[3] = "i-act"
-                                       } else {
-                                           toolsColor[3] = ""
-                                       }
-                                       this.addMember();
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onClick={(e) => {
+                                        if (toolsColor[3] === "i-hover") {
+                                            toolsColor[3] = "i-act"
+                                        } else {
+                                            toolsColor[3] = ""
+                                        }
+                                        this.addMember()
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
 
-                                   onMouseLeave={(e) => {
-                                       if (toolsColor[3] === "i-hover") {
-                                           toolsColor[3] = ""
-                                       }
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onMouseLeave={(e) => {
+                                        if (toolsColor[3] === "i-hover") {
+                                            toolsColor[3] = ""
+                                        }
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={4} >
                             <div className="tools">
                                 <i className={"icon webim1 webim1-off-microphone " + toolsColor[0]}
-                                   onMouseOver={(e) => {
-                                       if (toolsColor[0] === "") {
-                                           toolsColor[0] = "i-hover"
-                                           this.setState({
-                                               toolsColor: toolsColor
-                                           })
-                                       }
-                                   }
-                                   }
+                                    onMouseOver={(e) => {
+                                        if (toolsColor[0] === "") {
+                                            toolsColor[0] = "i-hover"
+                                            this.setState({
+                                                toolsColor: toolsColor
+                                            })
+                                        }
+                                    }
+                                    }
 
-                                   onClick={(e) => {
-                                       if (toolsColor[0] === "i-hover") {
-                                           toolsColor[0] = "i-act"
-                                       } else {
-                                           toolsColor[0] = ""
-                                       }
-                                       this.localMic()
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onClick={(e) => {
+                                        if (toolsColor[0] === "i-hover") {
+                                            toolsColor[0] = "i-act"
+                                        } else {
+                                            toolsColor[0] = ""
+                                        }
+                                        this.localMic()
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
 
-                                   onMouseLeave={(e) => {
-                                       if (toolsColor[0] === "i-hover") {
-                                           toolsColor[0] = ""
-                                       }
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onMouseLeave={(e) => {
+                                        if (toolsColor[0] === "i-hover") {
+                                            toolsColor[0] = ""
+                                        }
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={4}>
                             <div className="tools">
                                 <i className={"icon webim1 webim1-Shut-down " + toolsColor[1]}
-                                   onMouseOver={(e) => {
-                                       if (toolsColor[1] === "") {
-                                           toolsColor[1] = "i-hover"
-                                           this.setState({
-                                               toolsColor: toolsColor
-                                           })
-                                       }
-                                   }
-                                   }
+                                    onMouseOver={(e) => {
+                                        if (toolsColor[1] === "") {
+                                            toolsColor[1] = "i-hover"
+                                            this.setState({
+                                                toolsColor: toolsColor
+                                            })
+                                        }
+                                    }
+                                    }
 
-                                   onClick={(e) => {
-                                       if (toolsColor[1] === "i-hover") {
-                                           toolsColor[1] = "i-act"
-                                       } else {
-                                           toolsColor[1] = ""
-                                       }
-                                       this.remoteSound()
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onClick={(e) => {
+                                        if (toolsColor[1] === "i-hover") {
+                                            toolsColor[1] = "i-act"
+                                        } else {
+                                            toolsColor[1] = ""
+                                        }
+                                        this.remoteSound()
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
 
-                                   onMouseLeave={(e) => {
-                                       if (toolsColor[1] === "i-hover") {
-                                           toolsColor[1] = ""
-                                       }
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onMouseLeave={(e) => {
+                                        if (toolsColor[1] === "i-hover") {
+                                            toolsColor[1] = ""
+                                        }
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
                                 >
                                 </i>
                             </div>
@@ -542,36 +542,36 @@ class MultiAVModal extends React.Component {
                         <Col span={4}>
                             <div className="tools">
                                 <i className={"icon webim1 webim1-off-camera " + toolsColor[2]}
-                                   onMouseOver={(e) => {
-                                       if (toolsColor[2] === "") {
-                                           toolsColor[2] = "i-hover"
-                                           this.setState({
-                                               toolsColor: toolsColor
-                                           })
-                                       }
-                                   }
-                                   }
+                                    onMouseOver={(e) => {
+                                        if (toolsColor[2] === "") {
+                                            toolsColor[2] = "i-hover"
+                                            this.setState({
+                                                toolsColor: toolsColor
+                                            })
+                                        }
+                                    }
+                                    }
 
-                                   onClick={(e) => {
-                                       if (toolsColor[2] === "i-hover") {
-                                           toolsColor[2] = "i-act"
-                                       } else {
-                                           toolsColor[2] = ""
-                                       }
-                                       this.localVideo()
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onClick={(e) => {
+                                        if (toolsColor[2] === "i-hover") {
+                                            toolsColor[2] = "i-act"
+                                        } else {
+                                            toolsColor[2] = ""
+                                        }
+                                        this.localVideo()
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
 
-                                   onMouseLeave={(e) => {
-                                       if (toolsColor[2] === "i-hover") {
-                                           toolsColor[2] = ""
-                                       }
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
+                                    onMouseLeave={(e) => {
+                                        if (toolsColor[2] === "i-hover") {
+                                            toolsColor[2] = ""
+                                        }
+                                        this.setState({
+                                            toolsColor: toolsColor
+                                        })
+                                    }}
                                 ></i>
                             </div>
                         </Col>
