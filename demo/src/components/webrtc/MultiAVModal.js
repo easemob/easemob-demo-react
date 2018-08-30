@@ -104,22 +104,23 @@ class MultiAVModal extends React.Component {
         let rv = this.state.rv, temp = [], rvCount = this.state.rvCount
         for (let [ index, elem ] of rv.entries()) {
             if (elem.nickName === nickName) {
-                for (let i = index; i < 4; i++) {
-                    rv[i] = rv[i + 1]
-                }
+                // for (let i = index; i < 4; i++) {
+                //     rv[i] = rv[i + 1]
+                // }
+                let ref_ = "rv_" + index
+                rv[index] = {
+		            nickName: "",
+		            streamId: "",
+		            video: <video autoPlay playsInline className="default" ref={ref_}/>
+		        }
                 break
             }
-        }
-        rv[4] = {
-            nickName: "",
-            streamId: "",
-            video: <video autoPlay />
         }
         this.setState({
             rvCount: --rvCount,
             rv: rv
         })
-        console.log("RemoveRV: ", rv)
+        console.log("RemoveRV2: ", rv)
     }
 
     initEmedia() {
@@ -236,7 +237,17 @@ class MultiAVModal extends React.Component {
 
                 const ifContain = contains(nickName, rv)
                 if (ifContain === false) {
-                    var index = rvCount++
+                    var index
+                    // 从0～5看哪个位置空着，就往哪里添加
+                    for (let i = 0; i < 5; i++) {
+			            if(rv[i].nickName == ""){
+                            index = i
+                            if(index || index == 0){
+                                break
+                            }
+                        }
+			        }
+                    rvCount++
                     let video = me.refs["rv_" + index]
                     const elem = {
                         nickName: nickName,
@@ -337,14 +348,23 @@ class MultiAVModal extends React.Component {
             remoteUsernames = this.state.remoteUsernames
 
         let rv = this.state.rv
-        for (let i = rvCount; i < 5; i++) {
+        for (let i = 0; i < 5; i++) {
             let ref_ = "rv_" + i
             rv[i] = {
-                nickName: "",
-                streamId: "",
-                video: <video autoPlay playsInline className="default" ref={ref_}/>
+                nickName: rv[i].nickName || "",
+                streamId: rv[i].streamId || "",
+                openVideo:	rv[i].openVideo || false,
+                video: <video autoPlay playsInline className="default" ref={ref_}/>,
             }
         }
+        // for (let i = rvCount; i < 5; i++) {
+        //     let ref_ = "rv_" + i
+        //     rv[i] = {
+        //         nickName: "",
+        //         streamId: "",
+        //         video: <video autoPlay playsInline className="default" ref={ref_}/>,
+        //     }
+        // }
 
         return (
             <Draggable
