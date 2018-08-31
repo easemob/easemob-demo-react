@@ -239,7 +239,7 @@ WebIM.conn.listen({
                 var options = {
                     confrId: message.ext.conferenceId,
                     password: message.ext.password,
-                    gid: message.ext.inviter,
+                    gid: message.ext.msg_extension && message.ext.msg_extension.group_id,
                     inviter: message.ext.inviter
                 }
                 WebIM.call.listener.onInvite(from, options);
