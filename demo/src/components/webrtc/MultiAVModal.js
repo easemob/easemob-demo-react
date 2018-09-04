@@ -344,7 +344,7 @@ class MultiAVModal extends React.Component {
             byId = this.props.byId,
             toolsColor = this.state.toolsColor,
             rvCount = this.state.rvCount,
-            groupName = byId[gid] && byId[gid].groupname || "群组名称",
+            groupName = byId[gid] && byId[gid].groupName || "群组名称",
             remoteUsernames = this.state.remoteUsernames
 
         let rv = this.state.rv
@@ -614,7 +614,7 @@ export default connect(
         multiAV,
         byId: entities.group.byId,
         gid: multiAV.gid,
-        confr: multiAV.confr
+        confr: multiAV.confr,
     }),
     dispatch => ({
         closeModal: () => dispatch(MultiAVActions.closeModal()),

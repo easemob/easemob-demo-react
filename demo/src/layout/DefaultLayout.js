@@ -19,6 +19,7 @@ import GroupMemberActions from "@/redux/GroupMemberRedux"
 import MessageActions from "@/redux/MessageRedux"
 import { config } from "@/config"
 import WebRTCModal from "@/components/webrtc/WebRTCModal"
+import getCurrentContacts from "@/selectors/ContactSelector"
 
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
@@ -27,7 +28,7 @@ const { Header, Content, Footer, Sider, RightSider } = Layout
 let chat_message_status = {}
 
 class DefaultLayout extends Component {
-    constructor({ breakpoint, match }) {
+    constructor({ breakpoint, match , entities }) {
         super()
         const { selectTab, selectItem = "" } = match.params
 
@@ -38,6 +39,7 @@ class DefaultLayout extends Component {
             collapsed: breakpoint[SIDER_COL_BREAK],
             selectTab: selectTab,
             selectItem: selectItem,
+            entities: entities,
             headerTabs: [
                 {
                     key: "contact",
@@ -84,10 +86,14 @@ class DefaultLayout extends Component {
     }
 
     // switch chat type
-    changeTab(e) {
-        const { history, location } = this.props
+    changeTab(e,opt) {
+        var info = {}
+        opt = opt || {}
+
+
+        const { history, location , entities } = this.props
         const { selectItem, selectTab } = this.state
-        const redirectPath = "/" + [e.key].join("/")
+        const redirectPath = "/" + [ e.key ].join("/")
         if (selectTab == e.key) return
 
         // quite previous chatroom
@@ -95,14 +101,69 @@ class DefaultLayout extends Component {
 
         this.props.switchRightSider({ rightSiderOffset: 0 })
         history.push(redirectPath + location.search)
+
+        // 多人视频
+        // if(opt.multiAV){
+        //     var gid = this.props.multiAV.gid
+        //     var byId = entities.group.byId
+        //     var groupId = byId[gid] && byId[gid].groupId
+        //     info.key = groupId
+        //     info.tab = "group"
+        //     this.changeItem(info,{ defaultItem:true })
+        // }
+        // 选择tab时，默认打开第一个item
+        if(e.key == "contact"){
+            var contacts = entities.roster.friends.toString()
+            var newcontacts = contacts.split(",")
+            if(newcontacts && newcontacts[0]){
+                this.defaultSelectItem = newcontacts[0]
+                info.key = newcontacts[0]
+                info.tab = "contact"
+                this.changeItem(info,{ defaultItem:true })
+            }
+        }else if(!opt.multiAV && e.key == "group"){
+            var obj = entities.group.names
+            if(obj && obj[0]){
+                this.defaultGroupItem = obj[0].split("_#-#_")[1]
+                info.key = this.defaultGroupItem
+                info.tab = "group"
+                this.changeItem(info,{ defaultItem:true })
+            }
+        }else if(e.key == "chatroom"){
+            var obj = entities.chatroom.names
+            if(obj && obj[0]){
+                this.defaultChatroomItem = obj[0].split("_#-#_")[1]
+                info.key = this.defaultChatroomItem
+                info.tab = "chatroom"
+                this.changeItem(info,{ defaultItem:true })
+            }
+        }else if(e.key == "stranger"){
+            var obj = entities.stranger.names
+            if(obj && obj[0]){
+                this.defaultStrangerItem = obj[0].split("_#-#_")[1]
+                info.key = this.defaultStrangerItem
+                info.tab = "stranger"
+                this.changeItem(info,{ defaultItem:true })
+            }
+        }
     }
 
     // switch contact
-    changeItem(e) {
+    changeItem(e, opt) {
+        var selectTab
+        opt = opt || {}
         console.log("changeItem", e)
+        if(opt.defaultItem){
+            this.setSelectStatus(e,{ defaultItem:true })
+        }
         const { history, location, group } = this.props
-        const { selectItem, selectTab } = this.state
-        const redirectPath = "/" + [selectTab, e.key].join("/")
+        const { selectItem } = this.state
+        if(opt.defaultItem){
+            selectTab = e.tab
+        }else{
+            selectTab = this.state.selectTab
+        }
+        const redirectPath = "/" + [ selectTab, e.key ].join("/")
         const typeMap = { contact: "chat", group: "groupchat", chatroom: "chatroom", stranger: "stranger" }
 
         // chatroom will push recent messages automatically
@@ -147,15 +208,23 @@ class DefaultLayout extends Component {
         history.push(redirectPath + location.search)
     }
 
-    setSelectStatus() {
+    setSelectStatus(defaultItem,opt) {
         const { history, location, match } = this.props
         // console.log(location.patchname, match)
         const { selectTab, selectItem = "" } = match.params
         // console.log(match)
-        this.setState({
-            selectTab,
-            selectItem
-        })
+        opt = opt || {}
+        if(!opt.defaultItem){
+	        this.setState({
+	            selectTab,
+	            selectItem
+	        })
+        }else{
+            this.setState({
+	            selectTab :defaultItem.tab,
+	            selectItem:defaultItem.key
+	        })
+        }
     }
 
     handleCloseRightSiderClick(e) {
@@ -166,15 +235,15 @@ class DefaultLayout extends Component {
 
     componentDidMount() {
         // this.setSelectStatus()
-
+        const { entities } = this.props
         //解决在群组页面进行刷新，获取不到群成员的情况。聊天室要类似处理
         var reg = /\/group\/\d+\?username=/
-        var hash = location.hash;
+        var hash = location.hash
         if(reg.test(hash)){
 
-            var groupId = hash.slice(hash.indexOf("group")+6,hash.indexOf("?"));
+            var groupId = hash.slice(hash.indexOf("group")+6,hash.indexOf("?"))
 
-            const { group } = this.props;
+            const { group } = this.props
             this.setState({ roomId: groupId })
             const room = _.get(group, `byId.${groupId}`, {})
             this.setState({ room })
@@ -186,8 +255,9 @@ class DefaultLayout extends Component {
 
 
     componentWillReceiveProps(nextProps) {
+        var info = {}
         // console.log("componentWillReceiveProps", this.props.location.pathname, nextProps.location.pathname)
-        const { breakpoint, location } = this.props
+        const { breakpoint, location , entities ,match } = this.props
         const nextBeakpoint = nextProps.breakpoint
 
         // if (breakpoint[SIDER_COL_BREAK] != nextBeakpoint[SIDER_COL_BREAK]) {
@@ -201,13 +271,88 @@ class DefaultLayout extends Component {
             // console.log("componentWillReceiveProps", location)
             this.setSelectStatus()
         }
+        // 刷新时，默认打开第一个item
+        if(!match.params.selectItem){
+            var selectTab
+            if(nextProps && nextProps.match.params.selectTab){
+                selectTab = nextProps.match.params.selectTab
+            }else{
+                selectTab = match.params.selectTab
+            }
+            if(selectTab == "contact" && entities.roster && !this.defaultSelectItem){
+	            var contacts = entities.roster.friends.toString()
+	            var newcontacts = contacts.split(",")
+	            if(newcontacts && newcontacts[0]){
+	                this.defaultSelectItem = newcontacts[0]
+	                info.key = newcontacts[0]
+	                info.tab = "contact"
+	                this.changeItem(info,{ defaultItem:true })
+	            }
+	        }else if(selectTab == "group" && !this.defaultGroupItem){
+	            var obj = entities.group.names
+	            if(obj && obj[0]){
+	                this.defaultGroupItem = obj[0].split("_#-#_")[1]
+	                info.key = this.defaultGroupItem
+	                info.tab = "group"
+	                this.changeItem(info,{ defaultItem:true })
+	            }
+	        }else if(selectTab == "chatroom" && !this.defaultChatroomItem){
+	            var obj = entities.chatroom.names
+	            if(obj && obj[0]){
+	                this.defaultChatroomItem = obj[0].split("_#-#_")[1]
+	                info.key = this.defaultChatroomItem
+	                info.tab = "chatroom"
+	                this.changeItem(info,{ defaultItem:true })
+	            }
+	        }else if(selectTab == "stranger" && !this.defaultStrangerItem){
+	            var obj = entities.stranger.names
+	            if(obj && obj[0]){
+	                this.defaultStrangerItem = obj[0].split("_#-#_")[1]
+	                info.key = this.defaultStrangerItem
+	                info.tab = "stranger"
+	                this.changeItem(info,{ defaultItem:true })
+	            }
+	        }
+        }
+
+        // 多人视频打开时
+        if(this.props.multiAV.ifShowMultiAVModal){
+            const { match } = this.props
+            var gid = this.props.multiAV.gid
+            var byId = entities.group.byId
+            var groupId = byId[gid] && byId[gid].groupId
+            if(groupId && !this.multiGroupSelectItem){
+                this.multiGroupSelectItem = groupId
+                info.tab = "group"
+	            info.key = groupId
+	            this.changeItem(info,{ defaultItem:true })
+            }
+            if(!groupId && match.params.selectTab != "group"){
+                info.key = "group"
+                this.changeTab(info,{ multiAV:true })
+            }
+        }
+
     }
 
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
-        const { login, rightSiderOffset, multiAV } = this.props
+        const { login, rightSiderOffset, multiAV,entities } = this.props
 
         let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
+
+        if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
+            var info = {}
+            var gid = multiAV.gid
+	        var byId = entities.group.byId
+	        var groupId = byId[gid] && byId[gid].groupId
+            if(groupId){
+                this.multiAVSelectItem = groupId
+                info.key = groupId
+		        info.tab = "group"
+		        this.changeItem(info,{ defaultItem:true })
+            }
+        }
 
         return (
             <Layout>
@@ -216,7 +361,7 @@ class DefaultLayout extends Component {
                     <HeaderTab
                         collapsed={collapsed}
                         items={headerTabs}
-                        selectedKeys={[selectTab]}
+                        selectedKeys={[ selectTab ]}
                         onClick={this.changeTab}
                     />
                 </Header>
@@ -230,7 +375,7 @@ class DefaultLayout extends Component {
                             left: selectItem && collapsed ? "-100%" : 0
                         }}
                     >
-                        <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[selectItem]}
+                        <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[ selectItem ]}
                         />
                     </div>
                     <div className="x-layout-video"
@@ -281,6 +426,8 @@ export default withRouter(
             common,
             rightSiderOffset: entities.group.rightSiderOffset,
             multiAV,
+            entities
+
         }),
         dispatch => ({
             getGroupMember: id => dispatch(GroupMemberActions.getGroupMember(id)),
