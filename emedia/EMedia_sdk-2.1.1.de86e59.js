@@ -118,7 +118,7 @@ if (!!document.documentMode) {
 adapter.__browser = adapter.__browser || adapter.browserDetails.browser; // firefox chrome safari
 adapter.__browserVersion = adapter.__browserVersion || adapter.browserDetails.version;
 
-console && console.info("Current browser", adapter.__browser, adapter.__browserVersion);
+console && typeof console.info === "function" && console.info("Current browser", adapter.__browser, adapter.__browserVersion);
 
 if ("Not a supported browser." === adapter.__browser) {
     throw "Not a supported browser";
@@ -178,11 +178,13 @@ function wrapAttachMediaStream() {
         return element;
     }
 
-    if (window.attachMediaStream) {
+    if (window.attachMediaStream && window.attachMediaStream._wrapped !== true) {
         window.__attachMediaStream = window.attachMediaStream;
     }
 
     window.attachMediaStream = easemobAttachMediaStream;
+    window.attachMediaStream._wrapped = true;
+    console && typeof console.info === "function" && console.info("Wrap the attachMediaStream ", adapter.__browser, adapter.__browserVersion);
 }
 
 /***/ }),
@@ -6338,18 +6340,23 @@ module.exports = _util.prototypeExtend({
 
             if (!self.remotePlayAudioObject) {
                 var _audioId = "__o_remote_play_audio_" + self.id;
+                var audioObject = document.querySelector("#" + _audioId);
+                if (audioObject) {
+                    //audioObject.remove();
+                } else {
+                    audioObject = document.createElement("audio");
 
-                var audioObject = document.createElement("audio");
-                audioObject.style.display = "none";
-                audioObject.id = "__o_remote_play_audio_" + self.id;
-                audioObject.autoplay = true;
-                audioObject.playsinline = true;
+                    audioObject.style.display = "none";
+                    audioObject.id = "__o_remote_play_audio_" + self.id;
+                    audioObject.autoplay = true;
+                    audioObject.playsinline = true;
+
+                    document.body.appendChild(audioObject);
+                }
 
                 //monitorEvents && monitorEvents(audioObject);
 
                 self.remotePlayAudioObject = audioObject;
-
-                document.body.appendChild(audioObject);
             }
 
             // self.remotePlayAudioObject.autoplay = true;
@@ -7047,12 +7054,11 @@ module.exports = _util.prototypeExtend({
         return self.blob2URL(self.blob2URL(code));
     },
 
-    downloadFile: function downloadFile(fileName, content) {
+    downloadFile: function downloadFile(fileName, content, blobs) {
         var self = this;
 
         var aLink = document.createElement('a');
-        var blob = self.base64Img2Blob(content); //new Blob([content]);
-
+        var blob = content ? self.base64Img2Blob(content) : blobs; //new Blob([content]);
 
         aLink.download = fileName;
         aLink.href = self.blob2URL(blob);
@@ -8049,6 +8055,67 @@ module.exports = _util.prototypeExtend({
         };
 
         return new diy();
+    },
+
+    blobRecorder: function blobRecorder(mediaStream, options, handleDataAvailable, handleStop) {
+        var self = this;
+
+        if (_util.targetDOM(mediaStream)) {
+            mediaStream = mediaStream.srcObject;
+        }
+
+        options || (options = { mimeType: 'video/webm;codecs=vp9' });
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+            _logger.info(options.mimeType, ' is not Supported');
+            options = { mimeType: 'video/webm;codecs=vp8' };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                _logger.info(options.mimeType, ' is not Supported');
+                options = { mimeType: 'video/webm' };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    _logger.info(options.mimeType, ' is not Supported');
+                    options = { mimeType: '' };
+                }
+            }
+        }
+
+        try {
+            var mediaRecorder = new MediaRecorder(mediaStream, options);
+        } catch (e) {
+            _logger.error('Exception while creating MediaRecorder: ', e);
+            //alert('Exception while creating MediaRecorder: ' + e + '. mimeType: ' + options.mimeType);
+            return;
+        }
+        var recordedBlobs = [];
+        mediaRecorder.onstop = handleStop || function handleStop(event) {
+            _logger.info('Recorder stopped: ', event);
+        };
+        mediaRecorder.ondataavailable = handleDataAvailable || function (event) {
+            if (event.data && event.data.size > 0) {
+                recordedBlobs.push(event.data);
+            }
+        };
+        // mediaRecorder.start(10); // collect 10ms of data
+        // _logger.error('MediaRecorder started', mediaRecorder);
+
+        function BlobRecorder() {
+            this.blobs = recordedBlobs;
+        }
+        BlobRecorder.prototype.start = function (secornds) {
+            mediaRecorder.start(secornds);
+        };
+        BlobRecorder.prototype.stop = function () {
+            mediaRecorder.stop();
+        };
+        BlobRecorder.prototype.playurl = function (options) {
+            var superBuffer = new Blob(this.blobs, options || { type: 'video/webm' });
+            return window.URL.createObjectURL(superBuffer);
+        };
+        BlobRecorder.prototype.download = function (filename, options) {
+            var blobs = new Blob(this.blobs, options || { type: 'video/webm' });
+            self.downloadFile(filename, undefined, blobs);
+        };
+
+        return new BlobRecorder();
     }
 });
 
@@ -10024,7 +10091,9 @@ function _connect(onConnected, onConnectFail, retry) {
             var tmp = [];
             for (var tsxId in _messageMap) {
                 var msg = _messageMap[tsxId];
-                if (retry > 0 && !self.online && (msg.op === 107 || msg.op === 201 || msg.op === 204 || msg.op === 206 || msg.op === 400 || msg.op === 500)) {
+                //if(retry > 0 && !self.online && (msg.op === 107 || msg.op === 201 || msg.op === 204 || msg.op === 206 || msg.op === 400 || msg.op === 500)) {
+                if (retry > 0 && !self.online) {
+                    //缓存所有消息
                     tmp.push(msg);
                     continue;
                 }
@@ -10035,15 +10104,15 @@ function _connect(onConnected, onConnectFail, retry) {
 
             tmp.length > 0 && Array.prototype.push.apply(self._bufferedMessages, tmp);
         } else if (!self.connected()) {
-            var _messageMap = _util.extend(false, {}, self._callbacks);
-
-            for (var tsxId in _messageMap) {
-                var msg = _messageMap[tsxId];
-                if (msg.op !== 102 && msg.op !== 105 && msg.op !== 1000) {
-                    continue;
-                }
-                self.onMessage({ op: 1001, tsxId: tsxId, result: -9527, msg: "websocket disconnect", retrying: true });
-            }
+            // var _messageMap = _util.extend(false, {}, self._callbacks);
+            //
+            // for(var tsxId in _messageMap){
+            //     var msg = _messageMap[tsxId];
+            //     if(msg.op !== 102 && msg.op !== 105 && msg.op !== 1000) {
+            //         continue;
+            //     }
+            //     self.onMessage({op: 1001, tsxId: tsxId, result: -9527, msg: "websocket disconnect", retrying: true});
+            // }
         }
     }
 
@@ -11448,11 +11517,10 @@ var Attendee = Member.extend({
 
                 var offerOptions, subArgs;
                 if (pubS.type === 2) {
-                    emedia.isSafari && (offerOptions = {
+                    offerOptions = {
                         offerToReceiveAudio: true,
                         offerToReceiveVideo: false
-                    });
-
+                    };
                     subArgs = {
                         subSVideo: false,
                         subSAudio: true
@@ -11590,10 +11658,10 @@ var Attendee = Member.extend({
 
             var offerOptions, subArgs;
             if (pubS.type === 2) {
-                emedia.isSafari && (offerOptions = {
+                offerOptions = {
                     offerToReceiveAudio: true,
                     offerToReceiveVideo: false
-                });
+                };
                 subArgs = {
                     subSVideo: false,
                     subSAudio: true
@@ -13752,11 +13820,15 @@ var _WebRTC = _util.prototypeExtend({
                 var sdpSection = new SDPSection(desc.sdp, self);
                 updateVCodes && sdpSection.updateVCodes(self.optimalVideoCodecs);
 
-                if (!emedia.isSafari && self.subArgs) {//订阅流
-                } else if (emedia.isSafari) {
-                    self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
-                    self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
-                }
+                // if(!emedia.isSafari && self.subArgs){ //订阅流
+                // }else if(emedia.isSafari){
+                //     self.offerOptions && self.offerOptions.offerToReceiveVideo === false
+                //         && sdpSection.updateVideoSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
+                //     self.offerOptions && self.offerOptions.offerToReceiveAudio === false
+                //         && sdpSection.updateAudioSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
+                // }
+                self.offerOptions && self.offerOptions.offerToReceiveVideo === false && sdpSection.updateVideoSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
+                self.offerOptions && self.offerOptions.offerToReceiveAudio === false && sdpSection.updateAudioSection(/a=sendrecv|a=recvonly/g, "a=sendonly");
 
                 desc.sdp = sdpSection.getUpdatedSDP();
             }
@@ -17296,29 +17368,29 @@ var _outer = {};
 
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"].onMemberJoin = function (member, confrId) {
     emedia.decodeMemeberName(member);
-    this.onMemberJoined(member);
+    this.onMemberJoined(member, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"].onMemberLeave = function (member, reason, confrId) {
     emedia.decodeMemeberName(member);
-    this.onMemberExited(member, reason);
+    this.onMemberExited(member, reason, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._onRoleUpdated = function (role, confrId) {
-    this.onRoleChanged(role);
+    this.onRoleChanged(role, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._onAddMemberStream = function (stream, confrId) {
     stream && emedia.decodeMemeberName(stream.owner);
-    this.onStreamAdded(stream.owner, stream);
+    this.onStreamAdded(stream.owner, stream, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._onRemoveMemberStream = function (stream, confrId) {
     stream && emedia.decodeMemeberName(stream.owner);
-    this.onStreamRemoved(stream.owner, stream);
+    this.onStreamRemoved(stream.owner, stream, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._onUpdateMemberStream = function (stream, constaints, confrId) {
     stream && emedia.decodeMemeberName(stream.owner);
-    this.onStreamUpdated && this.onStreamUpdated(stream.owner, stream, constaints);
+    this.onStreamUpdated && this.onStreamUpdated(stream.owner, stream, constaints, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 _Manager__WEBPACK_IMPORTED_MODULE_0__["single"].onExit = function (reason, failed, confrId) {
-    this.onConferenceExit(reason, failed);
+    this.onConferenceExit(reason, failed, _Manager__WEBPACK_IMPORTED_MODULE_0__["single"]._confr(confrId));
 };
 
 _outer.onMemberJoined = function (member) {};
@@ -17403,6 +17475,7 @@ window.onload = function () {
 
     var WebIM = window.WebIM;
     if (WebIM && WebIM.conn && typeof WebIM.conn.onOpened === "function") {
+        // noinspection JSAnnotator
         var useIM = function useIM() {
             emedia.decodeMemeberNameString = function (member) {
                 if (typeof member === 'string') {
@@ -17857,7 +17930,8 @@ function rxJoinUseTicket(confrId, ticket, ext) {
     return rxjs__WEBPACK_IMPORTED_MODULE_3__["Observable"].create(function onSubscription(observer) {
         service.join(function (memId) {
             self.__current_confrId = confrId;
-            self._confrs[confrId].__myMemId = memId;
+            self._confrs[confrId].joinId = memId;
+            self._confrs[confrId].role = service.current && service.current.role;
 
             observer.next(self._confrs[confrId]);
             observer.complete();
@@ -17980,6 +18054,14 @@ function rxResumePauseAudio(pubS, aoff, confrId) {
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["throwError"])("pub stream not exsits. it is " + pubS);
     }
 
+    if (confr.type === self.ConfrType.COMMUNICATION_MIX || confr.type === self.ConfrType.LIVE) {
+        //混音时，共享桌面带声音，会造成 服务端错误。
+        if (!aoff) {
+            _logger.warn("confr mix. not allow desktop with audio.");
+            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["throwError"])("confr mix. not allow desktop with audio.");
+        }
+    }
+
     return rxAoff.call(self, confrId, pubS, aoff);
 }
 
@@ -18071,6 +18153,14 @@ function rxShareDesktop(confrId, constaints, videoTag, ext) {
     }
     if (confr.desktop) {
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["throwError"])("desktop stream has been published. not allow repeat publish.");
+    }
+
+    if (confr.type === self.ConfrType.COMMUNICATION_MIX || confr.type === self.ConfrType.LIVE) {
+        //混音时，共享桌面带声音，会造成 服务端错误。
+        if (constaints.audio) {
+            _logger.warn("confr mix. not allow desktop with audio.");
+            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["throwError"])("confr mix. not allow desktop with audio.");
+        }
     }
 
     if (!constaints.audio && confr.av && !confr.av.aoff) {
@@ -18459,7 +18549,7 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
         return rxJoinUseTicket.call(this, confrId, ticket, ext).toPromise();
     },
     joined: function joined(confrId) {
-        return confrId && this._confrs[confrId] && this._confrs[confrId].__myMemId || this.__current_confrId && this.joined(this.__current_confrId);
+        return confrId && this._confrs[confrId] && this._confrs[confrId].joinId || this.__current_confrId && this.joined(this.__current_confrId);
     },
 
     shareDesktopWithAudio: function shareDesktopWithAudio(videoConstaints, withAudio, videoTag, ext, confrId) {
@@ -30441,10 +30531,10 @@ function init() {
         },
 
         onAddMember: function onAddMember(member) {
-            this.mgr.onMemberJoin(member);
+            this.mgr.onMemberJoin(member, this.confrId);
         },
         onRemoveMember: function onRemoveMember(member, reason) {
-            this.mgr.onMemberLeave(member, reason);
+            this.mgr.onMemberLeave(member, reason, this.confrId);
         },
 
         onAddStream: function onAddStream(stream) {
@@ -30461,6 +30551,12 @@ function init() {
         onRemoveStream: function onRemoveStream(stream) {
             if (stream.id == 0) {
                 return;
+            }
+
+            var confr = this.mgr._confr(this.confrId);
+            if (confr && stream && stream.located()) {
+                confr.av && confr.av.id === stream.id && (confr.av = undefined);
+                confr.desktop && confr.desktop.id === stream.id && (confr.desktop = undefined);
             }
 
             var video = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.removeAttribute(this.mgr._videos, stream.id);
@@ -30533,13 +30629,14 @@ function init() {
         onRoleUpdate: function onRoleUpdate(role, roleToken) {
             var confr = this.mgr._confrs[this.confrId];
             roleToken && (confr.roleToken = roleToken);
+            confr.role = role;
 
             if (role == this.mgr.Role.AUDIENCE) {
                 confr.av && this.mgr.hungup(confr.av);
                 confr.desktop && this.mgr.hungup(confr.desktop);
             }
 
-            this.mgr._onRoleUpdated(role);
+            this.mgr._onRoleUpdated(role, this.confrId);
         },
 
         onNotifyEvent: function onNotifyEvent(evt) {
@@ -32858,5 +32955,5 @@ emedia.chooseElectronDesktopMedia = function (sources, accessApproved, accessDen
 /***/ })
 /******/ ]);
 });
-//2.1.1_Git.cc63e0c
-console && console.warn('EMedia version', '2.1.1_Git.cc63e0c');
+//2.1.1_Git.de86e59
+console && console.warn('EMedia version', '2.1.1_Git.de86e59');
