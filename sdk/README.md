@@ -1,5 +1,33 @@
 # Changelog
 
+## v1.8.1 @ 2018-5-21
+* [sdk] 添加获取漫游消息API
+```
+* conn.getMessages(options)
+```
+通过getMessages方法，你可以获取某用户（群组）的历史消息记录，每次执行此方法可以获取指定条数的消息
+* queue 会话用户username
+* group 是否是群组，默认false
+* count 获取消息数量 默认一次获取20条
+* start 起始消息id，默认为-1， 从头开始
+* success 成功回调
+* fail 失败回调
+
+```javascript
+// 获取漫游消息接口演示
+conn.getMessages({
+	queue: "sunylt",
+	group: false,
+	count: 20,
+	success: function(res) {
+		console.log(res) // 如果获取到的结果为[]，则表示结束
+	},
+	fail: function(err) {
+		console.log(err)
+	}
+})
+```
+
 ## v1.8.0 @ 2018-5-21
 * [sdk] 解决无法申请入群
 * [sdk] 解决无法邀请好友
