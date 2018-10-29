@@ -76,11 +76,10 @@ class AddAVMemberModal extends React.Component {
                 this.props.setSelected(seleted_members)
                 this.props.setGid(gid);
                 let jids = []
-                const appkey = WebIM.config.appkey, spHost = WebIM.config.xmppURL.split(".")
-                const host = spHost[1] + '.' + spHost[2]
+                const appkey = WebIM.config.appkey, spHost = WebIM.config.Host
                 if (seleted_members) {
                     for (let elem of seleted_members) {
-                        jids.push(appkey + '_' + elem + '@' + host)
+                        jids.push(appkey + '_' + elem + '@' + spHost)
                     }
                 }
                 const { confrId, password } = me.props.confr
