@@ -25,6 +25,7 @@ import getTabMessages from "@/selectors/ChatSelector"
 import WebRTCModal from "@/components/webrtc/WebRTCModal"
 import AddAVMemberModal from "@/components/webrtc/AddAVMemberModal"
 import ModalComponent from "@/components/common/ModalComponent"
+import getCurrentContacts from "@/selectors/ContactSelector"
 
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -390,7 +391,24 @@ class Chat extends React.Component {
             history.push(redirectPath)
         }
 
-        let name = selectItem
+        //Todo: 统一redux数据格式
+        const infoMap = {
+            contact: {
+                by: 'byName',
+                info: 'name'
+            },
+            group: {
+                by: 'byId',
+                info: 'groupName'
+            },
+            chatroom: {
+                by: 'byId',
+                info: 'name'
+            }
+        }
+
+        let name = this.props.contacts[infoMap[selectTab].by][selectItem][infoMap[selectTab].info];
+        // let name = selectItem;
         let webrtcButtons = []
         if (WebIM.config.isWebRTC && selectTab === "contact") {
             // webrtc video button
@@ -527,7 +545,8 @@ export default connect(
     (state, props) => ({
         messageList: getTabMessages(state, props),
         confrModal: state.multiAV.confrModal,
-        avModal: state.multiAV.ifShowMultiAVModal
+        avModal: state.multiAV.ifShowMultiAVModal,
+        contacts: getCurrentContacts(state, props.match.params)
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
