@@ -7,6 +7,11 @@ packing(){
     cd ../
     echo -e "\nINSTALL DONE.\n"
 
+    cd ./sdk
+    npm link
+    cd ../
+    echo -e "\nCREATE [WEBRTC] GLOBAL LINK DONE.\n"
+
     cd ./webrtc
     npm link
     cd ../
@@ -16,6 +21,11 @@ packing(){
     npm link
     cd ../
     echo -e "\nCREATE [EMEDIA] GLOBAL LINK DONE.\n"
+
+    cd ./demo
+    npm link easemob-websdk
+    cd ../
+    echo -e "\nLINK [WEBRTC] DONE.\n"
 
     cd ./demo
     npm link easemob-webrtc
@@ -42,11 +52,15 @@ upload(){
     echo -e "\nZIP files...\n"
 	zip -r $TRAVIS_TAG.zip chatdemo-webim
     
-    UPLOAD_PARAMS="-v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v="$TRAVIS_TAG" -F p=zip -F file=@"$TRAVIS_TAG".zip -u "${nexus_auth}
+    UPLOAD_PARAMS="-v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v="$TRAVIS_TAG" -F p=zip -F file=@"$TRAVIS_TAG".zip -u ci-deploy:Xyc-R5c-SdS-2Qr "
     UPLOAD_URL="https://hk.nexus.op.easemob.com/nexus/service/local/artifact/maven/content"
     echo -e "\nUPLOAD ZIP..."
     echo -e $UPLOAD_PARAMS"\n"$UPLOAD_URL"\n"
 	curl $UPLOAD_PARAMS $UPLOAD_URL
+
+    # curl 
+    # -v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.im.fe.rs -F a=im-console -F v=$TRAVIS_TAG -F p=zip -F file=@console.zip -u ci-deploy:Xyc-R5c-SdS-2Qr 
+    # http://hk.nexus.op.easemob.com/nexus/service/local/artifact/maven/content
 }
 
 
