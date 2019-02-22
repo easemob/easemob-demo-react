@@ -81,24 +81,25 @@ const { Types, Creators } = createActions({
             })
         }
     },
-    inviteToGroupAsync: (groupId, users) => {
-        return (dispatch, getState) => {
-            dispatch(Creators.setLoading(true))
-            WebIM.conn.inviteToGroup({
-                groupId,
-                users,
-                success: response => {
-                    // let data = response.data <-- !!!
-                    dispatch(Creators.setLoading(false))
-                    dispatch(Creators.setLoadingFailed(false))
-                },
-                error: e => {
-                    dispatch(Creators.setLoading(false))
-                    dispatch(Creators.setLoadingFailed(true))
-                }
-            })
-        }
-    },
+    // inviteToGroupAsync: (groupId, users, suc) => {
+    //     return (dispatch, getState) => {
+    //         dispatch(Creators.setLoading(true))
+    //         WebIM.conn.inviteToGroup({
+    //             groupId,
+    //             users,
+    //             success: response => {
+    //                 suc()
+    //                 // let data = response.data <-- !!!
+    //                 dispatch(Creators.setLoading(false))
+    //                 dispatch(Creators.setLoadingFailed(false))
+    //             },
+    //             error: e => {
+    //                 dispatch(Creators.setLoading(false))
+    //                 dispatch(Creators.setLoadingFailed(true))
+    //             }
+    //         })
+    //     }
+    // },
     listGroups: options => {
         return (dispatch, getState) => {
             WebIM.conn.listGroups(options)

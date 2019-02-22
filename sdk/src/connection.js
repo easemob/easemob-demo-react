@@ -369,6 +369,9 @@ var _parseFriend = function (queryTag, conn, from) {
 };
 
 var _login = function (options, conn) {
+    if(!options){
+        return;
+    }
     var accessToken = options.access_token || '';
     if (accessToken == '') {
         var loginfo = _utils.stringify(options);
@@ -467,11 +470,11 @@ var _loginCallback = function (status, msg, conn) {
         conflict && (error.conflict = true);
         conn.onError(error);
     } else if (status == Strophe.Status.ATTACHED || status == Strophe.Status.CONNECTED) {
-        // client should limit the speed of sending ack messages  up to 5/s
+        // client should limit the speed of sending ack messages  up to 5/s  (后修改为10/s途虎重复收到离线消息)
         conn.autoReconnectNumTotal = 0;
         conn.intervalId = setInterval(function () {
             conn.handelSendQueue();
-        }, 200);
+        }, 100);
         var handleMessage = function (msginfo) {
             var delivery = msginfo.getElementsByTagName('delivery');
             var acked = msginfo.getElementsByTagName('acked');
@@ -590,9 +593,9 @@ var _loginCallback = function (status, msg, conn) {
             conn.onError(error);
         }
     } else if (status == Strophe.Status.DISCONNECTED) {
-        if (conn.isOpened()) {
+        if (!conn.isClosing() || conn.isOpened()) {
             if (conn.autoReconnectNumTotal < conn.autoReconnectNumMax) {
-                conn.reconnect();
+                conn.reconnect(!conn.isClosing());
                 return;
             } else {
                 error = {
@@ -737,7 +740,7 @@ var connection = function (options) {
     this.isMultiLoginSessions = options.isMultiLoginSessions || false;
     this.wait = options.wait || 30;
     this.retry = options.retry || false;
-    this.https = options.https || location.protocol === 'https:';
+    this.https = options.https && location.protocol === 'https:';
     this.url = _getXmppUrl(options.url, this.https);
     this.hold = options.hold || 1;
     this.route = options.route || null;
@@ -962,10 +965,32 @@ connection.prototype.getHttpDNS = function (options, type) {
         self.restTotal = restHosts.length;
 
         //get xmpp ips
-        var xmppHosts = self.getHostsByTag(data, 'xmpp');
+        var makeArray = function(obj){    //伪数组转为数组
+          return Array.prototype.slice.call(obj,0); 
+        } 
+        try{ 
+            Array.prototype.slice.call(document.documentElement.childNodes, 0)[0].nodeType; 
+        }catch(e){ 
+            makeArray = function(obj){ 
+                var res = []; 
+                for(var i=0,len=obj.length; i<len; i++){
+                   res.push(obj[i]); 
+                } 
+              return res; 
+          } 
+        } 
+        var xmppHosts = makeArray(self.getHostsByTag(data, 'xmpp'));
         if (!xmppHosts) {
             console.log('xmpp hosts error3');
             return;
+        }
+        for(var i = 0; i< xmppHosts.length; i++){
+            var httpType = self.https ? 'https' : 'http';
+            if(_utils.getXmlFirstChild(xmppHosts[i], 'protocol').textContent === httpType ){
+                var currentPost = xmppHosts[i];
+                xmppHosts.splice(i,1);
+                xmppHosts.unshift(currentPost);
+            }
         }
         self.xmppHosts = xmppHosts;
         self.xmppTotal = xmppHosts.length;
@@ -1051,6 +1076,8 @@ connection.prototype.signup = function (options) {
 
 
 connection.prototype.open = function (options) {
+    console.log(8888888);
+    
     var appkey = options.appKey,
         orgName = appkey.split('#')[0],
         appName = appkey.split('#')[1];
@@ -1580,6 +1607,7 @@ connection.prototype.handleMessage = function (msginfo) {
         }
         var msgBody = msg.bodies[0];
         var type = msgBody.type;
+        var isCmdMsg = false;
 
         try {
             switch (type) {
@@ -1770,7 +1798,18 @@ connection.prototype.handleMessage = function (msginfo) {
                     msg.error = errorBool;
                     msg.errorText = errorText;
                     msg.errorCode = errorCode;
-                    this.onCmdMessage(msg);
+                    if(msgBody.action === 'em_retrieve_dns'){
+                        isCmdMsg = true;
+                    }
+                    if(msgBody.action.indexOf("em_") !== 0){
+                        self.onCmdMessage(msg);
+                    }
+                    else{
+                        var ackMessage = new WebIM.message("read", self.getUniqueId())
+                        ackMessage.set({ id: msg.id, to: msg.from, ext: { logo: "easemob" } })
+                        self.send(ackMessage.body)
+                        self.handelSendQueue();        
+                    }
                     break;
             }
             ;
@@ -1784,6 +1823,7 @@ connection.prototype.handleMessage = function (msginfo) {
                 });
                 self.send(deliverMessage.body);
             }
+            isCmdMsg && this.close();       //action==em_retrieve_dns 的cmd消息用于迁集群，退出重新登录以获取config信息
         } catch (e) {
             this.onError({
                 type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
@@ -2649,8 +2689,9 @@ connection.prototype._onUpdateMyGroupList = function (options) {
 connection.prototype._onUpdateMyRoster = function (options) {
     this.onUpdateMyRoster(options);
 };
-connection.prototype.reconnect = function () {
+connection.prototype.reconnect = function (v) {
     var that = this;
+    v && that.xmppIndex++;       //重连时改变ip地址
     setTimeout(function () {
         _login(that.context.restTokenData, that);
     }, (this.autoReconnectNumTotal == 0 ? 0 : this.autoReconnectInterval) * 1000);
@@ -3047,6 +3088,7 @@ connection.prototype.leaveGroup = function (options) {
  */
 
 connection.prototype.addGroupMembers = function (options) {
+    console.log(10101010);
     var sucFn = options.success || _utils.emptyfn;
     var errFn = options.error || _utils.emptyfn;
     var list = options.list || [];

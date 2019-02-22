@@ -198,7 +198,9 @@ class Chat extends React.Component {
      * @memberof Chat
      */
     handleRightIconClick() {
-        const { selectTab } = this.state
+        const { match } = this.props
+        const { selectTab } = match.params
+        // const { selectTab } = this.state
         if (selectTab === "group") {
             const rightSiderOffset = -1 * config.RIGHT_SIDER_WIDTH
             this.props.switchRightSider({ rightSiderOffset })

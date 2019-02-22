@@ -51,6 +51,21 @@ const { Types, Creators } = createActions({
             })
         }
     },
+    inviteToGroupAsync: (groupId, users) => {
+        return (dispatch, getState) => {
+            WebIM.conn.inviteToGroup({
+                groupId,
+                users,
+                success: response => {
+                    dispatch(Creators.listGroupMemberAsync({ groupId: groupId }))
+                },
+                error: e => {
+                    // dispatch(Creators.setLoading(false))
+                    // dispatch(Creators.setLoadingFailed(true))
+                }
+            })
+        }
+    },
     listGroupMemberAsync: opt => {
         let { groupId, pageNum, pageSize } = opt
         pageNum = pageNum || 1

@@ -64,7 +64,6 @@ class DefaultLayout extends Component {
             ],
             rightSiderOffset: -1 * RIGHT_SIDER_WIDTH,
             roomId: NaN,
-            room: {},
             contactItems: []
         }
 
@@ -182,8 +181,8 @@ class DefaultLayout extends Component {
             const groupId = e.key
             if (groupId) {
                 this.setState({ roomId: groupId })
-                const room = _.get(group, `byId.${groupId}`, {})
-                this.setState({ room })
+                // const room = _.get(group, `byId.${groupId}`, {})
+                // this.setState({ room })
                 // const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
                 // if (selectItem && selectTab === "group") {
                 // const groupId = selectItem
@@ -245,8 +244,8 @@ class DefaultLayout extends Component {
 
             const { group } = this.props
             this.setState({ roomId: groupId })
-            const room = _.get(group, `byId.${groupId}`, {})
-            this.setState({ room })
+            // const room = _.get(group, `byId.${groupId}`, {})
+            // this.setState({ room })
             this.props.listGroupMemberAsync({ groupId })
             this.props.getMutedAsync(groupId)
             this.props.getGroupAdminAsync(groupId)
@@ -337,7 +336,8 @@ class DefaultLayout extends Component {
 
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
-        const { login, rightSiderOffset, multiAV,entities } = this.props
+        const { login, rightSiderOffset, multiAV, entities, group } = this.props
+        const room = _.get(group, `byId.${roomId}`, {})
 
         let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
 
@@ -405,7 +405,7 @@ class DefaultLayout extends Component {
                             marginLeft: `${rightSiderOffset}px`
                         }}
                     >
-                        <RightSider roomId={roomId} room={this.state.room} ref="rightSider" />
+                        <RightSider roomId={roomId} room={room} ref="rightSider" />
                     </div>
                     {multiAVModal}
                     {/*<Footer style={{ textAlign: "center" }}>

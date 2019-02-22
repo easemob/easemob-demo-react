@@ -34,8 +34,8 @@ const GroupInfoForm = Form.create()(props => {
 })
 
 class GroupInfo extends React.Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             users: [],
             visible: false,
@@ -123,6 +123,7 @@ class GroupInfo extends React.Component {
         const value = this.state.users
         if (!value || value.length === 0) return
         this.props.inviteToGroupAsync(this.props.room.groupId, value)
+        // this.props.listGroupMemberAsync({ groupId: this.props.room.groupId })
         this.closeInviteModal()
     }
 
@@ -294,12 +295,13 @@ class GroupInfo extends React.Component {
 export default connect(
     ({ entities, login }) => ({ login, groupMember: entities.groupMember }),
     dispatch => ({
+        listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
         updateGroupInfoAsync: info => dispatch(GroupActions.updateGroupInfoAsync(info)),
         dissolveGroupAsync: ({ groupId, groupName }) =>
             dispatch(GroupActions.dissolveGroupAsync({ groupId, groupName })),
         getGroupBlackListAsync: groupId => dispatch(GroupMemberActions.getGroupBlackListAsync(groupId)),
         removeGroupBlockSingleAsync: (groupId, username) => dispatch(GroupMemberActions.removeGroupBlockSingleAsync(groupId, username)),
-        inviteToGroupAsync: (groupId, users) => dispatch(GroupActions.inviteToGroupAsync(groupId, users)),
+        inviteToGroupAsync: (groupId, users) => dispatch(GroupMemberActions.inviteToGroupAsync(groupId, users)),
         quitGroupAsync: (groupId, username) => dispatch(GroupMemberActions.quitGroupAsync(groupId, username)),
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset }))
     })

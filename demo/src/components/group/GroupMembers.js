@@ -11,6 +11,11 @@ import "./style/index.less"
 const iconStyle = { fontSize: 16, marginRight: 15 }
 
 class GroupMembers extends React.Component {
+
+    componentDidMount() {
+        const { login, roomId, groupMember } = this.props
+        this.props.listGroupMemberAsync({ groupId: roomId })
+    }
     setAdmin = (groupId, name) => this.props.setAdminAsync(groupId, name)
 
     removeAdmin = (groupId, name) => this.props.removeAdminAsync(groupId, name)
@@ -157,8 +162,12 @@ class GroupMembers extends React.Component {
 }
 
 export default connect(
-    ({ entities, login }) => ({ login, groupMember: entities.groupMember }),
+    ({ entities, login }) => ({ 
+        login, 
+        groupMember: entities.groupMember 
+    }),
     dispatch => ({
+        listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
         setAdminAsync: (groupId, name) => dispatch(GroupMemberActions.setAdminAsync(groupId, name)),
         removeAdminAsync: (groupId, name) => dispatch(GroupMemberActions.removeAdminAsync(groupId, name)),
         muteAsync: (groupId, name) => dispatch(GroupMemberActions.muteAsync(groupId, name)),

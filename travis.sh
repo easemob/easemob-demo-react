@@ -31,6 +31,7 @@ packing(){
     TRAVIS=true TAG_NAME=$TRAVIS_TAG npm run build
     cd ../
     echo -e "\nBUILD DONE.\n"
+    sed -i "s/{#version}/${TRAVIS_TAG}/g"  ./demo/build/index.html
 }
 
 upload(){
