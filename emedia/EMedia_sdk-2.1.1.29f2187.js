@@ -5230,16 +5230,11 @@ module.exports = __webpack_require__(14);
 
 //console.  emedia.__easemob_current_mservice.current
 
+
 var emedia = window.emedia = window.emedia || {};
 
 var util = emedia.util = __webpack_require__(15);
-
-(function requireWebrtcAdapter() {
-    var adapter = __webpack_require__(2);
-    emedia.browser = adapter.__browser; // firefox chrome safari IE
-    emedia.browserVersion = adapter.__browserVersion;
-})();
-util.logger.info("Current browser", emedia.browser, emedia.browserVersion);
+var zepto = __webpack_require__(6);
 
 emedia.config = function (cfg) {
     cfg = util.extend({}, cfg);
@@ -5249,6 +5244,11 @@ emedia.config = function (cfg) {
         if (key === "logLevel") {
             emedia.LOG_LEVEL = cfg[key];
         }
+    }
+
+    if (emedia.config.loglastConfrCount && !emedia._logContext) {
+        emedia._logContext = new Array(emedia.config.loglastConfrCount);
+        emedia._logContextIndex = -1; //代表没有日志
     }
 };
 
@@ -5288,9 +5288,23 @@ emedia.config({
     ctrlCheckIntervalMillis: 10 * 1000,
     ctrlTimeoutMillis: 30 * 1000,
 
-    _printDebugStats: false
+    _printDebugStats: false,
+    statsSeconds: 3,
     //wsorigin
+
+    loglastConfrCount: 2,
+    consoleLogger: true
 });
+
+util.logger.count();
+//util.logger.info(navigator.userAgent);
+
+(function requireWebrtcAdapter() {
+    var adapter = __webpack_require__(2);
+    emedia.browser = adapter.__browser; // firefox chrome safari IE
+    emedia.browserVersion = adapter.__browserVersion;
+})();
+util.logger.info("Current browser", emedia.browser, emedia.browserVersion);
 
 emedia.AudioContext = window.AudioContext || window.webkitAudioContext;
 
@@ -5314,21 +5328,23 @@ if (emedia.config.getMediaMeterIntervalMillis) {
 
     // context state at this time is `undefined` in iOS8 Safari
     if (emedia.__usingWebAudio && emedia.__audioContext.state === 'suspended') {
-        var resume = function resume() {
-            emedia.__audioContext.state === 'suspended' && emedia.__audioContext.resume();
-            util.logger.warn("AudioContext state suspended ->", emedia.__audioContext.state);
+        zepto(function () {
+            var resume = function resume() {
+                emedia.__audioContext.state === 'suspended' && emedia.__audioContext.resume();
+                util.logger.warn("AudioContext state suspended ->", emedia.__audioContext.state);
 
-            setTimeout(function () {
-                if (emedia.__audioContext.state === 'running') {
-                    document.body.removeEventListener('touchend', resume, false);
-                    document.body.removeEventListener('click', resume, false);
-                }
-            }, 0);
-        };
+                setTimeout(function () {
+                    if (emedia.__audioContext.state === 'running') {
+                        document.body.removeEventListener('touchend', resume, false);
+                        document.body.removeEventListener('click', resume, false);
+                    }
+                }, 0);
+            };
 
-        document.body.addEventListener('touchend', resume, false);
-        //document.body.addEventListener('load', resume, false);
-        document.body.addEventListener('click', resume, false);
+            document.body.addEventListener('touchend', resume, false);
+            //document.body.addEventListener('load', resume, false);
+            document.body.addEventListener('click', resume, false);
+        });
     }
 
     if (!emedia.__usingWebAudio) {
@@ -5377,18 +5393,30 @@ emedia.stopAndRemoveAudioTracks = function (_stream) {
 };
 
 emedia.stopTracks = function (_stream) {
-    if (!_stream || _stream.active === false) {
-        return;
-    }
+    try {
+        var stop = function stop() {
+            _stream.getTracks().forEach(function (track) {
+                track.stop();
+            });
 
-    function stop() {
-        _stream.getTracks().forEach(function (track) {
-            track.stop();
-        });
-        util.logger.info("stream tracks stoped. it ", _stream);
+            if (_stream._bindAttendee) {
+                //push stream时，由于异步，在未返回成功后，退出会议，摄像头不会被关闭问题
+                util.removeAttribute(_stream._bindAttendee._openedRtcMediaStreams, _stream.id);
+                _stream._bindAttendee = null;
+            }
+            util.logger.info("stream tracks stoped. it ", _stream);
+        };
+
+        if (!_stream || _stream.active === false) {
+            util.logger.debug("stream tracks had been stoped. it ", _stream && _stream.id);
+            return;
+        }
+
+        stop();
+        //setTimeout(stop, 300);
+    } catch (e) {
+        util.logger.error(e);
     }
-    stop();
-    //setTimeout(stop, 300);
 };
 
 emedia.enableVideoTracks = function (_stream, enabled) {
@@ -5442,6 +5470,50 @@ emedia.hasEnabledTracks = function (mediaStream) {
     return false;
 };
 
+emedia.fileReport = function () {
+    if (!emedia._logContext) {
+        return;
+    }
+    if (!(emedia._logContext instanceof Array)) {
+        return;
+    }
+    if (typeof emedia._logContextIndex === 'undefined' || emedia._logContextIndex < 0) {
+        return;
+    }
+
+    var start = 0;
+    var end = emedia._logContextIndex;
+    if (emedia._logContextIndex >= emedia._logContext.length) {
+        start = emedia._logContextIndex - emedia._logContext.length + 1;
+    }
+
+    var report = "";
+    for (var i = start; i <= end; i++) {
+        var index = i % emedia._logContext.length;
+        var oneConfrLogs = emedia._logContext[index];
+        report += oneConfrLogs.join("\r\n") + "\r\n";
+    }
+
+    if (emedia._logContext.loadlogs && emedia._logContext.loadlogs instanceof Array) {
+        report += "-------------------------------------------------------------\r\n";
+        report += emedia._logContext.loadlogs.join("\r\n") + "\r\n";
+    }
+
+    var fileContent = report;
+    var content = encodeURIComponent(fileContent);
+
+    var link = document.createElement('a');
+    link.style.display = 'none';
+    link.download = 'emedia-' + new Date().toJSON() + '.log';
+    link.href = 'data:text/plain;charset=utf-8,' + content;
+    //link.setAttribute('download', link.download);
+    //link.setAttribute('href', 'data:text/plain;charset=utf-8,' + content); //'data:attachment/file;charset=utf-8,' + content
+
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
+};
+
 var Service = __webpack_require__(16);
 var __event = __webpack_require__(21);
 
@@ -5450,7 +5522,8 @@ emedia.Webrtc = __webpack_require__(24);
 emedia.Service = Service;
 emedia.P2P = __webpack_require__(33);
 // var cloneService = util.extend({}, Service).extend(Service);
-emedia.XService = emedia.P2P(Service);
+emedia.XService = Service;
+emedia.XServiceWithP2P = emedia.P2P(Service);
 
 // emedia.mgr = require("./components/mgr/Manager");
 // emedia.mgr = emedia.mgr.single;
@@ -5490,7 +5563,11 @@ emedia.isEdge = 'edge' === emedia.browser;
 
 emedia.isElectron = /Electron/.test(navigator.userAgent);
 if (emedia.isElectron) {
-    __webpack_require__(245);
+    try {
+        __webpack_require__(245);
+    } catch (e) {
+        util.logger.error(e);
+    }
 }
 
 emedia.isWebRTC = window.RTCPeerConnection && /^https\:$/.test(window.location.protocol);
@@ -5501,8 +5578,15 @@ emedia.isWebRTC = window.RTCPeerConnection && /^https\:$/.test(window.location.p
 if (emedia.isChrome || emedia.isSafari) {
     emedia.supportPRAnswer = true;
 }
-//WebIM.WebRTC.supportPRAnswer = false;
-
+/**
+ * 2019.02.21
+ * 发现chrome72版本 对pranswer支持有问题，https://webrtc.github.io/samples/src/content/peerconnection/pr-answer 事例也不能正显示视频
+ * video.srcObject [remote media stream] active: false.
+ *
+ * 统一设置为不支持pranswer
+ *
+ */
+emedia.supportPRAnswer = false;
 
 emedia.config({
     baseAcptOps: [102, 104, 105, 106, 107, 300, 302, 303, 304, 301, 204, 206, 400, 401, 1001, 100201, 100202, 100203]
@@ -5554,17 +5638,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 /*
  * ! Math.uuid.js (v1.4) http://www.broofa.com mailto:robert@broofa.com
- * 
+ *
  * Copyright (c) 2010 Robert Kieffer Dual licensed under the MIT and GPL
  * licenses.
  */
 
 /*
  * Generate a random uuid.
- * 
+ *
  * USAGE: Math.uuid(length, radix) length - the desired number of characters
  * radix - the number of allowable values for each character.
- * 
+ *
  * EXAMPLES: // No arguments - returns RFC4122, version 4 ID >>> Math.uuid()
  * "92329D39-6F5C-4520-ABFC-AAB64544E172" // One argument - returns ID of the
  * specified length >>> Math.uuid(15) // 15 character ID (default base=62)
@@ -5681,6 +5765,11 @@ var Logger = function Logger(tag) {
 
         level = arguments[0] = LogLevelName[level];
 
+        emedia._logContext && sdklog.apply(null, arguments);
+        if (emedia.config.consoleLogger !== true) {
+            return;
+        }
+
         if (emedia && emedia.isElectron) {
             console.log.apply(console, arguments);
             return;
@@ -5691,6 +5780,101 @@ var Logger = function Logger(tag) {
     };
 
     function callLog(level, args) {
+        try {
+            _callLog(level, args);
+        } catch (e) {
+            if (console) {
+                if (console.error) {
+                    console.error(e);
+                    return;
+                }
+                if (console.log) {
+                    console.log(e);
+                    return;
+                }
+            }
+
+            throw e;
+        }
+    }
+
+    function _sdklog() {
+        if (emedia._logContextIndex < 0) {
+            return;
+        }
+        if (!emedia._logContext || !(emedia._logContext instanceof Array)) {
+            return;
+        }
+
+        var contextIndex = emedia._logContextIndex % emedia._logContext.length;
+        var logInfos = emedia._logContext[contextIndex];
+        if (!logInfos || !(logInfos instanceof Array)) {
+            logInfos = emedia._logContext[contextIndex] = [];
+        }
+
+        var info = [];
+        info.push(emedia._logContextIndex);
+
+        var now = new Date();
+        if (now.toJSON) {
+            info.push(now.toJSON());
+        } else if (now.toISOString) {
+            info.push(now.toISOString());
+        } else {
+            info.push(now + "");
+        }
+
+        for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+
+            if (typeof arg === "string") {
+                info.push(arg);
+                continue;
+            }
+
+            if (typeof arg.message === "string") {
+                info.push(arg.message);
+                continue;
+            }
+            if (typeof arg.message === "function") {
+                info.push(arg.message());
+                continue;
+            }
+            if (typeof arg.stack === "string") {
+                info.push(arg.stack);
+                continue;
+            }
+            if (arg.event && typeof arg.event.toString === "function") {
+                info.push(arg.event.toString());
+                continue;
+            }
+            if (arg.event && typeof arg.event.toString === "function") {
+                info.push(arg.event.toString());
+                continue;
+            }
+
+            if (typeof arg.candidate === "string") {
+                info.push(arg.candidate);
+                continue;
+            }
+            if (typeof arg.sdp === "string") {
+                info.push(arg.sdp);
+                continue;
+            }
+
+            arg && info.push(JSON.stringify(arg));
+        }
+
+        logInfos.push(info.join(' '));
+    };
+
+    function sdklog() {
+        try {
+            _sdklog.apply(null, arguments);
+        } catch (e) {}
+    };
+
+    function _callLog(level, args) {
         if (emedia && emedia.LOG_LEVEL && level < emedia.LOG_LEVEL) {
             return;
         }
@@ -5736,6 +5920,19 @@ var Logger = function Logger(tag) {
     this.fatal = function () {
         this._log && callLog(LogLevel.FATAL, arguments);
     };
+};
+
+Logger.prototype.count = function () {
+    if (emedia._logContext) {
+        emedia._logContextIndex++;
+
+        var contextIndex = emedia._logContextIndex % emedia._logContext.length;
+
+        if (contextIndex === 0 && emedia._logContextIndex !== 0) {
+            emedia._logContext.loadlogs = emedia._logContext[contextIndex];
+        }
+        emedia._logContext[contextIndex] = [];
+    }
 };
 
 Util.prototype.logger = new Logger();
@@ -6274,6 +6471,9 @@ module.exports = _util.prototypeExtend({
     __init__: function __init__() {
         var self = this;
 
+        _logger.warn("emedia version: ", window._emediaVersion || "unkown");
+        _logger.warn("UserAgent: ", navigator.userAgent);
+
         var urlLogLevel = _util.parseURL("__log_level___");
         if (urlLogLevel) {
             emedia.LOG_LEVEL = parseInt(urlLogLevel);
@@ -6310,6 +6510,9 @@ module.exports = _util.prototypeExtend({
             }
             //self.constaints || (self.constaints = {audio: !self.aoff, video: !self.voff});
             self.constaints || (self.constaints = { audio: true, video: true });
+
+            emedia.config.maxVideoBitrate && (self.vbitrate = emedia.config.maxVideoBitrate);
+            emedia.config.maxAudioBitrate && (self.abitrate = emedia.config.maxAudioBitrate);
         }
     }),
 
@@ -6324,8 +6527,8 @@ module.exports = _util.prototypeExtend({
 
             self.constaints || (self.constaints = { audio: true, video: false });
             if (self.constaints) {
-                var audio = self.constaints.audio;
-                self.constaints.audio = true;
+                var audio = !!self.constaints.audio;
+                //self.constaints.audio = true;
                 self.constaints.video || (self.constaints.video = false);
 
                 self.constaints.video || (self.voff = 1);
@@ -6333,6 +6536,9 @@ module.exports = _util.prototypeExtend({
 
                 audio === false && (self.aoff = 1);
             }
+
+            emedia.config.maxVideoBitrate && (self.vbitrate = emedia.config.maxVideoBitrate);
+            emedia.config.maxAudioBitrate && (self.abitrate = emedia.config.maxAudioBitrate);
         },
 
         onGotRemoteMediaStream: function onGotRemoteMediaStream(remoteMediaStream) {
@@ -6379,15 +6585,20 @@ module.exports = _util.prototypeExtend({
 
             self.mutedMuted = true;
             self.constaints = { audio: !this.aoff, video: true };
+
+            emedia.config.maxVideoBitrate && (self.vbitrate = emedia.config.maxVideoBitrate);
+            emedia.config.maxAudioBitrate && (self.abitrate = emedia.config.maxAudioBitrate);
         }
     }),
 
     __assertCurrent: function __assertCurrent() {
         var self = this;
         if (!self.current) {
+            _logger.error("Please call emedia.service.setup(ticket)");
             throw "Please call emedia.service.setup(ticket)";
         }
         if (self.current.closed) {
+            _logger.error("current closed");
             throw "current closed";
         }
     },
@@ -6470,11 +6681,14 @@ module.exports = _util.prototypeExtend({
     },
 
     openUserMedia: function openUserMedia(pubS) {
+        _logger.debug("begin open user media", pubS);
+
         var self = this;
 
         //self.__assertCurrent();
 
         if (!pubS) {
+            _logger.error("require pubS");
             throw "require pubS";
         }
 
@@ -6487,6 +6701,7 @@ module.exports = _util.prototypeExtend({
                 } else if (pubS instanceof self.AudioMixerPubstream) {
                     self._openCamera(pubS, success, errCallback);
                 } else {
+                    _logger.error("Unspported pubS");
                     throw "Unspported pubS";
                 }
             }
@@ -6499,7 +6714,13 @@ module.exports = _util.prototypeExtend({
         //self.__assertCurrent();
 
         function getAudioStream(pubS) {
-            self.__getUserMedia({ audio: true }, function (_user, stream) {
+            var audioConstaints = { audio: true };
+            if (pubS.constaints) {
+                if (_typeof(pubS.constaints.audio) === 'object' && pubS.constaints.audio) {} else if (!pubS.constaints.audio) {
+                    audioConstaints.audio = false;
+                }
+            }
+            self.__getUserMedia(audioConstaints, function (_user, stream) {
                 var mediaStream = new MediaStream();
                 mediaStream._located = true;
 
@@ -6549,7 +6770,7 @@ module.exports = _util.prototypeExtend({
                     }
                 };
 
-                delete pubS.mandatory;
+                //delete pubS.mandatory;
 
                 self.__getUserMedia(constraints, function (_me, stream) {
                     pubS.localStream = stream;
@@ -6569,18 +6790,18 @@ module.exports = _util.prototypeExtend({
 
     _openCamera: function _openCamera(pubS, success, errCallback) {
         var self = this;
-
         //self.__assertCurrent();
 
         //var constaints = pubS.constaints || {audio: !pubS.aoff, video: !pubS.voff};
         var constaints = pubS.constaints || { audio: true, video: true };
 
-        self.__getUserMedia(constaints, function (_me, stream) {
+        function successCallback(_me, stream) {
             self.__controlStream(pubS, stream);
 
             pubS.localStream = stream;
             success && success(self.current, stream);
-        }, errCallback);
+        }
+        self.__getUserMedia(constaints, successCallback.bind(constaints), errCallback);
     },
 
     __controlStream: function __controlStream(pubS, stream) {
@@ -6589,11 +6810,30 @@ module.exports = _util.prototypeExtend({
     },
 
     __getUserMedia: function __getUserMedia(constaints, success, errCallback) {
+        _logger.debug('Using get user media. constaints', constaints);
+
         var self = this;
+
+        constaints = _util.extend({}, constaints);
+        if (_typeof(constaints.audio) === 'object' && constaints.audio) {
+            constaints.audio = true;
+        }
 
         var _openstream;
 
         function onSuccess(stream) {
+            if (self.current && !self.current.closed) {
+                //push stream时，由于异步，在未返回成功后，退出会议，摄像头不会被关闭问题
+                //将stream 与 Attendee绑定
+                self.current._openedRtcMediaStreams[stream.id] = stream;
+                stream._bindAttendee = self.current;
+                _logger.info("stream bind attendee.", stream.id, self.current.ticket && self.current.ticket.id || self.current.memName);
+            }
+
+            if (emedia.isSafari) {
+                emedia._isSafariYetPushedStream = true;
+            }
+
             _openstream = stream;
 
             var videoTracks = stream.getVideoTracks();
@@ -6620,14 +6860,90 @@ module.exports = _util.prototypeExtend({
             errCallback && errCallback(new __event.OpenMediaError({ member: self.current, event: e }));
         }
 
-        navigator.mediaDevices.getUserMedia(constaints).then(onSuccess).catch(onFail);
-        // navigator.mediaDevices ? navigator.mediaDevices.getUserMedia(constaints).then(onSuccess).catch(onFail)
-        //     : navigator.getUserMedia(constaints, onSuccess, onFail);
+        self.__sysGetUserMedia(constaints, onSuccess, onFail);
+    },
+
+    __sysGetUserMedia: function __sysGetUserMedia(constaints, onSuccess, onFail) {
+        function getUserMedia(constaints, onSuccess, onFail) {
+            navigator.mediaDevices.getUserMedia(constaints).then(onSuccess).catch(onFail);
+            // navigator.mediaDevices ? navigator.mediaDevices.getUserMedia(constaints).then(onSuccess).catch(onFail)
+            //     : navigator.getUserMedia(constaints, onSuccess, onFail);
+        }
+
+        if (!emedia.isSafari) {
+            getUserMedia(constaints, onSuccess, onFail);
+            return;
+        }
+
+        constaints = _.extend({}, constaints);
+
+        function newStreamAndCallback() {
+            var mediaStream = new MediaStream();
+
+            constaints.audioStream && constaints.audioStream.getAudioTracks().forEach(function (track) {
+                mediaStream.addTrack(track);
+            });
+            constaints.videoStream && constaints.videoStream.getVideoTracks().forEach(function (track) {
+                mediaStream.addTrack(track);
+            });
+            onSuccess && onSuccess(mediaStream);
+        }
+
+        function successCallback(stream) {
+            if (constaints.failed) {
+                emedia.stopTracks(stream);
+                return;
+            }
+
+            if (this.audio) {
+                constaints.audioStream = stream;
+                if (!constaints.video) {
+                    newStreamAndCallback();
+                    return;
+                }
+            }
+            if (this.video) {
+                constaints.videoStream = stream;
+                if (!constaints.audio) {
+                    newStreamAndCallback();
+                    return;
+                }
+            }
+
+            if (constaints.audioStream && constaints.videoStream) {
+                newStreamAndCallback();
+                return;
+            }
+        }
+
+        function failCallback(e) {
+            if (constaints.failed) {
+                return;
+            }
+
+            constaints.failed = true;
+            onFail(e);
+        }
+
+        if (constaints.audio) {
+            var onlyAudio = { audio: constaints.audio };
+            getUserMedia(onlyAudio, successCallback.bind(onlyAudio), failCallback);
+        }
+        if (constaints.video) {
+            var onlyVideo = { video: constaints.video };
+            getUserMedia(onlyVideo, successCallback.bind(onlyVideo), failCallback);
+        }
+
+        if (!constaints.video && !constaints.audio) {
+            failCallback("Failed to execute 'getUserMedia' on 'MediaDevices': At least one of audio and video must be requested");
+        }
+        //Failed to execute 'getUserMedia' on 'MediaDevices': At least one of audio and video must be requested
     },
 
     setup: function setup(ticket, ext) {
         var self = this;
 
+        _logger.count();
         _logger.debug("recv ticket", ticket, ext);
 
         ext = ext || {};
@@ -6647,11 +6963,14 @@ module.exports = _util.prototypeExtend({
             ticket = JSON.parse(ticket);
         }
 
-        var sysUserId = memName = ticket.memName;
+        var sysUserId, memName;
+        sysUserId = memName = ticket.memName;
 
         if (self.current && !self.current.closed) {
             var __eventCalling = new __event.CurrentCalling();
             self.current.onEvent(__eventCalling);
+
+            _logger.error("confr not close. calling...");
             throw __eventCalling;
             //return;
 
@@ -6702,7 +7021,14 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         self.__assertCurrent();
-        self.current._session._sessionId = undefined;
+        if (self.current._memberId) {
+            //已经加入会议
+            _logger.warn("Had joined. igrone it");
+            joined && joined(self.memId);
+            return;
+        } else {
+            self.current._session._sessionId = undefined;
+        }
 
         self.current.join(joined, joinError);
     },
@@ -6711,11 +7037,17 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         if (!pubS || !pubS.localStream) {
+            _logger.error("pubS null or stream not open");
             throw "pubS null or stream not open";
         }
 
         self.__assertCurrent();
-        self.current._session._sessionId = undefined;
+        if (self.current._memberId) {
+            //已经加入会议
+            _logger.warn("Had joined. igrone it");
+        } else {
+            self.current._session._sessionId = undefined;
+        }
 
         return self.current.withpublish(pubS);
     },
@@ -6731,6 +7063,7 @@ module.exports = _util.prototypeExtend({
         }
 
         if (!pubS || !pubS.localStream) {
+            _logger.error("pubS or stream open");
             throw "pubS or stream open";
         }
 
@@ -6740,6 +7073,19 @@ module.exports = _util.prototypeExtend({
 
     subscribe: function subscribe(streamId, onSub, subfail, subArgs) {
         var self = this;
+
+        _logger.info("begin subscribe ", streamId, subArgs);
+
+        if (onSub && _util.isPlainObject(onSub)) {
+            subArgs = onSub;
+            onSub = subfail = undefined;
+        }
+        if (subfail && _util.isPlainObject(subfail)) {
+            subArgs = subfail;
+            subfail = onSub;
+            onSub = undefined;
+        }
+
         if (emedia.isSafari) {
             var _onSub = function _onSub() {
                 try {
@@ -6813,8 +7159,24 @@ module.exports = _util.prototypeExtend({
 
         var webrtc = self.current._getWebrtc(streamId);
 
+        var usePreRTCPeer = webrtc && webrtc.isConnected();
+
+        var remoteStream = usePreRTCPeer && webrtc.getRemoteStream();
+        if (remoteStream && (usePreRTCPeer = remoteStream.active)) {
+            var hasAudioTracks = remoteStream.getAudioTracks().length;
+            var hasVideoTracks = remoteStream.getVideoTracks().length;
+
+            if (!hasAudioTracks && subArgs.subSAudio === true) {
+                usePreRTCPeer = false;
+            } else if (!hasVideoTracks && subArgs.subSVideo === true) {
+                usePreRTCPeer = false;
+            }
+        }
+
+        _logger.info("sub stream", streamId, ", use prertcpeer =", usePreRTCPeer);
+
         // if(webrtc && webrtc.isConnected() && !emedia.isSafari){
-        if (webrtc && webrtc.isConnected()) {
+        if (usePreRTCPeer) {
             self.current.subscribeStream(webrtc._rtcId, streamId, subfail, subArgs, onSub);
             onSub && onSub();
             return;
@@ -6949,6 +7311,7 @@ module.exports = _util.prototypeExtend({
 
         var linkedStream = attendee._linkedStreams[streamId];
         if (!linkedStream || linkedStream.located()) {
+            _logger.error("not exsits or locate, not connect", streamId);
             throw streamId + " not exsits or locate, not connect";
         }
 
@@ -6994,6 +7357,7 @@ module.exports = _util.prototypeExtend({
 
         var linkedStream = attendee._linkedStreams[streamId];
         if (!linkedStream || linkedStream.located()) {
+            _logger.error("not exsits or locate, not connect", streamId);
             throw streamId + " not exsits or locate, not connect";
         }
 
@@ -7042,6 +7406,10 @@ module.exports = _util.prototypeExtend({
             uInt8Array[i] = raw.charCodeAt(i);
         }
 
+        // if(emedia.isSafari){
+        //     return new Blob([uInt8Array], {type:"application/octet-stream"});
+        // }
+
         return new Blob([uInt8Array], { type: contentType });
     },
 
@@ -7058,16 +7426,41 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         var aLink = document.createElement('a');
+        aLink.style.display = 'none';
         var blob = content ? self.base64Img2Blob(content) : blobs; //new Blob([content]);
 
+        // if(typeof FileReader === 'object'){
+        //     var reader = new FileReader();
+        //
+        //     reader.onloadend = function () {
+        //         var url = reader.result;
+        //         url = url.replace(/^data:[^;]*;/, 'data:attachment/file;');
+        //         window.location.href = url;
+        //     };
+        //
+        //     reader.readAsDataURL(blob);
+        //     return;
+        // }
+
+        var blobUrl;
         aLink.download = fileName;
-        aLink.href = self.blob2URL(blob);
+        aLink.href = blobUrl = self.blob2URL(blob);
+        aLink.rel = 'noopener';
+        // if(emedia.isSafari){
+        //     aLink.href = aLink.href.replace(/^data:[^;]*;/, 'data:attachment/file;');
+        // }
 
         var evt = document.createEvent("HTMLEvents");
         evt.initEvent("click", false, false); //initEvent 不加后两个参数在FF下会报错
         aLink.dispatchEvent(evt);
 
+        document.body.appendChild(aLink);
         aLink.click();
+        aLink.parentNode.removeChild(aLink);
+
+        setTimeout(function () {
+            URL.revokeObjectURL && URL.revokeObjectURL(blobUrl);
+        }, 40000);
     },
 
     videoCaptureBase64Context2URL: function videoCaptureBase64Context2URL(videoObj) {
@@ -7126,6 +7519,7 @@ module.exports = _util.prototypeExtend({
 
         var linkedStream = attendee._linkedStreams[streamId];
         if (!linkedStream || linkedStream.located()) {
+            _logger.error("not exsits or locate, not connect", streamId);
             throw streamId + " not exsits or locate, not connect";
         }
 
@@ -7175,6 +7569,7 @@ module.exports = _util.prototypeExtend({
 
         var linkedStream = attendee._linkedStreams[streamId];
         if (!linkedStream || linkedStream.located()) {
+            _logger.error("not exsits or locate, not connect", streamId);
             throw streamId + " not exsits or locate, not connect";
         }
 
@@ -7408,6 +7803,7 @@ module.exports = _util.prototypeExtend({
 
         var linkedStream = attendee._linkedStreams[streamId];
         if (!linkedStream || linkedStream.located()) {
+            _logger.error("not exsits or locate, not connect", streamId);
             throw streamId + " not exsits or locate, not connect";
         }
 
@@ -7441,6 +7837,8 @@ module.exports = _util.prototypeExtend({
     },
 
     _republish: function _republish(pubS, success, error) {
+        _logger.info("Republish stream. it = ", pubS.id);
+
         var self = this;
 
         var webrtc;
@@ -7453,59 +7851,58 @@ module.exports = _util.prototypeExtend({
 
         var _pubS;
 
+        // if(emedia.isSafari){
+        //     emedia.enableAudioTracks(false);
+        //     emedia.enableVideoTracks(false);
+        // }
+
         switch (pubS.type) {
             case 0:
+                //emedia.isSafari || emedia.stopTracks(pubS._localMediaStream);
                 emedia.stopTracks(pubS._localMediaStream);
-
                 _pubS = new self.AVPubstream(pubS);
-
-                setTimeout(function () {
-                    self.openUserMedia(_pubS).then(function () {
-                        pubS.localStream = _pubS.localStream;
-
-                        pubS.isRepublished = true;
-
-                        pubS.optimalVideoCodecs = pubS.optimalVideoCodecs || webrtc && webrtc.optimalVideoCodecs;
-                        self.push(pubS, success, error);
-                    }, error);
-                }, 300);
 
                 break;
             case 1:
+                //emedia.isSafari || emedia.stopAndRemoveAudioTracks(pubS._localMediaStream);
                 emedia.stopAndRemoveAudioTracks(pubS._localMediaStream);
-
                 _pubS = new self.ShareDesktopPubstream(pubS);
-
-                setTimeout(function () {
-                    self.openUserMedia(_pubS).then(function () {
-                        pubS.localStream = _pubS.localStream;
-
-                        pubS.isRepublished = true;
-
-                        pubS.optimalVideoCodecs = pubS.optimalVideoCodecs || webrtc && webrtc.optimalVideoCodecs;
-                        self.push(pubS, success, error);
-                    }, error);
-                }, 300);
 
                 break;
             case 2:
+                //emedia.isSafari || emedia.stopTracks(pubS._localMediaStream);
                 emedia.stopTracks(pubS._localMediaStream);
-
                 _pubS = new self.AudioMixerPubstream(pubS);
-
-                setTimeout(function () {
-                    self.openUserMedia(_pubS).then(function () {
-                        pubS.localStream = _pubS.localStream;
-
-                        pubS.isRepublished = true;
-
-                        pubS.optimalVideoCodecs = pubS.optimalVideoCodecs || webrtc && webrtc.optimalVideoCodecs;
-                        self.push(pubS, success, error);
-                    }, error);
-                }, 300);
 
                 break;
         }
+
+        setTimeout(function () {
+            self.openUserMedia(_pubS).then(function () {
+                pubS.localStream = _pubS.localStream;
+
+                pubS.isRepublished = true;
+
+                pubS.optimalVideoCodecs = pubS.optimalVideoCodecs || webrtc && webrtc.optimalVideoCodecs;
+                self.push(pubS, success, error);
+            }, error);
+        }, 100);
+
+        // if(emedia.isSafari){
+        //     setTimeout(function () {
+        //         switch(pubS.type) {
+        //             case 0:
+        //                 emedia.stopTracks(pubS._localMediaStream);
+        //                 break;
+        //             case 1:
+        //                 emedia.stopAndRemoveAudioTracks(pubS._localMediaStream);
+        //                 break;
+        //             case 2:
+        //                 emedia.stopTracks(pubS._localMediaStream);
+        //                 break;
+        //         }
+        //     }, 1400);
+        // }
     },
 
     chanageCamera: function chanageCamera(pubS, error, success) {
@@ -7630,9 +8027,11 @@ module.exports = _util.prototypeExtend({
             self.current && self.current.voff(pubS, _voff);
         }
 
-        if (pubS.constaints && !pubS.constaints.video) {
+        if (!_voff && pubS.constaints && !pubS.constaints.video) {
             //error && error("When pub. only audio, voff invalidate");
             //throw "When pub. only audio, voff invalidate";
+
+            var preVideo = pubS.constaints.video;
 
             pubS.constaints.video = true;
             self._republish(pubS, function (mediaStream) {
@@ -7641,7 +8040,7 @@ module.exports = _util.prototypeExtend({
             }, function (_evt) {
                 if (_evt instanceof emedia.event.OpenMediaError) {
                     //设备可能不支持，比如 没有摄像头，或 被禁止访问摄像头
-                    pubS.constaints.video = false;
+                    pubS.constaints.video = preVideo;
                 }
 
                 error && error(_evt);
@@ -7676,9 +8075,11 @@ module.exports = _util.prototypeExtend({
             self.current && self.current.aoff(pubS, _aoff);
         }
 
-        if (pubS.constaints && !pubS.constaints.audio) {
+        if (!_aoff && pubS.constaints && !pubS.constaints.audio) {
             // error && error("When pub. only video, aoff invalidate");
             // throw "When pub. only video, aoff invalidate";
+
+            var preAudio = pubS.constaints.audio;
 
             pubS.constaints.audio = true;
             self._republish(pubS, function (mediaStream) {
@@ -7687,7 +8088,7 @@ module.exports = _util.prototypeExtend({
             }, function (_evt) {
                 if (_evt instanceof emedia.event.OpenMediaError) {
                     //设备可能不支持，比如 没有摄像头，或 被禁止访问摄像头
-                    pubS.constaints.audio = false;
+                    pubS.constaints.audio = preAudio;
                 }
 
                 error && error(_evt);
@@ -7717,6 +8118,7 @@ module.exports = _util.prototypeExtend({
 
         var _stream = self.current._linkedStreams[streamId];
         if (!_stream) {
+            _logger.error("not at linked streams", streamId);
             throw streamId + " not at linked streams";
         }
         if (!_stream._webrtc) {
@@ -7731,6 +8133,7 @@ module.exports = _util.prototypeExtend({
 
         var _stream = self.current._records[streamId];
         if (!_stream) {
+            _logger.error("not at recording streams", streamId);
             throw streamId + " not at recording streams";
         }
 
@@ -10038,6 +10441,7 @@ function _connect(onConnected, onConnectFail, retry) {
         }
 
         if (_util.isPlainObject(message) && !(message instanceof Message)) {
+            _logger.error("message not a Messages");
             throw "message not a Messages";
         }
 
@@ -10064,6 +10468,7 @@ function _connect(onConnected, onConnectFail, retry) {
                 if (!bufferedMessage.sessId && !self.sessId && bufferedMessage.op != 200) {
                     //等待Enter
                     __array.push(bufferedMessage);
+                    _logger.warn("tmp store message, util enter success!", bufferedMessage);
                     continue;
                 }
 
@@ -10332,6 +10737,12 @@ module.exports = _util.prototypeExtend({
         // }
         // _logger.warn("ticket url modifiy. ", hostname, url);
 
+        if (typeof emedia.convertWebsocketURLOfTicket === "function") {
+            var oldUrl = url;
+            url = emedia.convertWebsocketURLOfTicket(url);
+            _logger.warn(oldUrl, "-->", url);
+        }
+
         if (url.startsWith('/')) {
             //通过地址栏 补齐url
             if (emedia.config.wsorigin) {
@@ -10356,6 +10767,10 @@ module.exports = _util.prototypeExtend({
             url += "&" + __url_seqno++;
         } else {
             url += "?" + __url_seqno++;
+        }
+
+        if (self.ticket.confrId) {
+            url += "&" + encodeURIComponent(self.ticket.confrId);
         }
         return url;
     },
@@ -10485,6 +10900,7 @@ module.exports = _util.prototypeExtend({
         if (onFunc = self._events[event]) {
             self[onFunc] = func;
         } else {
+            _logger.error("Not supported event = ", event);
             throw "Not supported event = " + event;
         }
     },
@@ -10635,10 +11051,12 @@ module.exports = _util.prototypeExtend({
         }
 
         if (servMessage.op != 1001 && !servMessage.sessId) {
+            _logger.error("message sessId error. server evt data error");
             throw "message sessId error. server evt data error";
         }
 
         if (servMessage.op != 1001 && self._sessionId && self._sessionId != servMessage.sessId) {
+            _logger.error("message sessId error. server and local not equal");
             throw "message sessId error. server and local not equal";
         }
 
@@ -11234,13 +11652,17 @@ var Attendee = Member.extend({
 
         self._session || self.sessionFactory && (self._session = self.sessionFactory());
 
-        if (!self._session) throw "Require session";
+        if (!self._session) {
+            _logger.error("Require session");
+            throw "Require session";
+        }
 
         self._cver = 0;
 
         self._cacheMembers = {};
         self._cacheStreams = {};
         self._mediaMeters = {};
+        self._openedRtcMediaStreams = {};
 
         self._linkedStreams = {};
         self._maybeNotExistStreams = {}; //与self._streams结构相同，用 存储 断网时，ice fail的stream对象。这个对象可能不存在了
@@ -11284,6 +11706,7 @@ var Attendee = Member.extend({
                 if (self.memId && !self.owner) {
                     self.owner = _util.extend({}, attendee._cacheMembers[self.memId]);
                     if (!self.owner && !self.located()) {
+                        _logger.error("Remote stream, not owner. it = ", self.id);
                         throw "Remote stream, not owner. it = " + self.id;
                     }
                 }
@@ -11383,25 +11806,6 @@ var Attendee = Member.extend({
             self.postMessage(enter, enterRsp);
         }
 
-        if (self.isSafariButNotPushStream()) {
-            // safari 如果没有getUserMedia时，是不会生成cands的
-            self._service.__getUserMedia({ audio: true }, function success(_user, mediaStream) {
-                emedia._isSafariYetPushedStream = true;
-
-                self.connect(onConnected, onJoinError);
-                _logger.debug("join", self.ticket.url);
-
-                setTimeout(function () {
-                    emedia.stopAudioTracks(mediaStream);
-                }, 1000);
-            }, function (event) {
-                emedia._isSafariYetPushedStream = false;
-                _logger.error("Safari must getUserMedia, gather cands. now try get audio. fail. joinFail");
-                onJoinError(event);
-            });
-            return;
-        }
-
         self.connect(onConnected, onJoinError);
         _logger.debug("join", self.ticket.url);
     },
@@ -11410,6 +11814,7 @@ var Attendee = Member.extend({
         var self = this;
 
         if (!pubS || !pubS.localStream) {
+            _logger.error("pubS null or stream not open");
             throw "pubS null or stream not open";
         }
 
@@ -11531,7 +11936,9 @@ var Attendee = Member.extend({
                     _rtcId: pubS.rtcId,
                     optimalVideoCodecs: optimalVideoCodecs,
                     offerOptions: offerOptions,
-                    subArgs: subArgs
+                    subArgs: subArgs,
+                    vbitrate: pubS.vbitrate || pubS.constaints && pubS.constaints.video && pubS.constaints.video.bitrate,
+                    abitrate: pubS.abitrate || pubS.constaints && pubS.constaints.audio && pubS.constaints.audio.bitrate
                 }, pubS.iceRebuildCount);
                 self.setLocalStream(stream, webrtc.getRtcId());
 
@@ -11539,25 +11946,6 @@ var Attendee = Member.extend({
                     enter = self.newMessage().setOp(200).setTicket(self.ticket).setNickName(self.nickName || self.ticket.memName).setResource(self.resource).setSdp(sdp).setRtcId(webrtc.getRtcId()).setPubS(pubS).setExt(self.ext);
                     self.postMessage(enter, enterRsp);
                 });
-            }
-
-            if (self.isSafariButNotPushStream()) {
-                // safari 如果没有getUserMedia时，是不会生成cands的
-                self._service.__getUserMedia({ audio: true }, function success(_user, mediaStream) {
-                    emedia._isSafariYetPushedStream = true;
-
-                    self.connect(onConnected, onJoinError);
-                    _logger.debug("join", self.ticket.url);
-
-                    setTimeout(function () {
-                        emedia.stopAudioTracks(mediaStream);
-                    }, 1000);
-                }, function (event) {
-                    emedia._isSafariYetPushedStream = false;
-                    _logger.error("Safari must getUserMedia, gather cands. now try get audio. fail. joinFail");
-                    onJoinError(event);
-                });
-                return;
             }
 
             self.connect(onConnected, onJoinError);
@@ -11580,6 +11968,7 @@ var Attendee = Member.extend({
         }
 
         if (!pubS || !pubS.localStream) {
+            _logger.error("pubS or stream open");
             throw "pubS or stream open";
         }
 
@@ -11672,7 +12061,9 @@ var Attendee = Member.extend({
                 _rtcId: pubS.rtcId,
                 optimalVideoCodecs: optimalVideoCodecs,
                 offerOptions: offerOptions,
-                subArgs: subArgs
+                subArgs: subArgs,
+                vbitrate: pubS.vbitrate || pubS.constaints && pubS.constaints.video && pubS.constaints.video.bitrate,
+                abitrate: pubS.abitrate || pubS.constaints && pubS.constaints.audio && pubS.constaints.audio.bitrate
             }, pubS.iceRebuildCount);
 
             self.setLocalStream(stream, webrtc.getRtcId());
@@ -11695,19 +12086,51 @@ var Attendee = Member.extend({
         );
     },
 
-    isSafariButNotPushStream: function isSafariButNotPushStream() {
+    isSafariButNotPushStream: function isSafariButNotPushStream(successOpenMedia, failOpenMedia) {
         var self = this;
 
         if (self.isSafari() && !emedia._isSafariYetPushedStream) {
-            // var pubCount = 0;
-            // _util.forEach(self._cacheStreams, function (_sid, _stream) {
-            //     if(_stream.located()){
-            //         pubCount ++;
-            //     }
-            // });
-            // if(pubCount == 0){
-            //     return true;
-            // }
+            if (self.__tryingOpenMedia === true) {
+                self.__tryingOpenMediaWaitSuceess = self.__tryingOpenMediaWaitSuceess || [];
+                self.__tryingOpenMediaWaitFail = self.__tryingOpenMediaWaitFail || [];
+
+                if (typeof successOpenMedia === "function") {
+                    self.__tryingOpenMediaWaitSuceess.push(successOpenMedia);
+                }
+                if (typeof failOpenMedia === "function") {
+                    self.__tryingOpenMediaWaitFail.push(failOpenMedia);
+                }
+            } else {
+                self.__tryingOpenMedia = true;
+                self._service.__getUserMedia({ audio: true }, function success(_user, mediaStream) {
+                    emedia._isSafariYetPushedStream = true;
+                    // setTimeout(function () {
+                    //     emedia.stopAudioTracks(mediaStream);
+                    // }, 700);
+                    emedia.stopAudioTracks(mediaStream);
+
+                    setTimeout(function () {
+                        self.__tryingOpenMedia = false;
+                        successOpenMedia && successOpenMedia.apply(self);
+                        self.__tryingOpenMediaWaitSuceess && _util.forEach(self.__tryingOpenMediaWaitSuceess, function (index, func) {
+                            func.apply(self);
+                        });
+                        self.__tryingOpenMediaWaitSuceess = [];
+                        self.__tryingOpenMediaWaitFail = [];
+                    }, 300);
+                }, function (event) {
+                    //emedia._isSafariYetPushedStream = false;
+                    self.__tryingOpenMedia = false;
+                    _logger.error("Safari must getUserMedia, gather cands. now try get audio. fail. subfail");
+
+                    failOpenMedia && failOpenMedia.call(self, event);
+                    self.__tryingOpenMediaWaitFail && _util.forEach(self.__tryingOpenMediaWaitFail, function (index, func) {
+                        func.call(self, event);
+                    });
+                    self.__tryingOpenMediaWaitSuceess = [];
+                    self.__tryingOpenMediaWaitFail = [];
+                });
+            }
             return true;
         }
 
@@ -11741,14 +12164,6 @@ var Attendee = Member.extend({
             callbacks && callbacks.onEvent && callbacks.onEvent(evt);
             self.onEvent && self.onEvent(evt);
         }
-
-        // if(self.isSafariButNotPushStream()){
-        //     _onSubFail(_util.extend(new __event.SubFail(), new __event.SubFailSafariNotAllowSubBeforePub({
-        //         stream: stream
-        //     })));
-        //     return;
-        // }
-
 
         var pubStreamVCodes = subStream.vcodes || [];
         var pubMemberSupportVCodes = subMember && subMember.vcodes || [];
@@ -11805,21 +12220,12 @@ var Attendee = Member.extend({
         subArgs && stream._webrtc && stream._webrtc.setSubArgs(subArgs);
         subArgs && (stream.subArgs = subArgs);
 
-        if (self.isSafariButNotPushStream()) {
-            // safari 如果没有getUserMedia时，是不会生成cands的
-            self._service.__getUserMedia({ audio: true }, function success(_user, mediaStream) {
-                //emedia._isSafariYetPushedStream = true;
-
-                self.offerCall(rtcId, null, streamId, _onSubFail, function onRspSuccess() {});
-
-                setTimeout(function () {
-                    emedia.stopAudioTracks(mediaStream);
-                }, 1000);
-            }, function (event) {
-                emedia._isSafariYetPushedStream = false;
-                _logger.error("Safari must getUserMedia, gather cands. now try get audio. fail. subfail", rtcId, streamId);
-                _onSubFail(event);
-            });
+        if (self.isSafariButNotPushStream(function success() {
+            self.offerCall(rtcId, null, streamId, _onSubFail, function onRspSuccess() {});
+        }, function (event) {
+            _logger.error("Safari must getUserMedia, gather cands. now try get audio. fail. subfail", rtcId, streamId);
+            _onSubFail(event);
+        })) {// safari 如果没有getUserMedia时，是不会生成cands的
         } else {
             self.offerCall(rtcId, null, streamId, _onSubFail, function onRspSuccess() {});
         }
@@ -11990,6 +12396,27 @@ var Attendee = Member.extend({
         //self._session._sessionId = undefined;
         //self._session = undefined;
 
+
+        //push stream时，由于异步，在未返回成功后，退出会议，摄像头不会被关闭问题
+        var openedMediaStreams = [];
+        _util.forEach(self._openedRtcMediaStreams, function (streamId, mediaStream) {
+            if (mediaStream.active !== false) {
+                //还没有关闭的流
+                openedMediaStreams.push(mediaStream);
+            }
+        });
+        if (openedMediaStreams.length > 0) {
+            for (var i = 0; i < openedMediaStreams.length; i++) {
+                try {
+                    var _openStream = openedMediaStreams[i];
+                    _logger.info("exit, close stream = ", _openStream.id);
+                    emedia.stopTracks(_openStream);
+                } catch (e) {
+                    _logger.error(e);
+                }
+            }
+        }
+
         _logger.warn("finally. all clean.");
     },
 
@@ -12041,7 +12468,10 @@ var Attendee = Member.extend({
     onPub: function onPub(cver, memId, pubS) {
         var self = this;
 
-        if (!self._cacheMembers[memId]) throw "No found member. when pub";
+        if (!self._cacheMembers[memId]) {
+            _logger.error("No found member. when pub");
+            throw "No found member. when pub";
+        }
 
         // if(pubS.type === 2){ //强制 aoff = 1
         //     pubS._1_aoff = pubS.aoff;
@@ -12074,11 +12504,11 @@ var Attendee = Member.extend({
         self._onAddStream(self.newStream(stream));
 
         if (self.autoSub) {
-            if (self.isSafariButNotPushStream()) {
-                stream._autoSubWhenPushStream = true;
-                _logger.warn("Dont auto sub stream ", stream.id, ", caused by safari not pub stream");
-                return;
-            }
+            // if(self.isSafariButNotPushStream()){
+            //     stream._autoSubWhenPushStream = true;
+            //     _logger.warn("Dont auto sub stream ", stream.id, ", caused by safari not pub stream");
+            //     //return;
+            // }
 
             self.createWebrtcAndSubscribeStream(pubS.id, {
                 onGotRemote: function onGotRemote(stream) {}
@@ -12153,6 +12583,7 @@ var Attendee = Member.extend({
 
         var rtcId = self.__getWebrtcFor(pubS.id);
         if (!rtcId) {
+            _logger.error("pubS not publish", pubS.id);
             throw "pubS not publish" + pubS.id;
         }
 
@@ -12168,6 +12599,7 @@ var Attendee = Member.extend({
 
         var rtcId = self.__getWebrtcFor(pubS.id);
         if (!rtcId) {
+            _logger.error("pubS not publish", pubS.id);
             throw "pubS not publish" + pubS.id;
         }
 
@@ -12453,7 +12885,10 @@ module.exports = _util.prototypeExtend({
     __init__: function __init__() {
         var self = this;
 
-        if (!self._session) throw "Require session";
+        if (!self._session) {
+            _logger.error("Require session");
+            throw "Require session";
+        }
 
         self.closed = false;
         self._ices = {};
@@ -12716,6 +13151,7 @@ module.exports = _util.prototypeExtend({
         var self = this;
 
         if (stream && stream.rtcId !== webrtc.getRtcId()) {
+            _logger.error("stream and webrtc rtcId not equal.");
             throw "stream and webrtc rtcId not equal.";
         }
 
@@ -12976,7 +13412,7 @@ module.exports = _util.prototypeExtend({
         } finally {
             //webrtc && _util.removeAttribute(self._ices, rtcId);
 
-            webrtc && webrtc.close();
+            webrtc && webrtc.close(remainLocalStream); //
             webrtc && self.onWebrtcTermC && self.onWebrtcTermC(webrtc);
 
             if (remainLocalStream) {} else {
@@ -13022,7 +13458,7 @@ module.exports = _util.prototypeExtend({
 
         if (self._ices) {
             for (var _rtcId in self._ices) {
-                self.closeWebrtc(_rtcId);
+                self.closeWebrtc(_rtcId, false);
             }
         }
 
@@ -13085,14 +13521,18 @@ module.exports = _util.prototypeExtend({
                 self.onRemoveMember(_member);
             });
         } finally {
-            setTimeout(function () {
-                self._session && self._session.close(reason);
-            }, 500);
+            try {
+                setTimeout(function () {
+                    self._session && self._session.close(reason);
+                }, 500);
 
-            self.onEvent(new __event.Hangup({ reason: reason, failed: failed, self: { id: self._memberId } }));
-            self.onMeExit && self.onMeExit(reason, failed);
-
-            self._onFinally && self._onFinally();
+                self.onEvent(new __event.Hangup({ reason: reason, failed: failed, self: { id: self._memberId } }));
+                self.onMeExit && self.onMeExit(reason, failed);
+            } catch (e) {
+                _logger.error(e);
+            } finally {
+                self._onFinally && self._onFinally();
+            }
         }
     },
 
@@ -13217,6 +13657,30 @@ var _SDPSection = {
         self.headerSection = self._parseHeaderSection(sdp, audioIndex, videoIndex);
         self.audioSection = self._parseAudioSection(sdp, audioIndex, videoIndex);
         self.videoSection = self._parseVideoSection(sdp, audioIndex, videoIndex);
+    },
+
+    setVideoBitrate: function setVideoBitrate(vbitrate) {
+        if (!vbitrate || !this.videoSection) {
+            return;
+        }
+
+        this.videoSection = this.setBitrate(this.videoSection, vbitrate);
+    },
+
+    setAudioBitrate: function setAudioBitrate(abitrate) {
+        if (!abitrate || !this.audioSection) {
+            return;
+        }
+
+        this.audioSection = this.setBitrate(this.audioSection, abitrate);
+    },
+
+    setBitrate: function setBitrate(section, bitrate) {
+        section = section.replace(/(b=)(?:AS|TIAS)(\:)\d+/g, "$1AS$2" + bitrate);
+        if (section.indexOf('b=AS') < 0) {
+            section = section.replace(/(m=(?:audio|video)[^\r\n]+)([\r\n]+)/g, "$1$2b=AS:" + bitrate + "$2");
+        }
+        return section;
     },
 
     updateVideoSection: function updateVideoSection(regx, oper) {
@@ -13448,6 +13912,22 @@ var _SDPSection = {
             self.audioSection && (sdp += self.audioSection);
             self.videoSection && (sdp += self.videoSection);
         } else {
+            if (audioVideo === false && self.videoSection && self.audioSection) {
+                var videoMid;
+                self.videoSection.replace(/a=mid:([^\r\n]+)/, function (match, p1) {
+                    videoMid = p1;
+                    return match;
+                });
+
+                var audioMid;
+                self.audioSection.replace(/a=mid:([^\r\n]+)/, function (match, p1) {
+                    audioMid = p1;
+                    return match;
+                });
+
+                sdp = self.headerSection.replace(/a=group:BUNDLE [^\r\n]+/, "a=group:BUNDLE " + videoMid + " " + audioMid);
+            }
+
             self.videoSection && (sdp += self.videoSection);
             self.audioSection && (sdp += self.audioSection);
         }
@@ -13712,7 +14192,8 @@ var _WebRTC = _util.prototypeExtend({
             }
 
             if (!candidate.candidate) {
-                throw "Not found candidate. candidate is error, " + event.candidate.candidate;
+                _logger.error("Not found candidate. candidate is error");
+                throw "Not found candidate. candidate is error,";
             }
 
             candidate.cctx = self.cctx;
@@ -13810,8 +14291,11 @@ var _WebRTC = _util.prototypeExtend({
             }
             if (emedia.isFirefox) {
                 //需要交换 cand answer
-                self.fireFoxOfferVideoPreAudio = SDPSection.isVideoPreAudio(desc.sdp);
+                self.fireFoxOfferVideoPreAudio = self.__offerVideoPreAudio = SDPSection.isVideoPreAudio(desc.sdp);
+            } else {
+                self.__offerVideoPreAudio = SDPSection.isVideoPreAudio(desc.sdp); // video在audio前时，xswitch的answer是 audio在前。set answer时需要 变换answer
             }
+
             desc.sdp = desc.sdp.replace(/m=video 0/g, "m=video 9");
             _logger.warn("setLocalDescription. modify offer. if 'm=video 0' -> 'm=video 9'; if H264, 'profile-level-id=42e01f'", self._rtcId, self.__id);
 
@@ -13954,6 +14438,11 @@ var _WebRTC = _util.prototypeExtend({
         } catch (e) {
             _logger.warn(e);
         } finally {
+            if (self._localStream && remainLocalStream === false) {
+                //localstream存在，不保留localstream
+                emedia.stopTracks(self._localStream);
+            }
+
             if (self._remoteStream) {
                 emedia.stopTracks(self._remoteStream);
             }
@@ -14024,7 +14513,7 @@ var _WebRTC = _util.prototypeExtend({
                 return;
             }
 
-            if (self.fireFoxOfferVideoPreAudio === true) {
+            if (self.fireFoxOfferVideoPreAudio === true || self.__offerVideoPreAudio === true) {
                 //_logger.debug("Remote sdp.1", desc.sdp);
 
                 var sdpSection = new SDPSection(desc.sdp, self);
@@ -14039,6 +14528,18 @@ var _WebRTC = _util.prototypeExtend({
         desc.sdp = desc.sdp.replace(/UDP\/TLS\/RTP\/SAVPF/g, "RTP/SAVPF");
         _logger.warn('setRemoteDescription. UDP/TLS/RTP/SAVPF -> RTP/SAVPF; if firefox: switch audio video;', self._rtcId, self.__id);
         _logger.debug('setRemoteDescription.', desc, self._rtcId, self.__id);
+
+        // https://webrtchacks.com/limit-webrtc-bandwidth-sdp/
+        // bitrate
+        if (self.vbitrate || self.abitrate) {
+            var sdpSection = new SDPSection(desc.sdp, self);
+
+            self.vbitrate && sdpSection.setVideoBitrate(self.vbitrate);
+            self.abitrate && sdpSection.setAudioBitrate(self.abitrate);
+
+            _logger.warn("vbitrate = ", self.vbitrate, ", abitrate = ", self.abitrate, self._rtcId, self.__id);
+            desc.sdp = sdpSection.getUpdatedSDP();
+        }
 
         desc = self.__remoteDescription = new RTCSessionDescription(desc);
 
@@ -14928,6 +15429,7 @@ var MediaSoundMeter = _util.prototypeExtend({
         var self = this;
 
         if (!self._mediaStream) {
+            _logger.error("_mediaStream empty");
             throw "_mediaStream empty";
         }
 
@@ -14936,6 +15438,7 @@ var MediaSoundMeter = _util.prototypeExtend({
         }
 
         if (!self.__audioContext) {
+            _logger.error("require audioContext");
             throw "require audioContext";
         }
 
@@ -15094,6 +15597,7 @@ module.exports = _util.prototypeExtend({ //type 0 AVpub 1 Desktop 2 Sub
             var self = this;
 
             if (!self._stream || typeof self._stream.getMediaStream !== 'function') {
+                _logger.error("_stream empty or not found method getMediaStream");
                 throw "_stream empty or not found method getMediaStream";
             }
 
@@ -15102,6 +15606,7 @@ module.exports = _util.prototypeExtend({ //type 0 AVpub 1 Desktop 2 Sub
             self._mediaStream = self._mediaStream;
 
             if (self._stream.type === 2 && !self._stream.located() && !self._webrtc) {
+                _logger.error("require webrtc. when type = 2 and not located");
                 throw "require webrtc. when type = 2 and not located";
             }
 
@@ -16106,6 +16611,7 @@ module.exports = _util.prototypeExtend({
         var tsxId = 'tsx_' + __shareDesktopMessageCount__++ + '_' + Math.random().toString(36).substr(2, 4);
 
         if (!self.__extLoaded) {
+            _logger.error("Rtc share desktop not loaded");
             throw "Rtc share desktop not loaded";
         }
 
@@ -16929,14 +17435,17 @@ var addonsAttendee = function addonsAttendee(Attendee) {
             stream._webrtc && (stream._webrtc.subArgs = stream._webrtc.subArgs || { subSVideo: true, subSAudio: true });
 
             if (!stream.subArgs.subSVideo && subArgs.subSVideo && stream.voff) {
+                _logger.error("Sub not allow. stream voff");
                 throw "Sub not allow. stream voff";
             }
 
             if (!stream.subArgs.subSAudio && subArgs.subSAudio && stream.aoff) {
+                _logger.error("Sub not allow. stream aoff");
                 throw "Sub not allow. stream aoff";
             }
 
             if (stream.subArgs.subSVideo && !subArgs.subSVideo && !stream.voff && emedia.isSafari) {
+                _logger.error("Sub not allow. safari close sub video. will error");
                 throw "Sub not allow. safari close sub video. will error";
             }
 
@@ -17145,6 +17654,7 @@ var addonsService = function addonsService(Service, Session, Attendee) {
 
             if (self.current && self.current.isP2P()) {
                 if (pubS.type === 2) {
+                    _logger.error("P2P do not allow audio_mixer");
                     throw "P2P do not allow audio_mixer";
                 }
 
@@ -17468,12 +17978,9 @@ emedia.decodeMemeberName = function (member) {
 emedia.ConfrType = _Manager__WEBPACK_IMPORTED_MODULE_0__["single"].ConfrType;
 emedia.Role = _Manager__WEBPACK_IMPORTED_MODULE_0__["single"].Role;
 
-var windowOnload = window.onload;
-
-window.onload = function () {
-    windowOnload && windowOnload.apply(window, arguments);
-
+zepto__WEBPACK_IMPORTED_MODULE_2___default()(function () {
     var WebIM = window.WebIM;
+
     if (WebIM && WebIM.conn && typeof WebIM.conn.onOpened === "function") {
         // noinspection JSAnnotator
         var useIM = function useIM() {
@@ -17518,7 +18025,7 @@ window.onload = function () {
             useIM();
         };
     }
-};
+});
 
 var outer = underscore__WEBPACK_IMPORTED_MODULE_1___default.a.extend(_Manager__WEBPACK_IMPORTED_MODULE_0__["single"], _outer);
 
@@ -18056,7 +18563,7 @@ function rxResumePauseAudio(pubS, aoff, confrId) {
 
     if (confr.type === self.ConfrType.COMMUNICATION_MIX || confr.type === self.ConfrType.LIVE) {
         //混音时，共享桌面带声音，会造成 服务端错误。
-        if (!aoff) {
+        if (pubS.type === 1 && !aoff) {
             _logger.warn("confr mix. not allow desktop with audio.");
             return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["throwError"])("confr mix. not allow desktop with audio.");
         }
@@ -18105,7 +18612,7 @@ function rxPublishMedia(confrId, constaints, videoTag, ext) {
     });
 
     return openUserMedia.call(self, confr.id, stream).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["concatMap"])(function (userStream) {
-        videoTag && (videoTag.srcObject = userStream.localStream);
+        videoTag && _Util__WEBPACK_IMPORTED_MODULE_0___default.a.targetDOM(videoTag) && attachMediaStream(videoTag, userStream.localStream);
         return rxPublish.call(self, confr.id, userStream, ext);
     }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])(function (pushedStream) {
         confr.av = pushedStream;
@@ -18115,6 +18622,8 @@ function rxPublishMedia(confrId, constaints, videoTag, ext) {
     }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["catchError"])(function (err, caught) {
         confr.av && self.hungup(confr.av);
         confr.av = undefined;
+
+        _logger.error(err);
         throw err;
     }));
 }
@@ -18169,12 +18678,15 @@ function rxShareDesktop(confrId, constaints, videoTag, ext) {
 
     var stream = confr.desktop = new service.ShareDesktopPubstream({
         screenOptions: constaints.video && constaints.video.screenOptions || ['screen', 'window', 'tab'],
-        aoff: constaints.audio || 1,
+        mandatory: constaints.video && constaints.video.mandatory || {},
+        vbitrate: constaints.video && constaints.video.bitrate,
+        abitrate: constaints.audio && constaints.audio.bitrate,
+        aoff: !!constaints.audio ? 0 : 1,
         ext: ext
     });
 
     return openUserMedia.call(self, confr.id, stream).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["concatMap"])(function (userStream) {
-        videoTag && _Util__WEBPACK_IMPORTED_MODULE_0___default.a.targetDOM(videoTag) && (videoTag.srcObject = userStream.localStream);
+        videoTag && _Util__WEBPACK_IMPORTED_MODULE_0___default.a.targetDOM(videoTag) && attachMediaStream(videoTag, userStream.localStream);
         return rxPublish.call(self, confr.id, userStream, ext);
     }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["map"])(function (pushedStream) {
         confr.desktop = pushedStream;
@@ -18182,6 +18694,7 @@ function rxShareDesktop(confrId, constaints, videoTag, ext) {
         return _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend({}, pushedStream);
     }), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["catchError"])(function (err, caught) {
         confr.desktop = undefined;
+        _logger.error(err);
         throw err;
     }));
 }
@@ -18315,6 +18828,7 @@ function _streamBindVideo(stream, _videoTag, confrId) {
     $video.off("remoteControl");
     $video.on("remoteControl", function (e, mirror, onDisControlled, onAccept, onNotAllowRemoteControl, onRemoteControlTimeout, onReject, onBusy) {
         if (stream.located()) {
+            _logger.error("not allow remote control at local");
             throw "not allow remote control at local";
         } else {
             self.remoteControl(stream, videoTag, videoTag, mirror, onDisControlled, onAccept, onNotAllowRemoteControl, onRemoteControlTimeout, onReject, onBusy, confrId);
@@ -18361,11 +18875,13 @@ function _streamBindVideo(stream, _videoTag, confrId) {
         }
     });
 
-    var constaints = { video: !stream.voff, audio: !stream.aoff };
+    var constaints = { video: !stream.voff, audio: !stream.aoff, voff: stream.voff, aoff: stream.aoff };
     if (!stream.located()) {
         constaints = {
             video: stream.subArgs ? stream.subArgs.subSVideo : !stream.voff,
-            audio: stream.subArgs ? stream.subArgs.subSAudio : !stream.aoff
+            audio: stream.subArgs ? stream.subArgs.subSAudio : !stream.aoff,
+            voff: stream.voff,
+            aoff: stream.aoff
         };
     }
     $video.trigger("onMediaChanaged", [constaints, stream, stream.owner, confrId]);
@@ -18505,6 +19021,18 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
         confrId || (confrId = self.__current_confrId);
         return this._services[confrId];
     },
+
+    getStreamById: function getStreamById(streamId, confrId) {
+        var self = this;
+        var service = self._service(confrId);
+        return service && service.getStreamById(streamId);
+    },
+    getMemberById: function getMemberById(memId, confrId) {
+        var self = this;
+        var service = self._service(confrId);
+        return service && service.getMemberById(memId);
+    },
+
     streamBindVideo: function streamBindVideo(stream, videoTag, confrId) {
         _streamBindVideo.call(this, stream, videoTag, confrId);
     },
@@ -18514,6 +19042,7 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
             stream = stream.id;
         }
         if (typeof stream !== "string") {
+            _logger.error("Bad stream ", stream);
             throw "Bad stream " + stream;
         }
         return self._videos[stream];
@@ -18594,6 +19123,53 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
         var self = this;
         var service = self._service(confrId);
         return service.captureVideo(videoObj, storeLocal, filename);
+    },
+
+    openUserMedia: function openUserMedia(constaints, confrId) {
+        var self = this;
+        var service = self._service(confrId);
+
+        return rxjs__WEBPACK_IMPORTED_MODULE_3__["Observable"].create(function onSubscription(observer) {
+            service.__getUserMedia(constaints, function (attendee, stream) {
+                observer.next(stream);
+                observer.complete();
+            }, function (error) {
+                observer.error(error);
+            });
+        }).pipe(errorHandler).toPromise();
+    },
+
+    mediaDevices: function mediaDevices(kind) {
+        if (typeof kind === 'function') {
+            kind = undefined;
+        }
+
+        return rxjs__WEBPACK_IMPORTED_MODULE_3__["Observable"].create(function onSubscription(observer) {
+            navigator.mediaDevices.enumerateDevices().then(function (deviceInfos) {
+                var resultDeviceInfos = [];
+
+                for (var i = 0; i !== deviceInfos.length; ++i) {
+                    var deviceInfo = deviceInfos[i];
+                    var deviceId = deviceInfo.deviceId;
+
+                    if (!kind) {
+                        resultDeviceInfos.push(deviceInfo);
+                    }
+
+                    if (kind && kind === deviceInfo.kind) {
+                        resultDeviceInfos.push(deviceInfo);
+                    } else if (deviceInfo.kind === 'audioinput') {} else if (deviceInfo.kind === 'audiooutput') {} else if (deviceInfo.kind === 'videoinput') {} else {
+                        _logger.info('Some other kind of source/device: ', deviceInfo);
+                    }
+                }
+
+                observer.next(resultDeviceInfos);
+                observer.complete();
+            }).catch(function handleError(error) {
+                _logger.warn('navigator.getUserMedia error: ', error);
+                observer.error(error);
+            });
+        }).pipe(errorHandler).toPromise();
     },
     resumeVideo: function resumeVideo(pubS, videoConstaints, confrId) {
         return rxResumePauseVideo.call(this, pubS, videoConstaints || true, confrId).toPromise();
@@ -18762,6 +19338,7 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
     _onUpdateMemberStream: function _onUpdateMemberStream(stream, constaints, confrId) {},
     _onMemberMediaChanaged: function _onMemberMediaChanaged(member, stream, constaints, confrId) {
         var tag = this._videos[stream.id];
+        constaints && (constaints.voff = stream.voff, constaints.aoff = stream.aoff);
         tag && zepto__WEBPACK_IMPORTED_MODULE_1___default()(tag).trigger("onMediaChanaged", [constaints, stream, member, confrId]);
     },
     onMediaChanaged: function onMediaChanaged(tag, cb) {
@@ -18776,6 +19353,7 @@ var _single = _Util__WEBPACK_IMPORTED_MODULE_0___default.a.extend(new Manager(),
     onSoundChanaged: function onSoundChanaged(tag, cb) {
         // cb video audio
         if (!emedia.config.getMediaMeterIntervalMillis || emedia.config.getMediaMeterIntervalMillis <= 0) {
+            _logger.error("monit sound chanaged not config. please config getMediaMeterIntervalMillis");
             throw "monit sound chanaged not config. please config getMediaMeterIntervalMillis";
         }
 
@@ -30870,6 +31448,8 @@ var RemoteControl = _util.prototypeExtend({
 
         if (self.hasOtherControl()) {
             self.busy();
+
+            _logger.error("Other has been controled.");
             throw "Other has been controled.";
         }
 
@@ -31345,6 +31925,8 @@ function reqControlled(service, streamId, videoTarget, mirror, maskTarget, onCal
     if (!stream._webrtc) {
         //throw "Not allow control. cause by the stream not sub";
         onCallbacks && onCallbacks.onNotAllowRemoteControl && onCallbacks.onNotAllowRemoteControl(stream);
+
+        _logger.error("Not allow control. cause by the stream not sub");
         throw "Not allow control. cause by the stream not sub";
     }
 
@@ -31410,6 +31992,7 @@ function _controlled(service, streamId, videoTarget, mirror, maskTarget, onCallb
     }
 
     if (!stream.located() && !stream.owner.acptOps[1003]) {
+        _logger.error("which do not recv remote message, it is ", stream.owner.memName);
         throw stream.owner.memName + " do not recv remote message";
     }
 
@@ -32449,6 +33032,7 @@ var CompositeCanvas = _util.prototypeExtend(SimpleCanvasRenderingContext2D, {
     requestFrame: function requestFrame(_frameRate) {
         var self = this;
         if (typeof this.requestOneFrame !== "function") {
+            _logger.error("Pleas implement requestOneFrame()");
             throw "Pleas implement requestOneFrame()";
         }
 
@@ -32654,10 +33238,12 @@ module.exports = PCStats = _util.prototypeExtend({
 
         this._bysamples = {};
         if (this._inbound_ !== false) {
-            this._bysamples["inbound-rtp"] = ["bytesReceived", "framesDecoded", "packetsLost", "packetsReceived", "pliCount"];
+            //this._bysamples["inbound-rtp"] = ["bytesReceived", "framesDecoded", "packetsLost", "packetsReceived", "pliCount", "packageLossRate"];
+            this._bysamples["inbound-rtp"] = ["bytesReceived", "packetsLost", "packetsReceived", "packageLossRate"];
         }
         if (this._outbound_ !== false) {
-            this._bysamples["outbound-rtp"] = ["bytesSent", "packetsSent", "qpSum", "pliCount"];
+            //this._bysamples["outbound-rtp"] = ["bytesSent", "packetsSent", "qpSum", "pliCount"];
+            this._bysamples["outbound-rtp"] = ["bytesSent"];
         }
     },
 
@@ -32675,6 +33261,7 @@ module.exports = PCStats = _util.prototypeExtend({
 
     statsOfTrack: function statsOfTrack(selector) {
         if (!selector instanceof window.MediaStreamTrack) {
+            _logger.error("selector not a MediaStreamTrack");
             throw "selector not a MediaStreamTrack";
         }
 
@@ -32745,7 +33332,12 @@ module.exports = PCStats = _util.prototypeExtend({
                             var items = tmp[_param] || (tmp[_param] = []);
 
                             var item = { timestamp: _stat.timestamp, kind: _stat.mediaType || track.kind || mediaType };
-                            item[_param] = _stat[_param];
+                            if ("packageLossRate" === _param) {
+                                item[_param] = { packetsLost: _stat["packetsLost"], packetsReceived: _stat["packetsReceived"] };
+                            } else {
+                                item[_param] = _stat[_param];
+                            }
+
                             items.push(item);
                         });
                     }
@@ -32788,6 +33380,29 @@ module.exports = PCStats = _util.prototypeExtend({
         var data = dataArray.shift();
         return data && data.pliCount || 0;
     },
+    _gather_inbound_rtp_packetsLost: function _gather_inbound_rtp_packetsLost(dataArray) {
+        var data = dataArray.shift();
+        return data && data.packetsLost || 0;
+    },
+    _gather_inbound_rtp_packetsReceived: function _gather_inbound_rtp_packetsReceived(dataArray) {
+        var data = dataArray.shift();
+        return data && data.packetsReceived || 0;
+    },
+    _gather_inbound_rtp_packageLossRate: function _gather_inbound_rtp_packageLossRate(dataArray) {
+        if (!dataArray || dataArray.length === 0) {
+            return 0;
+        }
+
+        var data = dataArray[dataArray.length - 1];
+        var firstData;
+        if (dataArray.length < emedia.config.statsSeconds) {
+            return 0;
+        } else {
+            firstData = dataArray.shift();
+        }
+
+        return (data.packageLossRate.packetsLost - firstData.packageLossRate.packetsLost) / (data.packageLossRate.packetsReceived - firstData.packageLossRate.packetsReceived);
+    },
 
     _gather: function _gather(type, subtype, dataArray) {
         type = type.replace(/[^\w]/g, "_");
@@ -32798,7 +33413,7 @@ module.exports = PCStats = _util.prototypeExtend({
             return this[func](dataArray);
         }
 
-        var count = 3;
+        var count = emedia.config.statsSeconds;
         if (dataArray.length < count) {
             return 0;
         }
@@ -32955,5 +33570,6 @@ emedia.chooseElectronDesktopMedia = function (sources, accessApproved, accessDen
 /***/ })
 /******/ ]);
 });
-//2.1.1_Git.de86e59
-console && console.warn('EMedia version', '2.1.1_Git.de86e59');
+//2.1.1_Git.29f2187
+window._emediaVersion = '2.1.1_Git.29f2187'; 
+console && console.warn('EMedia version', '2.1.1_Git.29f2187');
