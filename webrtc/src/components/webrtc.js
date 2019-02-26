@@ -11,6 +11,9 @@ Webrtc.prototype.__getUserMedia = function(){
 Webrtc.prototype.__controlStream = function(){
     Service.prototype.__controlStream.apply(this, arguments);
 }
+Webrtc.prototype.__sysGetUserMedia = function(){
+    Service.prototype.__sysGetUserMedia.apply(this, arguments);
+}
 
 //callback (rtc, stream)
 Webrtc.prototype.createMedia = function(constaints, callback){

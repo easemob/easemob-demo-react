@@ -12,16 +12,16 @@
 // }
 
 function getUrl(){
-    var apiUrl = ""
-    var xmppUrl = ""
-    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1){
+    var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
+    var xmppUrl = "im-api.easemob.com"
+    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1 || window.location.href.indexOf("172.17.2.168") !== -1){
         apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
         xmppUrl = "im-api.easemob.com"
     }
-    else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
-        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-        xmppUrl = "im-api-hsb.easemob.com"
-    }
+    // else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
+    //     apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
+    //     xmppUrl = "im-api-hsb.easemob.com"
+    // }
     return {
         apiUrl: apiUrl,
         xmppUrl: xmppUrl
