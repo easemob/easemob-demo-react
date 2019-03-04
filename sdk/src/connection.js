@@ -728,6 +728,26 @@ var _getXmppUrl = function (baseUrl, https) {
 };
 
 
+/**
+ * The connection class.
+ * @constructor
+ * @param {Object} options - 创建连接的初始化参数
+ * @param {String} options.url - xmpp服务器的URL
+ * @param {String} options.apiUrl - API服务器的URL
+ * @param {Boolean} options.isHttpDNS - 防止域名劫持
+ * @param {Boolean} options.isMultiLoginSessions - 为true时同一账户可以同时在多个Web页面登录（多标签登录，默认不开启，如有需要请联系商务），为false时同一账号只能在一个Web页面登录
+ * @param {Boolean} options.https - 是否启用wss.
+ * @param {Number} options.heartBeatWait - 发送心跳包的时间间隔（毫秒）
+ * @param {Boolean} options.isAutoLogin - 登录成功后是否自动出席
+ * @param {Number} options.autoReconnectNumMax - 掉线后重连的最大次数
+ * @param {Number} options.autoReconnectInterval -  掉线后重连的间隔时间（毫秒）
+ * @param {Boolean} options.isWindowSDK - 是否运行在WindowsSDK上
+ * @param {Boolean} options.encrypt - 是否加密文本消息
+ * @param {Boolean} options.delivery - 是否发送delivered ack
+ * @returns {Class}  连接实例
+ */
+
+
 //class
 var connection = function (options) {
     if (!this instanceof connection) {
@@ -948,10 +968,10 @@ connection.prototype.getRestFromHttpDNS = function (options, type) {
 };
 
 connection.prototype.getHttpDNS = function (options, type) {
-    if (this.restHosts) {
-        this.getRestFromHttpDNS(options, type);
-        return;
-    }
+    // if (this.restHosts) {
+    //     this.getRestFromHttpDNS(options, type);
+    //     return;
+    // }
     var self = this;
     var suc = function (data, xhr) {
         data = new DOMParser().parseFromString(data, "text/xml").documentElement;
@@ -2044,6 +2064,12 @@ connection.prototype.send = function (messageSource) {
     }
 };
 
+/**
+ * 添加联系人，已废弃不用
+ * @param {Object} options
+ * @deprecated
+ */
+
 connection.prototype.addRoster = function (options) {
     var jid = _getJid(options, this);
     var name = options.name || '';
@@ -2062,6 +2088,15 @@ connection.prototype.addRoster = function (options) {
     var error = options.error || _utils.emptyfn;
     this.context.stropheConn.sendIQ(iq.tree(), suc, error);
 };
+
+/**
+ * 删除联系人
+ *
+ * @param {Object} options
+ * @param {String} options.to - 想要删除的联系人ID
+ * @param {Function} options.success - 成功回调，在这里面调用connection.unsubscribed才能真正删除联系人
+ * @fires connection#unsubscribed
+ */
 
 connection.prototype.removeRoster = function (options) {
     var jid = _getJid(options, this);
@@ -3066,10 +3101,11 @@ connection.prototype.leaveGroup = function (options) {
 };
 
 /**
- * addGroupMembers 添加群组成员
+ * 添加群组成员
  *
- * @param options
-
+ * @param {Object} options -
+ * @deprecated
+ * @example
  Attention the sequence: message first (每个成员单独发一条message), iq second (多个成员可以合成一条iq发)
  <!-- 添加成员通知：send -->
  <message to='easemob-demo#chatdemoui_1477482739698@conference.easemob.com'>
@@ -3130,7 +3166,12 @@ connection.prototype.addGroupMembers = function (options) {
 /**
  * acceptInviteFromGroup 接受加入申请
  *
- * @param options
+ * @param {Object} options - 参数
+ * @param {Function} options.success - 成功回调，默认为空
+ * @param {Function} options.error - 失败回调，默认为空
+ * @param {Array} options.list - 列表，默认[]
+ * @param {String} options.roomId - 聊天室id
+ * @param {String} options.reason - 原因
  */
 connection.prototype.acceptInviteFromGroup = function (options) {
     options.success = function () {
@@ -3754,6 +3795,8 @@ connection.prototype.quitGroup = function (opt) {
     options.error = opt.error || _utils.emptyfn;
     WebIM.utils.ajax(options);
 };
+
+/** @function */
 
 connection.prototype.modifyGroup = function (opt) {
     var groupId = opt.groupId,
