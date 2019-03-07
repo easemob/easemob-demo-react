@@ -241,7 +241,9 @@ var _Call = {
                     subSAudio: true
                 },
                 onGotLocalStream: self.listener.onGotLocalStream,
-                onGotRemoteStream: self.listener.onGotRemoteStream,
+                onGotRemoteStream: function(remoteStream, event){
+                    self.listener.onGotRemoteStream(remoteStream, streamType);
+                },
                 onError: self.listener.onError
             }),
 
