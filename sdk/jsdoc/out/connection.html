@@ -572,7 +572,7 @@
 
 
 <div class="description">
-    acceptInviteFromGroup 接受加入申请
+    接受加入申请(已废弃)
 </div>
 
 
@@ -626,7 +626,7 @@
 
             
 
-            <td class="description last">参数
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -648,52 +648,6 @@
     </thead>
 
     <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>success</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">成功回调，默认为空</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>error</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">失败回调，默认为空</td>
-        </tr>
-
     
 
         <tr>
@@ -761,6 +715,52 @@
             
 
             <td class="description last">原因</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">成功之后的回调，默认为空</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -843,7 +843,7 @@
 
 
 <div class="description">
-    添加群组成员
+    添加群组成员(已废弃)
 </div>
 
 
@@ -916,7 +916,125 @@
 
             
 
-            <td class="description last">-</td>
+            <td class="description last">-
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>list</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">字符串数组，成员列表。[id1,id2,id3]</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>roomId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">群组id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">成功回调</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败回调</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -992,7 +1110,7 @@
 
 
 <div class="description">
-    添加联系人，已废弃不用
+    添加联系人(已废弃)
 </div>
 
 
@@ -1174,7 +1292,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -1216,30 +1334,9 @@
 
             
 
-            <td class="description last">json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单加上这次新加黑名单），json的key值为好友的ID
-                <h6>Properties</h6>
-                
+            <td class="description last">json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单加上这次新加黑名单），json的key值为好友的ID，value为之前获取的整个好友对象即可</td>
+        </tr>
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
@@ -1259,21 +1356,15 @@
             
 
             
-                <td class="default">
-                
-                    <code>jid</code>
-                
-                </td>
-            
 
-            <td class="description last">要加到黑名单的好友对象的type，默认是jid</td>
+            <td class="description last">要加到黑名单的好友对象的type，默认是"jid"</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>order</code></td>
+                <td class="name"><code>list[].order</code></td>
             
 
             <td class="type">
@@ -1288,19 +1379,15 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
-            <td class="description last">要加到黑名单的好友对象的order，所有order不重复</td>
+            <td class="description last">要加到黑名单的好友对象的order，所有order不重复,可不填</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>jid</code></td>
+                <td class="name"><code>list[].jid</code></td>
             
 
             <td class="type">
@@ -1314,10 +1401,6 @@
 
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">要加到黑名单的好友的jid</td>
@@ -1327,7 +1410,7 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>list[].name</code></td>
             
 
             <td class="type">
@@ -1342,19 +1425,54 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">要加到黑名单的好友的ID</td>
         </tr>
 
     
-    </tbody>
-</table>
 
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
             </td>
+
+            
+
+            
+
+            <td class="description last">成功之后的回调，默认为空</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -1437,7 +1555,7 @@
 
 
 <div class="description">
-    加入群组黑名单
+    加入群组黑名单(已废弃)
 </div>
 
 
@@ -1661,7 +1779,7 @@
 
             
 
-            <td class="description last">申请加群的用户名</td>
+            <td class="description last">申请加群的用户ID</td>
         </tr>
 
     
@@ -1707,7 +1825,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -1730,7 +1848,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -1933,7 +2051,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -1956,7 +2074,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -2039,7 +2157,7 @@
 
 
 <div class="description">
-    changeGroupSubject 修改群名称
+    修改群名称(已废弃)
 </div>
 
 
@@ -2216,7 +2334,7 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">断开原因</td>
         </tr>
 
     
@@ -2292,7 +2410,7 @@
 
 
 <div class="description">
-    创建群组
+    创建群组(已废弃)
 </div>
 
 
@@ -2431,7 +2549,7 @@
 
 
 <div class="description">
-    创建群组-异步
+    创建群组-异步(已废弃)
 </div>
 
 
@@ -2616,6 +2734,48 @@
 
             
 
+            <td class="description last">-
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
             <td class="description last">群组信息
                 <h6>Properties</h6>
                 
@@ -2642,7 +2802,7 @@
 
         <tr>
             
-                <td class="name"><code>data.groupname</code></td>
+                <td class="name"><code>groupname</code></td>
             
 
             <td class="type">
@@ -2665,7 +2825,7 @@
 
         <tr>
             
-                <td class="name"><code>data.desc</code></td>
+                <td class="name"><code>desc</code></td>
             
 
             <td class="type">
@@ -2688,7 +2848,7 @@
 
         <tr>
             
-                <td class="name"><code>data.members</code></td>
+                <td class="name"><code>members</code></td>
             
 
             <td class="type">
@@ -2704,14 +2864,14 @@
 
             
 
-            <td class="description last">群好友列表</td>
+            <td class="description last">好友id数组，群好友列表</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>data.public</code></td>
+                <td class="name"><code>public</code></td>
             
 
             <td class="type">
@@ -2734,7 +2894,7 @@
 
         <tr>
             
-                <td class="name"><code>data.approval</code></td>
+                <td class="name"><code>approval</code></td>
             
 
             <td class="type">
@@ -2757,7 +2917,7 @@
 
         <tr>
             
-                <td class="name"><code>data.allowinvites</code></td>
+                <td class="name"><code>allowinvites</code></td>
             
 
             <td class="type">
@@ -2774,6 +2934,13 @@
             
 
             <td class="description last">前提：opt.data.public=false, true: 允许成员邀请入群，false: 不允许成员邀请入群</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -2796,7 +2963,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -2819,7 +2986,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -2902,7 +3069,7 @@
 
 
 <div class="description">
-    删除群组
+    删除群组(已废弃)
 </div>
 
 
@@ -3160,7 +3327,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -3183,7 +3350,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -3417,7 +3584,7 @@
 
     
 
-    <h4 class="name" id="getBlacklist"><span class="type-signature"></span>getBlacklist<span class="signature">(options)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="getBlacklist"><span class="type-signature"></span>getBlacklist<span class="signature">(options)</span><span class="type-signature"></span></h4>
 
     
 
@@ -3518,7 +3685,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -3560,7 +3727,7 @@
 
             
 
-            <td class="description last">获取好友黑名单成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -3583,7 +3750,7 @@
 
             
 
-            <td class="description last">获取好友黑名单失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -3610,28 +3777,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    好友列表
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Object</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
         
@@ -3740,7 +3885,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -3841,7 +3986,7 @@
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">function</span>
 
 
             
@@ -3851,7 +3996,7 @@
 
             
 
-            <td class="description last">成功之后的回调，参数为返回值；</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -3989,7 +4134,7 @@
 
             
 
-            <td class="description last">加入两个回调函数即可，success, error
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -4031,7 +4176,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -4054,7 +4199,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -4257,7 +4402,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -4280,7 +4425,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -4363,7 +4508,7 @@
 
 
 <div class="description">
-    获取群组黑名单
+    获取群组黑名单(已废弃)
 </div>
 
 
@@ -4610,7 +4755,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -4633,7 +4778,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -4836,7 +4981,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -4859,7 +5004,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -5059,7 +5204,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -5082,7 +5227,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -5217,7 +5362,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -5243,29 +5388,6 @@
 
         <tr>
             
-                <td class="name"><code>error</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">获取好友列表失败</td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>success</code></td>
             
 
@@ -5282,7 +5404,30 @@
 
             
 
-            <td class="description last">获取好友列表成功</td>
+            <td class="description last">成功之后的回调，默认为空</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -5316,7 +5461,7 @@
 
     
 
-    <h4 class="name" id="getUniqueId"><span class="type-signature"></span>getUniqueId<span class="signature">(prefix<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    <h4 class="name" id="getUniqueId"><span class="type-signature"></span>getUniqueId<span class="signature">(prefix)</span><span class="type-signature"></span></h4>
 
     
 
@@ -5389,11 +5534,7 @@
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -5418,26 +5559,10 @@
             </td>
 
             
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
 
             
-                <td class="default">
-                
-                    <code>WEBIM_</code>
-                
-                </td>
-            
 
-            <td class="description last">前缀</td>
+            <td class="description last">前缀，默认为"WEBIM_"</td>
         </tr>
 
     
@@ -5457,28 +5582,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    唯一的id
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">String</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
         
@@ -5675,7 +5778,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -5698,7 +5801,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -5921,7 +6024,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -5944,7 +6047,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -6144,7 +6247,7 @@
 
             
 
-            <td class="description last">用户名ID数组</td>
+            <td class="description last">用户ID数组</td>
         </tr>
 
     
@@ -6167,7 +6270,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -6190,7 +6293,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -6325,7 +6428,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -6367,7 +6470,7 @@
 
             
 
-            <td class="description last">加入聊天室的id</td>
+            <td class="description last">聊天室的ID</td>
         </tr>
 
     
@@ -6390,7 +6493,7 @@
 
             
 
-            <td class="description last">加入聊天室成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -6413,7 +6516,7 @@
 
             
 
-            <td class="description last">加入聊天室失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -6593,7 +6696,7 @@
 
             
 
-            <td class="description last">群组ID</td>
+            <td class="description last">加入群组ID</td>
         </tr>
 
     
@@ -6616,7 +6719,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -6639,7 +6742,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -6722,7 +6825,7 @@
 
 
 <div class="description">
-    加入公开群组
+    加入公开群组(已废弃)
 </div>
 
 
@@ -6852,7 +6955,7 @@
 
 
 <div class="description">
-    群主从群组中踢人，后续会改为调用RestFul API
+    群主从群组中踢人(已废弃)
 </div>
 
 
@@ -7066,7 +7169,7 @@
 
 
 <div class="description">
-    主动离开群组
+    主动离开群组(已废弃)
 </div>
 
 
@@ -7891,7 +7994,7 @@
 
             
 
-            <td class="description last">页码</td>
+            <td class="description last">页码，默认1</td>
         </tr>
 
     
@@ -7914,7 +8017,7 @@
 
             
 
-            <td class="description last">每一页的最大群成员数目</td>
+            <td class="description last">每一页的最大群成员数目,最大值1000</td>
         </tr>
 
     
@@ -7937,7 +8040,7 @@
 
             
 
-            <td class="description last">群ID</td>
+            <td class="description last">群组ID</td>
         </tr>
 
     
@@ -7960,7 +8063,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -7983,7 +8086,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -8225,7 +8328,7 @@
                 </td>
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -8252,7 +8355,7 @@
                 </td>
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -8335,7 +8438,7 @@
 
 
 <div class="description">
-    获取聊天室列表
+    获取聊天室列表(已废弃)
 </div>
 
 
@@ -8628,7 +8731,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -8651,7 +8754,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -8854,7 +8957,7 @@
 
             
 
-            <td class="description last">被禁言的时长</td>
+            <td class="description last">被禁言的时长，单位ms</td>
         </tr>
 
     
@@ -8877,7 +8980,7 @@
 
             
 
-            <td class="description last">群ID</td>
+            <td class="description last">群组ID</td>
         </tr>
 
     
@@ -8900,7 +9003,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -8923,7 +9026,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -9173,6 +9276,98 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>apiUrl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Rest 服务地址,非必须。可在项目的WebIMConfig配置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>xmppURL</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Xmpp 服务地址,非必须。可在项目的WebIMConfig配置</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">成功之后的回调，默认为空，token登录没有该回调</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空，token登录没有该回调</td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -9252,7 +9447,7 @@
 
 
 <div class="description">
-    获取群组信息
+    获取群组信息(已废弃)
 </div>
 
 
@@ -9382,7 +9577,7 @@
 
 
 <div class="description">
-    获取群组成员列表
+    获取群组成员列表(已废弃)
 </div>
 
 
@@ -9512,7 +9707,7 @@
 
 
 <div class="description">
-    获取聊天室管理员
+    获取聊天室管理员(已废弃)
 </div>
 
 
@@ -9694,7 +9889,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -9736,7 +9931,7 @@
 
             
 
-            <td class="description last">退出聊天室的id</td>
+            <td class="description last">聊天室的ID</td>
         </tr>
 
     
@@ -9759,7 +9954,7 @@
 
             
 
-            <td class="description last">退出聊天室成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -9782,7 +9977,7 @@
 
             
 
-            <td class="description last">退出聊天室失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -9982,7 +10177,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -10005,7 +10200,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -10140,7 +10335,7 @@
 
             
 
-            <td class="description last">用户信息
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -10182,7 +10377,7 @@
 
             
 
-            <td class="description last">用户名</td>
+            <td class="description last">用户名，即用户ID</td>
         </tr>
 
     
@@ -10251,7 +10446,7 @@
 
             
 
-            <td class="description last">注册成功回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -10274,7 +10469,7 @@
 
             
 
-            <td class="description last">注册失败</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -10357,7 +10552,7 @@
 
 
 <div class="description">
-    拒绝入群申请
+    拒绝入群申请(已废弃)
 </div>
 
 
@@ -10594,7 +10789,7 @@
 
             
 
-            <td class="description last">申请加群的用户名</td>
+            <td class="description last">申请加群的用户ID</td>
         </tr>
 
     
@@ -10640,7 +10835,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -10663,7 +10858,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -10886,7 +11081,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -10909,7 +11104,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -11044,7 +11239,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -11086,30 +11281,9 @@
 
             
 
-            <td class="description last">json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单去掉这次新加黑名单），json的key值为好友的ID
-                <h6>Properties</h6>
-                
+            <td class="description last">json数组，调用这个函数后黑名单的所有名单列表，json的key值为好友的ID，value为之前获取的整个好友对象即可</td>
+        </tr>
 
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-        <th>Default</th>
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
     
 
         <tr>
@@ -11129,21 +11303,15 @@
             
 
             
-                <td class="default">
-                
-                    <code>jid</code>
-                
-                </td>
-            
 
-            <td class="description last">要加到黑名单的好友对象的type，默认是jid</td>
+            <td class="description last">要加到黑名单的好友对象的type，默认是"jid"</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>order</code></td>
+                <td class="name"><code>list[].order</code></td>
             
 
             <td class="type">
@@ -11158,10 +11326,6 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">要加到黑名单的好友对象的order，所有order不重复</td>
         </tr>
@@ -11170,7 +11334,7 @@
 
         <tr>
             
-                <td class="name"><code>jid</code></td>
+                <td class="name"><code>list[].jid</code></td>
             
 
             <td class="type">
@@ -11184,10 +11348,6 @@
 
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">要加到黑名单的好友的jid</td>
@@ -11197,7 +11357,7 @@
 
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>list[].name</code></td>
             
 
             <td class="type">
@@ -11212,19 +11372,54 @@
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">要加到黑名单的好友的ID</td>
         </tr>
 
     
-    </tbody>
-</table>
 
+        <tr>
+            
+                <td class="name"><code>success</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
             </td>
+
+            
+
+            
+
+            <td class="description last">成功之后的回调，默认为空</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -11401,7 +11596,7 @@
 
             
 
-            <td class="description last">群组名</td>
+            <td class="description last">群组ID</td>
         </tr>
 
     
@@ -11447,7 +11642,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -11470,7 +11665,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -11670,7 +11865,7 @@
 
             
 
-            <td class="description last">用户名</td>
+            <td class="description last">用户ID</td>
         </tr>
 
     
@@ -11693,7 +11888,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -11716,7 +11911,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -11799,7 +11994,7 @@
 
 
 <div class="description">
-    从群组黑名单删除
+    从群组黑名单删除(已废弃)
 </div>
 
 
@@ -12069,7 +12264,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -12092,7 +12287,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -12272,7 +12467,7 @@
 
             
 
-            <td class="description last">群ID</td>
+            <td class="description last">群组ID</td>
         </tr>
 
     
@@ -12318,7 +12513,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -12341,7 +12536,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -12433,6 +12628,21 @@
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>connection.removeRoster({
+  to: id,
+  success: function() {
+     connection.unsubscribed({
+         to: id
+     })
+  },
+  error: function() {
+
+  }
+})</code></pre>
+
+
 
 
     <h5>Parameters:</h5>
@@ -12476,7 +12686,7 @@
 
             
 
-            <td class="description last">
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -12518,7 +12728,7 @@
 
             
 
-            <td class="description last">想要删除的联系人ID</td>
+            <td class="description last">联系人ID</td>
         </tr>
 
     
@@ -12541,30 +12751,7 @@
 
             
 
-            <td class="description last">（****不清楚）</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>error</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">获取好友列表失败</td>
+            <td class="description last">用于生成jid，默认"webim"</td>
         </tr>
 
     
@@ -12587,7 +12774,30 @@
 
             
 
-            <td class="description last">成功回调，在这里面调用connection.unsubscribed才能真正删除联系人</td>
+            <td class="description last">成功之后的回调，在回调里调用connection.unsubscribed才能真正删除联系人</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>error</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -12792,7 +13002,7 @@
 
             
 
-            <td class="description last">用户名</td>
+            <td class="description last">用户ID</td>
         </tr>
 
     
@@ -12815,7 +13025,7 @@
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -12838,7 +13048,7 @@
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -12919,7 +13129,7 @@
 
 
 <div class="description">
-    send message
+    发送消息
 </div>
 
 
@@ -12932,7 +13142,7 @@
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>var deliverMessage = new WebIM.message('delivery', msgId);
+    <pre class="prettyprint"><code>let deliverMessage = new WebIM.message('delivery', msgId);
 deliverMessage.set({
  id: msgId, 
  to: msg.from
@@ -13199,7 +13409,7 @@ conn.send(deliverMessage.body);</code></pre>
 
             
 
-            <td class="description last">成功之后的回调</td>
+            <td class="description last">成功之后的回调，默认为空</td>
         </tr>
 
     
@@ -13222,7 +13432,7 @@ conn.send(deliverMessage.body);</code></pre>
 
             
 
-            <td class="description last">失败之后的回调</td>
+            <td class="description last">失败之后的回调，默认为空</td>
         </tr>
 
     
@@ -13319,31 +13529,31 @@ conn.send(deliverMessage.body);</code></pre>
     <pre class="prettyprint"><code>A订阅B（A添加B为好友）
 A执行：
  conn.subscribe({
-                to: 'B',
-                message: 'Hello~'
-            });
+        to: 'B',
+        message: 'Hello~'
+    });
  B的监听函数onPresence参数message.type == subscribe监听到有人订阅他
  B执行：
  conn.subscribed({
-                to: 'A',
-                message: '[resp:true]'
-          });
+    to: 'A',
+    message: '[resp:true]'
+ });
  同意A的订阅请求
  B继续执行：
  conn.subscribe({
-                to: 'A',
-                message: '[resp:true]'
-            });
+    to: 'A',
+    message: '[resp:true]'
+ });
  反向订阅A，这样才算双方添加好友成功。
  若B拒绝A的订阅请求，只需执行：
  conn.unsubscribed({
-                        to: 'A',
-                        message: 'I don't want to be subscribed'
-                    });
+    to: 'A',
+    message: 'I don't want to be subscribed'
+ });
  另外，在监听函数onPresence参数message.type == "subscribe"这个case中，加一句
  if (message &amp;&amp; message.status === '[resp:true]') {
-            return;
-        }
+    return;
+ }
  否则会进入死循环</code></pre>
 
 
@@ -13390,7 +13600,7 @@ A执行：
 
             
 
-            <td class="description last">想要订阅的联系人信息
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -13432,7 +13642,7 @@ A执行：
 
             
 
-            <td class="description last">想要订阅的联系人ID</td>
+            <td class="description last">想要订阅的联系人</td>
         </tr>
 
     
@@ -13455,7 +13665,7 @@ A执行：
 
             
 
-            <td class="description last">想要订阅的联系人ID （非必须）</td>
+            <td class="description last">想要订阅的联系人昵称 （非必须）</td>
         </tr>
 
     
@@ -13613,7 +13823,7 @@ A执行：
 
             
 
-            <td class="description last">订阅人的信息
+            <td class="description last">-
                 <h6>Properties</h6>
                 
 
@@ -13628,8 +13838,6 @@ A执行：
 
         
 
-        
-        <th>Default</th>
         
 
         <th class="last">Description</th>
@@ -13656,10 +13864,6 @@ A执行：
             
 
             
-                <td class="default">
-                
-                </td>
-            
 
             <td class="description last">订阅人的ID</td>
         </tr>
@@ -13682,12 +13886,6 @@ A执行：
 
             
 
-            
-                <td class="default">
-                
-                    <code>[resp:true</code>
-                
-                </td>
             
 
             <td class="description last">默认为[resp:true]，后续将去掉该参数</td>
@@ -13773,7 +13971,7 @@ A执行：
 
 
 <div class="description">
-    取消订阅成功，废弃不用
+    取消订阅成功(已废弃)
 </div>
 
 
@@ -15372,7 +15570,7 @@ A执行：
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 07 2019 15:53:38 GMT+0800 (CST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Mar 14 2019 14:48:37 GMT+0800 (CST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

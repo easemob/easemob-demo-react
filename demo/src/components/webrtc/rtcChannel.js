@@ -242,8 +242,8 @@ var Channel = React.createClass({
                     width: this.state.full_width + "px",
                     height: this.state.full_height + "px"
                 }}>
-                <video ref='localVideo' className={localClassName} muted autoPlay/>
-                <video ref='remoteVideo' className={remoteClassName} autoPlay/>
+                <video ref='localVideo' className={localClassName} muted autoPlay playsInline/>
+                <video ref='remoteVideo' className={remoteClassName} autoPlay playsInline/>
                 <span>{this.props.title}</span>
                 <i ref='close' id='webrtc_close' className='font small close' style={{
                     left: "auto",

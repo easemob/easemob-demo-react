@@ -1,4 +1,8 @@
 # Changelog
+## v1.11.1 @ 2019-3-18
+* [sdk] 通过设置isHttpDNS为true，从服务端获取DNS配置文件
+* [demo] 解决safari视频无图片、无声音问题
+
 ## v1.8.0 @ 2019-3-7
 * [sdk] 解决 chrome72被呼叫时，无法显示对方视频的问题
 * [demo] 解决部分已知bug

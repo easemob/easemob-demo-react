@@ -227,7 +227,7 @@ WebIM.conn.listen({
         const chatId = bySelf || type !== "chat" ? to : from
         if (type === "chat" &&( _.get(rootState,"entities.roster.byName["+chatId+"].subscription")  === "none") ||  !(_.get(rootState,"entities.roster.byName["+chatId+"].subscription"))){
             type = "stranger";
-            // store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
+            store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
         }
         store.dispatch(MessageActions.addMessage(message, "txt"))        
         store.dispatch(MessageActions.sendRead(message))        
@@ -253,9 +253,9 @@ WebIM.conn.listen({
             break
         case "stranger":
             // todo: remove chatdata to stranger list
-            store.dispatch(RosterActions.topRoster(from))
+            // store.dispatch(RosterActions.topRoster(from))
             // store.dispatch(MessageActions.addMessage(message, "txt"))                    
-            // store.dispatch(StrangerActions.topStranger(from))
+            store.dispatch(StrangerActions.topStranger(from))
             break
         default:
             break

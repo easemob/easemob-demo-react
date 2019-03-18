@@ -405,7 +405,10 @@ class DefaultLayout extends Component {
                             marginLeft: `${rightSiderOffset}px`
                         }}
                     >
-                        <RightSider roomId={roomId} room={room} ref="rightSider" />
+                        {   roomId ? 
+                            <RightSider roomId={roomId} room={room} ref="rightSider" />
+                            : null
+                        }
                     </div>
                     {multiAVModal}
                     {/*<Footer style={{ textAlign: "center" }}>

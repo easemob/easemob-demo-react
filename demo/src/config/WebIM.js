@@ -23,7 +23,7 @@ WebIM.loglevel = loglevel
 // console.log = loglevel.info
 
 WebIM.conn = new websdk.connection({
-    isHttpDNS: true,
+    isHttpDNS: WebIM.config.isHttpDNS,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     https: WebIM.config.https,
     url: WebIM.config.xmppURL,

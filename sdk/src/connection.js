@@ -805,12 +805,12 @@ var connection = function (options) {
 
 /**
  * 注册新用户
- * @param {Object} options - 用户信息
- * @param {String} options.username - 用户名
+ * @param {Object} options - 
+ * @param {String} options.username - 用户名，即用户ID
  * @param {String} options.password - 密码
  * @param {String} options.nickname - 用户昵称
- * @param {Function} options.success - 注册成功回调
- * @param {Function} options.error - 注册失败
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 
 connection.prototype.registerUser = function (options) {
@@ -1258,6 +1258,10 @@ connection.prototype.signup = function (options) {
  * @param {String} options.pwd - 用户密码，跟token二选一
  * @param {String} options.accessToken - token，跟密码二选一
  * @param {String} options.appKey - Appkey
+ * @param {String} options.apiUrl - Rest 服务地址,非必须。可在项目的WebIMConfig配置
+ * @param {String} options.xmppURL - Xmpp 服务地址,非必须。可在项目的WebIMConfig配置
+ * @param {Function} options.success - 成功之后的回调，默认为空，token登录没有该回调
+ * @param {Function} options.error - 失败之后的回调，默认为空，token登录没有该回调
  */
 
 connection.prototype.open = function (options) {
@@ -1425,7 +1429,7 @@ connection.prototype.attach = function (options) {
 
 /**
  * 断开连接，同时心跳停止
- * @param {String} reason
+ * @param {String} reason - 断开原因
  */
 
 connection.prototype.close = function (reason) {
@@ -2208,8 +2212,7 @@ connection.prototype.sendCommand = function (dom, id) {
 
 /**
  * 随机生成一个id用于消息id
- * @param {String} [prefix=WEBIM_] - 前缀
- * @returns {String} 唯一的id
+ * @param {String} prefix - 前缀，默认为"WEBIM_"
  */
 connection.prototype.getUniqueId = function (prefix) {
     // fix: too frequently msg sending will make same id
@@ -2231,10 +2234,10 @@ connection.prototype.getUniqueId = function (prefix) {
 };
 
 /**
- * send message
+ * 发送消息
  * @param {Object} messageSource - 由 Class Message 生成
  * @example
- *var deliverMessage = new WebIM.message('delivery', msgId);
+ *let deliverMessage = new WebIM.message('delivery', msgId);
  *deliverMessage.set({
  *  id: msgId, 
  *  to: msg.from
@@ -2308,7 +2311,7 @@ connection.prototype.send = function (messageSource) {
 };
 
 /**
- * 添加联系人，已废弃不用
+ * 添加联系人(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2335,11 +2338,23 @@ connection.prototype.addRoster = function (options) {
 /**
  * 删除联系人
  *
- * @param {Object} options
- * @param {String} options.to - 想要删除的联系人ID
- * @param {String} options.resource - （****不清楚）
- * @param {Function} options.error - 获取好友列表失败
- * @param {Function} options.success - 成功回调，在这里面调用connection.unsubscribed才能真正删除联系人
+ * @param {Object} options -
+ * @param {String} options.to - 联系人ID
+ * @param {String} options.resource - 用于生成jid，默认"webim"
+ * @param {Function} options.success - 成功之后的回调，在回调里调用connection.unsubscribed才能真正删除联系人
+ * @param {Function} options.error - 失败之后的回调，默认为空
+ * @example
+ * connection.removeRoster({
+ *   to: id,
+ *   success: function() {
+ *      connection.unsubscribed({
+ *          to: id
+ *      })
+ *   },
+ *   error: function() {
+ *
+ *   }
+ * })
  * @fires connection#unsubscribed
  */
 
@@ -2357,9 +2372,9 @@ connection.prototype.removeRoster = function (options) {
 
 /**
  * 获取联系人
- * @param {Object} options
- * @param {Function} options.error - 获取好友列表失败
- * @param {Function} options.success - 获取好友列表成功
+ * @param {Object} options - 
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.getRoster = function (options) {
     var conn = this;
@@ -2401,36 +2416,36 @@ connection.prototype.getRoster = function (options) {
  * A订阅B（A添加B为好友）
  * A执行：
  *  conn.subscribe({
-                to: 'B',
-                message: 'Hello~'
-            });
+        to: 'B',
+        message: 'Hello~'
+    });
  B的监听函数onPresence参数message.type == subscribe监听到有人订阅他
  B执行：
  conn.subscribed({
-                to: 'A',
-                message: '[resp:true]'
-          });
+    to: 'A',
+    message: '[resp:true]'
+ });
  同意A的订阅请求
  B继续执行：
  conn.subscribe({
-                to: 'A',
-                message: '[resp:true]'
-            });
+    to: 'A',
+    message: '[resp:true]'
+ });
  反向订阅A，这样才算双方添加好友成功。
  若B拒绝A的订阅请求，只需执行：
  conn.unsubscribed({
-                        to: 'A',
-                        message: 'I don't want to be subscribed'
-                    });
+    to: 'A',
+    message: 'I don't want to be subscribed'
+ });
  另外，在监听函数onPresence参数message.type == "subscribe"这个case中，加一句
  if (message && message.status === '[resp:true]') {
-            return;
-        }
+    return;
+ }
  否则会进入死循环
  *
- * @param {Object} options - 想要订阅的联系人信息
- * @param {String} options.to - 想要订阅的联系人ID
- * @param {String} options.nick - 想要订阅的联系人ID （非必须）
+ * @param {Object} options - 
+ * @param {String} options.to - 想要订阅的联系人
+ * @param {String} options.nick - 想要订阅的联系人昵称 （非必须）
  * @param {String} options.message - 发送给想要订阅的联系人的验证消息（非必须）
  */
 connection.prototype.subscribe = function (options) {
@@ -2447,9 +2462,9 @@ connection.prototype.subscribe = function (options) {
 
 /**
  * 被订阅后确认同意被订阅
- * @param {Object} options - 订阅人的信息
+ * @param {Object} options - 
  * @param {String} options.to - 订阅人的ID
- * @param {String} options.message=[resp:true] - 默认为[resp:true]，后续将去掉该参数
+ * @param {String} options.message  - 默认为[resp:true]，后续将去掉该参数
  */
 connection.prototype.subscribed = function (options) {
     var jid = _getJid(options, this);
@@ -2462,7 +2477,7 @@ connection.prototype.subscribed = function (options) {
 };
 
 /**
- * 取消订阅成功，废弃不用
+ * 取消订阅成功(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2494,7 +2509,7 @@ connection.prototype.unsubscribed = function (options) {
 };
 
 /**
- * 加入公开群组
+ * 加入公开群组(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2519,7 +2534,7 @@ connection.prototype.joinPublicGroup = function (options) {
 };
 
 /**
- * 获取聊天室列表
+ * 获取聊天室列表(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2556,7 +2571,7 @@ connection.prototype.listRooms = function (options) {
 };
 
 /**
- * 获取群组成员列表
+ * 获取群组成员列表(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2597,7 +2612,7 @@ connection.prototype.queryRoomMember = function (options) {
 };
 
 /**
- * 获取群组信息
+ * 获取群组信息(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2680,7 +2695,7 @@ connection.prototype.queryRoomInfo = function (options) {
 };
 
 /**
- * 获取聊天室管理员
+ * 获取聊天室管理员(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -2852,11 +2867,11 @@ connection.prototype.clear = function () {
 
 /**
  * 获取聊天室列表（分页）
- * @param {Object} options
+ * @param {Object} options -
  * @param {String} options.apiUrl - rest的接口地址
  * @param {Number} options.pagenum - 页码，默认1
  * @param {Number} options.pagesize - 每页数量，默认20
- * @param {String} options.success - 成功之后的回调，参数为返回值；
+ * @param {Function} options.success - 成功之后的回调，默认为空
  */
 connection.prototype.getChatRooms = function (options) {
 
@@ -2922,10 +2937,10 @@ connection.prototype.getChatRooms = function (options) {
 
 /**
  * 加入聊天室
- * @param {Object} options
- * @param {String} options.roomId - 加入聊天室的id
- * @param {Function} options.success - 加入聊天室成功之后的回调
- * @param {Function} options.error - 加入聊天室失败之后的回调
+ * @param {Object} options - 
+ * @param {String} options.roomId - 聊天室的ID
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.joinChatRoom = function (options) {
     var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
@@ -2953,10 +2968,10 @@ connection.prototype.joinChatRoom = function (options) {
 
 /**
  * 退出聊天室
- * @param {Object} options
- * @param {String} options.roomId - 退出聊天室的id
- * @param {Function} options.success - 退出聊天室成功之后的回调
- * @param {Function} options.error - 退出聊天室失败之后的回调
+ * @param {Object} options -
+ * @param {String} options.roomId - 聊天室的ID
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.quitChatRoom = function (options) {
     var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
@@ -3235,10 +3250,9 @@ function _parsePrivacy(iq) {
 
 /**
  * 获取好友黑名单
- * @param {Object} options
- * @param {Function} options.success - 获取好友黑名单成功之后的回调
- * @param {Function} options.error - 获取好友黑名单失败之后的回调
- * @returns {Object} 好友列表
+ * @param {Object} options - 
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.getBlacklist = function (options) {
     options = (options || {});
@@ -3261,12 +3275,14 @@ connection.prototype.getBlacklist = function (options) {
 
 /**
  * 将好友加入到黑名单
- * @param {Object} options
- * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单加上这次新加黑名单），json的key值为好友的ID
- * @param {Object} options.list[].type=jid - 要加到黑名单的好友对象的type，默认是jid
- * @param {Number} options.list[].order - 要加到黑名单的好友对象的order，所有order不重复
+ * @param {Object} options -
+ * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单加上这次新加黑名单），json的key值为好友的ID，value为之前获取的整个好友对象即可
+ * @param {Object} options.type - 要加到黑名单的好友对象的type，默认是"jid"
+ * @param {Number} options.list[].order - 要加到黑名单的好友对象的order，所有order不重复,可不填
  * @param {string} options.list[].jid - 要加到黑名单的好友的jid
  * @param {string} options.list[].name - 要加到黑名单的好友的ID
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.addToBlackList = function (options) {
     var iq = $iq({type: 'set'});
@@ -3299,12 +3315,14 @@ connection.prototype.addToBlackList = function (options) {
 
 /**
  * 将好友从黑名单移除
- * @param {Object} options
- * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单去掉这次新加黑名单），json的key值为好友的ID
- * @param {Object} options.list[].type=jid - 要加到黑名单的好友对象的type，默认是jid
+ * @param {Object} options -
+ * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表，json的key值为好友的ID，value为之前获取的整个好友对象即可
+ * @param {Object} options.type - 要加到黑名单的好友对象的type，默认是"jid"
  * @param {Number} options.list[].order - 要加到黑名单的好友对象的order，所有order不重复
  * @param {string} options.list[].jid - 要加到黑名单的好友的jid
  * @param {string} options.list[].name - 要加到黑名单的好友的ID
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeFromBlackList = function (options) {
 
@@ -3345,7 +3363,7 @@ connection.prototype._getGroupJid = function (to) {
 };
 
 /**
- * 加入群组黑名单
+ * 加入群组黑名单(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -3396,7 +3414,7 @@ function _parseGroupBlacklist(iq) {
 }
 
 /**
- * 获取群组黑名单
+ * 获取群组黑名单(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -3422,7 +3440,7 @@ connection.prototype.getGroupBlacklist = function (options) {
 };
 
 /**
- * 从群组黑名单删除
+ * 从群组黑名单删除(已废弃)
  * @param {Object} options
  * @deprecated
  */
@@ -3449,7 +3467,7 @@ connection.prototype.removeGroupMemberFromBlacklist = function (options) {
 };
 
 /**
- * changeGroupSubject 修改群名称
+ * 修改群名称(已废弃)
  *
  * @param options
  * @deprecated
@@ -3495,7 +3513,7 @@ connection.prototype.changeGroupSubject = function (options) {
 };
 
 /**
- * 删除群组
+ * 删除群组(已废弃)
  *
  * @param {Object} options -
  * @example
@@ -3529,7 +3547,7 @@ connection.prototype.destroyGroup = function (options) {
 };
 
 /**
- * 主动离开群组
+ * 主动离开群组(已废弃)
  *
  * @param {Object} options -
  * @example
@@ -3568,7 +3586,7 @@ connection.prototype.leaveGroupBySelf = function (options) {
 };
 
 /**
- * 群主从群组中踢人，后续会改为调用RestFul API
+ * 群主从群组中踢人(已废弃)
  *
  * @param {Object} options -
  * @param {string[]} options.list - 需要从群组移除的好友ID组成的数组
@@ -3616,9 +3634,13 @@ connection.prototype.leaveGroup = function (options) {
 };
 
 /**
- * 添加群组成员
+ * 添加群组成员(已废弃)
  *
  * @param {Object} options -
+ * @param {Object} options.list - 字符串数组，成员列表。[id1,id2,id3]
+ * @param {Object} options.roomId - 群组id
+ * @param {Function} options.success - 成功回调
+ * @param {Function} options.error - 失败回调
  * @deprecated
  * @example
  Attention the sequence: message first (每个成员单独发一条message), iq second (多个成员可以合成一条iq发)
@@ -3638,7 +3660,6 @@ connection.prototype.leaveGroup = function (options) {
  </iq>
  */
 connection.prototype.addGroupMembers = function (options) {
-    console.log(10101010);
     var sucFn = options.success || _utils.emptyfn;
     var errFn = options.error || _utils.emptyfn;
     var list = options.list || [];
@@ -3678,14 +3699,14 @@ connection.prototype.addGroupMembers = function (options) {
 };
 
 /**
- * acceptInviteFromGroup 接受加入申请
+ * 接受加入申请(已废弃)
  *
- * @param {Object} options - 参数
- * @param {Function} options.success - 成功回调，默认为空
- * @param {Function} options.error - 失败回调，默认为空
+ * @param {Object} options - 
  * @param {Array} options.list - 列表，默认[]
  * @param {String} options.roomId - 聊天室id
  * @param {String} options.reason - 原因
+ * @param {Function} options.success - 成功之后的回调，默认为空
+ * @param {Function} options.error - 失败之后的回调，默认为空
  * @deprecated
  */
 connection.prototype.acceptInviteFromGroup = function (options) {
@@ -3697,7 +3718,7 @@ connection.prototype.acceptInviteFromGroup = function (options) {
 };
 
 /**
- * 拒绝入群申请
+ * 拒绝入群申请(已废弃)
  * @param {Object} options -
  * @example
  throw request for now 暂时不处理，直接丢弃
@@ -3728,7 +3749,7 @@ connection.prototype.rejectInviteFromGroup = function (options) {
 };
 
 /**
- * 创建群组-异步
+ * 创建群组-异步(已废弃)
  * @param {Object} p -
  * @deprecated
  */
@@ -3829,7 +3850,7 @@ connection.prototype.createGroupAsync = function (p) {
 };
 
 /**
- * 创建群组
+ * 创建群组(已废弃)
  * @param {Object} options -
  * @deprecated
  * @example
@@ -3854,15 +3875,16 @@ connection.prototype.createGroup = function (options) {
 };
 /**
  * 通过RestFul API接口创建群组
- * @param opt {Object} - 群组信息
+ * @param opt {Object} - 
+ * @param opt.data {Object} - 群组信息
  * @param opt.data.groupname {string} - 群组名
  * @param opt.data.desc {string} - 群组描述
- * @param opt.data.members {string[]} - 群好友列表
+ * @param opt.data.members {string[]} - 好友id数组，群好友列表
  * @param opt.data.public {Boolean} - true: 公开群，false: 私有群
  * @param opt.data.approval {Boolean} - 前提：opt.data.public=true, true: 加群需要审批，false: 加群无需审批
  * @param opt.data.allowinvites {Boolean} - 前提：opt.data.public=false, true: 允许成员邀请入群，false: 不允许成员邀请入群
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.createGroupNew = function (opt) {
@@ -3890,8 +3912,8 @@ connection.prototype.createGroupNew = function (opt) {
  * 通过RestFul API屏蔽群组，只对移动端有效
  * @param {Object} opt -
  * @param {string} opt.groupId - 需要屏蔽的群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.blockGroup = function (opt) {
@@ -3919,9 +3941,9 @@ connection.prototype.blockGroup = function (opt) {
 /**
  * 通过RestFul API发出入群申请
  * @param {Object} opt -
- * @param {String} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {String} opt.groupId - 加入群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.joinGroup = function (opt) {
@@ -3945,8 +3967,8 @@ connection.prototype.joinGroup = function (opt) {
  * @param {Object} opt -
  * @param {Number} opt.limit - 每一页群组的最大数目
  * @param {string} opt.cursor=null - 游标，如果数据还有下一页，API 返回值会包含此字段，传递此字段可获取下一页的数据，为null时获取第一页数据
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.listGroups = function (opt) {
@@ -3978,8 +4000,8 @@ connection.prototype.listGroups = function (opt) {
  * 通过RestFul API根据groupId获取群组详情
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.getGroupInfo = function (opt) {
@@ -3999,9 +4021,9 @@ connection.prototype.getGroupInfo = function (opt) {
 
 /**
  * 通过RestFul API列出某用户所加入的所有群组
- * @param {Object} opt - 加入两个回调函数即可，success, error
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Object} opt - 
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.getGroup = function (opt) {
@@ -4024,11 +4046,11 @@ connection.prototype.getGroup = function (opt) {
 /**
  * 通过RestFul API分页列出群组的所有成员
  * @param {Object} opt -
- * @param {Number} opt.pageNum - 页码
- * @param {Number} opt.pageSize - 每一页的最大群成员数目
- * @param {string} opt.groupId - 群ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Number} opt.pageNum - 页码，默认1
+ * @param {Number} opt.pageSize - 每一页的最大群成员数目,最大值1000
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.listGroupMember = function (opt) {
     if (isNaN(opt.pageNum) || opt.pageNum <= 0) {
@@ -4065,10 +4087,10 @@ connection.prototype.listGroupMember = function (opt) {
  * 通过RestFul API禁止群用户发言
  * @param {Object} opt -
  * @param {string} opt.username - 被禁言的群成员的ID
- * @param {Number} opt.muteDuration - 被禁言的时长
- * @param {string} opt.groupId - 群ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Number} opt.muteDuration - 被禁言的时长，单位ms
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.mute = function (opt) {
@@ -4096,10 +4118,10 @@ connection.prototype.mute = function (opt) {
 /**
  * 通过RestFul API取消对用户禁言
  * @param {Object} opt -
- * @param {string} opt.groupId - 群ID
+ * @param {string} opt.groupId - 群组ID
  * @param {string} opt.username - 被取消禁言的群用户ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.removeMute = function (opt) {
@@ -4124,8 +4146,8 @@ connection.prototype.removeMute = function (opt) {
  * 通过RestFul API获取群组下所有管理员
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  * @since 1.4.11
  */
 connection.prototype.getGroupAdmin = function (opt) {
@@ -4149,8 +4171,8 @@ connection.prototype.getGroupAdmin = function (opt) {
  * 通过RestFul API获取群组下所有被禁言成员
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.getMuted = function (opt) {
     var groupId = opt.groupId;
@@ -4174,8 +4196,8 @@ connection.prototype.getMuted = function (opt) {
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
  * @param {string} opt.username - 用户ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.setAdmin = function (opt) {
     var groupId = opt.groupId,
@@ -4203,8 +4225,8 @@ connection.prototype.setAdmin = function (opt) {
  * @param {Object} opt -
  * @param {string} opt.gorupId - 群组ID
  * @param {string} opt.username - 用户ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeAdmin = function (opt) {
     var groupId = opt.groupId,
@@ -4227,10 +4249,10 @@ connection.prototype.removeAdmin = function (opt) {
 /**
  * 通过RestFul API同意用户加入群
  * @param {Object} opt -
- * @param {string} opt.applicant - 申请加群的用户名
+ * @param {string} opt.applicant - 申请加群的用户ID
  * @param {Object} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.agreeJoinGroup = function (opt) {
     var groupId = opt.groupId,
@@ -4258,10 +4280,10 @@ connection.prototype.agreeJoinGroup = function (opt) {
 /**
  * 通过RestFul API拒绝用户加入群
  * @param {Object} opt -
- * @param {string} opt.applicant - 申请加群的用户名
+ * @param {string} opt.applicant - 申请加群的用户ID
  * @param {Object} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.rejectJoinGroup = function (opt) {
     var groupId = opt.groupId,
@@ -4291,8 +4313,8 @@ connection.prototype.rejectJoinGroup = function (opt) {
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
  * @param {stirng} opt.username - 用户ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.groupBlockSingle = function (opt) {
     var groupId = opt.groupId,
@@ -4318,8 +4340,8 @@ connection.prototype.groupBlockSingle = function (opt) {
  * @param {Object} opt -
  * @param {string[]} opt.username - 用户ID数组
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.groupBlockMulti = function (opt) {
     var groupId = opt.groupId,
@@ -4348,9 +4370,9 @@ connection.prototype.groupBlockMulti = function (opt) {
  * 通过RestFul API将用户从群黑名单移除（单个）
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {string} opt.username - 用户名
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {string} opt.username - 用户ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeGroupBlockSingle = function (opt) {
     var groupId = opt.groupId,
@@ -4374,10 +4396,10 @@ connection.prototype.removeGroupBlockSingle = function (opt) {
 /**
  * 通过RestFul API将用户从群黑名单移除（批量）
  * @param {Object} opt -
- * @param {string} opt.groupId - 群组名
+ * @param {string} opt.groupId - 群组ID
  * @param {string[]} opt.username - 用户ID数组
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeGroupBlockMulti = function (opt) {
     var groupId = opt.groupId,
@@ -4402,8 +4424,8 @@ connection.prototype.removeGroupBlockMulti = function (opt) {
  * 通过RestFul API解散群组
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.dissolveGroup = function (opt) {
     var groupId = opt.groupId,
@@ -4426,8 +4448,8 @@ connection.prototype.dissolveGroup = function (opt) {
  * 通过RestFul API获取群组黑名单
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.getGroupBlacklistNew = function (opt) {
     var groupId = opt.groupId,
@@ -4450,8 +4472,8 @@ connection.prototype.getGroupBlacklistNew = function (opt) {
  * 通过RestFul API离开群组
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.quitGroup = function (opt) {
     var groupId = opt.groupId,
@@ -4476,8 +4498,8 @@ connection.prototype.quitGroup = function (opt) {
  * @param {string} opt.groupId - 群组ID
  * @param {string} opt.groupName - 群组名
  * @param {string} opt.description - 群组简介
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.modifyGroup = function (opt) {
     var groupId = opt.groupId,
@@ -4505,9 +4527,9 @@ connection.prototype.modifyGroup = function (opt) {
  * 通过RestFul API删除单个群成员
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {string} opt.username - 用户名
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {string} opt.username - 用户ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeSingleGroupMember = function (opt) {
     var groupId = opt.groupId,
@@ -4533,8 +4555,8 @@ connection.prototype.removeSingleGroupMember = function (opt) {
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
  * @param {string[]} opt.users - 用户ID数组
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeMultiGroupMember = function (opt) {
     var groupId = opt.groupId,
@@ -4559,9 +4581,9 @@ connection.prototype.removeMultiGroupMember = function (opt) {
  * 通过RestFul API邀请群成员
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组名
- * @param {string[]} opt.users - 用户名ID数组
- * @param {Function} opt.success - 成功之后的回调
- * @param {Function} opt.error - 失败之后的回调
+ * @param {string[]} opt.users - 用户ID数组
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
  */
 connection.prototype.inviteToGroup = function (opt) {
     var groupId = opt.groupId,
