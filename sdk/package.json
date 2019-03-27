@@ -3,9 +3,19 @@
   "version": "1.11.0",
   "description": "Easemob IM websdk",
   "main": "index.js",
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "underscore": "^1.9.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.15.3",
+    "eslint-plugin-html": "^5.0.3",
+    "parcel-bundler": "^1.12.3"
+  },
   "scripts": {
-    "build": "gulp",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "parcel build index.js -d build/output; node rename.js"
   },
   "repository": {
     "type": "git",
@@ -19,26 +29,6 @@
     "strophe",
     "webrtc"
   ],
-  "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "browserify": "^13.1.1",
-    "crypto-js": "^3.1.9-1",
-    "docdash": "^0.4.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^2.2.0",
-    "gulp-uglify": "^2.0.0",
-    "gulp-util": "^3.0.7",
-    "jsdoc": "^3.5.3",
-    "underscore": "^1.8.3",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "webpack-stream": "^3.2.0"
-  },
-  "author": {
-    "name": "easemob"
-  },
+  "author": "easemob",
   "license": "MIT"
 }
