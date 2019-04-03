@@ -19,6 +19,11 @@
     "strophe",
     "webrtc"
   ],
+  "dependencies": {
+    "long": "^4.0.0",
+    "protobufjs": "^6.8.8",
+    "sockjs-client": "^1.1.5"
+  },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",

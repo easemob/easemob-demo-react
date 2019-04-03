@@ -45,7 +45,9 @@ var CryptoJS = require('crypto-js');
 
     Message.delivery.prototype.set = function (opt) {
         this.body = {
-            bodyId: opt.id
+            id: this.id,
+            type: this.type,
+            bodyId: opt.bodyId
             , to: opt.to
         };
     };
@@ -218,6 +220,9 @@ var CryptoJS = require('crypto-js');
             , fail: opt.fail
             , flashUpload: opt.flashUpload
             , body: opt.body
+
+
+            
         };
         !opt.roomType && delete this.body.roomType;
     };

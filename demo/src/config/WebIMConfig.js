@@ -12,10 +12,10 @@
 // }
 
 function getUrl(){
-    var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
+    var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
     var xmppUrl = "im-api.easemob.com"
     if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1 || window.location.href.indexOf("172.17.2.168") !== -1){
-        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
+        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
         xmppUrl = "im-api.easemob.com"
     }
     // else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){

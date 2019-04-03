@@ -96,7 +96,7 @@ class DefaultLayout extends Component {
         if (selectTab == e.key) return
 
         // quite previous chatroom
-        if (selectItem) this.props.quitChatRoom(selectItem)
+        if (selectItem && selectTab == "chatroom") this.props.quitChatRoom(selectItem)
 
         this.props.switchRightSider({ rightSiderOffset: 0 })
         history.push(redirectPath + location.search)

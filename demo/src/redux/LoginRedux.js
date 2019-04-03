@@ -36,6 +36,7 @@ const { Types, Creators } = createActions({
                 //  accessToken: password,
                 appKey: WebIM.config.appkey,
                 success(token) {
+                    console.log(token, 9999);
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                     message.success(I18N.loginSuccessfully, 1)
 

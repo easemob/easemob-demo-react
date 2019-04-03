@@ -101,7 +101,7 @@ class App extends Component {
 
         return (
             <div>
-                <Loading show={isLoading} />
+                <Loading show={false} />
                 <Switch>
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/register" component={Register} />
