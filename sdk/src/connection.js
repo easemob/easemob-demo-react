@@ -2705,15 +2705,7 @@ connection.prototype.addRoster = function (options) {
  */
 
 connection.prototype.removeRoster = function (options) {
-    var jid = _getJid(options, this);
-    var iq = $iq({type: 'set'}).c('query', {xmlns: 'jabber:iq:roster'}).c('item', {
-        jid: jid,
-        subscription: 'remove'
-    });
-
-    var suc = options.success || _utils.emptyfn;
-    var error = options.error || _utils.emptyfn;
-    this.context.stropheConn.sendIQ(iq, suc, error);
+    HandleRosterMessage.operatRoster(options, "remove", this);
 };
 
 /**
@@ -2869,17 +2861,7 @@ connection.prototype.getRoster = function (options) {
  * @param {String} options.message - 发送给想要订阅的联系人的验证消息（非必须）
  */
 connection.prototype.subscribe = function (options) {
-    HandleRosterMessage.addRoster(options, "add", this);
-    // var jid = _getJid(options, this);
-    // var pres = $pres({to: jid, type: 'subscribe'});
-    // if (options.message) {
-    //     pres.c('status').t(options.message).up();
-    // }
-    // if (options.nick) {
-    //     pres.c('nick', {'xmlns': 'http://jabber.org/protocol/nick'}).t(options.nick);
-    // }
-    // this.sendCommand(pres.tree());
-
+    HandleRosterMessage.operatRoster(options, "add", this);
 };
 
 /**
@@ -2889,13 +2871,7 @@ connection.prototype.subscribe = function (options) {
  * @param {String} options.message  - 默认为[resp:true]，后续将去掉该参数
  */
 connection.prototype.subscribed = function (options) {
-    var jid = _getJid(options, this);
-    var pres = $pres({to: jid, type: 'subscribed'});
-
-    if (options.message) {
-        pres.c('status').t(options.message).up();
-    }
-    this.sendCommand(pres.tree());
+    HandleRosterMessage.operatRoster(options, "accept", this);
 };
 
 /**
@@ -2921,13 +2897,14 @@ connection.prototype.unsubscribe = function (options) {
  * @param {String} options.message - 发送给拒绝订阅的联系人的验证消息（非必须）
  */
 connection.prototype.unsubscribed = function (options) {
-    var jid = _getJid(options, this);
-    var pres = $pres({to: jid, type: 'unsubscribed'});
+    HandleRosterMessage.operatRoster(options, "decline", this);
+    // var jid = _getJid(options, this);
+    // var pres = $pres({to: jid, type: 'unsubscribed'});
 
-    if (options.message) {
-        pres.c('status').t(options.message).up();
-    }
-    this.sendCommand(pres.tree());
+    // if (options.message) {
+    //     pres.c('status').t(options.message).up();
+    // }
+    // this.sendCommand(pres.tree());
 };
 
 /**

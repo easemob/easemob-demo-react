@@ -13,15 +13,21 @@ var sendDelivery = function(conn, msg ,msgId){
         // self.send(deliverMessage.body);
     }
 }
-var addRoster = function(option, type, conn){
+var operatRoster = function(option, type, conn){
     var emptyMessage = [];
     var rosterBody = conn.context.root.lookup("easemob.pb.RosterBody");
     var rosterBodyJson = rosterBody.decode(emptyMessage);
     if(type === 'add'){
         rosterBodyJson.operation = 2
     }
-    else if(type === 'del'){
+    else if(type === 'remove'){
         rosterBodyJson.operation = 3
+    }
+    else if(type === 'accept'){
+        rosterBodyJson.operation = 4
+    }
+    else if(type === 'decline'){
+        rosterBodyJson.operation = 5
     }
     rosterBodyJson.from = conn.context.jid;
     rosterBodyJson.to = [{
@@ -30,7 +36,7 @@ var addRoster = function(option, type, conn){
         domain: "easemob.com",
         clientResource: conn.clientResource
     }]
-    // rosterBodyJson.reason = ;
+    rosterBodyJson.reason = option.message;
     // rosterBodyJson.roster_ver = '';
     // rosterBodyJson.bi_direction = false;
     rosterBodyJson = rosterBody.encode(rosterBodyJson).finish();
@@ -64,19 +70,40 @@ var handleMessage = function(meta, conn){
     var thirdMessage = messageBodyMessage.decode(meta.payload);
     var msgId = new Long(meta.id.low, meta.id.high, meta.id.unsigned).toString();
     var type = null;
-    // if (thirdMessage.type === 1) {             //messagetype 群组/聊天室。。。。
-    //     type = "chat";
-    // }
-    // else if (thirdMessage.type === 2) {
-    //     type = "groupchat";
-    // }
-    // else if (thirdMessage.type === 3) {
-    //     type = "chatroom";
-    // }
-    // else if(thirdMessage.type === 5){
-    //     type = "deliver_ack";
-    //     return;
-    // }
+    var msg = {
+        to: thirdMessage.to[0].name,
+        from: thirdMessage.from.name,
+        status: thirdMessage.reason
+    };
+    switch (thirdMessage.operation){
+        case 0:
+            break;
+        case 2:
+            msg.type = 'subscribe';
+            break;
+        case 3:
+            msg.type = 'unsubscribed';
+            break;
+        case 4:
+            msg.type = 'subscribed';
+            break;
+        case 5:
+            msg.type = 'unsubscribed';
+            break;
+        case 6:
+            break;
+        case 7:
+            break;
+        case 8:
+            msg.type = 'subscribed';
+            break;
+        case 9:
+            msg.type = 'unsubscribed';
+             break;
+
+    }
+
+    conn.onPresence(msg);
     console.log(thirdMessage.operation);
     
     
@@ -84,5 +111,5 @@ var handleMessage = function(meta, conn){
 
 export {
     handleMessage,
-    addRoster
+    operatRoster
 }
