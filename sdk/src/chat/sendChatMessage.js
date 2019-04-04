@@ -31,6 +31,12 @@
                 break;
             case 'file':
                 fifthMessage.type = 5;
+                fifthMessage.displayName = messageOption.body.filename;
+                fifthMessage.remotePath = messageOption.body.url;
+                fifthMessage.secretKey = messageOption.body.secret;
+                fifthMessage.fileLength = messageOption.body.file_length;
+                fifthMessage.size = messageOption.body.size;
+                fifthMessage.thumbnailDisplayName = messageOption.body.filename;
                 break;
             case 'cmd':
                 fifthMessage.type = 6;
@@ -195,7 +201,7 @@
                     , 
                     file_length: me.msg.ext.file_length || 0
                     , 
-                    filetype: me.msg.filetype
+                    filetype: me.msg.filetype || me.msg.file.filetype
                 }
                 sendMessage(me.msg, conn);
                 _tmpComplete instanceof Function && _tmpComplete(data, me.msg.id);

@@ -14,7 +14,7 @@ var sendDelivery = function(conn, msg ,msgId){
         // self.send(deliverMessage.body);
     }
 }
-var handleMessage = function(meta, conn){
+var handleMessage = function(meta, status, conn){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.MessageBody");
     var thirdMessage = messageBodyMessage.decode(meta.payload);
@@ -35,6 +35,9 @@ var handleMessage = function(meta, conn){
     }
     for (var i = 0; i < thirdMessage.contents.length; i++) {
         var msg = {};
+        var errorBool = status.errorCode > 0;
+        var errorCode = status.errorCode;
+        var errorText = status.reason;
         var msgBody = thirdMessage.contents[i];
         var from = thirdMessage.from.name;
         var to = thirdMessage.to.name
@@ -54,6 +57,9 @@ var handleMessage = function(meta, conn){
                         , ext: extmsg
                     };
                     !msg.delay && delete msg.delay;
+                    msg.error = errorBool;
+                    msg.errorText = errorText;
+                    msg.errorCode = errorCode;
                     self.onEmojiMessage(msg);
                 }
                 else{
@@ -65,17 +71,14 @@ var handleMessage = function(meta, conn){
 		                data: msgBody.text,
 		                ext: thirdMessage.ext,
 		                sourceMsg: msgBody.text
-		            }
-		            msg.error = "";
-			        msg.errorText = "";
-			        msg.errorCode = "";
+                    }
+                    msg.error = errorBool;
+                    msg.errorText = errorText;
+                    msg.errorCode = errorCode;
 			        conn.onTextMessage(msg);
                 }
-                sendDelivery(conn, msg, msgId);
-            break;
+                break;
         case 1:
-        	// var rwidth = 0;
-         //    var rheight = 0;
             if (msgBody.size) {
                 var rwidth = msgBody.size.width || 0;
                 var rheight = msgBody.size.height || 0;
@@ -100,21 +103,109 @@ var handleMessage = function(meta, conn){
                 // , delay: parseMsgData.delayTimeStamp
             };
             !msg.delay && delete msg.delay;
-            msg.error = "";
-            msg.errorText = "";
-            msg.errorCode = "";
-            sendDelivery(conn, msg, msgId);
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
             conn.onPictureMessage(msg);
             break;
         case 2:
+            msg = {
+                id: msgId
+                , type: type
+                , from: from
+                , to: to
+                ,
+                url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                , secret: msgBody.secretKey
+                , filename: msgBody.displayName
+                , length: msgBody.duration || ''
+                , file_length: msgBody.fileLength || ''
+                , filetype: msgBody.filetype || ''
+                , accessToken: conn.token || ''
+                , ext: extmsg
+                // , delay: parseMsgData.delayTimeStamp
+            };
+            !msg.delay && delete msg.delay;
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
+            conn.onAudioMessage(msg);
             break;
         case 3:
+            msg = {
+                id: msgId
+                , type: type
+                , from: from
+                , to: to
+                , addr: msgBody.address
+                , lat: msgBody.latitude
+                , lng: msgBody.longitude
+                , ext: extmsg
+                // , delay: parseMsgData.delayTimeStamp
+            };
+            !msg.delay && delete msg.delay;
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
+            conn.onLocationMessage(msg);
             break;
         case 4:
+            msg = {
+                id: msgId
+                , type: type
+                , from: from
+                , to: to
+                ,
+                url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                , secret: msgBody.secretKey
+                , filename: msgBody.displayName
+                , length: msgBody.duration || ''
+                , file_length: msgBody.fileLength || ''
+                , filetype: msgBody.filetype || ''
+                , accessToken: conn.token || ''
+                , ext: extmsg
+                // , delay: parseMsgData.delayTimeStamp
+            };
+            !msg.delay && delete msg.delay;
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
+            conn.onAudioMessage(msg);
             break;
         case 5:
+            msg = {
+                id: msgId
+                , type: type
+                , from: from
+                , to: to
+                ,
+                url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                , secret: msgBody.secretKey
+                , filename: msgBody.displayName
+                , file_length: msgBody.fileLength
+                , accessToken: conn.token || ''
+                , ext: extmsg
+                // , delay: parseMsgData.delayTimeStamp
+            };
+            !msg.delay && delete msg.delay;
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
+            conn.onFileMessage(msg);
             break;
         case 6:
+            msg = {
+                id: msgId
+                , from: from
+                , to: to
+                , action: msgBody.action
+                , ext: extmsg
+                // , delay: parseMsgData.delayTimeStamp
+            };
+            msg.error = errorBool;
+            msg.errorText = errorText;
+            msg.errorCode = errorCode;
+            conn.onCmdMessage(msg);
             break;
         default:
             break;
@@ -123,7 +214,7 @@ var handleMessage = function(meta, conn){
         // msg.error = "";
         // msg.errorText = "";
         // msg.errorCode = "";
-        // conn.onTextMessage(msg);
+        sendDelivery(conn, msg, msgId);
     }
     
 }

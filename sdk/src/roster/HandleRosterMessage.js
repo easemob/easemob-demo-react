@@ -64,7 +64,7 @@ var operatRoster = function(option, type, conn){
     conn.sendMSync(msyncMessageJson);
 
 }
-var handleMessage = function(meta, conn){
+var handleMessage = function(meta, status, conn){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.RosterBody");
     var thirdMessage = messageBodyMessage.decode(meta.payload);

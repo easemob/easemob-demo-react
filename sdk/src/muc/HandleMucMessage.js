@@ -13,7 +13,7 @@ var sendDelivery = function(conn, msg ,msgId){
         // self.send(deliverMessage.body);
     }
 }
-var handleMessage = function(meta, conn){
+var handleMessage = function(meta, status, conn){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.MUCBody");
     var thirdMessage = messageBodyMessage.decode(meta.payload);

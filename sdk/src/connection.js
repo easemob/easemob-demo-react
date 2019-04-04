@@ -468,7 +468,7 @@ var _login = function (options, conn) {
                 var metaId = new Long(CommSyncDLMessage.metaId.low,CommSyncDLMessage.metaId.high, CommSyncDLMessage.metaId.unsigned).toString();
                 console.log(CommSyncDLMessage);
                 if (CommSyncDLMessage.metas.length !== 0) {
-                        metapayload(CommSyncDLMessage.metas, conn);
+                        metapayload(CommSyncDLMessage.metas, CommSyncDLMessage.status, conn);
                         lastsession(CommSyncDLMessage.nextKey, CommSyncDLMessage.queue);
                 }
                 else if(CommSyncDLMessage.isLast){
@@ -558,17 +558,17 @@ var lastsession = function (nexkey, queue) {
     }
 }
 
-var metapayload = function (metas, conn) {
+var metapayload = function (metas, status, conn) {
     for (var i = 0; i < metas.length; i++) {
         if(metas[i].ns === 1){      //CHAT
             // messageBody(metas[i]);
-            HandleChatMessage.handleMessage(metas[i], conn)
+            HandleChatMessage.handleMessage(metas[i], status, conn)
         }
         else if(metas[i].ns === 2){   //MUC
-            HandleMucMessage.handleMessage(metas[i], conn);
+            HandleMucMessage.handleMessage(metas[i], status, conn);
         }
         else if(metas[i].ns === 3){    //ROSTER
-            HandleRosterMessage.handleMessage(metas[i], conn);
+            HandleRosterMessage.handleMessage(metas[i], status, conn);
         }
     }
 }
