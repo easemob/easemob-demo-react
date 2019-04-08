@@ -6,6 +6,7 @@ var _version = '1.4.13';
 var all = require('./all');
 var protobuf = require('protobufjs');
 var SockJS = require('sockjs-client');
+var Base64 = require('Base64')
 
 var _code = require('./status').code; 
 var _utils = require('./utils').utils; 
@@ -26,7 +27,6 @@ var Long = require("long");
 protobuf.util.Long = Long;
 protobuf.configure();
 var sock;
-
 
 
 var root = protobuf.Root.fromJSON(all);
@@ -450,8 +450,8 @@ var _login = function (options, conn) {
 
     sock.onmessage = function (e) {
         console.log("返回消息" + e.data);
-        var getmessage = window.atob(e.data);
-
+        var getmessage = Base64.atob(e.data);
+       //var getmessage = window.atob(e.data);
         var arr = [];
         for (var i = 0, j = getmessage.length; i < j; ++i) {
             arr.push(getmessage.charCodeAt(i));
@@ -659,7 +659,8 @@ var base64transform = function (str) {
         var str0 = String.fromCharCode(str[i]);
         strr = strr + str0;
     }
-    strr = window.btoa(strr);
+    strr = Base64.btoa(strr)
+    //strr = window.btoa(strr);
     console.log("转码发送" + strr);
     sock.send(strr);
 }
@@ -2139,7 +2140,8 @@ connection.prototype.handleMessage = function (msginfo) {    //****
                 case 'txt':
                     var receiveMsg = msgBody.msg;
                     if (self.encrypt.type === 'base64') {
-                        receiveMsg = atob(receiveMsg);
+                        receiveMsg = Base64.atob(receiveMsg);
+                        //receiveMsg = atob(receiveMsg);
                     } else if (self.encrypt.type === 'aes') {
                         var key = CryptoJS.enc.Utf8.parse(self.encrypt.key);
                         var iv = CryptoJS.enc.Utf8.parse(self.encrypt.iv);
@@ -2509,7 +2511,9 @@ connection.prototype.sendMSync = function(str){
         var str0 = String.fromCharCode(str[i]);
         strr = strr + str0;
     }
-    strr = window.btoa(strr);
+    strr = Base64.btoa(strr);
+    //strr = window.btoa(strr);
+
     console.log("转码发送" + strr);
     sock.send(strr);
 }
@@ -2570,7 +2574,8 @@ connection.prototype.sendOld = function (messageSource) {
     if (message.type === 'txt') {
         if (this.encrypt.type === 'base64') {
             message = _.clone(messageSource);
-            message.msg = btoa(message.msg);
+            message.msg = Base64.btoa(message.msg);
+           //message.msg = btoa(message.msg);
         } else if (this.encrypt.type === 'aes') {
             message = _.clone(messageSource);
             var key = CryptoJS.enc.Utf8.parse(this.encrypt.key);
