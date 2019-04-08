@@ -150,70 +150,70 @@ if (window.XDomainRequest) {
  * this will trigger socket.onError, therefore _doDisconnect again.
  * Fix it by overide  _onMessage
  */
-Strophe.Websocket.prototype._onMessage = function (message) {
-    logMessage(message)
-    // 获取Resource
-    var data = message.data;
-    if (data.indexOf('<jid>') > 0) {
-        var start = data.indexOf('<jid>'),
-            end = data.indexOf('</jid>'),
-            data = data.substring(start + 5, end);
-        stropheConn.setJid(data);
-    }
-    var elem, data;
-    // check for closing stream
-    // var close = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
-    // if (message.data === close) {
-    //     this._conn.rawInput(close);
-    //     this._conn.xmlInput(message);
-    //     if (!this._conn.disconnecting) {
-    //         this._conn._doDisconnect();
-    //     }
-    //     return;
-    //
-    // send and receive close xml: <close xmlns='urn:ietf:params:xml:ns:xmpp-framing'/>
-    // so we can't judge whether message.data equals close by === simply.
-    if (message.data.indexOf("<close ") === 0) {
-        elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
-        var see_uri = elem.getAttribute("see-other-uri");
-        if (see_uri) {
-            this._conn._changeConnectStatus(Strophe.Status.REDIRECT, "Received see-other-uri, resetting connection");
-            this._conn.reset();
-            this._conn.service = see_uri;
-            this._connect();
-        } else {
-            // if (!this._conn.disconnecting) {
-            this._conn._doDisconnect("receive <close> from server");
-            // }
-        }
-        return;
-    } else if (message.data.search("<open ") === 0) {
-        // This handles stream restarts
-        elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
-        if (!this._handleStreamStart(elem)) {
-            return;
-        }
-    } else {
-        data = this._streamWrap(message.data);
-        elem = new DOMParser().parseFromString(data, "text/xml").documentElement;
-    }
+// Strophe.Websocket.prototype._onMessage = function (message) {
+//     logMessage(message)
+//     // 获取Resource
+//     var data = message.data;
+//     if (data.indexOf('<jid>') > 0) {
+//         var start = data.indexOf('<jid>'),
+//             end = data.indexOf('</jid>'),
+//             data = data.substring(start + 5, end);
+//         stropheConn.setJid(data);
+//     }
+//     var elem, data;
+//     // check for closing stream
+//     // var close = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
+//     // if (message.data === close) {
+//     //     this._conn.rawInput(close);
+//     //     this._conn.xmlInput(message);
+//     //     if (!this._conn.disconnecting) {
+//     //         this._conn._doDisconnect();
+//     //     }
+//     //     return;
+//     //
+//     // send and receive close xml: <close xmlns='urn:ietf:params:xml:ns:xmpp-framing'/>
+//     // so we can't judge whether message.data equals close by === simply.
+//     if (message.data.indexOf("<close ") === 0) {
+//         elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
+//         var see_uri = elem.getAttribute("see-other-uri");
+//         if (see_uri) {
+//             this._conn._changeConnectStatus(Strophe.Status.REDIRECT, "Received see-other-uri, resetting connection");
+//             this._conn.reset();
+//             this._conn.service = see_uri;
+//             this._connect();
+//         } else {
+//             // if (!this._conn.disconnecting) {
+//             this._conn._doDisconnect("receive <close> from server");
+//             // }
+//         }
+//         return;
+//     } else if (message.data.search("<open ") === 0) {
+//         // This handles stream restarts
+//         elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
+//         if (!this._handleStreamStart(elem)) {
+//             return;
+//         }
+//     } else {
+//         data = this._streamWrap(message.data);
+//         elem = new DOMParser().parseFromString(data, "text/xml").documentElement;
+//     }
 
-    if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
-        return;
-    }
+//     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
+//         return;
+//     }
 
-    //handle unavailable presence stanza before disconnecting
-    if (this._conn.disconnecting &&
-        elem.firstChild.nodeName === "presence" &&
-        elem.firstChild.getAttribute("type") === "unavailable") {
-        this._conn.xmlInput(elem);
-        this._conn.rawInput(Strophe.serialize(elem));
-        // if we are already disconnecting we will ignore the unavailable stanza and
-        // wait for the </stream:stream> tag before we close the connection
-        return;
-    }
-    this._conn._dataRecv(elem, message.data);
-};
+//     //handle unavailable presence stanza before disconnecting
+//     if (this._conn.disconnecting &&
+//         elem.firstChild.nodeName === "presence" &&
+//         elem.firstChild.getAttribute("type") === "unavailable") {
+//         this._conn.xmlInput(elem);
+//         this._conn.rawInput(Strophe.serialize(elem));
+//         // if we are already disconnecting we will ignore the unavailable stanza and
+//         // wait for the </stream:stream> tag before we close the connection
+//         return;
+//     }
+//     this._conn._dataRecv(elem, message.data);
+// };
 
 
 var _listenNetwork = function (onlineCallback, offlineCallback) {
@@ -334,7 +334,7 @@ var _parseResponseMessage = function (msginfo) {    //****
     return parseMsgData;
 };
 
-var _parseNameFromJidFn = function (jid, domain) {
+var _parseNameFromJidFn = function (jid, domain) {     //*******删掉或者改动 */
     domain = domain || '';
     var tempstr = jid;
     var findex = tempstr.indexOf('_');
@@ -1788,7 +1788,7 @@ connection.prototype.notifyVersion = function (suc, fail) {
  * handle all types of presence message
  * @private
  */
-connection.prototype.handlePresence = function (msginfo) {
+connection.prototype.handlePresence = function (msginfo) {      //**** */
     if (this.isClosed()) {
         return;
     }
@@ -2487,7 +2487,7 @@ connection.prototype.handleMutedMessage = function (message) {  //****
 /**
  * @private
  */
-connection.prototype.sendCommand = function (dom, id) {
+connection.prototype.sendCommand = function (dom, id) {     //**** */
     if (this.isOpened()) {
         this.context.stropheConn.send(dom);
     } else {
@@ -2503,6 +2503,9 @@ connection.prototype.sendCommand = function (dom, id) {
     }
 };
 
+/**
+ * @private
+ */
 connection.prototype.sendMSync = function(str){
     var strr = "";
     for (var i = 0; i < str.length; i++) {
@@ -3622,7 +3625,7 @@ connection.prototype.closed = function () {
  * @private
  *
  */
-function _parsePrivacy(iq) {
+function _parsePrivacy(iq) {      //**** */
     var list = {};
     var items = iq.getElementsByTagName('item');
 
@@ -3679,6 +3682,7 @@ connection.prototype.getBlacklistOld = function (options) {
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.getBlacklist = function (options) {
+    var me = this;
     var options = options || {};
     if (!_utils.isCanSetRequestHeader) {
         conn.onError({
@@ -3703,10 +3707,18 @@ connection.prototype.getBlacklist = function (options) {
         }
 
         var suc = function (data, xhr) {
+            var list = {};
+            data.data.forEach((v,i)=>{
+                list[v] = {
+                    name: v
+                }
+            })
+            me.onBlacklistUpdate(list);
             typeof options.success === 'function' && options.success(data);
         };
 
         var error = function (res, xhr, msg) {
+            me.onBlacklistUpdate([]);
             typeof options.error === 'function' && options.error(res);
         };
 
@@ -3728,7 +3740,7 @@ connection.prototype.getBlacklist = function (options) {
 
 /**
  * 将好友加入到黑名单
- * @param {Object} options -
+ * @param {Object} options -    //&&&&
  * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表（已经存在的黑名单加上这次新加黑名单），json的key值为好友的ID，value为之前获取的整个好友对象即可
  * @param {Object} options.type - 要加到黑名单的好友对象的type，默认是"jid"
  * @param {Number} options.list[].order - 要加到黑名单的好友对象的order，所有order不重复,可不填
@@ -3738,37 +3750,40 @@ connection.prototype.getBlacklist = function (options) {
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.addToBlackList = function (options) {
-    var iq = $iq({type: 'set'});
-    var blacklist = options.list || {};
-    var type = options.type || 'jid';
-    var sucFn = options.success || _utils.emptyfn;
-    var errFn = options.error || _utils.emptyfn;
-    var piece = iq.c('query', {xmlns: 'jabber:iq:privacy'})
-        .c('list', {name: 'special'});
+    HandleRosterMessage.operatRoster({
+        to: options.name
+    }, "ban", this);
+    // var iq = $iq({type: 'set'});    ******
+    // var blacklist = options.list || {};
+    // var type = options.type || 'jid';
+    // var sucFn = options.success || _utils.emptyfn;
+    // var errFn = options.error || _utils.emptyfn;
+    // var piece = iq.c('query', {xmlns: 'jabber:iq:privacy'})
+    //     .c('list', {name: 'special'});
 
-    var keys = Object.keys(blacklist);
-    var len = keys.length;
-    var order = 2;
+    // var keys = Object.keys(blacklist);
+    // var len = keys.length;
+    // var order = 2;
 
-    for (var i = 0; i < len; i++) {
-        var item = blacklist[keys[i]];
-        var type = item.type || 'jid';
-        var jid = item.jid;
+    // for (var i = 0; i < len; i++) {
+    //     var item = blacklist[keys[i]];
+    //     var type = item.type || 'jid';
+    //     var jid = item.jid;
 
-        piece = piece.c('item', {action: 'deny', order: order++, type: type, value: jid})
-            .c('message');
-        if (i !== len - 1) {
-            piece = piece.up().up();
-        }
-    }
+    //     piece = piece.c('item', {action: 'deny', order: order++, type: type, value: jid})
+    //         .c('message');
+    //     if (i !== len - 1) {
+    //         piece = piece.up().up();
+    //     }
+    // }
 
-    // console.log('addToBlackList', blacklist, piece.tree());
-    this.context.stropheConn.sendIQ(piece.tree(), sucFn, errFn);
+    // // console.log('addToBlackList', blacklist, piece.tree());
+    // this.context.stropheConn.sendIQ(piece.tree(), sucFn, errFn);
 };
 
 /**
  * 将好友从黑名单移除
- * @param {Object} options -
+ * @param {Object} options -      //&&&&&
  * @param {Object[]} options.list - json数组，调用这个函数后黑名单的所有名单列表，json的key值为好友的ID，value为之前获取的整个好友对象即可
  * @param {Object} options.type - 要加到黑名单的好友对象的type，默认是"jid"
  * @param {Number} options.list[].order - 要加到黑名单的好友对象的order，所有order不重复
@@ -3778,32 +3793,34 @@ connection.prototype.addToBlackList = function (options) {
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.removeFromBlackList = function (options) {
+    HandleRosterMessage.operatRoster({
+        to: options.name
+    }, "allow", this);
+    // var iq = $iq({type: 'set'});
+    // var blacklist = options.list || {};
+    // var sucFn = options.success || _utils.emptyfn;
+    // var errFn = options.error || _utils.emptyfn;
+    // var piece = iq.c('query', {xmlns: 'jabber:iq:privacy'})
+    //     .c('list', {name: 'special'});
 
-    var iq = $iq({type: 'set'});
-    var blacklist = options.list || {};
-    var sucFn = options.success || _utils.emptyfn;
-    var errFn = options.error || _utils.emptyfn;
-    var piece = iq.c('query', {xmlns: 'jabber:iq:privacy'})
-        .c('list', {name: 'special'});
+    // var keys = Object.keys(blacklist);
+    // var len = keys.length;
 
-    var keys = Object.keys(blacklist);
-    var len = keys.length;
+    // for (var i = 0; i < len; i++) {
+    //     var item = blacklist[keys[i]];
+    //     var type = item.type || 'jid';
+    //     var jid = item.jid;
+    //     var order = item.order;
 
-    for (var i = 0; i < len; i++) {
-        var item = blacklist[keys[i]];
-        var type = item.type || 'jid';
-        var jid = item.jid;
-        var order = item.order;
+    //     piece = piece.c('item', {action: 'deny', order: order, type: type, value: jid})
+    //         .c('message');
+    //     if (i !== len - 1) {
+    //         piece = piece.up().up();
+    //     }
+    // }
 
-        piece = piece.c('item', {action: 'deny', order: order, type: type, value: jid})
-            .c('message');
-        if (i !== len - 1) {
-            piece = piece.up().up();
-        }
-    }
-
-    // console.log('removeFromBlackList', blacklist, piece.tree());
-    this.context.stropheConn.sendIQ(piece.tree(), sucFn, errFn);
+    // // console.log('removeFromBlackList', blacklist, piece.tree());
+    // this.context.stropheConn.sendIQ(piece.tree(), sucFn, errFn);
 };
 
 /**

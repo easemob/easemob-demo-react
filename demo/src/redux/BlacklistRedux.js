@@ -26,8 +26,9 @@ const { Types, Creators } = createActions({
             if (blacklist[id]) return
             blacklist[id] = roster[id]
             WebIM.conn.addToBlackList({
-                list: blacklist,
-                type: "jid",
+                // list: blacklist,
+                // type: "jid",
+                name: id,
                 success: function () {
                     // TODO: add to black list directly , shouldn't  re-pull
                     dispatch(CommonActions.fetched())
@@ -46,8 +47,9 @@ const { Types, Creators } = createActions({
             let blacklist = getState().entities.blacklist.byName.asMutable()
             delete blacklist[id]
             WebIM.conn.removeFromBlackList({
-                list: blacklist,
-                type: "jid",
+                // list: blacklist,
+                // type: "jid",
+                name: id,
                 success: function () {
                     // TODO: delete from black list directly , shouldn't  re-pull
                     dispatch(CommonActions.fetched())

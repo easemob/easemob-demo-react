@@ -29,10 +29,21 @@ var handleMessage = function(meta, status, conn){
     else if (thirdMessage.type === 3) {
         type = "chatroom";
     }
-    else if(thirdMessage.type === 5){
-        type = "deliver_ack";
+    else if(thirdMessage.type === 4){
+        type = "read_ack";     //发送ack没写
+        conn.onReadMessage({
+            mid: msgId
+        });
         return;
     }
+    else if(thirdMessage.type === 5){
+        type = "deliver_ack";
+        conn.onDeliverdMessage({
+            mid: msgId
+        });
+        return;
+    }
+    
     for (var i = 0; i < thirdMessage.contents.length; i++) {
         var msg = {};
         var errorBool = status.errorCode > 0;

@@ -29,6 +29,12 @@ var operatRoster = function(option, type, conn){
     else if(type === 'decline'){
         rosterBodyJson.operation = 5
     }
+    else if(type === 'ban'){    //加入黑名单
+        rosterBodyJson.operation = 6
+    }
+    else if(type === 'allow'){    //移除黑名单
+        rosterBodyJson.operation = 7
+    }
     rosterBodyJson.from = conn.context.jid;
     rosterBodyJson.to = [{
         appKey: conn.appKey,
@@ -91,8 +97,10 @@ var handleMessage = function(meta, status, conn){
             msg.type = 'unsubscribed';
             break;
         case 6:
+            conn.getBlacklist();
             break;
         case 7:
+            conn.getBlacklist();
             break;
         case 8:
             msg.type = 'subscribed';
