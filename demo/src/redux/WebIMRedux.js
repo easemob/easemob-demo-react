@@ -357,12 +357,13 @@ const { Types, Creators } = createActions({
     logout: () => {
         return (dispatch, state) => {
             let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
+            WebIM.conn.close("logout");
             message.success(I18N.logoutSuccessfully)
             dispatch(CommonActions.fetching())
             dispatch(LoginActions.logout())
-            if (WebIM.conn.isOpened()) {
-                WebIM.conn.close("logout")
-            }
+            // if (WebIM.conn.isOpened()) {
+                // WebIM.conn.close("logout")
+            // }
         }
     }
 })

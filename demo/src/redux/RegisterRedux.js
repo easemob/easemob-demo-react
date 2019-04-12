@@ -7,6 +7,7 @@ import Cookie from "js-cookie"
 import { message } from "antd"
 import { history } from "@/utils"
 import { store } from "@/redux"
+import WebIM from "@/config/WebIM"
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
@@ -20,17 +21,22 @@ const { Types, Creators } = createActions({
     register: (username, password, nickname) => {
         return (dispatch, getState) => {
             let options = {
+                // appKey: WebIM.config.appkey,
+                // apiUrl: WebIM.config.apiURL,
                 username: username.trim().toLowerCase(),
                 password: password,
-                nickname: nickname ? nickname.trim().toLowerCase() : ""
+                nickname: nickname ? nickname.trim().toLowerCase() : "",
+                success: function(){
+                    dispatch(Creators.registerSuccess(username))
+                }
             }
             dispatch(Creators.registerRequest(username, password, nickname))
-
-            return api
-                .post("/users", options)
-                .then(({ data }) => {
-                    dispatch(Creators.registerSuccess(username))
-                })
+            WebIM.conn.registerUser(options)
+            // return api
+            //     .post("/users", options)
+            //     .then(({ data }) => {
+            //         dispatch(Creators.registerSuccess(username))
+            //     })
         }
     },
 })

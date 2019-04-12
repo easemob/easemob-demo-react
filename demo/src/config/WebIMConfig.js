@@ -15,7 +15,7 @@ function getUrl(){
     var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
     var xmppUrl = "im-api.easemob.com"
     if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1 || window.location.href.indexOf("172.17.2.168") !== -1){
-        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
+        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb-ly.easemob.com"
         xmppUrl = "im-api.easemob.com"
     }
     // else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
@@ -33,7 +33,7 @@ var config = {
     /*
      * XMPP server
      */
-    xmppURL: getUrl().xmppUrl,
+    xmppURL: "http://39.107.157.123:8280/ws",
     // xmppURL: "im-api.easemob.com",
     // xmppURL: '172.17.2.139:5280',
     /*
@@ -57,7 +57,7 @@ var config = {
      * @parameter {Boolean} true or false
      */
     https: false,
-    isHttpDNS: true,
+    isHttpDNS: false,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.

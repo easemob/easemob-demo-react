@@ -1,8 +1,4 @@
 var _version = '1.4.13';
-// import all from "./all";
-// import protobuf from "protobufjs";
-
-// import SockJS from "sockjs-client";
 var all = require('./all');
 var protobuf = require('protobufjs');
 var SockJS = require('sockjs-client');
@@ -50,6 +46,7 @@ var logMessage = function (message) {
 }
 
 if (window.XDomainRequest) {
+
     // not support ie8 send is not a function , canot 
     // case send is object, doesn't has a attr of call
     // XDomainRequest.prototype.oldsend = XDomainRequest.prototype.send;
@@ -59,161 +56,6 @@ if (window.XDomainRequest) {
     // };
 }
 
-// Strophe.Request.prototype._newXHR = function () {
-//     var xhr = _utils.xmlrequest(true);
-//     if (xhr.overrideMimeType) {
-//         xhr.overrideMimeType('text/xml');
-//     }
-//     // use Function.bind() to prepend ourselves as an argument
-//     xhr.onreadystatechange = this.func.bind(null, this);
-//     return xhr;
-// };
-
-// Strophe.Websocket.prototype._closeSocket = function () {
-//     if (this.socket) {
-//         var me = this;
-//         setTimeout(function () {
-//             try {
-//                 me.socket.close();
-//             } catch (e) {
-//             }
-//         }, 0);
-//     } else {
-//         this.socket = null;
-//     }
-// };
-
-/** Function: log
- *  User overrideable logging function.
- *
- *  This function is called whenever the Strophe library calls any
- *  of the logging functions.  The default implementation of this
- *  function does nothing.  If client code wishes to handle the logging
- *  messages, it should override this with
- *  > Strophe.log = function (level, msg) {
-     *  >   (user code here)
-     *  > };
- *
- *  Please note that data sent and received over the wire is logged
- *  via Strophe.Connection.rawInput() and Strophe.Connection.rawOutput().
- *
- *  The different levels and their meanings are
- *
- *    DEBUG - Messages useful for debugging purposes.
- *    INFO - Informational messages.  This is mostly information like
- *      'disconnect was called' or 'SASL auth succeeded'.
- *    WARN - Warnings about potential problems.  This is mostly used
- *      to report transient connection errors like request timeouts.
- *    ERROR - Some error occurred.
- *    FATAL - A non-recoverable fatal error occurred.
- *
- *  Parameters:
- *    (Integer) level - The log level of the log message.  This will
- *      be one of the values in Strophe.LogLevel.
- *    (String) msg - The log message.
- */
-/* jshint ignore:start */
-// Strophe.log =  function (level, msg) {
-//     if(!isStropheLog){
-//         return
-//     }
-//     switch(level){
-//         case this.LogLevel.DEBUG:
-//             console.debug(msg)
-//             break;
-//         case this.LogLevel.INFO:
-//             console.info(msg);
-//             break;
-//         case this.LogLevel.WARN:
-//             console.warn(msg);
-//             break;
-//         case this.LogLevel.ERROR:
-//         case this.LogLevel.FATAL:
-//             console.error(msg);
-//             break;
-//         default:
-//             console.log(msg);
-//     }
-//     return;
-// }
-
-/**
- *
- * Strophe.Websocket has a bug while logout:
- * 1.send: <presence xmlns='jabber:client' type='unavailable'/> is ok;
- * 2.send: <close xmlns='urn:ietf:params:xml:ns:xmpp-framing'/> will cause a problem,log as follows:
- * WebSocket connection to 'ws://im-api.easemob.com/ws/' failed: Data frame received after close_connect @ strophe.js:5292connect @ strophe.js:2491_login @ websdk-1.1.2.js:278suc @ websdk-1.1.2.js:636xhr.onreadystatechange @ websdk-1.1.2.js:2582
- * 3 "Websocket error [object Event]"
- * _changeConnectStatus
- * onError Object {type: 7, msg: "The WebSocket connection could not be established or was disconnected.", reconnect: true}
- *
- * this will trigger socket.onError, therefore _doDisconnect again.
- * Fix it by overide  _onMessage
- */
-// Strophe.Websocket.prototype._onMessage = function (message) {
-//     logMessage(message)
-//     // 获取Resource
-//     var data = message.data;
-//     if (data.indexOf('<jid>') > 0) {
-//         var start = data.indexOf('<jid>'),
-//             end = data.indexOf('</jid>'),
-//             data = data.substring(start + 5, end);
-//         stropheConn.setJid(data);
-//     }
-//     var elem, data;
-//     // check for closing stream
-//     // var close = '<close xmlns="urn:ietf:params:xml:ns:xmpp-framing" />';
-//     // if (message.data === close) {
-//     //     this._conn.rawInput(close);
-//     //     this._conn.xmlInput(message);
-//     //     if (!this._conn.disconnecting) {
-//     //         this._conn._doDisconnect();
-//     //     }
-//     //     return;
-//     //
-//     // send and receive close xml: <close xmlns='urn:ietf:params:xml:ns:xmpp-framing'/>
-//     // so we can't judge whether message.data equals close by === simply.
-//     if (message.data.indexOf("<close ") === 0) {
-//         elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
-//         var see_uri = elem.getAttribute("see-other-uri");
-//         if (see_uri) {
-//             this._conn._changeConnectStatus(Strophe.Status.REDIRECT, "Received see-other-uri, resetting connection");
-//             this._conn.reset();
-//             this._conn.service = see_uri;
-//             this._connect();
-//         } else {
-//             // if (!this._conn.disconnecting) {
-//             this._conn._doDisconnect("receive <close> from server");
-//             // }
-//         }
-//         return;
-//     } else if (message.data.search("<open ") === 0) {
-//         // This handles stream restarts
-//         elem = new DOMParser().parseFromString(message.data, "text/xml").documentElement;
-//         if (!this._handleStreamStart(elem)) {
-//             return;
-//         }
-//     } else {
-//         data = this._streamWrap(message.data);
-//         elem = new DOMParser().parseFromString(data, "text/xml").documentElement;
-//     }
-
-//     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
-//         return;
-//     }
-
-//     //handle unavailable presence stanza before disconnecting
-//     if (this._conn.disconnecting &&
-//         elem.firstChild.nodeName === "presence" &&
-//         elem.firstChild.getAttribute("type") === "unavailable") {
-//         this._conn.xmlInput(elem);
-//         this._conn.rawInput(Strophe.serialize(elem));
-//         // if we are already disconnecting we will ignore the unavailable stanza and
-//         // wait for the </stream:stream> tag before we close the connection
-//         return;
-//     }
-//     this._conn._dataRecv(elem, message.data);
-// };
 
 
 var _listenNetwork = function (onlineCallback, offlineCallback) {
@@ -251,7 +93,7 @@ var _listenNetwork = function (onlineCallback, offlineCallback) {
     }
 };
 
-var _parseRoom = function (result) {
+var _parseRoom = function (result) {       //已废弃的方法里使用
     var rooms = [];
     var items = result.getElementsByTagName('item');
     if (items) {
@@ -270,7 +112,7 @@ var _parseRoom = function (result) {
     return rooms;
 };
 
-var _parseRoomOccupants = function (result) {
+var _parseRoomOccupants = function (result) {    //已废弃的方法里使用
     var occupants = [];
     var items = result.getElementsByTagName('item');
     if (items) {
@@ -286,135 +128,51 @@ var _parseRoomOccupants = function (result) {
     return occupants;
 };
 
-var _parseResponseMessage = function (msginfo) {    //****
-    var parseMsgData = {errorMsg: true, data: []};
-
-    var msgBodies = msginfo.getElementsByTagName('body');
-    if (msgBodies) {
-        for (var i = 0; i < msgBodies.length; i++) {
-            var msgBody = msgBodies[i];
-            var childNodes = msgBody.childNodes;
-            if (childNodes && childNodes.length > 0) {
-                var childNode = msgBody.childNodes[0];
-                if (childNode.nodeType == Strophe.ElementType.TEXT) {
-                    var jsondata = childNode.wholeText || childNode.nodeValue;
-                    jsondata = jsondata.replace('\n', '<br>');
-                    try {
-                        var data = eval('(' + jsondata + ')');
-                        parseMsgData.errorMsg = false;
-                        parseMsgData.data = [data];
-                    } catch (e) {
-                    }
-                }
-            }
-        }
-
-        var delayTags = msginfo.getElementsByTagName('delay');
-        if (delayTags && delayTags.length > 0) {
-            var delayTag = delayTags[0];
-            var delayMsgTime = delayTag.getAttribute('stamp');
-            if (delayMsgTime) {
-                parseMsgData.delayTimeStamp = delayMsgTime;
-            }
-        }
-    } else {
-        var childrens = msginfo.childNodes;
-        if (childrens && childrens.length > 0) {
-            var child = msginfo.childNodes[0];
-            if (child.nodeType == Strophe.ElementType.TEXT) {
-                try {
-                    var data = eval('(' + child.nodeValue + ')');
-                    parseMsgData.errorMsg = false;
-                    parseMsgData.data = [data];
-                } catch (e) {
-                }
-            }
-        }
-    }
-    return parseMsgData;
-};
 
 var _parseNameFromJidFn = function (jid, domain) {     //*******删掉或者改动 */
-    domain = domain || '';
-    var tempstr = jid;
-    var findex = tempstr.indexOf('_');
-
-    if (findex !== -1) {
-        tempstr = tempstr.substring(findex + 1);
-    }
-    var atindex = tempstr.indexOf('@' + domain);
-    if (atindex !== -1) {
-        tempstr = tempstr.substring(0, atindex);
-    }
-    return tempstr;
+    return jid.name;
 };
 
-var _parseFriend = function (queryTag, conn, from) {  //****
-    var rouster = [];
-    var items = queryTag.getElementsByTagName('item');
-    if (items) {
-        for (var i = 0; i < items.length; i++) {
-            var item = items[i];
-            var jid = item.getAttribute('jid');
-            if (!jid) {
-                continue;
+var _getSock = function(conn){
+    if (location.protocol != 'https:' && conn.isHttpDNS) {
+        var host = conn.xmppHosts[conn.xmppIndex];
+        var domain = host.domain;
+        var ip = host.ip;
+        if (ip) {
+            url = ip;
+            var port = host.port;
+            if (port != '80') {
+                url += ':' + port;
             }
-            var subscription = item.getAttribute('subscription');
-            var friend = {
-                subscription: subscription,
-                jid: jid
-            };
-            var ask = item.getAttribute('ask');
-            if (ask) {
-                friend.ask = ask;
-            }
-            var name = item.getAttribute('name');
-            if (name) {
-                friend.name = name;
-            } else {
-                var n = _parseNameFromJidFn(jid);
-                friend.name = n;
-            }
-            var groups = [];
-            Strophe.forEachChild(item, 'group', function (group) {
-                groups.push(Strophe.getText(group));
-            });
-            friend.groups = groups;
-            rouster.push(friend);
-            // B同意之后 -> B订阅A
-            // fix: 含有ask标示的好友代表已经发送过反向订阅消息，不需要再次发送。
-            if (conn && (subscription == 'from') && !ask) {
-                conn.subscribe({
-                    toJid: jid,
-                    message: "[resp:true]"
-                });
-            }
-
-            if (conn && (subscription == 'to')) {
-                conn.subscribed({
-                    toJid: jid
-                });
-            }
+        } else {
+            url = domain;
         }
+        conn.url = url;
     }
-    return rouster;
-};
-
+    return new SockJS(conn.url);
+}
 var _login = function (options, conn) {
     if(!options){
         return;
     }
-    sock = new SockJS('http://39.107.157.123:8280/ws');
+    
+    sock = _getSock(conn);
 
-    sock.onopen = function (a,b,c) {
-        console.log(a,111);
-        console.log(b,22);
-        console.log(c,33);
-        console.log("open");
+    sock.onopen = function () {
         var emptyMessage = [];
 
         var provisionMessage = root.lookup("easemob.pb.Provision");
         var secondMessage = provisionMessage.decode(emptyMessage);
+        conn.logOut = false;
+        conn.offLineSendConnecting = false;
+        if (conn.unSendMsgArr.length > 0) {
+            console.log("unSendMesArr",conn.unSendMsgArr);
+            for (var i in conn.unSendMsgArr) {
+                var str = conn.unSendMsgArr[i];
+                conn.sendMSync(str);
+                delete conn.unSendMsgArr[i];
+            }
+        }
 
         secondMessage.compressType = conn.compressType;
         secondMessage.encryptType = conn.encryptType;
@@ -434,18 +192,20 @@ var _login = function (options, conn) {
         firstMessage.deviceId = conn.deviceId;
         firstMessage.encryptType = conn.encryptType;
         firstMessage.payload = secondMessage;
-        //  console.log(JSON.stringify(conn.jid));
-        // console.log(JSON.stringify(firstMessage));
         firstMessage = firstLookUpMessage.encode(firstMessage).finish();
-        // console.log(JSON.stringify(firstMessage));
-        var result = firstLookUpMessage.decode(firstMessage);
-        //console.log(JSON.stringify(result));
         base64transform(firstMessage);
         conn.onOpened();
     };
 
-    sock.onclose = function () {
-        console.log("close");
+    sock.onclose = function (e) {
+        if(!conn.logOut){
+            conn.reconnect();
+        }
+        var error = {
+            type: _code.WEBIM_CONNCTION_DISCONNECTED
+        };
+        conn.onError(error);
+        console.log("close",e);
     };
 
     sock.onmessage = function (e) {
@@ -486,6 +246,10 @@ var _login = function (options, conn) {
                         }
                         delete _msgHash[metaId];
                     }
+                    // conn.handleReceivedMessage({
+                    //     id: metaId,
+                    //     mid: msgId
+                    // })  //可能不对
                 }
                 break;
             case 1:
@@ -666,47 +430,8 @@ var base64transform = function (str) {
 }
 
 
-var _parseMessageType = function (msginfo) {   //*****
-    var receiveinfo = msginfo.getElementsByTagName('received'),
-        inviteinfo = msginfo.getElementsByTagName('invite'),
-        deliveryinfo = msginfo.getElementsByTagName('delivery'),
-        acked = msginfo.getElementsByTagName('acked'),
-        error = msginfo.getElementsByTagName('error'),
-        msgtype = 'normal';
-    if (receiveinfo && receiveinfo.length > 0
-        &&
-        receiveinfo[0].namespaceURI === 'urn:xmpp:receipts') {
 
-        msgtype = 'received';
-
-    } else if (inviteinfo && inviteinfo.length > 0) {
-
-        msgtype = 'invite';
-
-    } else if (deliveryinfo && deliveryinfo.length > 0) {
-
-        msgtype = 'delivery';           // 消息送达
-
-    } else if (acked && acked.length) {
-
-        msgtype = 'acked';              // 消息已读
-
-    } else if (error && error.length) {
-
-        var errorItem = error[0],
-            userMuted = errorItem.getElementsByTagName('user-muted');
-
-        if (userMuted && userMuted.length) {
-
-            msgtype = 'userMuted';
-
-        }
-
-    }
-    return msgtype;
-};
-
-var _handleMessageQueue = function (conn) {
+var _handleMessageQueue = function (conn) {      // ******callback connect时调用
     for (var i in _msgHash) {
         if (_msgHash.hasOwnProperty(i)) {
             _msgHash[i].send(conn);
@@ -742,29 +467,29 @@ var _loginCallback = function (status, msg, conn) {    //******
             var delivery = msginfo.getElementsByTagName('delivery');
             var acked = msginfo.getElementsByTagName('acked');
             if (delivery.length) {
-                conn.handleDeliveredMessage(msginfo);
+                // conn.handleDeliveredMessage(msginfo);
                 return true;
             }
             if (acked.length) {
-                conn.handleAckedMessage(msginfo);
+                // conn.handleAckedMessage(msginfo);
                 return true;
             }
             var type = _parseMessageType(msginfo);
             switch (type) {
                 case "received":
-                    conn.handleReceivedMessage(msginfo);
+                    // conn.handleReceivedMessage(msginfo);
                     return true;
                 case "invite":
-                    conn.handleInviteMessage(msginfo);
+                    // conn.handleInviteMessage(msginfo);
                     return true;
                 case "delivery":
-                    conn.handleDeliveredMessage(msginfo);
+                    // conn.handleDeliveredMessage(msginfo);
                     return true;
                 case "acked":
-                    conn.handleAckedMessage(msginfo);
+                    // conn.handleAckedMessage(msginfo);
                     return true;
                 case "userMuted":
-                    conn.handleMutedMessage(msginfo);
+                    // conn.handleMutedMessage(msginfo);
                     return true;
                 default:
                     conn.handleMessage(msginfo);
@@ -776,28 +501,28 @@ var _loginCallback = function (status, msg, conn) {    //******
             return true;
         };
         var handlePing = function (msginfo) {
-            conn.handlePing(msginfo);
+            // conn.handlePing(msginfo);
             return true;
         };
-        var handleIqRoster = function (msginfo) {
-            conn.handleIqRoster(msginfo);
-            return true;
-        };
+        // var handleIqRoster = function (msginfo) {
+        //     conn.handleIqRoster(msginfo);
+        //     return true;
+        // };
         var handleIqPrivacy = function (msginfo) {
-            conn.handleIqPrivacy(msginfo);
+            // conn.handleIqPrivacy(msginfo);
             return true;
         };
         var handleIq = function (msginfo) {
-            conn.handleIq(msginfo);
+            // conn.handleIq(msginfo);
             return true;
         };
 
-        conn.addHandler(handleMessage, null, 'message', null, null, null);
-        conn.addHandler(handlePresence, null, 'presence', null, null, null);
-        conn.addHandler(handlePing, 'urn:xmpp:ping', 'iq', 'get', null, null);
-        conn.addHandler(handleIqRoster, 'jabber:iq:roster', 'iq', 'set', null, null);
-        conn.addHandler(handleIqPrivacy, 'jabber:iq:privacy', 'iq', 'set', null, null);
-        conn.addHandler(handleIq, null, 'iq', null, null, null);
+        // conn.addHandler(handleMessage, null, 'message', null, null, null);
+        // conn.addHandler(handlePresence, null, 'presence', null, null, null);
+        // conn.addHandler(handlePing, 'urn:xmpp:ping', 'iq', 'get', null, null);
+        // conn.addHandler(handleIqRoster, 'jabber:iq:roster', 'iq', 'set', null, null);
+        // conn.addHandler(handleIqPrivacy, 'jabber:iq:privacy', 'iq', 'set', null, null);
+        // conn.addHandler(handleIq, null, 'iq', null, null, null);
 
         conn.registerConfrIQHandler && (conn.registerConfrIQHandler());
 
@@ -816,9 +541,7 @@ var _loginCallback = function (status, msg, conn) {    //******
             supportSedMessage.push(_code.WEBIM_MESSAGE_REC_PHOTO);
             supportSedMessage.push(_code.WEBIM_MESSAGE_REC_AUDIO_FILE);
         }
-        conn.notifyVersion();
-        conn.retry && _handleMessageQueue(conn);
-        conn.heartBeat();
+        // conn.heartBeat();
         conn.isAutoLogin && conn.setPresence();
         console.log("conn",conn);
 
@@ -843,7 +566,7 @@ var _loginCallback = function (status, msg, conn) {    //******
         });
     } else if (status == Strophe.Status.DISCONNECTING) {
         if (conn.isOpened()) {
-            conn.stopHeartBeat();
+            // conn.stopHeartBeat();
             conn.context.status = _code.STATUS_CLOSING;
 
             error = {
@@ -890,22 +613,27 @@ var _loginCallback = function (status, msg, conn) {    //******
     conn.context.status_now = status;
 };
 
-var _getJid = function (options, conn) {
-    var jid = options.toJid || '';
+var _getJid = function (options, conn) {      //均在已经废弃的api中使用
+    var jid = options.toJid || {};
 
-    if (jid === '') {
+    if (jid === {}) {
+        
         var appKey = conn.context.appKey || '';
-        var toJid = appKey + '_' + options.to + '@' + conn.domain;
-
+        var toJid = {
+            appKey: appKey,
+            name: options.to,
+            domain: conn.domain,
+            clientResource: conn.clientResource
+        }
         if (options.resource) {
-            toJid = toJid + '/' + options.resource;
+            toJid.clientResource = options.resource
         }
         jid = toJid;
     }
     return jid;
 };
 
-var _getJidByName = function (name, conn) {
+var _getJidByName = function (name, conn) {    //均在已经废弃的api中使用
     var options = {
         to: name
     };
@@ -1030,18 +758,18 @@ var connection = function (options) {
 
     this.isHttpDNS = options.isHttpDNS || false;
     this.isMultiLoginSessions = options.isMultiLoginSessions || false;
-    this.wait = options.wait || 30;
-    this.retry = options.retry || false;
+    this.wait = options.wait || 30;    //**** attach*/
+    this.retry = options.retry || false;   //*** */
     this.https = options.https && location.protocol === 'https:';
-    this.url = _getXmppUrl(options.url, this.https);
-    this.hold = options.hold || 1;
-    this.route = options.route || null;
+    this.url = options.url;
+    this.hold = options.hold || 1;    //**** attach*/
+    this.route = options.route || null;   //*** */
     // this.domain = options.domain || 'easemob.com';
-    this.inactivity = options.inactivity || 30;
-    this.heartBeatWait = options.heartBeatWait || 4500;
-    this.maxRetries = options.maxRetries || 5;
-    this.isAutoLogin = options.isAutoLogin === false ? false : true;
-    this.pollingTime = options.pollingTime || 800;
+    this.inactivity = options.inactivity || 30;     //****getStrophe */
+    this.heartBeatWait = options.heartBeatWait || 4500;   //*** */
+    this.maxRetries = options.maxRetries || 5;     //*** getStrophe*/
+    this.isAutoLogin = options.isAutoLogin === false ? false : true;      //**** */
+    this.pollingTime = options.pollingTime || 800;    //****getStrophe */
     this.stropheConn = false;
     this.autoReconnectNumMax = options.autoReconnectNumMax || 0;
     this.autoReconnectNumTotal = 0;
@@ -1050,8 +778,8 @@ var connection = function (options) {
     this.sendQueue = new Queue();  //instead of sending message immediately,cache them in this queue
     this.intervalId = null;   //clearInterval return value
     this.apiUrl = options.apiUrl || '';
-    this.isWindowSDK = options.isWindowSDK || false;
-    this.encrypt = options.encrypt || {encrypt: {type: 'none'}};
+    this.isWindowSDK = options.isWindowSDK || false;    //????
+    this.encrypt = options.encrypt || {encrypt: {type: 'none'}};   //**** */
     this.delivery = options.delivery || false;
 
 
@@ -1077,19 +805,17 @@ var connection = function (options) {
 
     this.groupOption = {};
     //mysnc配置
-    this.version = options.version || 0;
-    this.compressAlgorimth = options.compressAlgorimth || 0;
-    this.userAgent = options.userAgent || 0;
-    this.pov = options.pov || 0;
+    this.version = options.version || "web1.0";
+    this.compressAlgorimth = options.compressAlgorimth || 0;   //*** */
+    this.userAgent = options.userAgent || 0;    //*** */
+    this.pov = options.pov || 0;    /**** */
     this.command = options.command || 3;
     this.deviceId = options.deviceId || 0;
-    this.encryptType = options.encryptType || [];
     this.encryptKey = options.encryptKey || "";
-    this.firstPayload = options.firstPayload || [];
+    this.firstPayload = options.firstPayload || [];   //*** */
     this.compressType = options.compressType || [0];
     this.encryptType = options.encryptType || [0];
     this.osType = 16;
-    this.version = "web1.0";
     window.this = this;
 
     
@@ -1121,12 +847,12 @@ connection.prototype.registerUser = function (options) {
  * @private
  */
 
-connection.prototype.handelSendQueue = function () {
-    var options = this.sendQueue.pop();
-    if (options !== null) {
-        this.sendReceiptsMessage(options);
-    }
-};
+// connection.prototype.handelSendQueue = function () {
+//     var options = this.sendQueue.pop();
+//     if (options !== null) {
+//         this.sendReceiptsMessage(options);
+//     }
+// };
 
 /**
  * 注册监听函数
@@ -1143,9 +869,9 @@ connection.prototype.handelSendQueue = function () {
  * @param {connection~onPresence} options.onPresence - 处理Presence消息的回调
  * @param {connection~onError} options.onError - 处理错误消息的回调
  * @param {connection~onReceivedMessage} options.onReceivedMessage - 处理Received消息的回调
- * @param {connection~onInviteMessage} options.onInviteMessage - 处理邀请消息的回调
+ * @param {connection~onInviteMessage} options.onInviteMessage - 处理邀请消息的回调    /.....
  * @param {connection~onDeliverdMessage} options.onDeliverdMessage - 处理Delivered ACK消息的回调
- * @param {connection~onReadMessage} options.onReadMessage - 处理Read ACK消息的回调
+ * @param {connection~onReadMessage} options.onReadMessage - 处理Read ACK消息的回调   //.....
  * @param {connection~onMutedMessage} options.onMutedMessage - 处理禁言消息的回调
  * @param {connection~onOffline} options.onOffline - 处理断网的回调
  * @param {connection~onOnline} options.onOnline - 处理联网的回调
@@ -1202,7 +928,7 @@ connection.prototype.listen = function (options) {
      */
     /**
      * 被邀请进群
-     * @callback connection~onInviteMessage
+     * @callback connection~onInviteMessage   //....
      */
     /**
      * 收到已送达回执
@@ -1265,37 +991,37 @@ connection.prototype.listen = function (options) {
  * @param {Boolean} forcing - 是否强制发送
  * @private
  */
-connection.prototype.heartBeat = function (forcing) {
-    if (forcing !== true) {
-        forcing = false;
-    }
-    var me = this;
-    //IE8: strophe auto switch from ws to BOSH, need heartbeat
-    var isNeed = !/^ws|wss/.test(me.url) || /mobile/.test(navigator.userAgent);
+// connection.prototype.heartBeat = function (forcing) {        //****改为协议发送心跳 */
+//     if (forcing !== true) {
+//         forcing = false;
+//     }
+//     var me = this;
+//     //IE8: strophe auto switch from ws to BOSH, need heartbeat
+//     var isNeed = !/^ws|wss/.test(me.url) || /mobile/.test(navigator.userAgent);
 
-    if (this.heartBeatID || (!forcing && !isNeed)) {
-        return;
-    }
+//     if (this.heartBeatID || (!forcing && !isNeed)) {
+//         return;
+//     }
 
-    var options = {
-        toJid: this.domain,
-        type: 'normal'
-    };
-    this.heartBeatID = setInterval(function () {
-        // fix: do heartbeat only when websocket 
-        _utils.isSupportWss && me.ping(options);
-    }, this.heartBeatWait);
-};
+//     var options = {
+//         toJid: this.domain,
+//         type: 'normal'
+//     };
+//     this.heartBeatID = setInterval(function () {
+//         // fix: do heartbeat only when websocket 
+//         _utils.isSupportWss && me.ping(options);
+//     }, this.heartBeatWait);
+// };
 
 /**
  * @private
  */
 
-connection.prototype.stopHeartBeat = function () {
-    if (typeof this.heartBeatID == "number") {
-        this.heartBeatID = clearInterval(this.heartBeatID);
-    }
-};
+// connection.prototype.stopHeartBeat = function () {
+//     if (typeof this.heartBeatID == "number") {
+//         this.heartBeatID = clearInterval(this.heartBeatID);
+//     }
+// };
 
 /**
  * 发送接收消息回执
@@ -1303,25 +1029,25 @@ connection.prototype.stopHeartBeat = function () {
  * @param {String} options.id - 消息id
  * @private
  */
-connection.prototype.sendReceiptsMessage = function (options) {
-    var dom = $msg({
-        from: this.context.jid || '',
-        to: this.domain,
-        id: options.id || ''
-    }).c('received', {
-        xmlns: 'urn:xmpp:receipts',
-        id: options.id || ''
-    });
-    this.sendCommand(dom.tree());
-};
+// connection.prototype.sendReceiptsMessage = function (options) {
+//     var dom = $msg({
+//         from: this.context.jid || '',
+//         to: this.domain,
+//         id: options.id || ''
+//     }).c('received', {
+//         xmlns: 'urn:xmpp:receipts',
+//         id: options.id || ''
+//     });
+//     this.sendCommand(dom.tree());
+// };
 
 /**
  * @private
  */
 
-connection.prototype.cacheReceiptsMessage = function (options) {
-    this.sendQueue.push(options);
-};
+// connection.prototype.cacheReceiptsMessage = function (options) {
+//     this.sendQueue.push(options);
+// };
 
 /**
  * @private
@@ -1364,20 +1090,20 @@ connection.prototype.getStrophe = function () {
  * @param tagName
  * @private
  */
-connection.prototype.getHostsByTag = function (data, tagName) {
-    var tag = _utils.getXmlFirstChild(data, tagName);
-    if (!tag) {
-        console.log(tagName + ' hosts error');
-        return null;
-    }
-    var hosts = tag.getElementsByTagName('hosts');
-    if (hosts.length == 0) {
-        console.log(tagName + ' hosts error2');
-        return null;
-    }
-    return hosts[0].getElementsByTagName('host');
+// connection.prototype.getHostsByTag = function (data, tagName) {
+//     var tag = _utils.getXmlFirstChild(data, tagName);
+//     if (!tag) {
+//         console.log(tagName + ' hosts error');
+//         return null;
+//     }
+//     var hosts = tag.getElementsByTagName('hosts');
+//     if (hosts.length == 0) {
+//         console.log(tagName + ' hosts error2');
+//         return null;
+//     }
+//     return hosts[0].getElementsByTagName('host');
 
-};
+// };
 
 /**
  * @private
@@ -1389,13 +1115,13 @@ connection.prototype.getRestFromHttpDNS = function (options, type) {
     }
     var url = '';
     var host = this.restHosts[this.restIndex];
-    var domain = _utils.getXmlFirstChild(host, 'domain');
-    var ip = _utils.getXmlFirstChild(host, 'ip');
+    var domain = host.domain;
+    var ip = host.ip;
     if (ip) {
-        var port = _utils.getXmlFirstChild(host, 'port');
-        url = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' + ip.textContent + ':' + port.textContent;
+        var port = host.port;
+        url = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' + ip + ':' + port;
     } else {
-        url = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' + domain.textContent;
+        url = (location.protocol === 'https:' ? 'https:' : 'http:') + '//' + domain;
     }
 
     if (url != '') {
@@ -1415,15 +1141,15 @@ connection.prototype.getRestFromHttpDNS = function (options, type) {
  */
 
 connection.prototype.getHttpDNS = function (options, type) {
-    // if (this.restHosts) {
+    // if (this.restHosts) {r
     //     this.getRestFromHttpDNS(options, type);
     //     return;
     // }
     var self = this;
     var suc = function (data, xhr) {
-        data = new DOMParser().parseFromString(data, "text/xml").documentElement;
+        // data = new DOMParser().parseFromString(data, "text/xml").documentElement;
         //get rest ips
-        var restHosts = self.getHostsByTag(data, 'rest');
+        var restHosts = data.rest.hosts;
         if (!restHosts) {
             console.log('rest hosts error3');
             return;
@@ -1446,14 +1172,14 @@ connection.prototype.getHttpDNS = function (options, type) {
               return res; 
           } 
         } 
-        var xmppHosts = makeArray(self.getHostsByTag(data, 'xmpp'));
+        var xmppHosts = data.rest.hosts;
         if (!xmppHosts) {
             console.log('xmpp hosts error3');
             return;
         }
         for(var i = 0; i< xmppHosts.length; i++){
             var httpType = self.https ? 'https' : 'http';
-            if(_utils.getXmlFirstChild(xmppHosts[i], 'protocol').textContent === httpType ){
+            if( xmppHosts[i].protocol=== httpType ){
                 var currentPost = xmppHosts[i];
                 xmppHosts.splice(i,1);
                 xmppHosts.unshift(currentPost);
@@ -1474,13 +1200,13 @@ connection.prototype.getHttpDNS = function (options, type) {
 
     };
     var options2 = {
-        url: this.dnsArr[this.dnsIndex] + '/easemob/server.xml',
-        dataType: 'text',
+        url: this.dnsArr[this.dnsIndex] + '/easemob/server.json',
+        dataType: 'json',
         type: 'GET',
 
         // url: 'http://www.easemob.com/easemob/server.xml',
         // dataType: 'xml',
-        data: {app_key: encodeURIComponent(options.appKey)},
+        data: {app_key: encodeURIComponent(options.appKey || this.appKey)},
         success: suc || _utils.emptyfn,
         error: error || _utils.emptyfn
     };
@@ -1495,9 +1221,9 @@ connection.prototype.signup = function (options) {
     var self = this;
     var orgName = options.orgName || '';
     var appName = options.appName || '';
-    var appKey = options.appKey || '';
-    var suc = options.success || EMPTYFN;
-    var err = options.error || EMPTYFN;
+    var appKey = options.appKey || this.appKey;
+    var suc = options.success || _utils.emptyfn;
+    var err = options.error || _utils.emptyfn;
 
     if (!orgName && !appName && appKey) {
         var devInfos = appKey.split('#');
@@ -1524,8 +1250,8 @@ connection.prototype.signup = function (options) {
         self.clear();
         err(res);
     };
-    var https = options.https || https;
-    var apiUrl = options.apiUrl;
+    var https = options.https || this.https;
+    var apiUrl = options.apiUrl || this.apiUrl;
     var restUrl = apiUrl + '/' + orgName + '/' + appName + '/users';
 
     var userjson = {
@@ -1546,7 +1272,7 @@ connection.prototype.signup = function (options) {
 };
 
 /**
- * 登录
+ * 登录  
  * @param {Object} options - 用户信息
  * @param {String} options.user - 用户名
  * @param {String} options.pwd - 用户密码，跟token二选一
@@ -1572,12 +1298,12 @@ connection.prototype.open = function (options) {
     // if (options.xmppURL) {
     //     this.url = _getXmppUrl(options.xmppURL, this.https);
     // }
-    // if (location.protocol != 'https:' && this.isHttpDNS) {
-    //     this.dnsIndex = 0;
-    //     this.getHttpDNS(options, 'login');
-    // } else {
+    if (location.protocol != 'https:' && this.isHttpDNS) {
+        this.dnsIndex = 0;
+        this.getHttpDNS(options, 'login');
+    } else {
         this.login(options);
-    // }
+    }
 };
 
 /**
@@ -1596,7 +1322,7 @@ connection.prototype.login = function (options) {
 
     var conn = this;
 
-    if (conn.isOpened()) {
+    if (conn.isOpened()) {    //** */
         return;
     }
 
@@ -1617,6 +1343,7 @@ connection.prototype.login = function (options) {
             if (options.success)
                 options.success(data);
             conn.token = data.access_token;
+            conn.context.restTokenData = data.access_token;
             _login(data, conn);
         };
         var error = function (res, xhr, msg) {
@@ -1670,56 +1397,56 @@ connection.prototype.login = function (options) {
  * attach to xmpp server for BOSH
  * @private
  */
-connection.prototype.attach = function (options) {
-    var pass = _validCheck(options, this);
+// connection.prototype.attach = function (options) {
+//     var pass = _validCheck(options, this);
 
-    if (!pass) {
-        return;
-    }
+//     if (!pass) {
+//         return;
+//     }
 
-    options = options || {};
+//     options = options || {};
 
-    var accessToken = options.accessToken || '';
-    if (accessToken == '') {
-        this.onError({
-            type: _code.WEBIM_CONNCTION_TOKEN_NOT_ASSIGN_ERROR
-        });
-        return;
-    }
+//     var accessToken = options.accessToken || '';
+//     if (accessToken == '') {
+//         this.onError({
+//             type: _code.WEBIM_CONNCTION_TOKEN_NOT_ASSIGN_ERROR
+//         });
+//         return;
+//     }
 
-    var sid = options.sid || '';
-    if (sid === '') {
-        this.onError({
-            type: _code.WEBIM_CONNCTION_SESSIONID_NOT_ASSIGN_ERROR
-        });
-        return;
-    }
+//     var sid = options.sid || '';
+//     if (sid === '') {
+//         this.onError({
+//             type: _code.WEBIM_CONNCTION_SESSIONID_NOT_ASSIGN_ERROR
+//         });
+//         return;
+//     }
 
-    var rid = options.rid || '';
-    if (rid === '') {
-        this.onError({
-            type: _code.WEBIM_CONNCTION_RID_NOT_ASSIGN_ERROR
-        });
-        return;
-    }
+//     var rid = options.rid || '';
+//     if (rid === '') {
+//         this.onError({
+//             type: _code.WEBIM_CONNCTION_RID_NOT_ASSIGN_ERROR
+//         });
+//         return;
+//     }
 
-    var stropheConn = this.getStrophe();
+//     var stropheConn = this.getStrophe();
 
-    this.context.accessToken = accessToken;
-    this.context.stropheConn = stropheConn;
-    this.context.status = _code.STATUS_DOLOGIN_IM;
+//     this.context.accessToken = accessToken;
+//     this.context.stropheConn = stropheConn;
+//     this.context.status = _code.STATUS_DOLOGIN_IM;
 
-    var conn = this;
-    var callback = function (status, msg) {
-        _loginCallback(status, msg, conn);
-    };
+//     var conn = this;
+//     var callback = function (status, msg) {
+//         _loginCallback(status, msg, conn);
+//     };
 
-    var jid = this.context.jid;
-    var wait = this.wait;
-    var hold = this.hold;
-    var wind = this.wind || 5;
-    stropheConn.attach(jid, sid, rid, callback, wait, hold, wind);
-};
+//     var jid = this.context.jid;
+//     var wait = this.wait;
+//     var hold = this.hold;
+//     var wind = this.wind || 5;
+//     stropheConn.attach(jid, sid, rid, callback, wait, hold, wind);
+// };
 
 /**
  * 断开连接，同时心跳停止
@@ -1728,19 +1455,21 @@ connection.prototype.attach = function (options) {
 
 connection.prototype.close = function (reason) {
     this.logOut = true;
-    this.stopHeartBeat();
+    this.context.status = _code.STATUS_CLOSING;
+    sock.close();
+    // this.stopHeartBeat();
 
-    var status = this.context.status;
-    if (status == _code.STATUS_INIT) {
-        return;
-    }
+    // var status = this.context.status;
+    // if (status == _code.STATUS_INIT) {
+    //     return;
+    // }
 
-    if (this.isClosed() || this.isClosing()) {
-        return;
-    }
+    // if (this.isClosed() || this.isClosing()) {
+    //     return;
+    // }
 
     this.context.status = _code.STATUS_CLOSING;
-    this.context.stropheConn.disconnect(reason);
+    // this.context.stropheConn.disconnect(reason);
 };
 
 /**
@@ -1748,48 +1477,48 @@ connection.prototype.close = function (reason) {
  * @private
  */
 
-connection.prototype.addHandler = function (handler, ns, name, type, id, from, options) {
-    this.context.stropheConn.addHandler(handler, ns, name, type, id, from, options);
-};
+// connection.prototype.addHandler = function (handler, ns, name, type, id, from, options) {
+//     this.context.stropheConn.addHandler(handler, ns, name, type, id, from, options);
+// };
 
 /**
  * strophe sendIQ
  * @private
  */
-connection.prototype.notifyVersion = function (suc, fail) {
-    var jid = _getJid({}, this);
-    var dom = $iq({
-        from: this.context.jid || ''
-        , to: this.domain
-        , type: 'result'
-    })
-        .c('query', {xmlns: 'jabber:iq:version'})
-        .c('name')
-        .t('easemob')
-        .up()
-        .c('version')
-        .t(_version)
-        .up()
-        .c('os')
-        .t('webim');
+// connection.prototype.notifyVersion = function (suc, fail) {       //****_loginCallback调用 */
+//     var jid = _getJid({}, this);
+//     var dom = $iq({
+//         from: this.context.jid || ''
+//         , to: this.domain
+//         , type: 'result'
+//     })
+//         .c('query', {xmlns: 'jabber:iq:version'})
+//         .c('name')
+//         .t('easemob')
+//         .up()
+//         .c('version')
+//         .t(_version)
+//         .up()
+//         .c('os')
+//         .t('webim');
 
-    var suc = suc || _utils.emptyfn;
-    var error = fail || this.onError;
-    var failFn = function (ele) {
-        error({
-            type: _code.WEBIM_CONNCTION_NOTIFYVERSION_ERROR
-            , data: ele
-        });
-    };
-    this.context.stropheConn.sendIQ(dom.tree(), suc, failFn);
-    return;
-};
+//     var suc = suc || _utils.emptyfn;
+//     var error = fail || this.onError;
+//     var failFn = function (ele) {
+//         error({
+//             type: _code.WEBIM_CONNCTION_NOTIFYVERSION_ERROR
+//             , data: ele
+//         });
+//     };
+//     this.context.stropheConn.sendIQ(dom.tree(), suc, failFn);
+//     return;
+// };
 
 /**
  * handle all types of presence message
  * @private
  */
-connection.prototype.handlePresence = function (msginfo) {      //**** */
+connection.prototype.handlePresence = function (msginfo) {      //****应该去掉，留着做事件处理 */
     if (this.isClosed()) {
         return;
     }
@@ -2016,484 +1745,491 @@ connection.prototype.handlePresence = function (msginfo) {      //**** */
  * @private
  */
 
-connection.prototype.handlePing = function (e) {
-    if (this.isClosed()) {
-        return;
-    }
-    var id = e.getAttribute('id');
-    var from = e.getAttribute('from');
-    var to = e.getAttribute('to');
-    var dom = $iq({
-        from: to
-        , to: from
-        , id: id
-        , type: 'result'
-    });
-    this.sendCommand(dom.tree());
-};
+// connection.prototype.handlePing = function (e) {
+//     if (this.isClosed()) {
+//         return;
+//     }
+//     var id = e.getAttribute('id');
+//     var from = e.getAttribute('from');
+//     var to = e.getAttribute('to');
+//     var dom = $iq({
+//         from: to
+//         , to: from
+//         , id: id
+//         , type: 'result'
+//     });
+//     this.sendCommand(dom.tree());
+// };
 
 /**
  * @private
  */
 
-connection.prototype.handleIq = function (iq) {
-    return true;
-};
+// connection.prototype.handleIq = function (iq) {
+//     return true;
+// };
 
 /**
  * @private
  */
-connection.prototype.handleIqPrivacy = function (msginfo) {
-    var list = msginfo.getElementsByTagName('list');
-    if (list.length == 0) {
-        return;
-    }
-    this.getBlacklist();
-};
+// connection.prototype.handleIqPrivacy = function (msginfo) {
+//     var list = msginfo.getElementsByTagName('list');
+//     if (list.length == 0) {
+//         return;
+//     }
+//     this.getBlacklist();
+// };
 
 /**
  * @private
  */
-connection.prototype.handleIqRoster = function (e) {
-    var id = e.getAttribute('id');
-    var from = e.getAttribute('from') || '';
-    var name = _parseNameFromJidFn(from);
-    var curJid = this.context.jid;
-    var curUser = this.context.userId;
+// connection.prototype.handleMessage = function (msginfo) {    //****
+//     var self = this;
+//     if (this.isClosed()) {
+//         return;
+//     }
 
-    var iqresult = $iq({type: 'result', id: id, from: curJid});
-    this.sendCommand(iqresult.tree());
-
-    var msgBodies = e.getElementsByTagName('query');
-    if (msgBodies && msgBodies.length > 0) {
-        var queryTag = msgBodies[0];
-        var rouster = _parseFriend(queryTag, this, from);
-        this.onRoster(rouster);
-    }
-    return true;
-};
-
-/**
- * @private
- */
-connection.prototype.handleMessage = function (msginfo) {    //****
-    var self = this;
-    if (this.isClosed()) {
-        return;
-    }
-
-    var id = msginfo.getAttribute('id') || '';
+//     var id = msginfo.getAttribute('id') || '';
 
 
-    // cache ack into sendQueue first , handelSendQueue will do the send thing with the speed of  5/s
-    this.cacheReceiptsMessage({
-        id: id
-    });
-    var parseMsgData = _parseResponseMessage(msginfo);
-    if (parseMsgData.errorMsg) {
-        this.handlePresence(msginfo);
-        return;
-    }
-    // send error
-    var error = msginfo.getElementsByTagName('error');
-    var errorCode = '';
-    var errorText = '';
-    var errorBool = false;
-    if (error.length > 0) {
-        errorBool = true;
-        errorCode = error[0].getAttribute('code');
-        var textDOM = error[0].getElementsByTagName('text');
-        errorText = textDOM[0].textContent || textDOM[0].text;
-    }
+//     // cache ack into sendQueue first , handelSendQueue will do the send thing with the speed of  5/s
+//     this.cacheReceiptsMessage({
+//         id: id
+//     });
+//     var parseMsgData = _parseResponseMessage(msginfo);
+//     if (parseMsgData.errorMsg) {
+//         this.handlePresence(msginfo);
+//         return;
+//     }
+//     // send error
+//     var error = msginfo.getElementsByTagName('error');
+//     var errorCode = '';
+//     var errorText = '';
+//     var errorBool = false;
+//     if (error.length > 0) {
+//         errorBool = true;
+//         errorCode = error[0].getAttribute('code');
+//         var textDOM = error[0].getElementsByTagName('text');
+//         errorText = textDOM[0].textContent || textDOM[0].text;
+//     }
 
-    var msgDatas = parseMsgData.data;
-    for (var i in msgDatas) {
-        if (!msgDatas.hasOwnProperty(i)) {
-            continue;
-        }
-        var msg = msgDatas[i];
-        if (!msg.from || !msg.to) {
-            continue;
-        }
+//     var msgDatas = parseMsgData.data;
+//     for (var i in msgDatas) {
+//         if (!msgDatas.hasOwnProperty(i)) {
+//             continue;
+//         }
+//         var msg = msgDatas[i];
+//         if (!msg.from || !msg.to) {
+//             continue;
+//         }
 
-        var from = (msg.from + '').toLowerCase();
-        var too = (msg.to + '').toLowerCase();
-        var extmsg = msg.ext || {};
-        var chattype = '';
-        var typeEl = msginfo.getElementsByTagName('roomtype');
-        if (typeEl.length) {
-            chattype = typeEl[0].getAttribute('type') || 'chat';
-        } else {
-            chattype = msginfo.getAttribute('type') || 'chat';
-        }
+//         var from = (msg.from + '').toLowerCase();
+//         var too = (msg.to + '').toLowerCase();
+//         var extmsg = msg.ext || {};
+//         var chattype = '';
+//         var typeEl = msginfo.getElementsByTagName('roomtype');
+//         if (typeEl.length) {
+//             chattype = typeEl[0].getAttribute('type') || 'chat';
+//         } else {
+//             chattype = msginfo.getAttribute('type') || 'chat';
+//         }
 
-        var msgBodies = msg.bodies;
-        if (!msgBodies || msgBodies.length == 0) {
-            continue;
-        }
-        var msgBody = msg.bodies[0];
-        var type = msgBody.type;
-        var isCmdMsg = false;
+//         var msgBodies = msg.bodies;
+//         if (!msgBodies || msgBodies.length == 0) {
+//             continue;
+//         }
+//         var msgBody = msg.bodies[0];
+//         var type = msgBody.type;
+//         var isCmdMsg = false;
 
-        try {
-            switch (type) {
-                case 'txt':
-                    var receiveMsg = msgBody.msg;
-                    if (self.encrypt.type === 'base64') {
-                        receiveMsg = Base64.atob(receiveMsg);
-                        //receiveMsg = atob(receiveMsg);
-                    } else if (self.encrypt.type === 'aes') {
-                        var key = CryptoJS.enc.Utf8.parse(self.encrypt.key);
-                        var iv = CryptoJS.enc.Utf8.parse(self.encrypt.iv);
-                        var mode = self.encrypt.mode.toLowerCase();
-                        var option = {};
-                        if (mode === 'cbc') {
-                            option = {
-                                iv: iv,
-                                mode: CryptoJS.mode.CBC,
-                                padding: CryptoJS.pad.Pkcs7
-                            };
-                        } else if (mode === 'ebc') {
-                            option = {
-                                mode: CryptoJS.mode.ECB,
-                                padding: CryptoJS.pad.Pkcs7
-                            }
-                        }
-                        var encryptedBase64Str = receiveMsg;
-                        var decryptedData = CryptoJS.AES.decrypt(encryptedBase64Str, key, option);
-                        var decryptedStr = decryptedData.toString(CryptoJS.enc.Utf8);
-                        receiveMsg = decryptedStr;
-                    }
-                    var emojibody = _utils.parseTextMessage(receiveMsg, WebIM.Emoji);
-                    if (emojibody.isemoji) {
-                        var msg = {
-                            id: id
-                            , type: chattype
-                            , from: from
-                            , to: too
-                            , delay: parseMsgData.delayTimeStamp
-                            , data: emojibody.body
-                            , ext: extmsg
-                        };
-                        !msg.delay && delete msg.delay;
-                        msg.error = errorBool;
-                        msg.errorText = errorText;
-                        msg.errorCode = errorCode;
-                        this.onEmojiMessage(msg);
-                    } else {
-                        var msg = {
-                            id: id
-                            , type: chattype
-                            , from: from
-                            , to: too
-                            , delay: parseMsgData.delayTimeStamp
-                            , data: receiveMsg
-                            , ext: extmsg
-                        };
-                        !msg.delay && delete msg.delay;
-                        msg.error = errorBool;
-                        msg.errorText = errorText;
-                        msg.errorCode = errorCode;
-                        this.onTextMessage(msg);
-                    }
-                    break;
-                case 'img':
-                    var rwidth = 0;
-                    var rheight = 0;
-                    if (msgBody.size) {
-                        rwidth = msgBody.size.width;
-                        rheight = msgBody.size.height;
-                    }
-                    var msg = {
-                        id: id
-                        , type: chattype
-                        , from: from
-                        , to: too
-                        ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
-                        , secret: msgBody.secret
-                        , filename: msgBody.filename
-                        , thumb: msgBody.thumb
-                        , thumb_secret: msgBody.thumb_secret
-                        , file_length: msgBody.file_length || ''
-                        , width: rwidth
-                        , height: rheight
-                        , filetype: msgBody.filetype || ''
-                        , accessToken: this.context.accessToken || ''
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    this.onPictureMessage(msg);
-                    break;
-                case 'audio':
-                    var msg = {
-                        id: id
-                        , type: chattype
-                        , from: from
-                        , to: too
-                        ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
-                        , secret: msgBody.secret
-                        , filename: msgBody.filename
-                        , length: msgBody.length || ''
-                        , file_length: msgBody.file_length || ''
-                        , filetype: msgBody.filetype || ''
-                        , accessToken: this.context.accessToken || ''
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    this.onAudioMessage(msg);
-                    break;
-                case 'file':
-                    var msg = {
-                        id: id
-                        , type: chattype
-                        , from: from
-                        , to: too
-                        ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
-                        , secret: msgBody.secret
-                        , filename: msgBody.filename
-                        , file_length: msgBody.file_length
-                        , accessToken: this.context.accessToken || ''
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    this.onFileMessage(msg);
-                    break;
-                case 'loc':
-                    var msg = {
-                        id: id
-                        , type: chattype
-                        , from: from
-                        , to: too
-                        , addr: msgBody.addr
-                        , lat: msgBody.lat
-                        , lng: msgBody.lng
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    this.onLocationMessage(msg);
-                    break;
-                case 'video':
-                    var msg = {
-                        id: id
-                        , type: chattype
-                        , from: from
-                        , to: too
-                        ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
-                        , secret: msgBody.secret
-                        , filename: msgBody.filename
-                        , file_length: msgBody.file_length
-                        , accessToken: this.context.accessToken || ''
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    this.onVideoMessage(msg);
-                    break;
-                case 'cmd':
-                    var msg = {
-                        id: id
-                        , from: from
-                        , to: too
-                        , action: msgBody.action
-                        , ext: extmsg
-                        , delay: parseMsgData.delayTimeStamp
-                    };
-                    !msg.delay && delete msg.delay;
-                    msg.error = errorBool;
-                    msg.errorText = errorText;
-                    msg.errorCode = errorCode;
-                    if(msgBody.action === 'em_retrieve_dns'){
-                        isCmdMsg = true;
-                    }
-                    if(msgBody.action.indexOf("em_") !== 0){
-                        self.onCmdMessage(msg);
-                    }
-                    else{
-                        var ackMessage = new WebIM.message("read", self.getUniqueId())
-                        ackMessage.set({ id: msg.id, to: msg.from, ext: { logo: "easemob" } })
-                        self.send(ackMessage.body)
-                        self.handelSendQueue();        
-                    }
-                    break;
-            }
-            ;
-            if (self.delivery) {
-                var msgId = self.getUniqueId();
-                var bodyId = msg.id;
-                var deliverMessage = new WebIM.message('delivery', msgId);
-                deliverMessage.set({
-                    id: bodyId
-                    , to: msg.from
-                });
-                self.send(deliverMessage.body);
-            }
-            isCmdMsg && this.close();       //action==em_retrieve_dns 的cmd消息用于迁集群，退出重新登录以获取config信息
-        } catch (e) {
-            this.onError({
-                type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
-                , data: e
-            });
-        }
-    }
-};
+//         try {
+//             switch (type) {
+//                 case 'txt':
+//                     var receiveMsg = msgBody.msg;
+//                     if (self.encrypt.type === 'base64') {
+//                         receiveMsg = atob(receiveMsg);
+//                     } else if (self.encrypt.type === 'aes') {
+//                         var key = CryptoJS.enc.Utf8.parse(self.encrypt.key);
+//                         var iv = CryptoJS.enc.Utf8.parse(self.encrypt.iv);
+//                         var mode = self.encrypt.mode.toLowerCase();
+//                         var option = {};
+//                         if (mode === 'cbc') {
+//                             option = {
+//                                 iv: iv,
+//                                 mode: CryptoJS.mode.CBC,
+//                                 padding: CryptoJS.pad.Pkcs7
+//                             };
+//                         } else if (mode === 'ebc') {
+//                             option = {
+//                                 mode: CryptoJS.mode.ECB,
+//                                 padding: CryptoJS.pad.Pkcs7
+//                             }
+//                         }
+//                         var encryptedBase64Str = receiveMsg;
+//                         var decryptedData = CryptoJS.AES.decrypt(encryptedBase64Str, key, option);
+//                         var decryptedStr = decryptedData.toString(CryptoJS.enc.Utf8);
+//                         receiveMsg = decryptedStr;
+//                     }
+//                     var emojibody = _utils.parseTextMessage(receiveMsg, WebIM.Emoji);
+//                     if (emojibody.isemoji) {
+//                         var msg = {
+//                             id: id
+//                             , type: chattype
+//                             , from: from
+//                             , to: too
+//                             , delay: parseMsgData.delayTimeStamp
+//                             , data: emojibody.body
+//                             , ext: extmsg
+//                         };
+//                         !msg.delay && delete msg.delay;
+//                         msg.error = errorBool;
+//                         msg.errorText = errorText;
+//                         msg.errorCode = errorCode;
+//                         this.onEmojiMessage(msg);
+//                     } else {
+//                         var msg = {
+//                             id: id
+//                             , type: chattype
+//                             , from: from
+//                             , to: too
+//                             , delay: parseMsgData.delayTimeStamp
+//                             , data: receiveMsg
+//                             , ext: extmsg
+//                         };
+//                         !msg.delay && delete msg.delay;
+//                         msg.error = errorBool;
+//                         msg.errorText = errorText;
+//                         msg.errorCode = errorCode;
+//                         this.onTextMessage(msg);
+//                     }
+//                     break;
+//                 case 'img':
+//                     var rwidth = 0;
+//                     var rheight = 0;
+//                     if (msgBody.size) {
+//                         rwidth = msgBody.size.width;
+//                         rheight = msgBody.size.height;
+//                     }
+//                     var msg = {
+//                         id: id
+//                         , type: chattype
+//                         , from: from
+//                         , to: too
+//                         ,
+//                         url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+//                         , secret: msgBody.secret
+//                         , filename: msgBody.filename
+//                         , thumb: msgBody.thumb
+//                         , thumb_secret: msgBody.thumb_secret
+//                         , file_length: msgBody.file_length || ''
+//                         , width: rwidth
+//                         , height: rheight
+//                         , filetype: msgBody.filetype || ''
+//                         , accessToken: this.context.accessToken || ''
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     this.onPictureMessage(msg);
+//                     break;
+//                 case 'audio':
+//                     var msg = {
+//                         id: id
+//                         , type: chattype
+//                         , from: from
+//                         , to: too
+//                         ,
+//                         url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+//                         , secret: msgBody.secret
+//                         , filename: msgBody.filename
+//                         , length: msgBody.length || ''
+//                         , file_length: msgBody.file_length || ''
+//                         , filetype: msgBody.filetype || ''
+//                         , accessToken: this.context.accessToken || ''
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     this.onAudioMessage(msg);
+//                     break;
+//                 case 'file':
+//                     var msg = {
+//                         id: id
+//                         , type: chattype
+//                         , from: from
+//                         , to: too
+//                         ,
+//                         url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+//                         , secret: msgBody.secret
+//                         , filename: msgBody.filename
+//                         , file_length: msgBody.file_length
+//                         , accessToken: this.context.accessToken || ''
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     this.onFileMessage(msg);
+//                     break;
+//                 case 'loc':
+//                     var msg = {
+//                         id: id
+//                         , type: chattype
+//                         , from: from
+//                         , to: too
+//                         , addr: msgBody.addr
+//                         , lat: msgBody.lat
+//                         , lng: msgBody.lng
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     this.onLocationMessage(msg);
+//                     break;
+//                 case 'video':
+//                     var msg = {
+//                         id: id
+//                         , type: chattype
+//                         , from: from
+//                         , to: too
+//                         ,
+//                         url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+//                         , secret: msgBody.secret
+//                         , filename: msgBody.filename
+//                         , file_length: msgBody.file_length
+//                         , accessToken: this.context.accessToken || ''
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     this.onVideoMessage(msg);
+//                     break;
+//                 case 'cmd':
+//                     var msg = {
+//                         id: id
+//                         , from: from
+//                         , to: too
+//                         , action: msgBody.action
+//                         , ext: extmsg
+//                         , delay: parseMsgData.delayTimeStamp
+//                     };
+//                     !msg.delay && delete msg.delay;
+//                     msg.error = errorBool;
+//                     msg.errorText = errorText;
+//                     msg.errorCode = errorCode;
+//                     if(msgBody.action === 'em_retrieve_dns'){
+//                         isCmdMsg = true;
+//                     }
+//                     if(msgBody.action.indexOf("em_") !== 0){
+//                         self.onCmdMessage(msg);
+//                     }
+//                     else{
+//                         var ackMessage = new WebIM.message("read", self.getUniqueId())
+//                         ackMessage.set({ id: msg.id, to: msg.from, ext: { logo: "easemob" } })
+//                         self.send(ackMessage.body)
+//                         self.handelSendQueue();        
+//                     }
+//                     break;
+//             }
+//             ;
+//             if (self.delivery) {
+//                 var msgId = self.getUniqueId();
+//                 var bodyId = msg.id;
+//                 var deliverMessage = new WebIM.message('delivery', msgId);
+//                 deliverMessage.set({
+//                     id: bodyId
+//                     , to: msg.from
+//                 });
+//                 self.send(deliverMessage.body);
+//             }
+//             isCmdMsg && this.close();       //action==em_retrieve_dns 的cmd消息用于迁集群，退出重新登录以获取config信息
+//         } catch (e) {
+//             this.onError({
+//                 type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
+//                 , data: e
+//             });
+//         }
+//     }
+// };
 
 /**
  * @private
  */
-connection.prototype.handleDeliveredMessage = function (message) {  //****
-    var id = message.id;
-    var body = message.getElementsByTagName('body');
-    var mid = 0;
-    mid = body[0].innerHTML;
-    var msg = {
-        mid: mid
-    };
-    this.onDeliverdMessage(msg);
-    this.sendReceiptsMessage({
-        id: id
-    });
-};
+// connection.prototype.handleDeliveredMessage = function (message) {  //****
+//     var id = message.id;
+//     var body = message.getElementsByTagName('body');
+//     var mid = 0;
+//     mid = body[0].innerHTML;
+//     var msg = {
+//         mid: mid
+//     };
+//     this.onDeliverdMessage(msg);
+//     // this.sendReceiptsMessage({
+//     //     id: id
+//     // });
+// };
 
 /**
  * @private
  */
-connection.prototype.handleAckedMessage = function (message) {  //****
-    var id = message.id;
-    var body = message.getElementsByTagName('body');
-    var mid = 0;
-    mid = body[0].innerHTML;
-    var msg = {
-        mid: mid
-    };
-    this.onReadMessage(msg);
-    this.sendReceiptsMessage({
-        id: id
-    });
-};
+// connection.prototype.handleAckedMessage = function (message) {  //****
+//     var id = message.id;
+//     var body = message.getElementsByTagName('body');
+//     var mid = 0;
+//     mid = body[0].innerHTML;
+//     var msg = {
+//         mid: mid
+//     };
+//     this.onReadMessage(msg);
+//     this.sendReceiptsMessage({
+//         id: id
+//     });
+// };
 
 /**
  * @private
  */
-connection.prototype.handleReceivedMessage = function (message) {  //****
-    try {
-        var received = message.getElementsByTagName("received");
-        var mid = received[0].getAttribute('mid');
-        var body = message.getElementsByTagName("body");
-        var id = body[0].innerHTML;
-        var msg = {
-            mid: mid,
-            id: id
-        };
-        this.onReceivedMessage(msg);
-    } catch (e) {
-        this.onError({
-            type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
-            , data: e
-        });
-    }
+// connection.prototype.handleReceivedMessage = function (message) {  //****
+//     try {
+//         var received = message.getElementsByTagName("received");
+//         var mid = received[0].getAttribute('mid');
+//         var body = message.getElementsByTagName("body");
+//         var id = body[0].innerHTML;
+//         var msg = {
+//             mid: mid,
+//             id: id
+//         };
+//         this.onReceivedMessage(msg);
+//     } catch (e) {
+//         this.onError({
+//             type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
+//             , data: e
+//         });
+//     }
 
-    var rcv = message.getElementsByTagName('received'),
-        id,
-        mid;
+//     var rcv = message.getElementsByTagName('received'),
+//         id,
+//         mid;
 
-    if (rcv.length > 0) {
-        if (rcv[0].childNodes && rcv[0].childNodes.length > 0) {
-            id = rcv[0].childNodes[0].nodeValue;
-        } else {
-            id = rcv[0].innerHTML || rcv[0].innerText;
-        }
-        mid = rcv[0].getAttribute('mid');
-    }
+//     if (rcv.length > 0) {
+//         if (rcv[0].childNodes && rcv[0].childNodes.length > 0) {
+//             id = rcv[0].childNodes[0].nodeValue;
+//         } else {
+//             id = rcv[0].innerHTML || rcv[0].innerText;
+//         }
+//         mid = rcv[0].getAttribute('mid');
+//     }
 
-    if (_msgHash[id]) {
-        try {
-            _msgHash[id].msg.success instanceof Function && _msgHash[id].msg.success(id, mid);
-        } catch (e) {
-            this.onError({
-                type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
-                , data: e
-            });
-        }
-        delete _msgHash[id];
-    }
-};
-
-/**
- * @private
- */
-connection.prototype.handleInviteMessage = function (message) {  //****
-    var form = null;
-    var invitemsg = message.getElementsByTagName('invite');
-    var reasonDom = message.getElementsByTagName('reason')[0];
-    var reasonMsg = reasonDom.textContent;
-    var id = message.getAttribute('id') || '';
-    this.sendReceiptsMessage({
-        id: id
-    });
-
-    if (invitemsg && invitemsg.length > 0) {
-        var fromJid = invitemsg[0].getAttribute('from');
-        form = _parseNameFromJidFn(fromJid);
-    }
-    var xmsg = message.getElementsByTagName('x');
-    var roomid = null;
-    if (xmsg && xmsg.length > 0) {
-        for (var i = 0; i < xmsg.length; i++) {
-            if ('jabber:x:conference' === xmsg[i].namespaceURI) {
-                var roomjid = xmsg[i].getAttribute('jid');
-                roomid = _parseNameFromJidFn(roomjid);
-            }
-        }
-    }
-    this.onInviteMessage({
-        type: 'invite',
-        from: form,
-        roomid: roomid,
-        reason: reasonMsg
-    });
-};
+//     if (_msgHash[id]) {
+//         try {
+//             _msgHash[id].msg.success instanceof Function && _msgHash[id].msg.success(id, mid);
+//         } catch (e) {
+//             this.onError({
+//                 type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
+//                 , data: e
+//             });
+//         }
+//         delete _msgHash[id];
+//     }
+// };
 
 /**
  * @private
  */
-connection.prototype.handleMutedMessage = function (message) {  //****
-    var id = message.id;
-    this.onMutedMessage({
-        mid: id
-    });
-};
+// connection.prototype.handleInviteMessage = function (message) {  //****
+//     var form = null;
+//     var invitemsg = message.getElementsByTagName('invite');
+//     var reasonDom = message.getElementsByTagName('reason')[0];
+//     var reasonMsg = reasonDom.textContent;
+//     var id = message.getAttribute('id') || '';
+//     this.sendReceiptsMessage({
+//         id: id
+//     });
+
+//     if (invitemsg && invitemsg.length > 0) {
+//         var fromJid = invitemsg[0].getAttribute('from');
+//         form = _parseNameFromJidFn(fromJid);
+//     }
+//     var xmsg = message.getElementsByTagName('x');
+//     var roomid = null;
+//     if (xmsg && xmsg.length > 0) {
+//         for (var i = 0; i < xmsg.length; i++) {
+//             if ('jabber:x:conference' === xmsg[i].namespaceURI) {
+//                 var roomjid = xmsg[i].getAttribute('jid');
+//                 roomid = _parseNameFromJidFn(roomjid);
+//             }
+//         }
+//     }
+//     this.onInviteMessage({
+//         type: 'invite',
+//         from: form,
+//         roomid: roomid,
+//         reason: reasonMsg
+//     });
+// };
 
 /**
  * @private
  */
-connection.prototype.sendCommand = function (dom, id) {     //**** */
-    if (this.isOpened()) {
-        this.context.stropheConn.send(dom);
-    } else {
-        this.unSendMsgArr.push(dom);
+// connection.prototype.handleMutedMessage = function (message) {  //****
+//     var id = message.id;
+//     this.onMutedMessage({
+//         mid: id
+//     });
+// };
+
+/**
+ * @private
+ */
+// connection.prototype.sendCommand = function (dom, id) {     //**** */
+//     if (this.isOpened()) {
+//         this.context.stropheConn.send(dom);
+//     } else {
+//         this.unSendMsgArr.push(dom);
+//         if(!this.offLineSendConnecting && !this.logOut){
+//             this.offLineSendConnecting = true;
+//             this.reconnect();
+//         }
+//         this.onError({
+//             type: _code.WEBIM_CONNCTION_DISCONNECTED,
+//             reconnect: true
+//         });
+//     }
+// };
+
+/**
+ * @private
+ */
+connection.prototype.sendMSync = function(str){     //
+    var strr = "";
+    // this.unSendMsgArr.push(dom);
+    for (var i = 0; i < str.length; i++) {
+        var str0 = String.fromCharCode(str[i]);
+        strr = strr + str0;
+    }
+    strr = Base64.btoa(strr);
+    //strr = window.btoa(strr);
+
+    console.log("转码发送" + strr);
+    if(sock.readyState === SockJS.OPEN){
+        sock.send(strr);
+    }
+    else{
+        this.unSendMsgArr.push(strr);
         if(!this.offLineSendConnecting && !this.logOut){
             this.offLineSendConnecting = true;
             this.reconnect();
@@ -2503,46 +2239,30 @@ connection.prototype.sendCommand = function (dom, id) {     //**** */
             reconnect: true
         });
     }
-};
-
-/**
- * @private
- */
-connection.prototype.sendMSync = function(str){
-    var strr = "";
-    for (var i = 0; i < str.length; i++) {
-        var str0 = String.fromCharCode(str[i]);
-        strr = strr + str0;
-    }
-    strr = Base64.btoa(strr);
-    //strr = window.btoa(strr);
-
-    console.log("转码发送" + strr);
-    sock.send(strr);
 }
 
 /**
  * 随机生成一个id用于消息id
  * @param {String} prefix - 前缀，默认为"WEBIM_"
  */
-connection.prototype.getUniqueIdOld = function (prefix) {
-    // fix: too frequently msg sending will make same id
-    if (this.autoIncrement) {
-        this.autoIncrement++
-    } else {
-        this.autoIncrement = 1
-    }
-    var cdate = new Date();
-    var offdate = new Date(2010, 1, 1);
-    var offset = cdate.getTime() - offdate.getTime();
-    var hexd = parseFloat(offset).toString(16) + this.autoIncrement;
+// connection.prototype.getUniqueIdOld = function (prefix) {
+//     // fix: too frequently msg sending will make same id
+//     if (this.autoIncrement) {
+//         this.autoIncrement++
+//     } else {
+//         this.autoIncrement = 1
+//     }
+//     var cdate = new Date();
+//     var offdate = new Date(2010, 1, 1);
+//     var offset = cdate.getTime() - offdate.getTime();
+//     var hexd = parseFloat(offset).toString(16) + this.autoIncrement;
 
-    if (typeof prefix === 'string' || typeof prefix === 'number') {
-        return prefix + '_' + hexd;
-    } else {
-        return 'WEBIM_' + hexd;
-    }
-};
+//     if (typeof prefix === 'string' || typeof prefix === 'number') {
+//         return prefix + '_' + hexd;
+//     } else {
+//         return 'WEBIM_' + hexd;
+//     }
+// };
 
 connection.prototype.getUniqueId = function (prefix) { //*******
     // fix: too frequently msg sending will make same id
@@ -2571,71 +2291,70 @@ connection.prototype.getUniqueId = function (prefix) { //*******
  *conn.send(deliverMessage.body);
  */
 
-connection.prototype.sendOld = function (messageSource) {
-    var self = this;
-    var message = messageSource;
-    if (message.type === 'txt') {
-        if (this.encrypt.type === 'base64') {
-            message = _.clone(messageSource);
-            message.msg = Base64.btoa(message.msg);
-           //message.msg = btoa(message.msg);
-        } else if (this.encrypt.type === 'aes') {
-            message = _.clone(messageSource);
-            var key = CryptoJS.enc.Utf8.parse(this.encrypt.key);
-            var iv = CryptoJS.enc.Utf8.parse(this.encrypt.iv);
-            var mode = this.encrypt.mode.toLowerCase();
-            var option = {};
-            if (mode === 'cbc') {
-                option = {
-                    iv: iv,
-                    mode: CryptoJS.mode.CBC,
-                    padding: CryptoJS.pad.Pkcs7
-                };
-            } else if (mode === 'ebc') {
-                option = {
-                    mode: CryptoJS.mode.ECB,
-                    padding: CryptoJS.pad.Pkcs7
-                }
-            }
-            var encryptedData = CryptoJS.AES.encrypt(message.msg, key, option);
+// connection.prototype.sendOld = function (messageSource) {
+//     var self = this;
+//     var message = messageSource;
+//     if (message.type === 'txt') {
+//         if (this.encrypt.type === 'base64') {
+//             message = _.clone(messageSource);
+//             message.msg = btoa(message.msg);
+//         } else if (this.encrypt.type === 'aes') {
+//             message = _.clone(messageSource);
+//             var key = CryptoJS.enc.Utf8.parse(this.encrypt.key);
+//             var iv = CryptoJS.enc.Utf8.parse(this.encrypt.iv);
+//             var mode = this.encrypt.mode.toLowerCase();
+//             var option = {};
+//             if (mode === 'cbc') {
+//                 option = {
+//                     iv: iv,
+//                     mode: CryptoJS.mode.CBC,
+//                     padding: CryptoJS.pad.Pkcs7
+//                 };
+//             } else if (mode === 'ebc') {
+//                 option = {
+//                     mode: CryptoJS.mode.ECB,
+//                     padding: CryptoJS.pad.Pkcs7
+//                 }
+//             }
+//             var encryptedData = CryptoJS.AES.encrypt(message.msg, key, option);
 
-            message.msg = encryptedData.toString();
-        }
-    }
-    if (this.isWindowSDK) {
-        WebIM.doQuery('{"type":"sendMessage","to":"' + message.to + '","message_type":"' + message.type + '","msg":"' + encodeURI(message.msg) + '","chatType":"' + message.chatType + '"}',
-            function (response) {
-            },
-            function (code, msg) {
-                var message = {
-                    data: {
-                        data: "send"
-                    },
-                    type: _code.WEBIM_MESSAGE_SED_ERROR
-                };
-                self.onError(message);
-            });
-    } else {
-        if (Object.prototype.toString.call(message) === '[object Object]') {
-            var appKey = this.context.appKey || '';
-            var toJid = appKey + '_' + message.to + '@' + this.domain;
+//             message.msg = encryptedData.toString();
+//         }
+//     }
+//     if (this.isWindowSDK) {
+//         WebIM.doQuery('{"type":"sendMessage","to":"' + message.to + '","message_type":"' + message.type + '","msg":"' + encodeURI(message.msg) + '","chatType":"' + message.chatType + '"}',
+//             function (response) {
+//             },
+//             function (code, msg) {
+//                 var message = {
+//                     data: {
+//                         data: "send"
+//                     },
+//                     type: _code.WEBIM_MESSAGE_SED_ERROR
+//                 };
+//                 self.onError(message);
+//             });
+//     } else {
+//         if (Object.prototype.toString.call(message) === '[object Object]') {
+//             var appKey = this.context.appKey || '';
+//             var toJid = appKey + '_' + message.to + '@' + this.domain;
 
-            if (message.group) {
-                toJid = appKey + '_' + message.to + '@conference.' + this.domain;
-            }
-            if (message.resource) {
-                toJid = toJid + '/' + message.resource;
-            }
+//             if (message.group) {
+//                 toJid = appKey + '_' + message.to + '@conference.' + this.domain;
+//             }
+//             if (message.resource) {
+//                 toJid = toJid + '/' + message.resource;
+//             }
 
-            message.toJid = toJid;
-            message.id = message.id || this.getUniqueId();
-            _msgHash[message.id] = new _message(message);
-            _msgHash[message.id].send(this);
-        } else if (typeof message === 'string') {
-            _msgHash[message] && _msgHash[message].send(this);
-        }
-    }
-};
+//             message.toJid = toJid;
+//             message.id = message.id || this.getUniqueId();
+//             _msgHash[message.id] = new _message(message);
+//             _msgHash[message.id].send(this);
+//         } else if (typeof message === 'string') {
+//             _msgHash[message] && _msgHash[message].send(this);
+//         }
+//     }
+// };
 
 /**
  * 发送消息
@@ -3136,71 +2855,71 @@ connection.prototype.queryRoomOccupants = function (options) {
  * @deprecated
  * @private
  */
-connection.prototype.setUserSig = function (desc) {
-    var dom = $pres({xmlns: 'jabber:client'});
-    desc = desc || '';
-    dom.c('status').t(desc);
-    this.sendCommand(dom.tree());
-};
+// connection.prototype.setUserSig = function (desc) {
+//     var dom = $pres({xmlns: 'jabber:client'});
+//     desc = desc || '';
+//     dom.c('status').t(desc);
+//     this.sendCommand(dom.tree());
+// };
 
 /**
  *
  * @private //demo删除
  */
-connection.prototype.setPresence = function (type, status) {
-    var dom = $pres({xmlns: 'jabber:client'});
-    if (type) {
-        if (status) {
-            dom.c('show').t(type);
-            dom.up().c('status').t(status);
-        } else {
-            dom.c('show').t(type);
-        }
-    }
-    this.sendCommand(dom.tree());
-};
+// connection.prototype.setPresence = function (type, status) {
+//     var dom = $pres({xmlns: 'jabber:client'});
+//     if (type) {
+//         if (status) {
+//             dom.c('show').t(type);
+//             dom.up().c('status').t(status);
+//         } else {
+//             dom.c('show').t(type);
+//         }
+//     }
+//     this.sendCommand(dom.tree());
+// };
 
 /**
  * @private
  *
  */
-connection.prototype.getPresence = function () {
-    var dom = $pres({xmlns: 'jabber:client'});
-    var conn = this;
-    this.sendCommand(dom.tree());
-};
+// connection.prototype.getPresence = function () {
+//     var dom = $pres({xmlns: 'jabber:client'});
+//     var conn = this;
+//     this.sendCommand(dom.tree());
+// };
 
 /**
  * @private
  *
  */
-connection.prototype.ping = function (options) {
-    var options = options || {};
-    var jid = _getJid(options, this);
+// connection.prototype.ping = function (options) {
+//     var options = options || {};
+//     var jid = _getJid(options, this);
 
-    var dom = $iq({
-        from: this.context.jid || ''
-        , to: jid
-        , type: 'get'
-    }).c('ping', {xmlns: 'urn:xmpp:ping'});
+//     var dom = $iq({
+//         from: this.context.jid || ''
+//         , to: jid
+//         , type: 'get'
+//     }).c('ping', {xmlns: 'urn:xmpp:ping'});
 
-    var suc = options.success || _utils.emptyfn;
-    var error = options.error || this.onError;
-    var failFn = function (ele) {
-        error({
-            type: _code.WEBIM_CONNCTION_PING_ERROR
-            , data: ele
-        });
-    };
-    if (this.isOpened()) {
-        this.context.stropheConn.sendIQ(dom.tree(), suc, failFn);
-    } else {
-        error({
-            type: _code.WEBIM_CONNCTION_DISCONNECTED
-        });
-    }
-    return;
-};
+//     var suc = options.success || _utils.emptyfn;
+//     var error = options.error || this.onError;
+//     var failFn = function (ele) {
+//         error({
+//             type: _code.WEBIM_CONNCTION_PING_ERROR
+//             , data: ele
+//         });
+//     };
+//     if (this.isOpened()) {
+//         this.context.stropheConn.sendIQ(dom.tree(), suc, failFn);
+//     } else {
+//         error({
+//             type: _code.WEBIM_CONNCTION_DISCONNECTED
+//         });
+//     }
+//     return;
+// };
 
 /**
  * @private
@@ -5082,16 +4801,16 @@ connection.prototype.inviteToGroup = function (opt) {
     WebIM.utils.ajax(options);
 };
 
-function _setText(valueDom, v) {
-    if ('textContent' in valueDom) {
-        valueDom.textContent = v;
-    } else if ('text' in valueDom) {
-        valueDom.text = v;
-    } else {
-        // Strophe.info('_setText 4 ----------');
-        // valueDom.innerHTML = v;
-    }
-}
+// function _setText(valueDom, v) {
+//     if ('textContent' in valueDom) {
+//         valueDom.textContent = v;
+//     } else if ('text' in valueDom) {
+//         valueDom.text = v;
+//     } else {
+//         // Strophe.info('_setText 4 ----------');
+//         // valueDom.innerHTML = v;
+//     }
+// }
 
 
 var WebIM = window.WebIM || {};
