@@ -58,6 +58,17 @@
             }
             fourthMessage.ack_message_id = messageOption.bodyId;
         }
+        else if(messageOption.type === "read"){
+            fourthMessage.type = 4;
+            fourthMessage.from = conn.context.jid;
+            fourthMessage.to = {
+                appKey: conn.appKey,
+                name: messageOption.to,
+                domain: "easemob.com",
+                clientResource: conn.clientResource
+            }
+            fourthMessage.ack_message_id = messageOption.ackId;
+        }
         else if(!messageOption.group && !messageOption.roomType){
             fourthMessage.type = 1;
             fourthMessage.from = conn.context.jid;
@@ -106,6 +117,15 @@
         var thirdMessage = MetaMessage.decode(emptyMessage);
         thirdMessage.id = messageOption.id;
         if(messageOption.type === "delivery"){   //目前为单聊的delivery
+            thirdMessage.from = conn.context.jid;
+            thirdMessage.to = {
+                appKey: conn.appKey,
+                name: messageOption.to,
+                domain: "easemob.com",
+                clientResource: conn.clientResource
+            }
+        }
+        else if(messageOption.type === "read"){   //目前为单聊的read
             thirdMessage.from = conn.context.jid;
             thirdMessage.to = {
                 appKey: conn.appKey,

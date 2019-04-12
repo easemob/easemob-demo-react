@@ -246,10 +246,10 @@ var _login = function (options, conn) {
                         }
                         delete _msgHash[metaId];
                     }
-                    // conn.handleReceivedMessage({
-                    //     id: metaId,
-                    //     mid: msgId
-                    // })  //可能不对
+                    conn.onReceivedMessage({
+                        id: metaId,
+                        mid: msgId
+                    })
                 }
                 break;
             case 1:
