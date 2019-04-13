@@ -22,12 +22,29 @@
                 break;
             case 'audio':
                 fifthMessage.type = 2;
+                fifthMessage.displayName = messageOption.body.filename;
+                fifthMessage.remotePath = messageOption.body.url;
+                fifthMessage.secretKey = messageOption.body.secret;
+                fifthMessage.fileLength = messageOption.body.file_length;
+                fifthMessage.duration = messageOption.body.length;
+                fifthMessage.thumbnailDisplayName = messageOption.body.filename;
                 break;
             case 'loc':
                 fifthMessage.type = 3;
+                fifthMessage.latitude = messageOption.lat;
+                fifthMessage.longitude = messageOption.lng;
+                fifthMessage.address = messageOption.addr;
+                fifthMessage.latitude = messageOption.lat;
                 break;
-            case 'audio':
+            case 'video':
                 fifthMessage.type = 4;
+                fifthMessage.displayName = messageOption.body.filename;
+                fifthMessage.remotePath = messageOption.body.url;
+                fifthMessage.secretKey = messageOption.body.secret;
+                fifthMessage.fileLength = messageOption.body.file_length;
+                fifthMessage.duration = messageOption.body.length;
+                fifthMessage.size = messageOption.body.size;
+                fifthMessage.thumbnailDisplayName = messageOption.body.filename;
                 break;
             case 'file':
                 fifthMessage.type = 5;
@@ -40,6 +57,8 @@
                 break;
             case 'cmd':
                 fifthMessage.type = 6;
+                fifthMessage.action = messageOption.action;
+                // fifthMessage.params = 
                 break;
             // default:
             //     fifthMessage.type = 0;
@@ -111,6 +130,7 @@
             }
         }
         fourthMessage.contents = [fifthMessage];
+        fourthMessage.ext = messageOption.ext;
 
         fourthMessage = messageBody.encode(fourthMessage).finish();
         var MetaMessage = conn.context.root.lookup("easemob.pb.Meta");
@@ -192,6 +212,10 @@
         var me = this;
         this.msg = messageOption;
         if(messageOption.file){
+            if (me.msg.body && me.msg.body.url) {// Only send msg
+                sendMessage(me.msg, conn);
+                return;
+            }
             var _tmpComplete = this.msg.onFileUploadComplete;
             var _complete = function (data) {
                 if (data.entities[0]['file-metadata']) {

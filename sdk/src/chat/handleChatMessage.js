@@ -170,9 +170,7 @@ var handleMessage = function(meta, status, conn){
                 url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
                 , secret: msgBody.secretKey
                 , filename: msgBody.displayName
-                , length: msgBody.duration || ''
                 , file_length: msgBody.fileLength || ''
-                , filetype: msgBody.filetype || ''
                 , accessToken: conn.token || ''
                 , ext: extmsg
                 // , delay: parseMsgData.delayTimeStamp
@@ -181,7 +179,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onAudioMessage(msg);
+            conn.onVideoMessage(msg);
             break;
         case 5:
             msg = {
