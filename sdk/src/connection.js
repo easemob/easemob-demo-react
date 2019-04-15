@@ -148,7 +148,11 @@ var _getSock = function(conn){
         } else {
             url = domain;
         }
-        conn.url = url;
+        if(url){
+            // var parter = /(.+\/\/).+(\/.+)/;
+            // conn.url = conn.url.replace(parter, "$1" + url + "$2");
+            conn.url = "//" + url + "/ws";
+        }
     }
     return new SockJS(conn.url);
 }
@@ -199,7 +203,12 @@ var _login = function (options, conn) {
     };
 
     sock.onclose = function (e) {
-        if(!conn.logOut){
+        if(!conn.logOut 
+            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax 
+            && conn.autoReconnectNumTotal <= conn.xmppHosts.length
+            && conn.xmppIndex < conn.xmppHosts.length
+        )
+        {
             conn.reconnect();
         }
         var error = {
@@ -873,6 +882,7 @@ connection.prototype.registerUser = function (options) {
  * @param {connection~onInviteMessage} options.onInviteMessage - 处理邀请消息的回调    /.....
  * @param {connection~onDeliverdMessage} options.onDeliverdMessage - 处理Delivered ACK消息的回调
  * @param {connection~onReadMessage} options.onReadMessage - 处理Read ACK消息的回调   //.....
+ * @param {connection~onRecallMessage} options.onRecallMessage - 处理Recall 消息的回调   //.....
  * @param {connection~onMutedMessage} options.onMutedMessage - 处理禁言消息的回调
  * @param {connection~onOffline} options.onOffline - 处理断网的回调
  * @param {connection~onOnline} options.onOnline - 处理联网的回调
@@ -940,6 +950,10 @@ connection.prototype.listen = function (options) {
      * @callback connection~onReadMessage
      */
     /**
+     * 收到撤回消息回执
+     * @callback connection~onRecallMessage
+     */
+    /**
      * 被群管理员禁言
      * @callback connection~onMutedMessage
      */
@@ -972,6 +986,7 @@ connection.prototype.listen = function (options) {
     this.onInviteMessage = options.onInviteMessage || _utils.emptyfn;
     this.onDeliverdMessage = options.onDeliveredMessage || _utils.emptyfn;
     this.onReadMessage = options.onReadMessage || _utils.emptyfn;
+    this.onRecallMessage = options.onRecallMessage  || _utils.emptyfn;
     this.onMutedMessage = options.onMutedMessage || _utils.emptyfn;
     this.onOffline = options.onOffline || _utils.emptyfn;
     this.onOnline = options.onOnline || _utils.emptyfn;
@@ -1173,7 +1188,7 @@ connection.prototype.getHttpDNS = function (options, type) {
               return res; 
           } 
         } 
-        var xmppHosts = data.rest.hosts;
+        var xmppHosts = data['msync-ws'].hosts;
         if (!xmppHosts) {
             console.log('xmpp hosts error3');
             return;
@@ -2217,6 +2232,25 @@ connection.prototype.close = function (reason) {
 // };
 
 /**
+ * 消息撤回
+ * @param {Object} option - 
+ */
+connection.prototype.recallMessage = function(option){
+    var messageOption = {
+        id: this.getUniqueId(),
+        type: "recall",
+        mid: option.mid,
+        to: option.to,
+        success: option.success,
+        fail: option.fail
+    }
+    this.send(messageOption, this);
+}
+
+
+
+
+/**
  * @private
  */
 connection.prototype.sendMSync = function(str){     //
@@ -2375,18 +2409,9 @@ connection.prototype.getUniqueId = function (prefix) { //*******
 
 connection.prototype.send= function (messageOption) {
     var self = this;
-    // sendMessage(messageSource, self);
     ChatMessage.default(messageOption, self);
     _msgHash[messageOption.id] = messageOption;
-    // base64transform(message);
 };
-
-// var sendMessage = function (messageOption, self) {
-//     var message = chatMessage(messageOption, self);
-//     _msgHash[messageOption.id] = messageOption;
-//     base64transform(message);
-// }
-
 
 /**
  * 添加联系人(已废弃)
@@ -3560,9 +3585,11 @@ connection.prototype._onUpdateMyRoster = function (options) {
  */
 connection.prototype.reconnect = function (v) {
     var that = this;
-    v && that.xmppIndex++;       //重连时改变ip地址
+    if(that.xmppIndex < that.xmppHosts.length){
+        that.xmppIndex++;       //重连时改变ip地址
+    }
     setTimeout(function () {
-        _login(that.context.restTokenData, that);
+        _login({access_token: that.context.restTokenData}, that);
     }, (this.autoReconnectNumTotal == 0 ? 0 : this.autoReconnectInterval) * 1000);
     this.autoReconnectNumTotal++;
 };

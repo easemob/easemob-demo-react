@@ -43,6 +43,13 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
         });
         return;
     }
+    else if(thirdMessage.type === 6){
+        type = "recall";
+        conn.onRecallMessage({     //需要增加一个回撤消息的监听
+            mid: msgId
+        });
+        return;
+    }
     
     for (var i = 0; i < thirdMessage.contents.length; i++) {
         var msg = {};
