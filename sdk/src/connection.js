@@ -23,6 +23,7 @@ var Long = require("long");
 protobuf.util.Long = Long;
 protobuf.configure();
 var sock;
+var mr_cache = {};
 
 
 var root = protobuf.Root.fromJSON(all);
@@ -1518,228 +1519,232 @@ connection.prototype.close = function (reason) {
  * handle all types of presence message
  * @private
  */
-connection.prototype.handlePresence = function (msginfo) {      //****应该去掉，留着做事件处理 */
-    if (this.isClosed()) {
-        return;
-    }
-    var from = msginfo.getAttribute('from') || '';
-    var to = msginfo.getAttribute('to') || '';
-    var type = msginfo.getAttribute('type') || '';
-    var presence_type = msginfo.getAttribute('presence_type') || '';
-    var fromUser = _parseNameFromJidFn(from);
-    var toUser = _parseNameFromJidFn(to);
-    var isCreate = false;
-    var isMemberJoin = false;
-    var isDecline = false;
-    var isApply = false;
-    var info = {
-        from: fromUser,
-        to: toUser,
-        fromJid: from,
-        toJid: to,
-        type: type,
-        chatroom: msginfo.getElementsByTagName('roomtype').length ? true : false
-    };
+// connection.prototype.handlePresence = function (msginfo) {
+//     if (this.isClosed()) {
+//         return;
+//     }
+//     var from = msginfo.getAttribute('from') || '';
+//     var to = msginfo.getAttribute('to') || '';
+//     var type = msginfo.getAttribute('type') || '';
+//     var presence_type = msginfo.getAttribute('presence_type') || '';
+//     var fromUser = _parseNameFromJidFn(from);
+//     var toUser = _parseNameFromJidFn(to);
+//     var isCreate = false;
+//     var isMemberJoin = false;
+//     var isDecline = false;
+//     var isApply = false;
+//     var info = {
+//         from: fromUser,
+//         to: toUser,
+//         fromJid: from,
+//         toJid: to,
+//         type: type,
+//         chatroom: msginfo.getElementsByTagName('roomtype').length ? true : false
+//     };
 
-    var showTags = msginfo.getElementsByTagName('show');
-    if (showTags && showTags.length > 0) {
-        var showTag = showTags[0];
-        info.show = Strophe.getText(showTag);
-    }
-    var statusTags = msginfo.getElementsByTagName('status');
-    if (statusTags && statusTags.length > 0) {
-        var statusTag = statusTags[0];
-        info.status = Strophe.getText(statusTag);
-        info.code = statusTag.getAttribute('code');
-    }
+//     var showTags = msginfo.getElementsByTagName('show');
+//     if (showTags && showTags.length > 0) {
+//         var showTag = showTags[0];
+//         info.show = Strophe.getText(showTag);
+//     }
+//     var statusTags = msginfo.getElementsByTagName('status');
+//     if (statusTags && statusTags.length > 0) {
+//         var statusTag = statusTags[0];
+//         info.status = Strophe.getText(statusTag);
+//         info.code = statusTag.getAttribute('code');
+//     }
 
-    var priorityTags = msginfo.getElementsByTagName('priority');
-    if (priorityTags && priorityTags.length > 0) {
-        var priorityTag = priorityTags[0];
-        info.priority = Strophe.getText(priorityTag);
-    }
+//     var priorityTags = msginfo.getElementsByTagName('priority');
+//     if (priorityTags && priorityTags.length > 0) {
+//         var priorityTag = priorityTags[0];
+//         info.priority = Strophe.getText(priorityTag);
+//     }
 
-    var error = msginfo.getElementsByTagName('error');
-    if (error && error.length > 0) {
-        var error = error[0];
-        info.error = {
-            code: error.getAttribute('code')
-        };
-    }
+//     var error = msginfo.getElementsByTagName('error');
+//     if (error && error.length > 0) {
+//         var error = error[0];
+//         info.error = {
+//             code: error.getAttribute('code')
+//         };
+//     }
 
-    var destroy = msginfo.getElementsByTagName('destroy');
-    if (destroy && destroy.length > 0) {
-        var destroy = destroy[0];
-        info.destroy = true;
+//     var destroy = msginfo.getElementsByTagName('destroy');
+//     if (destroy && destroy.length > 0) {
+//         var destroy = destroy[0];
+//         info.destroy = true;
 
-        var reason = destroy.getElementsByTagName('reason');
-        if (reason && reason.length > 0) {
-            info.reason = Strophe.getText(reason[0]);
-        }
-    }
+//         var reason = destroy.getElementsByTagName('reason');
+//         if (reason && reason.length > 0) {
+//             info.reason = Strophe.getText(reason[0]);
+//         }
+//     }
 
-    var members = msginfo.getElementsByTagName('item');
-    if (members && members.length > 0) {
-        var member = members[0];
-        var role = member.getAttribute('role');
-        var jid = member.getAttribute('jid');
-        var affiliation = member.getAttribute('affiliation');
-        // dismissed by group
-        if (role == 'none' && jid) {
-            var kickedMember = _parseNameFromJidFn(jid);
-            var actor = member.getElementsByTagName('actor')[0];
-            var actorNick = actor.getAttribute('nick');
-            info.actor = actorNick;
-            info.kicked = kickedMember;
-        }
-        // Service Acknowledges Room Creation `createGroupACK`
-        if (role == 'moderator' && info.code == '201') {
-            if (affiliation === 'owner') {
-                info.type = 'createGroupACK';
-                isCreate = true;
-            }
-            // else
-            //     info.type = 'joinPublicGroupSuccess';
-        }
-    }
+//     var members = msginfo.getElementsByTagName('item');
+//     if (members && members.length > 0) {
+//         var member = members[0];
+//         var role = member.getAttribute('role');
+//         var jid = member.getAttribute('jid');
+//         var affiliation = member.getAttribute('affiliation');
+//         // dismissed by group
+//         if (role == 'none' && jid) {
+//             var kickedMember = _parseNameFromJidFn(jid);
+//             var actor = member.getElementsByTagName('actor')[0];
+//             var actorNick = actor.getAttribute('nick');
+//             info.actor = actorNick;
+//             info.kicked = kickedMember;
+//         }
+//         // Service Acknowledges Room Creation `createGroupACK`
+//         if (role == 'moderator' && info.code == '201') {
+//             if (affiliation === 'owner') {
+//                 info.type = 'createGroupACK';
+//                 isCreate = true;
+//             }
+//             // else
+//             //     info.type = 'joinPublicGroupSuccess';
+//         }
+//     }
 
-    var x = msginfo.getElementsByTagName('x');
-    if (x && x.length > 0) {
-        // 加群申请
-        var apply = x[0].getElementsByTagName('apply');
-        // 加群成功
-        var accept = x[0].getElementsByTagName('accept');
-        // 同意加群后用户进群通知
-        var item = x[0].getElementsByTagName('item');
-        // 加群被拒绝
-        var decline = x[0].getElementsByTagName('decline');
-        // 被设为管理员
-        var addAdmin = x[0].getElementsByTagName('add_admin');
-        // 被取消管理员
-        var removeAdmin = x[0].getElementsByTagName('remove_admin');
-        // 被禁言
-        var addMute = x[0].getElementsByTagName('add_mute');
-        // 取消禁言
-        var removeMute = x[0].getElementsByTagName('remove_mute');
+//     var x = msginfo.getElementsByTagName('x');
+//     if (x && x.length > 0) {
+//         // 加群申请
+//         var apply = x[0].getElementsByTagName('apply');
+//         // 加群成功
+//         var accept = x[0].getElementsByTagName('accept');
+//         // 同意加群后用户进群通知
+//         var item = x[0].getElementsByTagName('item');
+//         // 加群被拒绝
+//         var decline = x[0].getElementsByTagName('decline');
+//         // 被设为管理员
+//         var addAdmin = x[0].getElementsByTagName('add_admin');
+//         // 被取消管理员
+//         var removeAdmin = x[0].getElementsByTagName('remove_admin');
+//         // 被禁言
+//         var addMute = x[0].getElementsByTagName('add_mute');
+//         // 取消禁言
+//         var removeMute = x[0].getElementsByTagName('remove_mute');
 
-        if (apply && apply.length > 0) {
-            isApply = true;
-            info.toNick = apply[0].getAttribute('toNick');
-            info.type = 'joinGroupNotifications';
-            var groupJid = apply[0].getAttribute('to');
-            var gid = groupJid.split('@')[0].split('_');
-            gid = gid[gid.length - 1];
-            info.gid = gid;
-        } else if (accept && accept.length > 0) {
-            info.type = 'joinPublicGroupSuccess';
-        } else if (item && item.length > 0) {
-            var affiliation = item[0].getAttribute('affiliation'),
-                role = item[0].getAttribute('role');
-            if (affiliation == 'member'
-                ||
-                role == 'participant') {
-                isMemberJoin = true;
-                info.mid = info.fromJid.split('/');
-                info.mid = info.mid[info.mid.length - 1];
-                info.type = 'memberJoinPublicGroupSuccess';
-                var roomtype = msginfo.getElementsByTagName('roomtype');
-                if (roomtype && roomtype.length > 0) {
-                    var type = roomtype[0].getAttribute('type');
-                    if (type == 'chatroom') {
-                        info.type = 'memberJoinChatRoomSuccess';
-                    }
-                }
-            }
-        } else if (decline && decline.length) {
-            isDecline = true;
-            var gid = decline[0].getAttribute("fromNick");
-            var owner = _parseNameFromJidFn(decline[0].getAttribute("from"));
-            info.type = "joinPublicGroupDeclined";
-            info.owner = owner;
-            info.gid = gid;
-        } else if (addAdmin && addAdmin.length > 0) {
-            var gid = _parseNameFromJidFn(addAdmin[0].getAttribute('mucjid'));
-            var owner = _parseNameFromJidFn(addAdmin[0].getAttribute('from'));
-            info.owner = owner;
-            info.gid = gid;
-            info.type = "addAdmin";
-        } else if (removeAdmin && removeAdmin.length > 0) {
-            var gid = _parseNameFromJidFn(removeAdmin[0].getAttribute('mucjid'));
-            var owner = _parseNameFromJidFn(removeAdmin[0].getAttribute('from'));
-            info.owner = owner;
-            info.gid = gid;
-            info.type = "removeAdmin";
-        } else if (addMute && addMute.length > 0) {
-            var gid = _parseNameFromJidFn(addMute[0].getAttribute('mucjid'));
-            var owner = _parseNameFromJidFn(addMute[0].getAttribute('from'));
-            info.owner = owner;
-            info.gid = gid;
-            info.type = "addMute";
-        } else if (removeMute && removeMute.length > 0) {
-            var gid = _parseNameFromJidFn(removeMute[0].getAttribute('mucjid'));
-            var owner = _parseNameFromJidFn(removeMute[0].getAttribute('from'));
-            info.owner = owner;
-            info.gid = gid;
-            info.type = "removeMute";
-        }
-    }
+//         // if (apply && apply.length > 0) {
+//         //     isApply = true;
+//         //     info.toNick = apply[0].getAttribute('toNick');
+//         //     info.type = 'joinGroupNotifications';
+//         //     var groupJid = apply[0].getAttribute('to');
+//         //     var gid = groupJid.split('@')[0].split('_');
+//         //     gid = gid[gid.length - 1];
+//         //     info.gid = gid;
+//         // } else if (accept && accept.length > 0) {
+//         //     info.type = 'joinPublicGroupSuccess';
+//         // } else if (item && item.length > 0) {
+//         //     var affiliation = item[0].getAttribute('affiliation'),
+//         //         role = item[0].getAttribute('role');
+//         //     if (affiliation == 'member'
+//         //         ||
+//         //         role == 'participant') {
+//         //         isMemberJoin = true;
+//         //         info.mid = info.fromJid.split('/');
+//         //         info.mid = info.mid[info.mid.length - 1];
+//         //         info.type = 'memberJoinPublicGroupSuccess';
+//         //         var roomtype = msginfo.getElementsByTagName('roomtype');
+//         //         if (roomtype && roomtype.length > 0) {
+//         //             var type = roomtype[0].getAttribute('type');
+//         //             if (type == 'chatroom') {
+//         //                 info.type = 'memberJoinChatRoomSuccess';
+//         //             }
+//         //         }
+//         //     }
+//         // } else if (decline && decline.length) {
+//         //     isDecline = true;
+//         //     var gid = decline[0].getAttribute("fromNick");
+//         //     var owner = _parseNameFromJidFn(decline[0].getAttribute("from"));
+//         //     info.type = "joinPublicGroupDeclined";
+//         //     info.owner = owner;
+//         //     info.gid = gid;
+//         // } else if (addAdmin && addAdmin.length > 0) {
+//         //     var gid = _parseNameFromJidFn(addAdmin[0].getAttribute('mucjid'));
+//         //     var owner = _parseNameFromJidFn(addAdmin[0].getAttribute('from'));
+//         //     info.owner = owner;
+//         //     info.gid = gid;
+//         //     info.type = "addAdmin";
+//         // } else if (removeAdmin && removeAdmin.length > 0) {
+//         //     var gid = _parseNameFromJidFn(removeAdmin[0].getAttribute('mucjid'));
+//         //     var owner = _parseNameFromJidFn(removeAdmin[0].getAttribute('from'));
+//         //     info.owner = owner;
+//         //     info.gid = gid;
+//         //     info.type = "removeAdmin";
+//         // } else if (addMute && addMute.length > 0) {
+//         //     var gid = _parseNameFromJidFn(addMute[0].getAttribute('mucjid'));
+//         //     var owner = _parseNameFromJidFn(addMute[0].getAttribute('from'));
+//         //     info.owner = owner;
+//         //     info.gid = gid;
+//         //     info.type = "addMute";
+//         // } else if (removeMute && removeMute.length > 0) {
+//         //     var gid = _parseNameFromJidFn(removeMute[0].getAttribute('mucjid'));
+//         //     var owner = _parseNameFromJidFn(removeMute[0].getAttribute('from'));
+//         //     info.owner = owner;
+//         //     info.gid = gid;
+//         //     info.type = "removeMute";
+//         // }
+//         //}
+//     }
 
 
-    if (info.chatroom) {
-        // diff the
-        info.presence_type = presence_type;
-        info.original_type = info.type;
-        var reflectUser = from.slice(from.lastIndexOf('/') + 1);
+//     // if (info.chatroom) {
+//     //     // diff the
+//     //     info.presence_type = presence_type;
+//     //     info.original_type = info.type;
+//     //     var reflectUser = from.slice(from.lastIndexOf('/') + 1);
 
-        if (reflectUser === this.context.userId) {
-            if (info.type === '' && !info.code) {
-                info.type = 'joinChatRoomSuccess';
-            } else if (presence_type === 'unavailable' || info.type === 'unavailable') {
-                if (!info.status) {// logout successfully.
-                    info.type = 'leaveChatRoom';
-                } else if (info.code == 110) {// logout or dismissied by admin.
-                    info.type = 'leaveChatRoom';
-                } else if (info.error && info.error.code == 406) {// The chat room is full.
-                    info.type = 'reachChatRoomCapacity';
-                }
-            }
-        }
-    } else {
-        info.presence_type = presence_type;
-        info.original_type = type;
+//     //     if (reflectUser === this.context.userId) {
+//     //         if (info.type === '' && !info.code) {
+//     //             info.type = 'joinChatRoomSuccess';
+//     //         } else if (presence_type === 'unavailable' || info.type === 'unavailable') {
+//     //             if (!info.status) {// logout successfully.
+//     //                 info.type = 'leaveChatRoom';
+//     //             } else if (info.code == 110) {// logout or dismissied by admin.
+//     //                 info.type = 'leaveChatRoom';
+//     //             } else if (info.error && info.error.code == 406) {// The chat room is full.
+//     //                 info.type = 'reachChatRoomCapacity';
+//     //             }
+//     //         }
+//     //     }
+//     // } 
 
-        if (/subscribe/.test(info.type)) {
-            //subscribe | subscribed | unsubscribe | unsubscribed
-        } else if (type == ""
-            &&
-            !info.status
-            &&
-            !info.error
-            &&
-            !isCreate
-            &&
-            !isApply
-            &&
-            !isMemberJoin
-            &&
-            !isDecline
-        ) {
-            console.log(2222222, msginfo, info, isApply);
-            // info.type = 'joinPublicGroupSuccess';
-        } else if (presence_type === 'unavailable' || type === 'unavailable') {// There is no roomtype when a chat room is deleted.
-            if (info.destroy) {// Group or Chat room Deleted.
-                info.type = 'deleteGroupChat';
-            } else if (info.code == 307 || info.code == 321) {// Dismissed by group.
-                var nick = msginfo.getAttribute('nick');
-                if (!nick)
-                    info.type = 'leaveGroup';
-                else
-                    info.type = 'removedFromGroup';
-            }
-        }
-    }
-    this.onPresence(info, msginfo);
-};
+//     // else {
+//     //     info.presence_type = presence_type;
+//     //     info.original_type = type;
+
+//     //     if (/subscribe/.test(info.type)) {
+//     //         //subscribe | subscribed | unsubscribe | unsubscribed
+//     //     } else if (type == ""
+//     //         &&
+//     //         !info.status
+//     //         &&
+//     //         !info.error
+//     //         &&
+//     //         !isCreate
+//     //         &&
+//     //         !isApply
+//     //         &&
+//     //         !isMemberJoin
+//     //         &&
+//     //         !isDecline
+//     //     ) {
+//     //         console.log(2222222, msginfo, info, isApply);
+//     //         // info.type = 'joinPublicGroupSuccess';
+//     //     } 
+//         // else if (presence_type === 'unavailable' || type === 'unavailable') {// There is no roomtype when a chat room is deleted.
+//         //     if (info.destroy) {// Group or Chat room Deleted.
+//         //         info.type = 'deleteGroupChat';
+//         //     } else if (info.code == 307 || info.code == 321) {// Dismissed by group.
+//         //         var nick = msginfo.getAttribute('nick');
+//         //         if (!nick)
+//         //             info.type = 'leaveGroup';
+//         //         else
+//         //             info.type = 'removedFromGroup';
+//         //     }
+//         // }
+//     //}
+//     this.onPresence(info, msginfo);
+// };
 
 /**
  * @private
@@ -2992,6 +2997,173 @@ connection.prototype.clear = function () {
 };
 
 /**
+ * 获取对话历史消息
+ * @param {Object} options
+ * @param {String} options.queue 对方id
+ * @param {Function} options.success
+ * @param {Funciton} options.fail
+ */
+connection.prototype.fetchHistoryMessages = function(options) {
+    var conn = this
+    if (!options.queue) {
+        conn.onError({
+            type: "",
+            msg: "queue is not specified"
+        });
+        return;
+    }
+
+    var count = options.count || 20
+
+    function _readCacheMessages() {
+        conn._fetchMessages({
+            count: count,
+            isGroup: options.isGroup ? true: false,
+            queue: options.queue,
+            success: function(data) {
+                var length = data.msgs.length
+                if (length >= count || data.is_last) {
+                    options.success(_utils.reverse(data.msgs.splice(0, count)))
+                } else {
+                    _readCacheMessages()
+                }
+            }
+        })
+    }
+    _readCacheMessages()
+};
+
+/**
+ * 获取对话历史消息
+ * @param {Object} options
+ * @param {String} options.queue
+ * @param {Function} options.success
+ * @param {Funciton} options.fail
+ */
+connection.prototype._fetchMessages = function(options) {
+    var conn = this,
+        token = options.accessToken || this.context.accessToken
+    
+    if (!_utils.isCanSetRequestHeader) {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_NOT_SUPPORT_CHATROOM_ERROR
+        });
+        return;
+    }
+
+    if (token) {
+        var apiUrl = this.apiUrl;
+        var appName = this.context.appName;
+        var orgName = this.context.orgName;
+
+        if (!appName || !orgName) {
+            conn.onError({
+                type: _code.WEBIM_CONNCTION_AUTH_ERROR
+            });
+            return;
+        }
+
+        if (!options.queue) {
+            conn.onError({
+                type: "",
+                msg: "queue is not specified"
+            });
+            return;
+        }
+
+        var queue = options.queue
+        var _dataQueue = mr_cache[queue] || (mr_cache[queue] = {msgs: []})
+    
+        var suc = function (res, xhr) {
+            
+            if (res && res.data) {
+                var data = res.data
+                var msgs =data.msgs;
+                var length = msgs.length;
+                
+                _dataQueue.is_last = data.is_last;
+                _dataQueue.next_key = data.next_key;
+
+                var _paseMeta = function(meta){
+                    var arr = [];
+                    meta = Base64.atob(meta);
+                    for (var i = 0, j = meta.length; i < j; ++i) {
+                        arr.push(meta.charCodeAt(i));
+                    }
+                    var tmpUint8Array = new Uint8Array(arr); 
+
+                    var CommSyncDLMessage = conn.context.root.lookup("easemob.pb.Meta");
+                    CommSyncDLMessage = CommSyncDLMessage.decode(tmpUint8Array);
+
+                    var status = {
+                        errorCode: 0,
+                        reason: ''
+                    }
+                    
+                    var thirdMessage = HandleChatMessage.handleMessage(CommSyncDLMessage, status, conn, true)
+                    return thirdMessage;
+                }
+
+                for (var i = 0; i < length; i++) {
+                    var msgObj = _paseMeta(msgs[i].msg)
+                    msgObj && _dataQueue.msgs.push(msgObj); 
+                }
+
+                typeof options.success === 'function' && options.success(_dataQueue);
+            }
+        };
+
+        var error = function (res, msg) {
+            if (res.error && res.error_description) {
+                conn.onError({
+                    type: _code.WEBIM_CONNCTION_LOAD_CHATROOM_ERROR,
+                    msg: res.error_description,
+                    data: res
+                });
+            }
+        };
+
+        var userId = this.context.userId;    
+        var start = -1
+        
+        // 无历史消息或者缓存消息足够不再加载
+        if (_dataQueue.msgs.length >= options.count || _dataQueue.is_last) {
+            typeof options.success === 'function' && options.success(_dataQueue);
+            return;
+        }
+        
+        // 根据上一次拉取返回的last_key 进行本次消息拉取
+        if (_dataQueue && _dataQueue.next_key) {
+            start = _dataQueue.next_key
+        }
+
+        var suffix = options.isGroup ? "@conference.easemob.com" : "@easemob.com";
+        var data = {
+            queue: queue + suffix,
+            start: start,
+            end: -1
+        };
+ 
+        var opts = {
+            url: apiUrl + '/' + orgName + '/' + appName + '/users/' + userId + '/messageroaming',
+            dataType: 'json',
+            type: 'POST',
+            headers: {'Authorization': 'Bearer ' + token},
+            data: JSON.stringify(data),
+            success: suc || _utils.emptyfn,
+            error: error || _utils.emptyfn
+        };
+
+        _utils.ajax(opts);
+
+    }  else {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_TOKEN_NOT_ASSIGN_ERROR
+        });
+    }
+}
+
+/**
  * 获取聊天室列表（分页）
  * @param {Object} options -
  * @param {String} options.apiUrl - rest的接口地址
@@ -3065,31 +3237,70 @@ connection.prototype.getChatRooms = function (options) {
  * 加入聊天室
  * @param {Object} options - 
  * @param {String} options.roomId - 聊天室的ID
+ * @param {stirng} opt.userName - 用户ID
+ * @param {stirng} opt.message - 原因
+ * @param {stirng} opt.nickname - 昵称
  * @param {Function} options.success - 成功之后的回调，默认为空
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.joinChatRoom = function (options) {
-    var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
-    var room_nick = roomJid + '/' + this.context.userId;
-    var suc = options.success || _utils.emptyfn;
-    var err = options.error || _utils.emptyfn;
-    var errorFn = function (ele) {
-        err({
-            type: _code.WEBIM_CONNCTION_JOINCHATROOM_ERROR
-            , data: ele
+    var options = options || {};
+    if (!_utils.isCanSetRequestHeader) {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_NOT_SUPPORT_CHATROOM_ERROR
         });
-    };
+        return;
+    }
 
-    var iq = $pres({
-        from: this.context.jid,
-        to: room_nick
-    })
-        .c('x', {xmlns: Strophe.NS.MUC + '#user'})
-        .c('item', {affiliation: 'member', role: 'participant'})
-        .up().up()
-        .c('roomtype', {xmlns: 'easemob:x:roomtype', type: 'chatroom'});
+    var conn = this
+    var token = options.accessToken || this.token;
 
-    this.context.stropheConn.sendIQ(iq.tree(), suc, errorFn);
+
+    if (token) {
+        var apiUrl = options.apiUrl || this.apiUrl;
+        var appName = this.context.appName;
+        var orgName = this.context.orgName;
+        var roomId = options.roomId
+        var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
+        var userName = options.userName;
+        var message = options.message || '';
+        var nickname = options.nickname || '';
+        if (!appName || !orgName) {
+            conn.onError({
+                type: _code.WEBIM_CONNCTION_AUTH_ERROR
+            });
+            return;
+        }
+
+        var suc = function (data, xhr) {
+            typeof options.success === 'function' && options.success(data);
+        };
+
+        var error = function (res, xhr, msg) {
+            typeof options.error === 'function' && options.error(res);
+        };
+
+        var opts = {
+            url: apiUrl + '/' + orgName + '/' + appName + '/chatrooms/' + roomId + '/apply',
+            dataType: 'json',
+            type: 'POST',
+            data: JSON.stringify({
+                message: message,
+                nickname: nickname
+            }),
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            success: suc || _utils.emptyfn,
+            error: error || _utils.emptyfn
+        };
+        _utils.ajax(opts);
+    } else {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_TOKEN_NOT_ASSIGN_ERROR
+        });
+    }
 };
 
 /**
@@ -3100,27 +3311,54 @@ connection.prototype.joinChatRoom = function (options) {
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
 connection.prototype.quitChatRoom = function (options) {
-    var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
-    var room_nick = roomJid + '/' + this.context.userId;
-    var suc = options.success || _utils.emptyfn;
-    var err = options.error || _utils.emptyfn;
-    var errorFn = function (ele) {
-        err({
-            type: _code.WEBIM_CONNCTION_QUITCHATROOM_ERROR
-            , data: ele
+    var options = options || {};
+    if (!_utils.isCanSetRequestHeader) {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_NOT_SUPPORT_CHATROOM_ERROR
         });
-    };
-    var iq = $pres({
-        from: this.context.jid,
-        to: room_nick,
-        type: 'unavailable'
-    })
-        .c('x', {xmlns: Strophe.NS.MUC + '#user'})
-        .c('item', {affiliation: 'none', role: 'none'})
-        .up().up()
-        .c('roomtype', {xmlns: 'easemob:x:roomtype', type: 'chatroom'});
+        return;
+    }
 
-    this.context.stropheConn.sendIQ(iq.tree(), suc, errorFn);
+    var conn = this
+    var token = options.accessToken || this.token;
+
+    if (token) {
+        var apiUrl = options.apiUrl || this.apiUrl;
+        var appName = this.context.appName;
+        var orgName = this.context.orgName;
+        var roomId = options.roomId
+        var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
+        if (!appName || !orgName) {
+            conn.onError({
+                type: _code.WEBIM_CONNCTION_AUTH_ERROR
+            });
+            return;
+        }
+
+        var suc = function (data, xhr) {
+            typeof options.success === 'function' && options.success(data);
+        };
+
+        var error = function (res, xhr, msg) {
+            typeof options.error === 'function' && options.error(res);
+        };
+
+        var opts = {
+            url: apiUrl + '/' + orgName + '/' + appName + '/chatrooms/' + roomId + '/quit',
+            dataType: 'json',
+            type: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            success: suc || _utils.emptyfn,
+            error: error || _utils.emptyfn
+        };
+        _utils.ajax(opts);
+    } else {
+        conn.onError({
+            type: _code.WEBIM_CONNCTION_TOKEN_NOT_ASSIGN_ERROR
+        });
+    }
 };
 
 /**
