@@ -66,7 +66,18 @@
         }
         var messageBody = conn.context.root.lookup("easemob.pb.MessageBody");
         var fourthMessage = messageBody.decode(emptyMessage);
-        if(messageOption.type === "delivery"){   //目前为单聊的delivery
+        if(messageOption.type === "recall"){
+            fourthMessage.type = 6;
+            fourthMessage.from = conn.context.jid;
+            fourthMessage.to = {
+                appKey: conn.appKey,
+                name: messageOption.to,
+                domain: "easemob.com",
+                clientResource: conn.clientResource
+            }
+            fourthMessage.ack_message_id = messageOption.mid;
+        }
+        else if(messageOption.type === "delivery"){   //目前为单聊的delivery
             fourthMessage.type = 5;
             fourthMessage.from = conn.context.jid;
             fourthMessage.to = {
@@ -136,7 +147,16 @@
         var MetaMessage = conn.context.root.lookup("easemob.pb.Meta");
         var thirdMessage = MetaMessage.decode(emptyMessage);
         thirdMessage.id = messageOption.id;
-        if(messageOption.type === "delivery"){   //目前为单聊的delivery
+        if(messageOption.type === "recall"){
+            thirdMessage.from = conn.context.jid;
+            thirdMessage.to = {
+                appKey: conn.appKey,
+                name: messageOption.to,
+                domain: "easemob.com",
+                clientResource: conn.clientResource
+            }
+        }
+        else if(messageOption.type === "delivery"){   //目前为单聊的delivery
             thirdMessage.from = conn.context.jid;
             thirdMessage.to = {
                 appKey: conn.appKey,

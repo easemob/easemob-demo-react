@@ -32,7 +32,8 @@ WebIM.conn = new websdk.connection({
     autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
     autoReconnectInterval: WebIM.config.autoReconnectInterval,
     isStropheLog: WebIM.config.isStropheLog,
-    delivery: WebIM.config.delivery
+    delivery: WebIM.config.delivery,
+    appKey: WebIM.config.appkey
 })
 
 // for downward compatibility 
