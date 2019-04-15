@@ -14,7 +14,7 @@ var sendDelivery = function(conn, msg ,msgId){
         // self.send(deliverMessage.body);
     }
 }
-var handleMessage = function(meta, status, conn){
+var handleMessage = function(meta, status, conn, ignoreCallback){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.MessageBody");
     var thirdMessage = messageBodyMessage.decode(meta.payload);
@@ -71,7 +71,7 @@ var handleMessage = function(meta, status, conn){
                     msg.error = errorBool;
                     msg.errorText = errorText;
                     msg.errorCode = errorCode;
-                    self.onEmojiMessage(msg);
+                    !ignoreCallback && self.onEmojiMessage(msg);
                 }
                 else{
 		            msg = {
@@ -86,7 +86,7 @@ var handleMessage = function(meta, status, conn){
                     msg.error = errorBool;
                     msg.errorText = errorText;
                     msg.errorCode = errorCode;
-			        conn.onTextMessage(msg);
+			       !ignoreCallback &&  conn.onTextMessage(msg);
                 }
                 break;
         case 1:
@@ -117,7 +117,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onPictureMessage(msg);
+            !ignoreCallback && conn.onPictureMessage(msg);
             break;
         case 2:
             msg = {
@@ -140,7 +140,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onAudioMessage(msg);
+            !ignoreCallback && conn.onAudioMessage(msg);
             break;
         case 3:
             msg = {
@@ -158,7 +158,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onLocationMessage(msg);
+            !ignoreCallback && conn.onLocationMessage(msg);
             break;
         case 4:
             msg = {
@@ -179,7 +179,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onVideoMessage(msg);
+            !ignoreCallback && conn.onVideoMessage(msg);
             break;
         case 5:
             msg = {
@@ -200,7 +200,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onFileMessage(msg);
+            !ignoreCallback && conn.onFileMessage(msg);
             break;
         case 6:
             msg = {
@@ -214,7 +214,7 @@ var handleMessage = function(meta, status, conn){
             msg.error = errorBool;
             msg.errorText = errorText;
             msg.errorCode = errorCode;
-            conn.onCmdMessage(msg);
+            !ignoreCallback && conn.onCmdMessage(msg);
             break;
         default:
             break;
@@ -223,7 +223,12 @@ var handleMessage = function(meta, status, conn){
         // msg.error = "";
         // msg.errorText = "";
         // msg.errorCode = "";
-        sendDelivery(conn, msg, msgId);
+        !ignoreCallback && sendDelivery(conn, msg, msgId);
+
+        if (ignoreCallback) {
+            msg.message_type = type
+            return msg
+        }
     }
     
 }
