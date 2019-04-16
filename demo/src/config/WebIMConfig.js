@@ -47,7 +47,7 @@ var config = {
     /*
      * Application AppKey
      */
-    appkey: "1100180419250820#bajiao",
+    appkey: "easemob-demo#chatdemoui",
     /*
      * Application Host
      */
@@ -57,7 +57,7 @@ var config = {
      * @parameter {Boolean} true or false
      */
     https: false,
-    isHttpDNS: true,
+    isHttpDNS: false,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
@@ -117,7 +117,7 @@ var config = {
      * sender, in order to tell the sender the message has delivered.
      * See call back function onReceivedMessage
      */
-    delivery: true,
+    delivery: false,
     /**
      * Size of message cache for group chating like group, chatroom etc
      */

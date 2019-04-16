@@ -554,7 +554,7 @@ export const updateMessageStatus = (state, { message, status = "" }) => {
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
         const messages = state.getIn([ type, chatId ]).asMutable()
-        const found = _.find(messages, { id })
+        const found = _.find(messages, { id: parseInt(id) })
         const msg = found.setIn([ "status" ], status)
         messages.splice(messages.indexOf(found), 1, msg)
         AppDB.updateMessageStatus(id, status).then(res => console.log(""))

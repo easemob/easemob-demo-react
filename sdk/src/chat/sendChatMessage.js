@@ -75,7 +75,7 @@
                 domain: "easemob.com",
                 clientResource: conn.clientResource
             }
-            fourthMessage.ack_message_id = messageOption.mid;
+            fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(messageOption.type === "delivery"){   //目前为单聊的delivery
             fourthMessage.type = 5;
@@ -86,7 +86,7 @@
                 domain: "easemob.com",
                 clientResource: conn.clientResource
             }
-            fourthMessage.ack_message_id = messageOption.bodyId;
+            fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(messageOption.type === "read"){
             fourthMessage.type = 4;
@@ -97,7 +97,7 @@
                 domain: "easemob.com",
                 clientResource: conn.clientResource
             }
-            fourthMessage.ack_message_id = messageOption.ackId;
+            fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(!messageOption.group && !messageOption.roomType){
             fourthMessage.type = 1;

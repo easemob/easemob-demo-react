@@ -7,7 +7,7 @@ var sendDelivery = function(conn, msg ,msgId){
         var id = conn.getUniqueId();
         var deliverMessage = new WebIM.message('delivery', id);
         deliverMessage.set({
-            bodyId: msgId
+            ackId: msgId
             , to: msg.from
         });
         ChatMessage.default(deliverMessage.body, conn);
@@ -19,6 +19,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.MessageBody");
     var thirdMessage = messageBodyMessage.decode(meta.payload);
     var msgId = new Long(meta.id.low, meta.id.high, meta.id.unsigned).toString();
+    var ackMsgId = thirdMessage.ackMessageId ? new Long(thirdMessage.ackMessageId.low, thirdMessage.ackMessageId.high, thirdMessage.ackMessageId.unsigned).toString() : "";
     var type = null;
     if (thirdMessage.type === 1) {             //messagetype 群组/聊天室。。。。
         type = "chat";
@@ -32,21 +33,21 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
     else if(thirdMessage.type === 4){
         type = "read_ack";     //发送ack没写
         conn.onReadMessage({
-            mid: msgId
+            mid: ackMsgId
         });
         return;
     }
     else if(thirdMessage.type === 5){
         type = "deliver_ack";
         conn.onDeliverdMessage({
-            mid: msgId
+            mid: ackMsgId
         });
         return;
     }
     else if(thirdMessage.type === 6){
         type = "recall";
         conn.onRecallMessage({     //需要增加一个回撤消息的监听
-            mid: msgId
+            mid: ackMsgId
         });
         return;
     }

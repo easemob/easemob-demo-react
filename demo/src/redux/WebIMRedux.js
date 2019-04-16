@@ -230,6 +230,9 @@ WebIM.conn.listen({
         const { id, mid } = message
         store.dispatch(MessageActions.updateMessageMid(id, mid))
     },
+    onRecallMessage: message => {
+        logger.info("onRecallMessage", message)
+    },
     onTextMessage: message => {
         console.log("onTextMessage", message)
         const { from, to } = message 

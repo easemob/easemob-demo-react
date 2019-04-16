@@ -197,7 +197,7 @@ var _login = function (options, conn) {
         if(!conn.logOut 
             && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax 
             && conn.autoReconnectNumTotal <= conn.xmppHosts.length
-            && conn.xmppIndex < conn.xmppHosts.length
+            // && conn.xmppIndex < conn.xmppHosts.length - 1
         )
         {
             conn.reconnect();
@@ -235,7 +235,7 @@ var _login = function (options, conn) {
                 else if(CommSyncDLMessage.isLast){
                     //当前为最后一条消息
                 }
-                else if(CommSyncDLMessage.status.errorCode === 0){
+                else if(CommSyncDLMessage.status && CommSyncDLMessage.status.errorCode === 0){
                     if (_msgHash[metaId]) {
                         try {
                             _msgHash[metaId].success instanceof Function && _msgHash[metaId].success(metaId, msgId);
@@ -2221,14 +2221,16 @@ connection.prototype.close = function (reason) {
 // };
 
 /**
- * 消息撤回
+ * 发送已读消息
  * @param {Object} option - 
+ * @param {Object} option.mid -   已读消息id
+ * @param {Object} option.to -   消息的接收方
  */
-connection.prototype.recallMessage = function(option){
+connection.prototype.readMessage = function(option){
     var messageOption = {
         id: this.getUniqueId(),
-        type: "recall",
-        mid: option.mid,
+        type: "read",
+        ackId: option.mid,
         to: option.to,
         success: option.success,
         fail: option.fail
@@ -2236,6 +2238,24 @@ connection.prototype.recallMessage = function(option){
     this.send(messageOption, this);
 }
 
+
+/**
+ * 发送撤回消息
+ * @param {Object} option - 
+ * @param {Object} option.mid -   回撤消息id
+ * @param {Object} option.to -   消息的接收方
+ */
+connection.prototype.recallMessage = function(option){
+    var messageOption = {
+        id: this.getUniqueId(),
+        type: "recall",
+        ackId: option.mid,
+        to: option.to,
+        success: option.success,
+        fail: option.fail
+    }
+    this.send(messageOption, this);
+}
 
 
 
@@ -2258,7 +2278,12 @@ connection.prototype.sendMSync = function(str){     //
     }
     else{
         this.unSendMsgArr.push(strr);
-        if(!this.offLineSendConnecting && !this.logOut){
+        if(
+            !this.offLineSendConnecting 
+            && !this.logOut
+            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax 
+            && conn.autoReconnectNumTotal <= conn.xmppHosts.length
+        ){
             this.offLineSendConnecting = true;
             this.reconnect();
         }
@@ -3010,51 +3035,7 @@ connection.prototype.clear = function () {
     }
 };
 
-/**
- * 获取对话历史消息
- * @param {Object} options
- * @param {String} options.queue 对方id
- * @param {Function} options.success
- * @param {Funciton} options.fail
- */
-connection.prototype.fetchHistoryMessages = function(options) {
-    var conn = this
-    if (!options.queue) {
-        conn.onError({
-            type: "",
-            msg: "queue is not specified"
-        });
-        return;
-    }
-
-    var count = options.count || 20
-
-    function _readCacheMessages() {
-        conn._fetchMessages({
-            count: count,
-            isGroup: options.isGroup ? true: false,
-            queue: options.queue,
-            success: function(data) {
-                var length = data.msgs.length
-                if (length >= count || data.is_last) {
-                    options.success(_utils.reverse(data.msgs.splice(0, count)))
-                } else {
-                    _readCacheMessages()
-                }
-            }
-        })
-    }
-    _readCacheMessages()
-};
-
-/**
- * 获取对话历史消息
- * @param {Object} options
- * @param {String} options.queue
- * @param {Function} options.success
- * @param {Funciton} options.fail
- */
-connection.prototype._fetchMessages = function(options) {
+var _fetchMessages = function(options) {
     var conn = this,
         token = options.accessToken || this.context.accessToken
     
@@ -3176,6 +3157,44 @@ connection.prototype._fetchMessages = function(options) {
         });
     }
 }
+
+/**
+ * 获取对话历史消息
+ * @param {Object} options
+ * @param {String} options.queue   - 对方用户名Id
+ * @param {Function} options.success
+ * @param {Funciton} options.fail
+ */
+connection.prototype.fetchHistoryMessages = function(options) {
+    var conn = this
+    if (!options.queue) {
+        conn.onError({
+            type: "",
+            msg: "queue is not specified"
+        });
+        return;
+    }
+
+    var count = options.count || 20
+
+    function _readCacheMessages() {
+        _fetchMessages({
+            count: count,
+            isGroup: options.isGroup ? true: false,
+            queue: options.queue,
+            success: function(data) {
+                var length = data.msgs.length
+                if (length >= count || data.is_last) {
+                    options.success(_utils.reverse(data.msgs.splice(0, count)))
+                } else {
+                    _readCacheMessages()
+                }
+            }
+        })
+    }
+    _readCacheMessages()
+};
+
 
 /**
  * 获取聊天室列表（分页）
@@ -3574,7 +3593,7 @@ connection.prototype._onUpdateMyRoster = function (options) {
  */
 connection.prototype.reconnect = function (v) {
     var that = this;
-    if(that.xmppIndex < that.xmppHosts.length){
+    if(that.xmppIndex < that.xmppHosts.length - 1){
         that.xmppIndex++;       //重连时改变ip地址
     }
     setTimeout(function () {
