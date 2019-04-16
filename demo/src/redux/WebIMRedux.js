@@ -84,6 +84,11 @@ WebIM.conn.listen({
             store.dispatch(CommonActions.setShowGroupRequestModal(true))
             store.dispatch(GroupRequestActions.addGroupRequest(msg))
             break
+        case "deleteGroupChat":
+            message.error(`group${msg.gid} was destroyed.`)
+            store.dispatch(GroupActions.getGroups())
+            break
+        case 'removedFromGroup':
         case "leaveGroup": // dismissed by admin
             message.error(
                 `${msg.kicked || I18n.t("you")} ${I18n.t("dismissed")}${I18n.t("by")}${msg.actor ||
@@ -91,6 +96,7 @@ WebIM.conn.listen({
             )
             store.dispatch(GroupActions.getGroups())
             break
+        case 'direct_joined': //被拉进群
         case "joinPublicGroupSuccess":
             message.success(`${I18n.t("joinGroup")} ${msg.from} ${I18n.t("successfully")}`)
             store.dispatch(GroupActions.getGroups())
@@ -146,6 +152,14 @@ WebIM.conn.listen({
         case "removeMute":
             console.log("you was unmuted", msg)
             message.success(`you was unmuted: ${msg}`)
+            break
+        case "addAdmin":
+            console.log("you were set to be an admin", msg)
+            message.success(`"you were set to be an admin": ${msg}`)
+            break
+        case "removeAdmin":
+            console.log("your admin has been canceled", msg)
+            message.success(`"your admin has been canceled": ${msg}`)
             break
         default:
             break
