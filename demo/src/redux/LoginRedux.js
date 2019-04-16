@@ -26,9 +26,9 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(Creators.setLoging(username, password, null))
 
-            if (WebIM.conn.isOpened()) {
-                WebIM.conn.close("logout")
-            }
+            // if (WebIM.conn.isOpened()) {
+            //     WebIM.conn.close("logout")
+            // }
             WebIM.conn.open({
                 apiUrl: WebIM.config.apiURL,
                 user: username.trim().toLowerCase(),
@@ -54,9 +54,9 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(Creators.setLoging(username, null, token))
 
-            if (WebIM.conn.isOpened()) {
-                WebIM.conn.close("logout")
-            }
+            // if (WebIM.conn.isOpened()) {
+            //     WebIM.conn.close("logout")
+            // }
             console.log("open", username, token)
             WebIM.conn.open({
                 apiUrl: WebIM.config.apiURL,

@@ -153,26 +153,19 @@ var _login = function (options, conn) {
 
     sock.onopen = function () {
         var emptyMessage = [];
+        var time = (new Date()).valueOf();
 
         var provisionMessage = root.lookup("easemob.pb.Provision");
         var secondMessage = provisionMessage.decode(emptyMessage);
-        conn.logOut = false;
-        conn.offLineSendConnecting = false;
-        if (conn.unSendMsgArr.length > 0) {
-            console.log("unSendMesArr",conn.unSendMsgArr);
-            for (var i in conn.unSendMsgArr) {
-                var str = conn.unSendMsgArr[i];
-                conn.sendMSync(str);
-                delete conn.unSendMsgArr[i];
-            }
-        }
-
+        
+        
         secondMessage.compressType = conn.compressType;
         secondMessage.encryptType = conn.encryptType;
         secondMessage.osType = conn.osType;
         secondMessage.version = conn.version;
         secondMessage.deviceName = "websdk";
-        secondMessage.resource = (new Date()).valueOf();
+        secondMessage.resource = "web_" + time;
+        secondMessage.deviceUuid = time;
         secondMessage.auth = "$t$" + options.access_token;
         secondMessage = provisionMessage.encode(secondMessage).finish();
         var firstLookUpMessage = root.lookup("easemob.pb.MSync");
@@ -187,6 +180,16 @@ var _login = function (options, conn) {
         firstMessage.payload = secondMessage;
         firstMessage = firstLookUpMessage.encode(firstMessage).finish();
         base64transform(firstMessage);
+        conn.logOut = false;
+        conn.offLineSendConnecting = false;
+        if (conn.unSendMsgArr.length > 0) {
+            console.log("unSendMesArr",conn.unSendMsgArr);
+            for (var i in conn.unSendMsgArr) {
+                var str = conn.unSendMsgArr[i];
+                conn.sendMSync(str);
+                delete conn.unSendMsgArr[i];
+            }
+        }
         conn.onOpened();
     };
 
@@ -269,7 +272,7 @@ var _login = function (options, conn) {
                 backqueue(noticeMessage.queue);
                 break;
             case 3:
-                receiveProvision(result);
+                receiveProvision(result, conn);
                 break;
         }
 
@@ -393,11 +396,11 @@ var backqueue = function (backqueue) {
     base64transform(firstMessage);
 }
 
-var receiveProvision = function (result) {
+var receiveProvision = function (result, conn) {
 
     var provisionMessage = root.lookup("easemob.pb.Provision");
     var receiveProvisionResult = provisionMessage.decode(result.payload);
-
+    conn.context.jid.clientResource = receiveProvisionResult.resource;
     if (receiveProvisionResult.status.errorCode == 0) {
         unreadDeal();
     }
@@ -808,7 +811,7 @@ var connection = function (options) {
     this.userAgent = options.userAgent || 0;    //*** */
     this.pov = options.pov || 0;    /**** */
     this.command = options.command || 3;
-    this.deviceId = options.deviceId || 0;
+    this.deviceId = options.deviceId || "web";
     this.encryptKey = options.encryptKey || "";
     this.firstPayload = options.firstPayload || [];   //*** */
     this.compressType = options.compressType || [0];
