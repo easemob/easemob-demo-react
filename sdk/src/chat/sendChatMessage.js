@@ -220,9 +220,9 @@
         var msyncMessage = conn.context.root.lookup("easemob.pb.MSync");
         var firstMessage = msyncMessage.decode(emptyMessage);
         firstMessage.version = conn.version;
-        firstMessage.encryptType = [0];
+        firstMessage.encryptType = conn.encryptType;
         firstMessage.command = 0;
-        firstMessage.guid = conn.jid;
+        firstMessage.guid = conn.context.jid;
         firstMessage.payload = secondMessage;
         firstMessage = msyncMessage.encode(firstMessage).finish();
         conn.sendMSync(firstMessage);

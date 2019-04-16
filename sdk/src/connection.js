@@ -163,8 +163,8 @@ var _login = function (options, conn) {
         secondMessage.encryptType = conn.encryptType;
         secondMessage.osType = conn.osType;
         secondMessage.version = conn.version;
-        secondMessage.deviceName = "websdk";
-        secondMessage.resource = "web_" + time;
+        secondMessage.deviceName = conn.deviceId;
+        secondMessage.resource = conn.deviceId + "_" + time;
         secondMessage.deviceUuid = time;
         secondMessage.auth = "$t$" + options.access_token;
         secondMessage = provisionMessage.encode(secondMessage).finish();
@@ -230,7 +230,7 @@ var _login = function (options, conn) {
                 console.log(CommSyncDLMessage);
                 if (CommSyncDLMessage.metas.length !== 0) {
                         metapayload(CommSyncDLMessage.metas, CommSyncDLMessage.status, conn);
-                        lastsession(CommSyncDLMessage.nextKey, CommSyncDLMessage.queue);
+                        lastsession(CommSyncDLMessage.nextKey, CommSyncDLMessage.queue, conn);
                 }
                 else if(CommSyncDLMessage.isLast){
                     //当前为最后一条消息
@@ -261,7 +261,7 @@ var _login = function (options, conn) {
                 }
                 else {
                     for (var i = 0; i < CommUnreadDLMessage.unread.length; i++) {
-                        backqueue(CommUnreadDLMessage.unread[i].queue);
+                        backqueue(CommUnreadDLMessage.unread[i].queue, conn);
                     }
                 }
                 break;
@@ -269,7 +269,7 @@ var _login = function (options, conn) {
                 var Message = root.lookup("easemob.pb.CommNotice");
                 var noticeMessage = Message.decode(result.payload);
                 // console.log(noticeMessage.queue);
-                backqueue(noticeMessage.queue);
+                backqueue(noticeMessage.queue, conn);
                 break;
             case 3:
                 receiveProvision(result, conn);
@@ -294,7 +294,7 @@ var _login = function (options, conn) {
 /**
  * 确定收到消息给erlang反馈//跟服务端确认是否为最后一条消息comm消息islast = true
  * */
-var lastsession = function (nexkey, queue) {
+var lastsession = function (nexkey, queue, conn) {
 
     console.log("队列");
     console.log(queue);
@@ -308,8 +308,8 @@ var lastsession = function (nexkey, queue) {
     var mSyncMessage = root.lookup("easemob.pb.MSync");
 
     var firstMessage = mSyncMessage.decode(emptyMessage);
-    firstMessage.version = "web1.0";
-    firstMessage.encryptType = [0];
+    firstMessage.version = conn.version;
+    firstMessage.encryptType = conn.encryptType;
     firstMessage.command = 0;
     firstMessage.payload = secondMessage;
     firstMessage = mSyncMessage.encode(firstMessage).finish();
@@ -380,7 +380,7 @@ var rebuild = function () {
 /**
  * 当服务器有新消息提示时进行返回queue
  * */
-var backqueue = function (backqueue) {
+var backqueue = function (backqueue, conn) {
     var emptyMessage = [];
     var commsynculMessage = root.lookup("easemob.pb.CommSyncUL");
     var secondMessage = commsynculMessage.decode(emptyMessage);
@@ -388,8 +388,8 @@ var backqueue = function (backqueue) {
     secondMessage = commsynculMessage.encode(secondMessage).finish();
     var mainMessage = root.lookup("easemob.pb.MSync");
     var firstMessage = mainMessage.decode(emptyMessage);
-    firstMessage.version = "web1.0";
-    firstMessage.encryptType = [0];
+    firstMessage.version = conn.version;
+    firstMessage.encryptType = conn.encryptType;
     firstMessage.command = 0;
     firstMessage.payload = secondMessage;
     firstMessage = mainMessage.encode(firstMessage).finish();
@@ -402,16 +402,16 @@ var receiveProvision = function (result, conn) {
     var receiveProvisionResult = provisionMessage.decode(result.payload);
     conn.context.jid.clientResource = receiveProvisionResult.resource;
     if (receiveProvisionResult.status.errorCode == 0) {
-        unreadDeal();
+        unreadDeal(conn);
     }
 }
 
-var unreadDeal = function () {
+var unreadDeal = function (conn) {
     var emptyMessage = [];
     var MSyncMessage = root.lookup("easemob.pb.MSync");
     var firstMessage = MSyncMessage.decode(emptyMessage);
-    firstMessage.version = "web1.0";
-    firstMessage.encryptType = [0];
+    firstMessage.version = conn.version;
+    firstMessage.encryptType = conn.encryptType;
     firstMessage.command = 1;
     firstMessage = MSyncMessage.encode(firstMessage).finish();
     base64transform(firstMessage);
