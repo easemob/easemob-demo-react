@@ -499,7 +499,7 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     }
 
     // the pushed message maybe have exsited in state, ignore
-    if (_message.type === "chatroom" && bySelf && _message.id.indexOf("WEBIM_") < 0) {
+    if (_message.type === "chatroom" && bySelf) {
         const oid = state.getIn([ "byMid", _message.id, "id" ])
         if (oid) {
             _message.id = oid
