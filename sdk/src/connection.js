@@ -27,19 +27,7 @@ var mr_cache = {};
 
 
 var root = protobuf.Root.fromJSON(all);
-// var sock = new SockJS('http://39.107.157.123:8280/ws');
-
-// sock.onopen = function (a,b,c) {
-//     console.log(a,111);
-//     console.log(b,22);
-//     console.log(c,33);
-//     console.log("open");
-//     connection.onOpened();
-// };
-
 var Strophe = window.Strophe
-var isStropheLog;
-var stropheConn = null
 
 window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 
@@ -441,187 +429,187 @@ var base64transform = function (str) {
 
 
 
-var _handleMessageQueue = function (conn) {      // ******callback connect时调用
-    for (var i in _msgHash) {
-        if (_msgHash.hasOwnProperty(i)) {
-            _msgHash[i].send(conn);
-        }
-    }
-};
+// var _handleMessageQueue = function (conn) {      // ******callback connect时调用
+//     for (var i in _msgHash) {
+//         if (_msgHash.hasOwnProperty(i)) {
+//             _msgHash[i].send(conn);
+//         }
+//     }
+// };
 
-var _loginCallback = function (status, msg, conn) {    //******
-    var conflict, error;
+// var _loginCallback = function (status, msg, conn) {    //******
+//     var conflict, error;
 
-    if (msg === 'conflict') {
-        conflict = true;
-        conn.close();
-    }
+//     if (msg === 'conflict') {
+//         conflict = true;
+//         conn.close();
+//     }
 
-    if (status == Strophe.Status.CONNFAIL) {
-        //client offline, ping/pong timeout, server quit, server offline
-        error = {
-            type: _code.WEBIM_CONNCTION_SERVER_CLOSE_ERROR,
-            msg: msg,
-            reconnect: true
-        };
+//     if (status == Strophe.Status.CONNFAIL) {
+//         //client offline, ping/pong timeout, server quit, server offline
+//         error = {
+//             type: _code.WEBIM_CONNCTION_SERVER_CLOSE_ERROR,
+//             msg: msg,
+//             reconnect: true
+//         };
 
-        conflict && (error.conflict = true);
-        conn.onError(error);
-    } else if (status == Strophe.Status.ATTACHED || status == Strophe.Status.CONNECTED) {
-        // client should limit the speed of sending ack messages  up to 5/s  (后修改为10/s途虎重复收到离线消息)
-        conn.autoReconnectNumTotal = 0;
-        conn.intervalId = setInterval(function () {
-            conn.handelSendQueue();
-        }, 100);
-        var handleMessage = function (msginfo) {
-            var delivery = msginfo.getElementsByTagName('delivery');
-            var acked = msginfo.getElementsByTagName('acked');
-            if (delivery.length) {
-                // conn.handleDeliveredMessage(msginfo);
-                return true;
-            }
-            if (acked.length) {
-                // conn.handleAckedMessage(msginfo);
-                return true;
-            }
-            var type = _parseMessageType(msginfo);
-            switch (type) {
-                case "received":
-                    // conn.handleReceivedMessage(msginfo);
-                    return true;
-                case "invite":
-                    // conn.handleInviteMessage(msginfo);
-                    return true;
-                case "delivery":
-                    // conn.handleDeliveredMessage(msginfo);
-                    return true;
-                case "acked":
-                    // conn.handleAckedMessage(msginfo);
-                    return true;
-                case "userMuted":
-                    // conn.handleMutedMessage(msginfo);
-                    return true;
-                default:
-                    conn.handleMessage(msginfo);
-                    return true;
-            }
-        };
-        var handlePresence = function (msginfo) {
-            conn.handlePresence(msginfo);
-            return true;
-        };
-        var handlePing = function (msginfo) {
-            // conn.handlePing(msginfo);
-            return true;
-        };
-        // var handleIqRoster = function (msginfo) {
-        //     conn.handleIqRoster(msginfo);
-        //     return true;
-        // };
-        var handleIqPrivacy = function (msginfo) {
-            // conn.handleIqPrivacy(msginfo);
-            return true;
-        };
-        var handleIq = function (msginfo) {
-            // conn.handleIq(msginfo);
-            return true;
-        };
+//         conflict && (error.conflict = true);
+//         conn.onError(error);
+//     } else if (status == Strophe.Status.ATTACHED || status == Strophe.Status.CONNECTED) {
+//         // client should limit the speed of sending ack messages  up to 5/s  (后修改为10/s途虎重复收到离线消息)
+//         conn.autoReconnectNumTotal = 0;
+//         conn.intervalId = setInterval(function () {
+//             conn.handelSendQueue();
+//         }, 100);
+//         var handleMessage = function (msginfo) {
+//             var delivery = msginfo.getElementsByTagName('delivery');
+//             var acked = msginfo.getElementsByTagName('acked');
+//             if (delivery.length) {
+//                 // conn.handleDeliveredMessage(msginfo);
+//                 return true;
+//             }
+//             if (acked.length) {
+//                 // conn.handleAckedMessage(msginfo);
+//                 return true;
+//             }
+//             var type = _parseMessageType(msginfo);
+//             switch (type) {
+//                 case "received":
+//                     // conn.handleReceivedMessage(msginfo);
+//                     return true;
+//                 case "invite":
+//                     // conn.handleInviteMessage(msginfo);
+//                     return true;
+//                 case "delivery":
+//                     // conn.handleDeliveredMessage(msginfo);
+//                     return true;
+//                 case "acked":
+//                     // conn.handleAckedMessage(msginfo);
+//                     return true;
+//                 case "userMuted":
+//                     // conn.handleMutedMessage(msginfo);
+//                     return true;
+//                 default:
+//                     conn.handleMessage(msginfo);
+//                     return true;
+//             }
+//         };
+//         var handlePresence = function (msginfo) {
+//             conn.handlePresence(msginfo);
+//             return true;
+//         };
+//         var handlePing = function (msginfo) {
+//             // conn.handlePing(msginfo);
+//             return true;
+//         };
+//         // var handleIqRoster = function (msginfo) {
+//         //     conn.handleIqRoster(msginfo);
+//         //     return true;
+//         // };
+//         var handleIqPrivacy = function (msginfo) {
+//             // conn.handleIqPrivacy(msginfo);
+//             return true;
+//         };
+//         var handleIq = function (msginfo) {
+//             // conn.handleIq(msginfo);
+//             return true;
+//         };
 
-        // conn.addHandler(handleMessage, null, 'message', null, null, null);
-        // conn.addHandler(handlePresence, null, 'presence', null, null, null);
-        // conn.addHandler(handlePing, 'urn:xmpp:ping', 'iq', 'get', null, null);
-        // conn.addHandler(handleIqRoster, 'jabber:iq:roster', 'iq', 'set', null, null);
-        // conn.addHandler(handleIqPrivacy, 'jabber:iq:privacy', 'iq', 'set', null, null);
-        // conn.addHandler(handleIq, null, 'iq', null, null, null);
+//         // conn.addHandler(handleMessage, null, 'message', null, null, null);
+//         // conn.addHandler(handlePresence, null, 'presence', null, null, null);
+//         // conn.addHandler(handlePing, 'urn:xmpp:ping', 'iq', 'get', null, null);
+//         // conn.addHandler(handleIqRoster, 'jabber:iq:roster', 'iq', 'set', null, null);
+//         // conn.addHandler(handleIqPrivacy, 'jabber:iq:privacy', 'iq', 'set', null, null);
+//         // conn.addHandler(handleIq, null, 'iq', null, null, null);
 
-        conn.registerConfrIQHandler && (conn.registerConfrIQHandler());
+//         conn.registerConfrIQHandler && (conn.registerConfrIQHandler());
 
-        conn.context.status = _code.STATUS_OPENED;
+//         conn.context.status = _code.STATUS_OPENED;
 
-        var supportRecMessage = [
-            _code.WEBIM_MESSAGE_REC_TEXT,
-            _code.WEBIM_MESSAGE_REC_EMOJI];
+//         var supportRecMessage = [
+//             _code.WEBIM_MESSAGE_REC_TEXT,
+//             _code.WEBIM_MESSAGE_REC_EMOJI];
 
-        if (_utils.isCanDownLoadFile) {
-            supportRecMessage.push(_code.WEBIM_MESSAGE_REC_PHOTO);
-            supportRecMessage.push(_code.WEBIM_MESSAGE_REC_AUDIO_FILE);
-        }
-        var supportSedMessage = [_code.WEBIM_MESSAGE_SED_TEXT];
-        if (_utils.isCanUploadFile) {
-            supportSedMessage.push(_code.WEBIM_MESSAGE_REC_PHOTO);
-            supportSedMessage.push(_code.WEBIM_MESSAGE_REC_AUDIO_FILE);
-        }
-        // conn.heartBeat();
-        conn.isAutoLogin && conn.setPresence();
-        console.log("conn",conn);
+//         if (_utils.isCanDownLoadFile) {
+//             supportRecMessage.push(_code.WEBIM_MESSAGE_REC_PHOTO);
+//             supportRecMessage.push(_code.WEBIM_MESSAGE_REC_AUDIO_FILE);
+//         }
+//         var supportSedMessage = [_code.WEBIM_MESSAGE_SED_TEXT];
+//         if (_utils.isCanUploadFile) {
+//             supportSedMessage.push(_code.WEBIM_MESSAGE_REC_PHOTO);
+//             supportSedMessage.push(_code.WEBIM_MESSAGE_REC_AUDIO_FILE);
+//         }
+//         // conn.heartBeat();
+//         conn.isAutoLogin && conn.setPresence();
+//         console.log("conn",conn);
 
-        try {
-            if (conn.unSendMsgArr.length > 0) {
-                console.log("unSendMesArr",conn.unSendMsgArr);
-                for (var i in conn.unSendMsgArr) {
-                    var dom = conn.unSendMsgArr[i];
-                    conn.sendCommand(dom);
-                    delete conn.unSendMsgArr[i];
-                }
-            }
-        } catch (e) {
-            console.error(e.message);
-        }
-        conn.offLineSendConnecting = false;
-        conn.logOut = false;
-        conn.onOpened({
-            canReceive: supportRecMessage,
-            canSend: supportSedMessage,
-            accessToken: conn.context.accessToken
-        });
-    } else if (status == Strophe.Status.DISCONNECTING) {
-        if (conn.isOpened()) {
-            // conn.stopHeartBeat();
-            conn.context.status = _code.STATUS_CLOSING;
+//         try {
+//             if (conn.unSendMsgArr.length > 0) {
+//                 console.log("unSendMesArr",conn.unSendMsgArr);
+//                 for (var i in conn.unSendMsgArr) {
+//                     var dom = conn.unSendMsgArr[i];
+//                     conn.sendCommand(dom);
+//                     delete conn.unSendMsgArr[i];
+//                 }
+//             }
+//         } catch (e) {
+//             console.error(e.message);
+//         }
+//         conn.offLineSendConnecting = false;
+//         conn.logOut = false;
+//         conn.onOpened({
+//             canReceive: supportRecMessage,
+//             canSend: supportSedMessage,
+//             accessToken: conn.context.accessToken
+//         });
+//     } else if (status == Strophe.Status.DISCONNECTING) {
+//         if (conn.isOpened()) {
+//             // conn.stopHeartBeat();
+//             conn.context.status = _code.STATUS_CLOSING;
 
-            error = {
-                type: _code.WEBIM_CONNCTION_SERVER_CLOSE_ERROR,
-                msg: msg,
-                reconnect: true
-            };
+//             error = {
+//                 type: _code.WEBIM_CONNCTION_SERVER_CLOSE_ERROR,
+//                 msg: msg,
+//                 reconnect: true
+//             };
 
-            conflict && (error.conflict = true);
-            conn.onError(error);
-        }
-    } else if (status == Strophe.Status.DISCONNECTED) {
-        if (!conn.isClosing() || conn.isOpened()) {
-            if (conn.autoReconnectNumTotal < conn.autoReconnectNumMax) {
-                conn.reconnect(!conn.isClosing());
-                return;
-            } else {
-                error = {
-                    type: _code.WEBIM_CONNCTION_DISCONNECTED
-                };
-                conn.onError(error);
-            }
-        }
-        conn.context.status = _code.STATUS_CLOSED;
-        conn.clear();
-        conn.onClosed();
-    } else if (status == Strophe.Status.AUTHFAIL) {
-        error = {
-            type: _code.WEBIM_CONNCTION_AUTH_ERROR
-        };
+//             conflict && (error.conflict = true);
+//             conn.onError(error);
+//         }
+//     } else if (status == Strophe.Status.DISCONNECTED) {
+//         if (!conn.isClosing() || conn.isOpened()) {
+//             if (conn.autoReconnectNumTotal < conn.autoReconnectNumMax) {
+//                 conn.reconnect(!conn.isClosing());
+//                 return;
+//             } else {
+//                 error = {
+//                     type: _code.WEBIM_CONNCTION_DISCONNECTED
+//                 };
+//                 conn.onError(error);
+//             }
+//         }
+//         conn.context.status = _code.STATUS_CLOSED;
+//         conn.clear();
+//         conn.onClosed();
+//     } else if (status == Strophe.Status.AUTHFAIL) {
+//         error = {
+//             type: _code.WEBIM_CONNCTION_AUTH_ERROR
+//         };
 
-        conflict && (error.conflict = true);
-        conn.onError(error);
-        conn.clear();
-    } else if (status == Strophe.Status.ERROR) {
-        conn.context.status = _code.STATUS_ERROR;
-        error = {
-            type: _code.WEBIM_CONNCTION_SERVER_ERROR
-        };
+//         conflict && (error.conflict = true);
+//         conn.onError(error);
+//         conn.clear();
+//     } else if (status == Strophe.Status.ERROR) {
+//         conn.context.status = _code.STATUS_ERROR;
+//         error = {
+//             type: _code.WEBIM_CONNCTION_SERVER_ERROR
+//         };
 
-        conflict && (error.conflict = true);
-        conn.onError(error);
-    }
-    conn.context.status_now = status;
-};
+//         conflict && (error.conflict = true);
+//         conn.onError(error);
+//     }
+//     conn.context.status_now = status;
+// };
 
 var _getJid = function (options, conn) {      //均在已经废弃的api中使用
     var jid = options.toJid || {};
@@ -711,31 +699,31 @@ var _validCheck = function (options, conn) {
     return true;
 };
 
-var _getXmppUrl = function (baseUrl, https) {
-    if (/^(ws|http)s?:\/\/?/.test(baseUrl)) {
-        return baseUrl;
-    }
+// var _getXmppUrl = function (baseUrl, https) {
+//     if (/^(ws|http)s?:\/\/?/.test(baseUrl)) {
+//         return baseUrl;
+//     }
 
-    var url = {
-        prefix: 'http',
-        base: '://' + baseUrl,
-        suffix: '/http-bind/'
-    };
+//     var url = {
+//         prefix: 'http',
+//         base: '://' + baseUrl,
+//         suffix: '/http-bind/'
+//     };
 
-    if (https && _utils.isSupportWss) {
-        url.prefix = 'wss';
-        url.suffix = '/ws/';
-    } else {
-        if (https) {
-            url.prefix = 'https';
-        } else if (window.WebSocket) {
-            url.prefix = 'ws';
-            url.suffix = '/ws/';
-        }
-    }
+//     if (https && _utils.isSupportWss) {
+//         url.prefix = 'wss';
+//         url.suffix = '/ws/';
+//     } else {
+//         if (https) {
+//             url.prefix = 'https';
+//         } else if (window.WebSocket) {
+//             url.prefix = 'ws';
+//             url.suffix = '/ws/';
+//         }
+//     }
 
-    return url.prefix + url.base + url.suffix;
-};
+//     return url.prefix + url.base + url.suffix;
+// };
 
 
 /**
@@ -1069,36 +1057,36 @@ connection.prototype.listen = function (options) {
  * @private
  */
 
-connection.prototype.getStrophe = function () {
-    if (location.protocol != 'https:' && this.isHttpDNS) {
-        //TODO: try this.xmppTotal times on fail
-        var url = '';
-        var host = this.xmppHosts[this.xmppIndex];
-        var domain = _utils.getXmlFirstChild(host, 'domain');
-        var ip = _utils.getXmlFirstChild(host, 'ip');
-        if (ip) {
-            url = ip.textContent;
-            var port = _utils.getXmlFirstChild(host, 'port');
-            if (port.textContent != '80') {
-                url += ':' + port.textContent;
-            }
-        } else {
-            url = domain.textContent;
-        }
+// connection.prototype.getStrophe = function () {
+//     if (location.protocol != 'https:' && this.isHttpDNS) {
+//         //TODO: try this.xmppTotal times on fail
+//         var url = '';
+//         var host = this.xmppHosts[this.xmppIndex];
+//         var domain = _utils.getXmlFirstChild(host, 'domain');
+//         var ip = _utils.getXmlFirstChild(host, 'ip');
+//         if (ip) {
+//             url = ip.textContent;
+//             var port = _utils.getXmlFirstChild(host, 'port');
+//             if (port.textContent != '80') {
+//                 url += ':' + port.textContent;
+//             }
+//         } else {
+//             url = domain.textContent;
+//         }
 
-        if (url != '') {
-            var parter = /(.+\/\/).+(\/.+)/;
-            this.url = this.url.replace(parter, "$1" + url + "$2");
-        }
-    }
+//         if (url != '') {
+//             var parter = /(.+\/\/).+(\/.+)/;
+//             this.url = this.url.replace(parter, "$1" + url + "$2");
+//         }
+//     }
 
-    var stropheConn = new Strophe.Connection(this.url, {
-        inactivity: this.inactivity,
-        maxRetries: this.maxRetries,
-        pollingTime: this.pollingTime
-    });
-    return stropheConn;
-};
+//     var stropheConn = new Strophe.Connection(this.url, {
+//         inactivity: this.inactivity,
+//         maxRetries: this.maxRetries,
+//         pollingTime: this.pollingTime
+//     });
+//     return stropheConn;
+// };
 
 /**
  *
@@ -1301,8 +1289,6 @@ connection.prototype.signup = function (options) {
  */
 
 connection.prototype.open = function (options) {
-    console.log(8888888);
-    
     var appkey = options.appKey,
         orgName = appkey.split('#')[0],
         appName = appkey.split('#')[1];
@@ -1338,9 +1324,9 @@ connection.prototype.login = function (options) {
 
     var conn = this;
 
-    if (conn.isOpened()) {    //** */
-        return;
-    }
+    // if (conn.isOpened()) {    //** */
+    //     return;
+    // }
 
     if (options.accessToken) {
         options.access_token = options.accessToken;
@@ -1365,27 +1351,27 @@ connection.prototype.login = function (options) {
         var error = function (res, xhr, msg) {
             if (options.error)
                 options.error();
-            // if (location.protocol != 'https:' && conn.isHttpDNS) {
-            //     if ((conn.restIndex + 1) < conn.restTotal) {
-            //         conn.restIndex++;
-            //         conn.getRestFromHttpDNS(options, 'login');
-            //         return;
-            //     }
-            // }
-            // conn.clear();
-            // if (res.error && res.error_description) {
-            //     conn.onError({
-            //         type: _code.WEBIM_CONNCTION_OPEN_USERGRID_ERROR,
-            //         data: res,
-            //         xhr: xhr
-            //     });
-            // } else {
-            //     conn.onError({
-            //         type: _code.WEBIM_CONNCTION_OPEN_ERROR,
-            //         data: res,
-            //         xhr: xhr
-            //     });
-            // }
+            if (location.protocol != 'https:' && conn.isHttpDNS) {
+                if ((conn.restIndex + 1) < conn.restTotal) {
+                    conn.restIndex++;
+                    conn.getRestFromHttpDNS(options, 'login');
+                    return;
+                }
+            }
+            conn.clear();
+            if (res.error && res.error_description) {
+                conn.onError({
+                    type: _code.WEBIM_CONNCTION_OPEN_USERGRID_ERROR,
+                    data: res,
+                    xhr: xhr
+                });
+            } else {
+                conn.onError({
+                    type: _code.WEBIM_CONNCTION_OPEN_ERROR,
+                    data: res,
+                    xhr: xhr
+                });
+            }
         };
 
         // this.context.status = _code.STATUS_DOLOGIN_USERGRID;
@@ -2471,38 +2457,38 @@ connection.prototype.removeRoster = function (options) {
  * @param {Function} options.success - 成功之后的回调，默认为空
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
-connection.prototype.getRosterOld = function (options) {
-    var conn = this;
-    var dom = $iq({
-        type: 'get'
-    }).c('query', {xmlns: 'jabber:iq:roster'});
+// connection.prototype.getRosterOld = function (options) {
+//     var conn = this;
+//     var dom = $iq({
+//         type: 'get'
+//     }).c('query', {xmlns: 'jabber:iq:roster'});
 
-    var options = options || {};
-    var suc = options.success || this.onRoster;
-    var completeFn = function (ele) {
-        var rouster = [];
-        var msgBodies = ele.getElementsByTagName('query');
-        if (msgBodies && msgBodies.length > 0) {
-            var queryTag = msgBodies[0];
-            rouster = _parseFriend(queryTag);
-        }
-        suc(rouster, ele);
-    };
-    var error = options.error || this.onError;
-    var failFn = function (ele) {
-        error({
-            type: _code.WEBIM_CONNCTION_GETROSTER_ERROR
-            , data: ele
-        });
-    };
-    if (this.isOpened()) {
-        this.context.stropheConn.sendIQ(dom.tree(), completeFn, failFn);
-    } else {
-        error({
-            type: _code.WEBIM_CONNCTION_DISCONNECTED
-        });
-    }
-};
+//     var options = options || {};
+//     var suc = options.success || this.onRoster;
+//     var completeFn = function (ele) {
+//         var rouster = [];
+//         var msgBodies = ele.getElementsByTagName('query');
+//         if (msgBodies && msgBodies.length > 0) {
+//             var queryTag = msgBodies[0];
+//             rouster = _parseFriend(queryTag);
+//         }
+//         suc(rouster, ele);
+//     };
+//     var error = options.error || this.onError;
+//     var failFn = function (ele) {
+//         error({
+//             type: _code.WEBIM_CONNCTION_GETROSTER_ERROR
+//             , data: ele
+//         });
+//     };
+//     if (this.isOpened()) {
+//         this.context.stropheConn.sendIQ(dom.tree(), completeFn, failFn);
+//     } else {
+//         error({
+//             type: _code.WEBIM_CONNCTION_DISCONNECTED
+//         });
+//     }
+// };
 
 /**
  * 获取联系人
@@ -2595,12 +2581,12 @@ connection.prototype.getRoster = function (options) {
     message: '[resp:true]'
  });
  同意A的订阅请求
- B继续执行：
- conn.subscribe({
-    to: 'A',
-    message: '[resp:true]'
- });
- 反向订阅A，这样才算双方添加好友成功。
+//  B继续执行：
+//  conn.subscribe({
+//     to: 'A',
+//     message: '[resp:true]'
+//  });
+//  反向订阅A，这样才算双方添加好友成功。
  若B拒绝A的订阅请求，只需执行：
  conn.unsubscribed({
     to: 'A',
@@ -2955,34 +2941,34 @@ connection.prototype.queryRoomOccupants = function (options) {
  * @private
  *
  */
-connection.prototype.isOpened = function () {
-    return this.context.status == _code.STATUS_OPENED;
-};
+// connection.prototype.isOpened = function () {
+//     return this.context.status == _code.STATUS_OPENED;
+// };
 
 /**
  * @private
  *
  */
-connection.prototype.isOpening = function () {
-    var status = this.context.status;
-    return status == _code.STATUS_DOLOGIN_USERGRID || status == _code.STATUS_DOLOGIN_IM;
-};
+// connection.prototype.isOpening = function () {
+//     var status = this.context.status;
+//     return status == _code.STATUS_DOLOGIN_USERGRID || status == _code.STATUS_DOLOGIN_IM;
+// };
 
 /**
  * @private
  *
  */
-connection.prototype.isClosing = function () {
-    return this.context.status == _code.STATUS_CLOSING;
-};
+// connection.prototype.isClosing = function () {
+//     return this.context.status == _code.STATUS_CLOSING;
+// };
 
 /**
  * @private
  *
  */
-connection.prototype.isClosed = function () {
-    return this.context.status == _code.STATUS_CLOSED;
-};
+// connection.prototype.isClosed = function () {
+//     return this.context.status == _code.STATUS_CLOSED;
+// };
 
 /**
  * @private
@@ -3816,7 +3802,7 @@ connection.prototype.removeFromBlackList = function (options) {
  *
  * @private
  */
-connection.prototype._getGroupJid = function (to) {
+connection.prototype._getGroupJid = function (to) {      //****均在已经废弃的方法中使用 */
     var appKey = this.context.appKey || '';
     return appKey + '_' + to + '@conference.' + this.domain;
 };
