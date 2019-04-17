@@ -3270,9 +3270,7 @@ connection.prototype.getChatRooms = function (options) {
  * 加入聊天室
  * @param {Object} options - 
  * @param {String} options.roomId - 聊天室的ID
- * @param {stirng} opt.userName - 用户ID
- * @param {stirng} opt.message - 原因
- * @param {stirng} opt.nickname - 昵称
+ * @param {stirng} opt.message - 原因，可选项
  * @param {Function} options.success - 成功之后的回调，默认为空
  * @param {Function} options.error - 失败之后的回调，默认为空
  */
@@ -3288,16 +3286,12 @@ connection.prototype.joinChatRoom = function (options) {
     var conn = this
     var token = options.accessToken || this.token;
 
-
     if (token) {
         var apiUrl = options.apiUrl || this.apiUrl;
         var appName = this.context.appName;
         var orgName = this.context.orgName;
         var roomId = options.roomId
-        var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
-        var userName = options.userName;
         var message = options.message || '';
-        var nickname = options.nickname || '';
         if (!appName || !orgName) {
             conn.onError({
                 type: _code.WEBIM_CONNCTION_AUTH_ERROR
@@ -3318,8 +3312,7 @@ connection.prototype.joinChatRoom = function (options) {
             dataType: 'json',
             type: 'POST',
             data: JSON.stringify({
-                message: message,
-                nickname: nickname
+                message: message
             }),
             headers: {
                 'Authorization': 'Bearer ' + token,
@@ -3360,7 +3353,6 @@ connection.prototype.quitChatRoom = function (options) {
         var appName = this.context.appName;
         var orgName = this.context.orgName;
         var roomId = options.roomId
-        var roomJid = this.context.appKey + '_' + options.roomId + '@conference.' + this.domain;
         if (!appName || !orgName) {
             conn.onError({
                 type: _code.WEBIM_CONNCTION_AUTH_ERROR
