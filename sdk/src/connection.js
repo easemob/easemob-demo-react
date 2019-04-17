@@ -164,8 +164,8 @@ var _login = function (options, conn) {
         secondMessage.osType = conn.osType;
         secondMessage.version = conn.version;
         secondMessage.deviceName = conn.deviceId;
-        secondMessage.resource = conn.deviceId + "_" + time;
-        secondMessage.deviceUuid = time;
+        secondMessage.resource = conn.isMultiLoginSessions ? conn.deviceId + "_" + time : conn.deviceId;
+        secondMessage.deviceUuid = conn.isMultiLoginSessions ? time : "";
         secondMessage.auth = "$t$" + options.access_token;
         secondMessage = provisionMessage.encode(secondMessage).finish();
         var firstLookUpMessage = root.lookup("easemob.pb.MSync");
@@ -195,8 +195,8 @@ var _login = function (options, conn) {
 
     sock.onclose = function (e) {
         if(!conn.logOut 
-            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax 
-            && conn.autoReconnectNumTotal <= conn.xmppHosts.length
+            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax
+            && (conn.autoReconnectNumTotal <= conn.xmppHosts.length && conn.isHttpDNS || !conn.isHttpDNS)
             // && conn.xmppIndex < conn.xmppHosts.length - 1
         )
         {
@@ -1327,9 +1327,9 @@ connection.prototype.login = function (options) {
 
     var conn = this;
 
-    // if (conn.isOpened()) {    //** */
-    //     return;
-    // }
+    if (conn.isOpened()) {    //** */
+        return;
+    }
 
     if (options.accessToken) {
         options.access_token = options.accessToken;
@@ -2279,10 +2279,9 @@ connection.prototype.sendMSync = function(str){     //
     else{
         this.unSendMsgArr.push(strr);
         if(
-            !this.offLineSendConnecting 
-            && !this.logOut
-            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax 
-            && conn.autoReconnectNumTotal <= conn.xmppHosts.length
+            !conn.logOut 
+            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax
+            && (conn.autoReconnectNumTotal <= conn.xmppHosts.length && conn.isHttpDNS || !conn.isHttpDNS)
         ){
             this.offLineSendConnecting = true;
             this.reconnect();
@@ -2969,9 +2968,9 @@ connection.prototype.queryRoomOccupants = function (options) {
  * @private
  *
  */
-// connection.prototype.isOpened = function () {
-//     return this.context.status == _code.STATUS_OPENED;
-// };
+connection.prototype.isOpened = function () {
+    return sock.readyState === SockJS.OPEN;
+};
 
 /**
  * @private
