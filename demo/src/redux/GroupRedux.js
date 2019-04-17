@@ -36,7 +36,7 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.updateGroup(response.data))
                 },
                 error: function(e) {
-                    WebIM.conn.setPresence()
+                   //WebIM.conn.setPresence()
                 }
             })
         }
@@ -64,7 +64,6 @@ const { Types, Creators } = createActions({
         }
     },
     dissolveGroupAsync: ({ groupId, groupName }) => {
-        debugger
         return (dispatch, getState) => {
             dispatch(Creators.setLoading(true))
             WebIM.conn.dissolveGroup({

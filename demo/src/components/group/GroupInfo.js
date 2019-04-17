@@ -97,9 +97,9 @@ class GroupInfo extends React.Component {
             this.setState({ blackListVisible: true })
             break
         case "5":
-            const { groupId, name } = this.props.room
+            const { groupId, groupName } = this.props.room
             this.props.switchRightSider({ rightSiderOffset: 0 })
-            this.props.dissolveGroupAsync({ groupId: groupId, groupName: name })
+            this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
             break
         case "6":
             const { login } = this.props
