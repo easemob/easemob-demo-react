@@ -201,12 +201,13 @@ var _login = function (options, conn) {
         )
         {
             conn.reconnect();
+            var error = {
+                type: _code.WEBIM_CONNCTION_DISCONNECTED
+            };
+            conn.onError(error);
+            conn.onClosed();
+            console.log("close",e);
         }
-        var error = {
-            type: _code.WEBIM_CONNCTION_DISCONNECTED
-        };
-        conn.onError(error);
-        console.log("close",e);
     };
 
     sock.onmessage = function (e) {
@@ -251,6 +252,19 @@ var _login = function (options, conn) {
                         id: metaId,
                         mid: msgId
                     })
+                }
+                else{
+                    if (_msgHash[metaId]) {
+                        try {
+                            _msgHash[metaId].fail instanceof Function && _msgHash[metaId].fail(metaId, msgId);
+                        } catch (e) {
+                            this.onError({
+                                type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
+                                , data: e
+                            });
+                        }
+                        delete _msgHash[metaId];
+                    }
                 }
                 break;
             case 1:
@@ -317,6 +331,10 @@ var lastsession = function (nexkey, queue, conn) {
 
     if (sock.readyState !== SockJS.OPEN) {
         console.log("这里出错");
+        var error = {
+            type: _code.WEBIM_CONNCTION_DISCONNECTED
+        };
+        conn.onError(error);
     } else {
 
         base64transform(firstMessage);
@@ -2969,7 +2987,7 @@ connection.prototype.queryRoomOccupants = function (options) {
  *
  */
 connection.prototype.isOpened = function () {
-    return sock.readyState === SockJS.OPEN;
+    return sock && sock.readyState === SockJS.OPEN;
 };
 
 /**
