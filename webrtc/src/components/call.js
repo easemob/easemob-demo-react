@@ -58,7 +58,7 @@ var _Call = {
             self.listener.onInvite.apply(self, arguments);
         },
 
-        self.api.onIceConnectionStateChange = function () {
+        self.api.onIceConnectionStateChange = function (iceState) {
             self.listener.onIceConnectionStateChange.apply(self, arguments);
         }
     },
@@ -68,10 +68,10 @@ var _Call = {
             rtKey: ""
         })
         this.api.reqTkt(
-            rt, 
+            rt,
             true,
             undefined,
-            pwd, 
+            pwd,
             function(from, rtcOptions){
                 var ticketStr = rtcOptions.ticket
                 rtcOptions.conferenceId = rtcOptions.confrId
@@ -86,9 +86,9 @@ var _Call = {
             rtflag: 0
         })
         this.api.invite(
-            rt, 
-            confrId, 
-            pwd, 
+            rt,
+            confrId,
+            pwd,
             gid,
             function(from, rtcOptions){
                 _callback && _callback(from, rtcOptions)
@@ -116,7 +116,7 @@ var _Call = {
 
         var mediaStreamConstaints = {};
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
-        self.mediaStreamConstaints.video = true;
+        mediaStreamConstaints.video = true;
 
         this.call(callee, mediaStreamConstaints, accessSid);
     },
@@ -127,7 +127,7 @@ var _Call = {
 
         var mediaStreamConstaints = {};
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
-        self.mediaStreamConstaints.video = false;
+        mediaStreamConstaints.video = false;
 
         self.call(callee, mediaStreamConstaints, accessSid);
     },
@@ -170,8 +170,9 @@ var _Call = {
                     self.listener.onError({message: "callee is not online!"});
                     return;
                 }
+                rtcOptions.streamType = mediaStreamConstaints.audio && mediaStreamConstaints.video ? "VIDEO" : "VOICE";
                 self._onGotServerP2PConfig(from, rtcOptions);
-                self.pattern.initC(self.mediaStreamConstaints, accessSid);
+                self.pattern.initC(mediaStreamConstaints, accessSid);
             });
     },
 
@@ -212,7 +213,7 @@ var _Call = {
             self.tkt = rtcOptions.tkt;
 
 
-            self.switchPattern(self.mediaStreamConstaints.audio && self.mediaStreamConstaints.video ? "VIDEO" : "VOICE");
+            self.switchPattern(rtcOptions.streamType);
         } else {
             //
         }

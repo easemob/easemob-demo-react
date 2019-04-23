@@ -121,7 +121,7 @@ Webrtc.prototype.setRemoteDescription = function (desc) {
     var self = this;
 
     if(self.streamType === "VOICE"){ //将remote sdp中 video中改为 a=mid:video -》 a=sendrecv|a=sendonly--recvonly
-        function videoSectionReplace(regx, use) {
+        var videoSectionReplace = function (regx, use) {
             var videoSectionIndex = desc.sdp.indexOf("m=video");
             var audioSectionIndex = desc.sdp.indexOf("m=audio");
             var end = audioSectionIndex > videoSectionIndex ? audioSectionIndex : desc.sdp.length;
@@ -133,7 +133,7 @@ Webrtc.prototype.setRemoteDescription = function (desc) {
                     return match;
                 }
             });
-        }
+        };
 
         videoSectionReplace(/a=sendrecv|a=sendonly/g, "a=inactive");
     }

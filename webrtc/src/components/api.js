@@ -137,6 +137,8 @@ var _clazz = {
             }
         };
 
+        rtcOptions.streamType = video && audio ? "VIDEO" : "VOICE";
+
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
 
