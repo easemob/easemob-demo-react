@@ -25,8 +25,8 @@ var handleMessage = function(meta, status, conn){
             type: '',
             owner: thirdMessage.from.name,
             gid: thirdMessage.mucId.name,
-            from: thirdMessage.from,
-            to: thirdMessage.to,
+            from: thirdMessage.from.name,
+            to: thirdMessage.to.length?thirdMessage.to[0].name:'',
             chatroom: thirdMessage.isChatroom,
             status: thirdMessage.status
         }
@@ -95,8 +95,6 @@ var handleMessage = function(meta, status, conn){
     }
 
     condition(operation)
-
-    console.log('%c'+'群组消息', 'background: green')
     console.log(thirdMessage);
 }
 
