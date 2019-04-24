@@ -26,7 +26,9 @@ var handleMessage = function(meta, status, conn){
             owner: thirdMessage.from.name,
             gid: thirdMessage.mucId.name,
             from: thirdMessage.from.name,
+            fromJid: thirdMessage.from,
             to: thirdMessage.to.length?thirdMessage.to[0].name:'',
+            toJid: thirdMessage.to,
             chatroom: thirdMessage.isChatroom,
             status: thirdMessage.status
         }
