@@ -10772,6 +10772,7 @@ module.exports = _util.prototypeExtend({
         if (self.ticket.confrId) {
             url += "&" + encodeURIComponent(self.ticket.confrId);
         }
+
         return url;
     },
 
@@ -33571,5 +33572,5 @@ emedia.chooseElectronDesktopMedia = function (sources, accessApproved, accessDen
 /******/ ]);
 });
 //2.1.1_Git.29f2187
-window._emediaVersion = '2.1.1_Git.29f2187'; 
+window._emediaVersion = '2.1.1_Git.29f2187';
 console && console.warn('EMedia version', '2.1.1_Git.29f2187');

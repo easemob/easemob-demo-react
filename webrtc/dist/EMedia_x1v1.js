@@ -36,32 +36,17 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -77,7 +62,7 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/liuyun/code/sdk/webim/webrtc";
+/******/ 	__webpack_require__.p = "/Users/DATA/WORK.HOME/projects/CO./EASEMOB_2016.05.03~/webim-2.0.git/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -107,7 +92,7 @@ WebIM.WebRTC.Util = Util;
 
 WebIM.__alreadyOpenMedias = [];
 
-if ( true && typeof module.exports === 'object') {
+if (typeof module === 'object' && typeof module.exports === 'object') {
     module.exports = WebIM.WebRTC;
 } else if (true) {
     !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
@@ -10012,7 +9997,7 @@ module.exports = _util.prototypeExtend({
   // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
   // IE 11 (#1621), Safari 8 (#1929), and PhantomJS (#2236).
   var nodelist = root.document && root.document.childNodes;
-  if ( true && typeof Int8Array != 'object' && typeof nodelist != 'function') {
+  if (typeof /./ != 'function' && typeof Int8Array != 'object' && typeof nodelist != 'function') {
     _.isFunction = function(obj) {
       return typeof obj == 'function' || false;
     };
@@ -10916,6 +10901,7 @@ module.exports = _util.prototypeExtend({
         if (self.ticket.confrId) {
             url += "&" + encodeURIComponent(self.ticket.confrId);
         }
+
         return url;
     },
 
@@ -33715,7 +33701,7 @@ emedia.chooseElectronDesktopMedia = function (sources, accessApproved, accessDen
 /******/ ]);
 });
 //2.1.1_Git.29f2187
-window._emediaVersion = '2.1.1_Git.29f2187'; 
+window._emediaVersion = '2.1.1_Git.29f2187';
 console && console.warn('EMedia version', '2.1.1_Git.29f2187');
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(5)))
@@ -33733,7 +33719,7 @@ g = (function() {
 
 try {
 	// This works if eval is allowed (see CSP)
-	g = g || new Function("return this")();
+	g = g || Function("return this")() || (1, eval)("this");
 } catch (e) {
 	// This works if the window reference is available
 	if (typeof window === "object") g = window;
@@ -33810,7 +33796,7 @@ var _Call = {
             self.listener.onInvite.apply(self, arguments);
         },
 
-        self.api.onIceConnectionStateChange = function () {
+        self.api.onIceConnectionStateChange = function (iceState) {
             self.listener.onIceConnectionStateChange.apply(self, arguments);
         }
     },
@@ -33820,10 +33806,10 @@ var _Call = {
             rtKey: ""
         })
         this.api.reqTkt(
-            rt, 
+            rt,
             true,
             undefined,
-            pwd, 
+            pwd,
             function(from, rtcOptions){
                 var ticketStr = rtcOptions.ticket
                 rtcOptions.conferenceId = rtcOptions.confrId
@@ -33838,9 +33824,9 @@ var _Call = {
             rtflag: 0
         })
         this.api.invite(
-            rt, 
-            confrId, 
-            pwd, 
+            rt,
+            confrId,
+            pwd,
             gid,
             function(from, rtcOptions){
                 _callback && _callback(from, rtcOptions)
@@ -33868,7 +33854,7 @@ var _Call = {
 
         var mediaStreamConstaints = {};
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
-        self.mediaStreamConstaints.video = true;
+        mediaStreamConstaints.video = true;
 
         this.call(callee, mediaStreamConstaints, accessSid);
     },
@@ -33879,7 +33865,7 @@ var _Call = {
 
         var mediaStreamConstaints = {};
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
-        self.mediaStreamConstaints.video = false;
+        mediaStreamConstaints.video = false;
 
         self.call(callee, mediaStreamConstaints, accessSid);
     },
@@ -33922,8 +33908,9 @@ var _Call = {
                     self.listener.onError({message: "callee is not online!"});
                     return;
                 }
+                rtcOptions.streamType = mediaStreamConstaints.audio && mediaStreamConstaints.video ? "VIDEO" : "VOICE";
                 self._onGotServerP2PConfig(from, rtcOptions);
-                self.pattern.initC(self.mediaStreamConstaints, accessSid);
+                self.pattern.initC(mediaStreamConstaints, accessSid);
             });
     },
 
@@ -33964,7 +33951,7 @@ var _Call = {
             self.tkt = rtcOptions.tkt;
 
 
-            self.switchPattern(self.mediaStreamConstaints.audio && self.mediaStreamConstaints.video ? "VIDEO" : "VOICE");
+            self.switchPattern(rtcOptions.streamType);
         } else {
             //
         }
@@ -34586,6 +34573,8 @@ var _clazz = {
                 peer: peer // appKey + "_" + curChatUserId + "@" + this.domain,
             }
         };
+
+        rtcOptions.streamType = video && audio ? "VIDEO" : "VOICE";
 
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
     },
@@ -35284,7 +35273,7 @@ easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setRemoteDescrip
     var self = this;
 
     if(self.streamType === "VOICE"){ //将remote sdp中 video中改为 a=mid:video -》 a=sendrecv|a=sendonly--recvonly
-        function videoSectionReplace(regx, use) {
+        var videoSectionReplace = function (regx, use) {
             var videoSectionIndex = desc.sdp.indexOf("m=video");
             var audioSectionIndex = desc.sdp.indexOf("m=audio");
             var end = audioSectionIndex > videoSectionIndex ? audioSectionIndex : desc.sdp.length;
@@ -35296,7 +35285,7 @@ easemob_emedia__WEBPACK_IMPORTED_MODULE_0__["Webrtc"].prototype.setRemoteDescrip
                     return match;
                 }
             });
-        }
+        };
 
         videoSectionReplace(/a=sendrecv|a=sendonly/g, "a=inactive");
     }
