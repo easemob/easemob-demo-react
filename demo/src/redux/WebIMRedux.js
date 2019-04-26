@@ -91,7 +91,7 @@ WebIM.conn.listen({
         case 'removedFromGroup':
         case "leaveGroup": // dismissed by admin
             message.error(
-                `${msg.kicked || I18n.t("you")} ${I18n.t("dismissed")}${I18n.t("by")}${msg.actor ||
+                `${msg.kicked || I18n.t("you")} ${I18n.t("dismissed")}${I18n.t("by")}${msg.owner ||
                     I18n.t("admin")} .`
             )
             store.dispatch(GroupActions.getGroups())
@@ -138,10 +138,10 @@ WebIM.conn.listen({
             }
             break
         case "memberJoinPublicGroupSuccess":
-            message.success(`${msg.mid}${I18n.t("join")}${I18n.t("group")}${msg.from}${I18n.t("successfully")}`)
+            message.success(`${msg.from}${I18n.t("join")}${I18n.t("group")}${msg.gid}${I18n.t("successfully")}`)
             break
         case "memberJoinChatRoomSuccess":
-            message.success(`${msg.mid}${I18n.t("join")}${I18n.t("chatroom")}${msg.from}${I18n.t("successfully")}`)
+            message.success(`${msg.from}${I18n.t("join")}${I18n.t("chatroom")}${msg.gid}${I18n.t("successfully")}`)
             break
         case "leaveChatRoom": // Leave the chat room
             break
