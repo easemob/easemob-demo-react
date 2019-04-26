@@ -197,15 +197,7 @@ class JoinGroupModal extends React.Component {
                         onScroll={this.onScroll}
                         ref="groupList"
                     >
-                        <div
-                            ref="loading"
-                            className={
-                                "x-body-loading " +
-                                (this.state.bodyLoading ? "" : "hide")
-                            }
-                        >
-                            <img src="demo/images/loading.gif" />
-                        </div>
+       
                         <ul
                             className={
                                 this.state.groupDetail
@@ -215,15 +207,7 @@ class JoinGroupModal extends React.Component {
                         >
                             {groups}
                         </ul>
-                        <div
-                            ref="loading"
-                            className={
-                                "x-contact-loading " +
-                                (this.state.loading ? "" : "hide")
-                            }
-                        >
-                            <img src="demo/images/loading.gif" />
-                        </div>
+                
                     </div>
                     <div
                         className={!this.state.groupDetail ? "hide" : ""}
