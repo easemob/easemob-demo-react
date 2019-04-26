@@ -55,12 +55,12 @@ var handleMessage = function(meta, status, conn){
                 conn.onPresence(info);
             },
             18: () => {
-                info.type = thirdMessage.isChatroom ? 'leaveChatRoom' : 'absence';
+                info.type = thirdMessage.isChatroom ? 'leaveChatRoom' : 'leaveGroup';
                 //info.type = 'absence'; //退出群了
                 conn.onPresence(info);
             },
             17: () => {
-                info.type = thirdMessage.isChatroom ? 'joinChatRoomSuccess' : 'presence';
+                info.type = thirdMessage.isChatroom ? 'memberJoinChatRoomSuccess' : 'memberJoinPublicGroupSuccess';
                 //info.type = 'presence'; //进群了
                 conn.onPresence(info);
             },
@@ -71,6 +71,7 @@ var handleMessage = function(meta, status, conn){
             },
             10: () => {
                 info.type = 'removedFromGroup'; //被移出群 或者被加入黑名单
+                info.kicked = info.to;
                 conn.onPresence(info);
             },
             6:  () => {
