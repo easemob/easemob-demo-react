@@ -815,10 +815,10 @@ var connection = function (options) {
     this.dnsArr = ['https://rs.easemob.com', 'https://rsbak.easemob.com', 'http://182.92.174.78', 'http://112.126.66.111']; //http dns server hosts
     this.dnsIndex = 0;   //the dns ip used in dnsArr currently
     this.dnsTotal = this.dnsArr.length;  //max number of getting dns retries
-    this.restHosts = null; //rest server ips
+    this.restHosts = []; //rest server ips
     this.restIndex = 0;    //the rest ip used in restHosts currently
     this.restTotal = 0;    //max number of getting rest token retries
-    this.xmppHosts = null; //xmpp server ips
+    this.xmppHosts = []; //xmpp server ips
     this.xmppIndex = 0;    //the xmpp ip used in xmppHosts currently
     this.xmppTotal = 0;    //max number of creating xmpp server connection(ws/bosh) retries
 
@@ -2297,9 +2297,9 @@ connection.prototype.sendMSync = function(str){     //
     else{
         this.unSendMsgArr.push(strr);
         if(
-            !conn.logOut 
-            && conn.autoReconnectNumTotal <= conn.autoReconnectNumMax
-            && (conn.autoReconnectNumTotal <= conn.xmppHosts.length && conn.isHttpDNS || !conn.isHttpDNS)
+            !this.logOut 
+            && this.autoReconnectNumTotal <= this.autoReconnectNumMax
+            && (this.autoReconnectNumTotal <= this.xmppHosts.length && this.isHttpDNS || !this.isHttpDNS)
         ){
             this.offLineSendConnecting = true;
             this.reconnect();
@@ -3606,7 +3606,7 @@ connection.prototype.reconnect = function (v) {
         that.xmppIndex++;       //重连时改变ip地址
     }
     setTimeout(function () {
-        _login({access_token: that.context.restTokenData}, that);
+        _login({access_token: that.context.accessToken}, that);
     }, (this.autoReconnectNumTotal == 0 ? 0 : this.autoReconnectInterval) * 1000);
     this.autoReconnectNumTotal++;
 };
