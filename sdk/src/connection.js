@@ -1,5 +1,5 @@
 var _version = '1.4.13';
-var all = require('./all');
+var All = require('./all');
 var protobuf = require('protobufjs');
 var SockJS = require('sockjs-client');
 var Base64 = require('Base64')
@@ -26,7 +26,7 @@ var sock;
 var mr_cache = {};
 
 
-var root = protobuf.Root.fromJSON(all);
+var root = protobuf.Root.fromJSON(All.getAll());
 var Strophe = window.Strophe
 
 window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
@@ -253,6 +253,22 @@ var _login = function (options, conn) {
                         mid: msgId
                     })
                 }
+                else if(CommSyncDLMessage.status && CommSyncDLMessage.status.errorCode === 15){
+                    conn.onReceivedMessage({
+                        id: metaId,
+                        mid: msgId
+                    })
+                        
+                    conn.onMutedMessage({
+                        mid: msgId
+                    });
+                }
+                // else if(CommSyncDLMessage.status && CommSyncDLMessage.status.errorCode === 1){
+                //     switch (CommSyncDLMessage.status.reason){
+                //         case: "blocked"
+                //             break;
+                //     }  
+                // }
                 else{
                     if (_msgHash[metaId]) {
                         try {
@@ -2244,17 +2260,17 @@ connection.prototype.close = function (reason) {
  * @param {Object} option.mid -   已读消息id
  * @param {Object} option.to -   消息的接收方
  */
-connection.prototype.readMessage = function(option){
-    var messageOption = {
-        id: this.getUniqueId(),
-        type: "read",
-        ackId: option.mid,
-        to: option.to,
-        success: option.success,
-        fail: option.fail
-    }
-    this.send(messageOption, this);
-}
+// connection.prototype.readMessage = function(option){
+//     var messageOption = {
+//         id: this.getUniqueId(),
+//         type: "read",
+//         ackId: option.mid,
+//         to: option.to,
+//         success: option.success,
+//         fail: option.fail
+//     }
+//     this.send(messageOption, this);
+// }
 
 
 /**

@@ -247,7 +247,7 @@ WebIM.conn.listen({
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
         }
         store.dispatch(MessageActions.addMessage(message, "txt"))        
-        // store.dispatch(MessageActions.sendRead(message))        
+        store.dispatch(MessageActions.sendRead(message))        
         switch (type) {
         case "chat":
             store.dispatch(RosterActions.topRoster(from))

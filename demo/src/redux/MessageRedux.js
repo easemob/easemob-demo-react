@@ -549,7 +549,7 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
  */
 export const updateMessageStatus = (state, { message, status = "" }) => {
     let { id } = message
-    if (_.isEmpty(id)) id = state.getIn([ "byMid", message.mid, "id" ])
+    if (!id) id = state.getIn([ "byMid", message.mid, "id" ])
     const byId = state.getIn([ "byId", id ])
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
@@ -582,7 +582,7 @@ export const muteMessage = (state, { mid }) => {
     const { type, chatId } = state.getIn([ "byId", id ], {})
     if (type && chatId) {
         const messages = state.getIn([ type, chatId ]).asMutable()
-        const found = _.find(messages, { id })
+        const found = _.find(messages, { id: parseInt(id) })
         const msg = found.setIn([ "status" ], "muted")
         messages.splice(messages.indexOf(found), 1, msg)
         state = state.setIn([ type, chatId ], messages)

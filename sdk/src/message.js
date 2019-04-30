@@ -30,8 +30,10 @@ var CryptoJS = require('crypto-js');
 
     Message.read.prototype.set = function (opt) {
         this.body = {
-            ackId: opt.id
-            , to: opt.to
+            id: this.id,
+            type: this.type,
+            ackId: opt.id,
+            to: opt.to
         }
     };
 

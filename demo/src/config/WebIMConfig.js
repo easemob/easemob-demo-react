@@ -33,7 +33,7 @@ var config = {
     /*
      * XMPP server
      */
-    xmppURL: "http://39.107.157.123:8280/ws",
+    xmppURL: "http://39.107.54.56:8280/ws",
     // xmppURL: "im-api.easemob.com",
     // xmppURL: '172.17.2.139:5280',
     /*
@@ -42,7 +42,7 @@ var config = {
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     // ios must be https!!! by lwz
     // apiURL: "https://a1.easemob.com",
-    apiURL: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb-ly.easemob.com",
+    apiURL: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com",
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//172.17.3.155:8080',
     /*
      * Application AppKey
