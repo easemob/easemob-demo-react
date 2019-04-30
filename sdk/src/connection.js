@@ -1,5 +1,5 @@
 var _version = '1.4.13';
-var All = require('./all');
+var all = require('./all');
 var protobuf = require('protobufjs');
 var SockJS = require('sockjs-client');
 var Base64 = require('Base64')
@@ -26,7 +26,7 @@ var sock;
 var mr_cache = {};
 
 
-var root = protobuf.Root.fromJSON(All.getAll());
+var root = protobuf.Root.fromJSON(all);
 var Strophe = window.Strophe
 
 window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
