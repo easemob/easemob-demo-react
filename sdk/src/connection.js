@@ -15,7 +15,7 @@ var ChatMessage = require('./chat/sendChatMessage');
 var HandleChatMessage = require('./chat/handleChatMessage');
 var HandleMucMessage = require('./muc/HandleMucMessage');
 var HandleRosterMessage = require('./roster/HandleRosterMessage');
-
+var HandleStatisticsMessage = require('./statistics/HandleStatisticsMessage');
 var CryptoJS = require('crypto-js');
 var _ = require('underscore');
 
@@ -154,18 +154,18 @@ var _login = function (options, conn) {
     sock.onopen = function () {
         var emptyMessage = [];
         var time = (new Date()).valueOf();
-
         var provisionMessage = root.lookup("easemob.pb.Provision");
         var secondMessage = provisionMessage.decode(emptyMessage);
         
         
+        conn.context.jid.clientResource = conn.deviceId + "_" + time;
         secondMessage.compressType = conn.compressType;
         secondMessage.encryptType = conn.encryptType;
         secondMessage.osType = conn.osType;
         secondMessage.version = conn.version;
         secondMessage.deviceName = conn.deviceId;
-        secondMessage.resource = conn.isMultiLoginSessions ? conn.deviceId + "_" + time : conn.deviceId;
-        secondMessage.deviceUuid = conn.isMultiLoginSessions ? time : "";
+        secondMessage.resource = conn.deviceId + "_" + time;
+        secondMessage.deviceUuid = time;
         secondMessage.auth = "$t$" + options.access_token;
         secondMessage = provisionMessage.encode(secondMessage).finish();
         var firstLookUpMessage = root.lookup("easemob.pb.MSync");
@@ -368,6 +368,11 @@ var metapayload = function (metas, status, conn) {
         }
         else if(metas[i].ns === 3){    //ROSTER
             HandleRosterMessage.handleMessage(metas[i], status, conn);
+        }
+        else if(metas[i].ns === 0){ 
+             //CHAT
+            // messageBody(metas[i]);
+            HandleStatisticsMessage.handleMessage(metas[i], status, conn)
         }
     }
 }

@@ -73,7 +73,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
@@ -84,7 +84,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
@@ -95,7 +95,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
@@ -106,7 +106,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if (messageOption.group === "groupchat" && !messageOption.roomType) {
@@ -121,7 +121,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
 
         }
@@ -137,7 +137,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         fourthMessage.contents = [fifthMessage];
@@ -153,7 +153,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if(messageOption.type === "delivery"){   //目前为单聊的delivery
@@ -162,7 +162,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if(messageOption.type === "read"){   //目前为单聊的read
@@ -171,7 +171,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if(!messageOption.group && !messageOption.roomType){
@@ -180,7 +180,7 @@
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if (messageOption.group === "groupchat" && !messageOption.roomType ) {
@@ -188,13 +188,13 @@
                 appKey: conn.appKey,
                 name: conn.user,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             };
             thirdMessage.to = {
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         else if (messageOption.group === "groupchat" && messageOption.roomType) {
@@ -202,13 +202,13 @@
                 appKey: conn.appKey,
                 name: conn.user,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             };
             thirdMessage.to = {
                 appKey: conn.appKey,
                 name: messageOption.to,
                 domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                // clientResource: conn.clientResource
             }
         }
         thirdMessage.ns = 1;

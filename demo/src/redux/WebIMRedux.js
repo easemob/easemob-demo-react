@@ -203,6 +203,30 @@ WebIM.conn.listen({
             history.push("/login")
             return
         }
+        if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_REMOVED) {
+            console.log("WEBIM_CONNCTION_USER_REMOVED")
+            message.error("用户下线")
+            history.push("/login")
+            return
+        }
+        if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_LOGIN_ANOTHER_DEVICE) {
+            console.log("WEBIM_CONNCTION_USER_LOGIN_ANOTHER_DEVICE")
+            message.error("账户在另外一台设备登录")
+            history.push("/login")
+            return
+        }
+        if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_KICKED_BY_CHANGE_PASSWORD) {
+            console.log("WEBIM_CONNCTION_USER_KICKED_BY_CHANGE_PASSWORD")
+            message.error("用户修改密码")
+            history.push("/login")
+            return
+        }
+        if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_KICKED_BY_OTHER_DEVICE) {
+            console.log("WEBIM_CONNCTION_USER_KICKED_BY_OTHER_DEVICE")
+            message.error("用户被其他设备踢掉")
+            history.push("/login")
+            return
+        }
         if (error.type == 1) {
             let data = error.data ? error.data.data : ""
             data && message.error(data)

@@ -40,7 +40,7 @@ var operatRoster = function(option, type, conn){
         appKey: conn.appKey,
         name: option.to,
         domain: "easemob.com",
-        clientResource: conn.clientResource
+        // clientResource: conn.clientResource
     }]
     rosterBodyJson.reason = option.message;
     // rosterBodyJson.roster_ver = '';
