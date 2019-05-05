@@ -68,76 +68,111 @@
         var fourthMessage = messageBody.decode(emptyMessage);
         if(messageOption.type === "recall"){
             fourthMessage.type = 6;
-            fourthMessage.from = conn.context.jid;
+            // fourthMessage.from = conn.context.jid;
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
+            fourthMessage.from = {
+                name: conn.context.jid.name
+            };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(messageOption.type === "delivery"){   //目前为单聊的delivery
             fourthMessage.type = 5;
-            fourthMessage.from = conn.context.jid;
+            // fourthMessage.from = conn.context.jid;
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
+            fourthMessage.from = {
+                name: conn.context.jid.name
+            };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(messageOption.type === "read"){
             fourthMessage.type = 4;
-            fourthMessage.from = conn.context.jid;
+            // fourthMessage.from = conn.context.jid;
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
+            fourthMessage.from = {
+                name: conn.context.jid.name
+            };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
             fourthMessage.ackMessageId = messageOption.ackId;
         }
         else if(!messageOption.group && !messageOption.roomType){
             fourthMessage.type = 1;
-            fourthMessage.from = conn.context.jid;
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
+            fourthMessage.from = {
+                name: conn.context.jid.name
+            };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
         }
         else if (messageOption.group === "groupchat" && !messageOption.roomType) {
             fourthMessage.type = 2;
+            // fourthMessage.from = {
+            //     appKey: conn.appKey,
+            //     name: conn.user,
+            //     domain: "conference.easemob.com",
+            //     clientResource: conn.clientResource
+            // };
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "conference.easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
             fourthMessage.from = {
-                appKey: conn.appKey,
-                name: conn.user,
-                domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                name: conn.context.jid.name
             };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "conference.easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
 
         }
         else if (messageOption.group === "groupchat" && messageOption.roomType) {
             fourthMessage.type = 3;
+            // fourthMessage.from = {
+            //     appKey: conn.appKey,
+            //     name: conn.user,
+            //     domain: "conference.easemob.com",
+            //     clientResource: conn.clientResource
+            // };
+            // fourthMessage.to = {
+            //     appKey: conn.appKey,
+            //     name: messageOption.to,
+            //     domain: "conference.easemob.com",
+            //     // clientResource: conn.clientResource
+            // }
             fourthMessage.from = {
-                appKey: conn.appKey,
-                name: conn.user,
-                domain: "conference.easemob.com",
-                clientResource: conn.clientResource
+                name: conn.context.jid.name
             };
             fourthMessage.to = {
-                appKey: conn.appKey,
-                name: messageOption.to,
-                domain: "conference.easemob.com",
-                // clientResource: conn.clientResource
+                name: messageOption.to
             }
         }
         fourthMessage.contents = [fifthMessage];

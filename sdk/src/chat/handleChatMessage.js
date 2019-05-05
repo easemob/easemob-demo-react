@@ -149,7 +149,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                 msg.error = errorBool;
                 msg.errorText = errorText;
                 msg.errorCode = errorCode;
-                !ignoreCallback && conn.onAudioMessage(msg);
+                !ignoreCallback && conn.onVideoMessage(msg);
                 break;
             case 3:
                 msg = {
@@ -188,7 +188,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                 msg.error = errorBool;
                 msg.errorText = errorText;
                 msg.errorCode = errorCode;
-                !ignoreCallback && conn.onVideoMessage(msg);
+                !ignoreCallback && conn.onAudioMessage(msg);
                 break;
             case 5:
                 msg = {
@@ -234,6 +234,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                 , data: e
             });
         }
+        console.log(msg);
         // msg.error = "";
         // msg.errorText = "";
         // msg.errorCode = "";
