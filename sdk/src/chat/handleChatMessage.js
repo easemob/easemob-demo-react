@@ -182,6 +182,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                     , file_length: msgBody.fileLength || ''
                     , accessToken: conn.token || ''
                     , ext: extmsg
+                    ,length: msgBody.duration
                     // , delay: parseMsgData.delayTimeStamp
                 };
                 !msg.delay && delete msg.delay;

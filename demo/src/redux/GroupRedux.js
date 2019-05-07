@@ -128,7 +128,7 @@ export const deleteGroup = (state, { groupId }) => {
     const byId = state.getIn([ "byId" ]).without(groupId)
     const names = []
     _.forEach(byId, (v, k) => {
-        names.push(v.name)
+        names.push(v.groupName + "_#-#_" + v.groupId)
     })
     return state.merge({ byId, names })
 }
@@ -173,12 +173,12 @@ export const updateGroup = (state, { groups }) => {
  */
 export const updateGroupInfo = (state, { info }) => {
     const group = state.getIn([ "byId", info.groupId ])
-    const oldName = `${group.name}_#-#_${group.roomId}`
-    const newName = `${info.groupName}_#-#_${group.roomId}`
+    const oldName = `${group.groupName}_#-#_${group.roomId || group.groupId}`
+    const newName = `${info.groupName}_#-#_${group.roomId || group.groupId}`
     const names = state.getIn([ "names" ]).asMutable()
     names.splice(names.indexOf(oldName), 1, newName)
 
-    return state.setIn([ "byId", info.groupId, "name" ], info.groupName).set("names", names.sort())
+    return state.setIn([ "byId", info.groupId, "groupName" ], info.groupName).set("names", names.sort())
 }
 
 /**

@@ -481,7 +481,11 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     // bySelf is true when sent by current user, otherwise is false
     const bySelf = from == username
     // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
-    const chatId = bySelf || type !== "chat" ? to : from
+    let chatId = bySelf || type !== "chat" ? to : from;
+    // chatId = type === "stranger" ? from
+    if(type === "stranger"){
+        chatId = from;
+    }
 
     // change type as stranger
     // if (type === "chat" && !rootState.entities.roster.byName[chatId]) {

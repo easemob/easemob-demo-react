@@ -266,12 +266,13 @@ WebIM.conn.listen({
         const bySelf = from == username
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
         const chatId = bySelf || type !== "chat" ? to : from
-        if (type === "chat" &&( _.get(rootState,"entities.roster.byName["+chatId+"].subscription")  === "none") ||  !(_.get(rootState,"entities.roster.byName["+chatId+"].subscription"))){
-            type = "stranger";
+        if (type === "chat" &&(( _.get(rootState,"entities.roster.byName["+chatId+"].subscription")  === "none") || !(_.get(rootState,"entities.roster.byName["+chatId+"].subscription")))){
+            message.type = "stranger";
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
         }
         store.dispatch(MessageActions.addMessage(message, "txt"))        
-        store.dispatch(MessageActions.sendRead(message))        
+        store.dispatch(MessageActions.sendRead(message))   
+
         switch (type) {
         case "chat":
             store.dispatch(RosterActions.topRoster(from))
@@ -295,7 +296,8 @@ WebIM.conn.listen({
         case "stranger":
             // todo: remove chatdata to stranger list
             // store.dispatch(RosterActions.topRoster(from))
-            // store.dispatch(MessageActions.addMessage(message, "txt"))                    
+            // message.type = "stranger";
+            store.dispatch(MessageActions.addMessage(message, "txt"))                    
             store.dispatch(StrangerActions.topStranger(from))
             break
         default:
