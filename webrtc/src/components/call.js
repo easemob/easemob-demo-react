@@ -150,7 +150,7 @@ var _Call = {
         var rt = new RouteTo({
             rtKey: "",
             sid: accessSid,
-
+            to: callee,
             success: function (result) {
                 _logger.debug("iq to server success", result);
             },
