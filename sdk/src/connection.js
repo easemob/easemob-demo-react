@@ -373,6 +373,8 @@ var metapayload = function (metas, status, conn) {
              //CHAT
             // messageBody(metas[i]);
             HandleStatisticsMessage.handleMessage(metas[i], status, conn)
+        }else if(metas[i].ns === 4){//rtc信令
+            conn.registerConfrIQHandler && (conn.registerConfrIQHandler(metas[i], status, conn));
         }
     }
 }
@@ -408,7 +410,7 @@ var rebuild = function () {
 
     var mainMessage = root.lookup("easemob.pb.MSync");
     var firstMessage = mainMessage.decode(emptyMessage);
-    firstMessage.version = "web1.0";
+    firstMessage.version = "3.0.0";
     firstMessage.encryptType = [0];
     firstMessage.command = 0;
     firstMessage.payload = secondMessage;
@@ -845,12 +847,12 @@ var connection = function (options) {
 
     this.groupOption = {};
     //mysnc配置
-    this.version = options.version || "web1.0";
+    this.version = options.version || "3.0.0";
     this.compressAlgorimth = options.compressAlgorimth || 0;   //*** */
     this.userAgent = options.userAgent || 0;    //*** */
     this.pov = options.pov || 0;    /**** */
     this.command = options.command || 3;
-    this.deviceId = options.deviceId || "web";
+    this.deviceId = options.deviceId || "webim";
     this.encryptKey = options.encryptKey || "";
     this.firstPayload = options.firstPayload || [];   //*** */
     this.compressType = options.compressType || [0];

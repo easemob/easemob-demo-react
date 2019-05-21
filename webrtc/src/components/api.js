@@ -44,19 +44,19 @@ var _clazz = {
     rtcHandler: null,
 
     events: {
-        '0': 'onReqP2P',
+        '0': 'onReqP2P', //use
         '1': 'onNewCfr',
         '2': 'onDelCfr',
         '3': 'onReqTkt',
 
-        '100': 'onPing',
-        '101': 'onPong',
-        '102': 'onInitC',
-        '103': 'onReqC',
-        '104': 'onAcptC',
-        '105': 'onTcklC',
-        '106': 'onAnsC',
-        '107': 'onTermC',
+        '100': 'onPing', 
+        '101': 'onPong', 
+        '102': 'onInitC', //use
+        '103': 'onReqC', //use
+        '104': 'onAcptC', //use
+        '105': 'onTcklC', //use
+        '106': 'onAnsC', //use
+        '107': 'onTermC', //use
 
         // '200' : 'onEnter',
         // '201' : 'onExit',
@@ -340,8 +340,7 @@ var _clazz = {
      */
     initC: function (rt, streamType, WebRTCId, tkt, sessId, rtcId, pubS, subS, sdp, cands, rtcCfg, WebRTC, callback) {
         _logger.debug("initC ...");
-
-
+        rt.to = rt.to.split('_')[1].split('@')[0]
         var rtcOptions = {
             data: {
                 op: 102
