@@ -1,6 +1,7 @@
-var Long = require("long");
-var _utils = require("../utils").utils;
-var _code = require('../status').code; 
+import Long from 'long';
+import _utils from '../utils'
+import getCode from '../status';
+const _code = getCode();
 var handleMessage = function(meta, status, conn){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.StatisticsBody");
@@ -47,6 +48,4 @@ var handleMessage = function(meta, status, conn){
     
 }
 
-export {
-    handleMessage
-}
+export default handleMessage

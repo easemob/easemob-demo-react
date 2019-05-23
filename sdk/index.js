@@ -1,1 +1,6 @@
-module.exports = require('./src/connection')
+
+
+import WebIM from './src/connection'
+
+export default WebIM
+

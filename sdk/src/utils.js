@@ -1,9 +1,7 @@
-;
-(function () {
-
     var EMPTYFN = function () {
     };
-    var _code = require('./status').code;
+    import getCode from './status';
+    const _code = getCode();
     var WEBIM_FILESIZE_LIMIT = 10485760;
 
     var _createStandardXHR = function () {
@@ -84,7 +82,6 @@
 
     if (!Object.keys) {
         Object.keys = (function () {
-            'use strict';
             var hasOwnProperty = Object.prototype.hasOwnProperty,
                 hasDontEnumBug = !({toString: null}).propertyIsEnumerable('toString'),
                 dontEnums = [
@@ -952,5 +949,4 @@
     };
 
 
-    exports.utils = utils;
-}());
+    export default utils
