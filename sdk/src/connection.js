@@ -1,30 +1,27 @@
-var _version = '1.4.13';
-var all = require('./all');
-var protobuf = require('protobufjs');
-var SockJS = require('sockjs-client');
-var Base64 = require('Base64')
+import getAll from './allnode'
+import protobuf from 'protobufjs';
+import SockJS from 'sockjs-client';
+import Base64 from 'Base64';
+import getCode from './status';
+import _utils from './utils'
+import _msg from './message';
+import Queue from './queue'
+import ChatMessage from './chat/sendChatMessage';
+import HandleChatMessage from './chat/handleChatMessage';
+import HandleMucMessage from './muc/HandleMucMessage';
+import HandleRosterMessage from './roster/HandleRosterMessage';
+import HandleStatisticsMessage from './statistics/HandleStatisticsMessage';
+import Long from 'long';
 
-var _code = require('./status').code; 
-var _utils = require('./utils').utils; 
-var _msg = require('./message');
-var _message = _msg._msg;
-var _msgHash = {};
-var Queue = require('./queue').Queue;
-
-var ChatMessage = require('./chat/sendChatMessage');
-var HandleChatMessage = require('./chat/handleChatMessage');
-var HandleMucMessage = require('./muc/HandleMucMessage');
-var HandleRosterMessage = require('./roster/HandleRosterMessage');
-var HandleStatisticsMessage = require('./statistics/HandleStatisticsMessage');
-var CryptoJS = require('crypto-js');
-var _ = require('underscore');
-
-var Long = require("long");
 protobuf.util.Long = Long;
 protobuf.configure();
+var _version = '1.4.13';
+var all = getAll()
+const _code = getCode();
+var _message = _msg._msg;
+var _msgHash = {};
 var sock;
 var mr_cache = {};
-
 
 var root = protobuf.Root.fromJSON(all);
 var Strophe = window.Strophe
@@ -218,10 +215,10 @@ var _login = function (options, conn) {
         for (var i = 0, j = getmessage.length; i < j; ++i) {
             arr.push(getmessage.charCodeAt(i));
         }
-        var tmpUint8Array = new Uint8Array(arr);    //注释：ie9不兼容https://www.cnblogs.com/jiangxiaobo/p/6016431.html
+        //var tmpUint8Array = new Uint8Array(arr);    //注释：ie9不兼容https://www.cnblogs.com/jiangxiaobo/p/6016431.html
 
         var mainMessage = root.lookup("easemob.pb.MSync");
-        var result = mainMessage.decode(tmpUint8Array);
+        var result = mainMessage.decode(arr);
         switch (result.command) {
             case 0:
                 var CommSyncDLMessage = root.lookup("easemob.pb.CommSyncDL");
@@ -361,10 +358,10 @@ var metapayload = function (metas, status, conn) {
     for (var i = 0; i < metas.length; i++) {
         if(metas[i].ns === 1){      //CHAT
             // messageBody(metas[i]);
-            HandleChatMessage.handleMessage(metas[i], status, conn)
+            HandleChatMessage(metas[i], status, conn)
         }
         else if(metas[i].ns === 2){   //MUC
-            HandleMucMessage.handleMessage(metas[i], status, conn);
+            HandleMucMessage(metas[i], status, conn);
         }
         else if(metas[i].ns === 3){    //ROSTER
             HandleRosterMessage.handleMessage(metas[i], status, conn);
@@ -372,7 +369,7 @@ var metapayload = function (metas, status, conn) {
         else if(metas[i].ns === 0){ 
              //CHAT
             // messageBody(metas[i]);
-            HandleStatisticsMessage.handleMessage(metas[i], status, conn)
+            HandleStatisticsMessage(metas[i], status, conn)
         }else if(metas[i].ns === 4){//rtc信令
             conn.registerConfrIQHandler && (conn.registerConfrIQHandler(metas[i], status, conn));
         }
@@ -862,7 +859,7 @@ var connection = function (options) {
 
     
     // global params
-    isStropheLog = options.isStropheLog || false;
+    //isStropheLog = options.isStropheLog || false;
 };
 
 /**
@@ -2463,7 +2460,7 @@ connection.prototype.getUniqueId = function (prefix) { //*******
 
 connection.prototype.send= function (messageOption) {
     var self = this;
-    ChatMessage.default(messageOption, self);
+    ChatMessage(messageOption, self);
     _msgHash[messageOption.id] = messageOption;
 };
 
@@ -3125,17 +3122,17 @@ var _fetchMessages = function(options) {
                     for (var i = 0, j = meta.length; i < j; ++i) {
                         arr.push(meta.charCodeAt(i));
                     }
-                    var tmpUint8Array = new Uint8Array(arr); 
+                    //var tmpUint8Array = new Uint8Array(arr); 
 
                     var CommSyncDLMessage = conn.context.root.lookup("easemob.pb.Meta");
-                    CommSyncDLMessage = CommSyncDLMessage.decode(tmpUint8Array);
+                    CommSyncDLMessage = CommSyncDLMessage.decode(arr);
 
                     var status = {
                         errorCode: 0,
                         reason: ''
                     }
                     
-                    var thirdMessage = HandleChatMessage.handleMessage(CommSyncDLMessage, status, conn, true)
+                    var thirdMessage = HandleChatMessage(CommSyncDLMessage, status, conn, true)
                     return thirdMessage;
                 }
 
@@ -5139,18 +5136,18 @@ WebIM.doQuery = function (str, suc, fail) {
 /**************************** debug ****************************/
 WebIM.debug = function (bool) {
 
-    logMessage = function (message) {
-        bool && console.log(WebIM.utils.ts() + '[recv] ', message.data);
-    }
+    // logMessage = function (message) {
+    //     bool && console.log(WebIM.utils.ts() + '[recv] ', message.data);
+    // }
 
-    Strophe.Connection.prototype.rawOutput = function (data) {
-        bool && console.log('%c ' + WebIM.utils.ts() + '[send] ' + data, "background-color: #e2f7da");
-    }
+    // Strophe.Connection.prototype.rawOutput = function (data) {
+    //     bool && console.log('%c ' + WebIM.utils.ts() + '[send] ' + data, "background-color: #e2f7da");
+    // }
 
 }
-
-module.exports = WebIM;
 
 if (module.hot) {
     module.hot.accept();
 }
+export default WebIM;
+

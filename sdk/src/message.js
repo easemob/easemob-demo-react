@@ -1,8 +1,5 @@
-var CryptoJS = require('crypto-js');
-;(function () {
-    'use strict';
-
-    var _utils = require('./utils').utils;
+import CryptoJS from 'crypto-js';
+import _utils from './utils'
     var Message = function (type, id) {
         if (!this instanceof Message) {
             return new Message(type);
@@ -394,6 +391,11 @@ var CryptoJS = require('crypto-js');
         }
     };
 
-    exports._msg = _Message;
-    exports.message = Message;
-}());
+    var _msg = {
+        _msg: _Message,
+        message: Message
+    }
+
+    export default _msg;
+
+

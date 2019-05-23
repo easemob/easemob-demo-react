@@ -1,7 +1,8 @@
-var Long = require("long");
-var _utils = require("../utils").utils;
-// var _msg = require('./message');
-var ChatMessage = require('./sendChatMessage');
+import Long from 'long'
+import _utils from '../utils'
+import ChatMessage from './sendChatMessage';
+import getCode from '../status';
+const _code = getCode();
 var sendDelivery = function(conn, msg ,msgId){
     if(conn.delivery){
         var id = conn.getUniqueId();
@@ -10,7 +11,7 @@ var sendDelivery = function(conn, msg ,msgId){
             ackId: msgId
             , to: msg.from
         });
-        ChatMessage.default(deliverMessage.body, conn);
+        ChatMessage(deliverMessage.body, conn);
         // self.send(deliverMessage.body);
     }
 }
@@ -249,4 +250,4 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
     
 }
 
-export {handleMessage}
+export default handleMessage

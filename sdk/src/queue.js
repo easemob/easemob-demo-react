@@ -1,4 +1,4 @@
-;(function () {
+
     function Array_h(length) {
         this.array = length === undefined ? [] : new Array(length);
     }
@@ -147,5 +147,5 @@
             this._array_h.clear();
         }
     };
-    exports.Queue = Queue;
-}());
+    export default Queue
+

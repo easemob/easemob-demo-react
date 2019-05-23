@@ -1,4 +1,4 @@
-    var _utils = require("../utils").utils;
+    import _utils from '../utils'
 
     var sendMessage = function(messageOption, conn){
         var self = conn;
@@ -264,8 +264,9 @@
     }
 
     var sendChatMessage = function(messageOption, conn){
-        var me = this;
-        this.msg = messageOption;
+        var me = conn || this;
+        //var me = this;
+        me.msg = messageOption;
         if(messageOption.file){
             if (me.msg.body && me.msg.body.url) {// Only send msg
                 sendMessage(me.msg, conn);
@@ -314,7 +315,6 @@
         }
     }
 
-
-    export default sendChatMessage;
+    export default sendChatMessage
 
  

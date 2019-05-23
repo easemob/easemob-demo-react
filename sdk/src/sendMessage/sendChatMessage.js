@@ -117,4 +117,4 @@ var sendChatMessage = function(messageOption, conn){
     return firstMessage;
 }
 
-export {sendChatMessage}
+export default sendChatMessage

@@ -1,18 +1,4 @@
-var Long = require("long");
-var _utils = require("../utils").utils;
-// var ChatMessage = require('./sendChatMessage');
-var sendDelivery = function(conn, msg ,msgId){
-    if(conn.delivery){
-        var id = conn.getUniqueId();
-        var deliverMessage = new WebIM.message('delivery', id);
-        deliverMessage.set({
-            bodyId: msgId
-            , to: msg.from
-        });
-        ChatMessage.default(deliverMessage.body, conn);
-        // self.send(deliverMessage.body);
-    }
-}
+import Long from 'long';
 var handleMessage = function(meta, status, conn){
 	var self = conn;
 	var messageBodyMessage = self.context.root.lookup("easemob.pb.MUCBody");
@@ -101,4 +87,4 @@ var handleMessage = function(meta, status, conn){
     console.log(thirdMessage);
 }
 
-export {handleMessage}
+export default handleMessage

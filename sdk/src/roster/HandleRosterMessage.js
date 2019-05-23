@@ -1,18 +1,4 @@
-var Long = require("long");
-var _utils = require("../utils").utils;
-// var ChatMessage = require('./sendChatMessage');
-var sendDelivery = function(conn, msg ,msgId){
-    if(conn.delivery){
-        var id = conn.getUniqueId();
-        var deliverMessage = new WebIM.message('delivery', id);
-        deliverMessage.set({
-            bodyId: msgId
-            , to: msg.from
-        });
-        ChatMessage.default(deliverMessage.body, conn);
-        // self.send(deliverMessage.body);
-    }
-}
+import Long from 'long'
 var operatRoster = function(option, type, conn){
     var emptyMessage = [];
     var rosterBody = conn.context.root.lookup("easemob.pb.RosterBody");
@@ -117,7 +103,9 @@ var handleMessage = function(meta, status, conn){
     
 }
 
-export {
-    handleMessage,
-    operatRoster
+var rosterClass = {
+    handleMessage: handleMessage,
+    operatRoster: operatRoster
 }
+
+export default rosterClass

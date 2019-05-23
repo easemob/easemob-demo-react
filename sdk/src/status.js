@@ -1,7 +1,7 @@
-;
-(function () {
+
+var getCode = function () {
     //管理各种错误信息
-    exports.code = {
+    return {
         WEBIM_CONNCTION_USER_NOT_ASSIGN_ERROR: 0,
         WEBIM_CONNCTION_OPEN_ERROR: 1,
         WEBIM_CONNCTION_AUTH_ERROR: 2,
@@ -90,4 +90,6 @@
         STATUS_CLOSED: 405,
         STATUS_ERROR: 406
     };
-}());
+}
+
+export default getCode
