@@ -1,13 +1,19 @@
 <!--本Demo登陆测试帐号：1c1c，密码：111, 测试账号：1v1v，密码：123456-->
+<!DOCTYPE html>
 <html>
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="edge" />
     <title>环信测试demo</title>
-    <!-- <script src="../demo/src/config/WebIMConfig.js"></script> -->
-    <script src="../demo/src/config/WebIMConfig.js"></script>
-    <script src="./dist/strophe-1.2.8.js"></script>
-    <script src="./dist/websdk-1.11.2.js"></script>
+    <script>
+      
+    </script>
+    <script src="./WebIMConfig.js"></script>
+    <!-- <script src="./dist/strophe-1.2.8.js"></script> -->
+    <!-- <script src="./dist/websdk-1.11.3.js"></script> -->
+    <!-- <script src="./websdk-1.4.13.js"></script> -->
+     <script src="./webimSDK.js"></script>
 
 </head>
 
@@ -122,12 +128,13 @@
         <button id="endConVideo">EndConVideo</button>
         </video>
     </div>
-    <script src="../webrtc/dist/EMedia_x1v1.js"></script>
+    <script src="./EMedia_sdk.js"></script>
     <script>
 
         var conn = {};
+        console.log(WebIM, window.WebIM);
         WebIM.config = config;
-        conn = WebIM.conn = new WebIM.connection({
+        conn = WebIM.conn = new WebIM.default.connection({
             isHttpDNS: WebIM.config.isHttpDNS,
             isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
             host: WebIM.config.Host,
@@ -174,8 +181,6 @@
                         console.log("********加入会议成功*******")
                         // var videoTag = document.getElementById("localVideo")
                         // emedia.mgr.streamBindVideo(stream, videoTag);
-                    }).catch(function (error) {
-
                     })
                 } else {
 
@@ -344,80 +349,80 @@
 
 
         //有人加入会议，其他人调用joinXX等方法，如果加入成功，已经在会议中的人将会收到
-        emedia.mgr.onMemberJoined = function (member) {
-            console.log("某某加入会议");
-        };
-        //有人退出会议
-        emedia.mgr.onMemberExited = function (member) {
-            console.log("某某退出会议");
-        };
-        //有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
-        emedia.mgr.onStreamAdded = function (member, stream) {
-            console.log("媒体流加入");
-            if (stream.located() === true) {
-                var videoTag = document.getElementById("video");
-                emedia.mgr.streamBindVideo(stream, videoTag);
-            } else {
-                var videoTag = document.getElementById("localVideo");
-                emedia.mgr.streamBindVideo(stream, videoTag)
-            }
-        }
-        //有媒体流移除
-        emedia.mgr.onStreamRemoved = function (member, stream) {
-            console.log("媒体流退出");
-        };
-        //角色改变
-        emedia.mgr.onRoleChanged = function (role) {
-            console.log("角色改变成功");
-            //会议退出；自己主动退 或 服务端主动关闭；
-            emedia.mgr.onConferenceExit = function (reason, failed) {
-                reason = (reason || 0);
-                switch (reason) {
-                    case 0:
-                        reason = "正常挂断";
-                        break;
-                    case 1:
-                        reason = "没响应";
-                        break;
-                    case 2:
-                        reason = "服务器拒绝";
-                        break;
-                    case 3:
-                        reason = "对方忙";
-                        break;
-                    case 4:
-                        reason = "失败,可能是网络或服务器拒绝";
-                        if (failed === -9527) {
-                            reason = "失败,网络原因";
-                        }
-                        if (failed === -500) {
-                            reason = "Ticket失效";
-                        }
-                        if (failed === -502) {
-                            reason = "Ticket过期";
-                        }
-                        if (failed === -504) {
-                            reason = "链接已失效";
-                        }
-                        if (failed === -508) {
-                            reason = "会议无效";
-                        }
-                        if (failed === -510) {
-                            reason = "服务端限制";
-                        }
-                        break;
-                    case 5:
-                        reason = "不支持";
-                        break;
-                    case 10:
-                        reason = "其他设备登录";
-                        break;
-                    case 11:
-                        reason = "会议关闭";
-                        break;
-                }
-            };
-        };
+        // emedia.mgr.onMemberJoined = function (member) {
+        //     console.log("某某加入会议");
+        // };
+        // //有人退出会议
+        // emedia.mgr.onMemberExited = function (member) {
+        //     console.log("某某退出会议");
+        // };
+        // //有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
+        // emedia.mgr.onStreamAdded = function (member, stream) {
+        //     console.log("媒体流加入");
+        //     if (stream.located() === true) {
+        //         var videoTag = document.getElementById("video");
+        //         emedia.mgr.streamBindVideo(stream, videoTag);
+        //     } else {
+        //         var videoTag = document.getElementById("localVideo");
+        //         emedia.mgr.streamBindVideo(stream, videoTag)
+        //     }
+        // }
+        // //有媒体流移除
+        // emedia.mgr.onStreamRemoved = function (member, stream) {
+        //     console.log("媒体流退出");
+        // };
+        // //角色改变
+        // emedia.mgr.onRoleChanged = function (role) {
+        //     console.log("角色改变成功");
+        //     //会议退出；自己主动退 或 服务端主动关闭；
+        //     emedia.mgr.onConferenceExit = function (reason, failed) {
+        //         reason = (reason || 0);
+        //         switch (reason) {
+        //             case 0:
+        //                 reason = "正常挂断";
+        //                 break;
+        //             case 1:
+        //                 reason = "没响应";
+        //                 break;
+        //             case 2:
+        //                 reason = "服务器拒绝";
+        //                 break;
+        //             case 3:
+        //                 reason = "对方忙";
+        //                 break;
+        //             case 4:
+        //                 reason = "失败,可能是网络或服务器拒绝";
+        //                 if (failed === -9527) {
+        //                     reason = "失败,网络原因";
+        //                 }
+        //                 if (failed === -500) {
+        //                     reason = "Ticket失效";
+        //                 }
+        //                 if (failed === -502) {
+        //                     reason = "Ticket过期";
+        //                 }
+        //                 if (failed === -504) {
+        //                     reason = "链接已失效";
+        //                 }
+        //                 if (failed === -508) {
+        //                     reason = "会议无效";
+        //                 }
+        //                 if (failed === -510) {
+        //                     reason = "服务端限制";
+        //                 }
+        //                 break;
+        //             case 5:
+        //                 reason = "不支持";
+        //                 break;
+        //             case 10:
+        //                 reason = "其他设备登录";
+        //                 break;
+        //             case 11:
+        //                 reason = "会议关闭";
+        //                 break;
+        //         }
+        //     };
+        // };
 
     </script>
     <script>
@@ -442,6 +447,7 @@
 
         //登录
         document.getElementById('login').onclick = function () {
+            console.log(WebIM, window.WebIM);
             var uname = document.getElementById("name").value;
             var upwd = document.getElementById("pwd").value;
             options = {
@@ -464,6 +470,9 @@
         * Message
         */
         //文本消息
+        var conf = WebIM.config
+        var WebIM = WebIM.default
+        WebIM.config = conf
         var myDate = new Date().toLocaleString();
         document.getElementById('privateText').onclick = function () {
             var uname = document.getElementById("name").value;
@@ -1399,9 +1408,6 @@
                 emedia.mgr.exit();
             }
         }
-
-
-
 
     </script>
 
