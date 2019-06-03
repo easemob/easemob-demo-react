@@ -72,7 +72,7 @@ var _clazz = {
         '303': 'onEvUnpub',
         '304': 'onEvMems',
         '204': 'onEvClose',
-        '400': 'onStreamControl',
+        '400': 'onStreamControl', //use
         '401': 'onEvJoin',
 
         'onServerError': 'onServerError'
@@ -249,7 +249,7 @@ var _clazz = {
      * @param controlType
      * @param callback
      */
-    streamControl: function (rt, sessId, rtcId, controlType, callback) {
+    streamControl: function (rt, sessId, rtcId, controlType, stream, callback) {
         _logger.debug("streamControl ...");
 
         var self = this;
@@ -259,7 +259,14 @@ var _clazz = {
                 op: 400
             }
         };
-
+        var enable = (controlType == 0 || controlType == 3)?true:false
+        if(controlType == 0 || controlType == 1){
+            emedia.enableAudioTracks(stream, enable)
+        }else{
+            emedia.enableVideoTracks(stream, enable)
+        }
+        
+        
         sessId && (rtcOptions.data.sessId = sessId);
         rtcId && (rtcOptions.data.rtcId = rtcId);
         (typeof controlType !== 'undefined' &&  controlType != null ) && (rtcOptions.data.controlType = controlType);

@@ -24,12 +24,10 @@ var CommonPattern = {
     _rtKey: null,
     _rtFlag: null,
 
-
     webRtc: null,
     api: null,
 
     callee: null,
-
 
     isCaller: false,
     accepted: false,
@@ -39,10 +37,8 @@ var CommonPattern = {
 
     hangup: false,
 
-
     init: function () {
         var self = this;
-
         self.api.onPing = function () {
             self._onPing.apply(self, arguments);
         };
@@ -117,11 +113,11 @@ var CommonPattern = {
 
     createLocalMedia: function (mediaStreamConstaints) {
         var self = this;
-
         this.webRtc.createMedia(mediaStreamConstaints, function (webrtc, stream) {
             self.webRtc.createRtcPeerConnection(self._rtcCfg);
 
             webrtc.setLocalVideoSrcObject(stream);
+            webrtc.localStream = stream
 
             self.webRtc.createOffer(function (offer) {
                 self._onGotWebRtcOffer(offer);
@@ -133,7 +129,7 @@ var CommonPattern = {
         var self = this;
 
         var rt = new P2PRouteTo({
-            sid: self.sid,
+            //sid: self.sid,
             to: self.callee,
             rtKey: self._rtKey
         });
@@ -149,7 +145,6 @@ var CommonPattern = {
 
     _onAcptC: function (from, options) {
         var self = this;
-
         if (options.ans && options.ans == 1) {
             _logger.info("[WebRTC-API] _onAcptC : 104, ans = 1, it is a answer. will onAcceptCall");
             self.onAcceptCall(from, options, options.enableVoice !== false, options.enableVideo !== false);
@@ -225,7 +220,6 @@ var CommonPattern = {
 
     _onAnsC: function (from, options) { // answer
         var self = this;
-
         _logger.info("[WebRTC-API] _onAnsC : recv answer. ");
 
         self.accepted = true;
@@ -385,7 +379,6 @@ var CommonPattern = {
         var self = this;
 
         // options.sdp && self.webRtc.setRemoteDescription(options.sdp);
-
         if (self.setRemoteSDP) {
             _logger.info("[WebRTC-API] recv and add cands.");
 
@@ -422,6 +415,7 @@ var CommonPattern = {
 
         if (self.setLocalSDP) {
             function sendIceCandidate(candidate) {
+               
                 _logger.debug("send ice candidate...");
 
                 var rt = new P2PRouteTo({
