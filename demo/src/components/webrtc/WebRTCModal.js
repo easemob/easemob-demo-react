@@ -4,7 +4,7 @@ import WebIM from "@/config/WebIM"
 import RTCChannel from "@/components/webrtc/rtcChannel"
 import { message, Modal } from "antd"
 import MultiAVActions from "@/redux/MultiAVRedux"
-import Creators from "../../redux/MultiAVRedux";
+import Creators from "../../redux/MultiAVRedux"
 
 const confirm = Modal.confirm
 
@@ -122,13 +122,13 @@ class WebRTCModal extends React.Component {
                     if (e && e.message) {
                         var close = false
                         switch (e.message) {
-                            case "CALLLING_EACH_OTHER_AT_THE_SAME_TIME":
-                                e.message = "Target is calling. Please try again later."
-                                close = true
-                                break
-                            case "TARGET_OFFLINE":
-                                e.message = "Target is offline."
-                                break
+                        case "CALLLING_EACH_OTHER_AT_THE_SAME_TIME":
+                            e.message = "Target is calling. Please try again later."
+                            close = true
+                            break
+                        case "TARGET_OFFLINE":
+                            e.message = "Target is offline."
+                            break
                         }
                         if (close) {
                             var closeButton = document.getElementById("webrtc_close")
@@ -143,7 +143,7 @@ class WebRTCModal extends React.Component {
                     const { avModal, multiAV } = me.props
                     let host = xmppURL.split(".")
                     host = "@" + host[1] + "." + host[2]
-                    from = from.replace(appkey + '_', "")
+                    from = from.replace(appkey + "_", "")
                     from = from.replace(host, "")
                     let callback = (confr) => {
                         me.props.setRtcOptions(confr)
@@ -157,17 +157,17 @@ class WebRTCModal extends React.Component {
                                     return
                                 }
                                 me.props.showMultiAVModal()
-                                me.props.setGid(gid);
+                                me.props.setGid(gid)
 
                                 setTimeout(() => {
-                                    const tkt = confr.ticket;
+                                    const tkt = confr.ticket
                                     WebIM.EMService.joinConferenceWithTicket(confr.confrId, tkt, "user ext field").then(function () {
-                                        WebIM.EMService.publish({audio: true, video: true}, "user ext field").catch(function (e) {
-                                            console.error(e);
-                                        });
+                                        WebIM.EMService.publish({ audio: true, video: true }, "user ext field").catch(function (e) {
+                                            console.error(e)
+                                        })
                                     }).catch(function (e) {
-                                        console.error(e);
-                                    });
+                                        console.error(e)
+                                    })
                                 }, 0)
                             },
                             onCancel() {
@@ -176,8 +176,8 @@ class WebRTCModal extends React.Component {
                         })
                     }
                     emedia.mgr.getConferenceTkt(confrId, password).then(function (confr) {
-                        callback(confr);
-                    });
+                        callback(confr)
+                    })
                 }
             }
         })

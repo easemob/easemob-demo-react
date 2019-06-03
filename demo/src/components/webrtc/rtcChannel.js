@@ -70,6 +70,22 @@ var Channel = React.createClass({
         }
     },
 
+    controlStream: function(type){
+        var controlType
+        if(type === "audioControl"){
+            controlType = this.refs.audio.isopen?0:1
+            this.refs.audio.style.color = this.refs.audio.isopen?"#eeeeee":"#4eb1f4"
+            this.refs.audio.isopen = !this.refs.audio.isopen
+        }else{
+            controlType = this.refs.video.isopen?3:2
+            this.refs.video.style.color = this.refs.video.isopen?"#eeeeee":"#4eb1f4"
+            this.refs.video.isopen = !this.refs.video.isopen
+        }
+        console.log("controlType", controlType)
+        var to = WebIM.call.callee.split("@")[0].split("_")[1]
+        WebIM.call.controlStream(controlType, to)
+    },
+
     setStream: function (props) {
         this.refs.remoteVideo.srcObject = props.remoteStream
         this.refs.localVideo.srcObject = props.localStream
@@ -274,7 +290,22 @@ var Channel = React.createClass({
                         top: "auto",
                         bottom: this.state.mute_bottom + "px"
                     }} onClick={this.mute}>m</i>
-
+                <i ref='audio' isopen={true} className='font small mute'
+                    style={{
+                        display: this.state.mute_display,
+                        left: this.state.toggle_right + 30 + "px",
+                        right: "auto",
+                        top: "auto",
+                        bottom: this.state.mute_bottom + "px"
+                    }} onClick={this.controlStream.bind(this, "audioControl")}>u</i>
+                <i ref='video' isopen={true} className='font small mute'
+                    style={{
+                        display: this.state.mute_display,
+                        left: this.state.toggle_right + 60 + "px",
+                        right: "auto",
+                        top: "auto",
+                        bottom: this.state.mute_bottom + "px"
+                    }} onClick={this.controlStream.bind(this,"videoControl")}>v</i>
             </div>
         )
     }

@@ -6,21 +6,15 @@ var _util = (require('./utils').default);
 var _logger = _util.logger;
 var API = require('./api');
 var RouteTo = API.RouteTo;
-
 var CONFERENCE_XMLNS = "urn:xmpp:media-conference";
-
 
 var _RtcHandler = {
     _apiCallbacks: {},
-
     imConnection: null,
-
     _connectedSid: '',
-
-
+ 
     init: function () {
         var self = this;
-
         var _conn = self.imConnection;
 
         _conn.registerConfrIQHandler = function(meta, status, conn){
@@ -31,25 +25,21 @@ var _RtcHandler = {
                     _logger.error(error);
                     //throw error;
                 }
-
                 //return true;
             //};
 
-
             // _conn.addHandler(handleConferenceIQ, CONFERENCE_XMLNS, 'iq', "set");
             // _conn.addHandler(handleConferenceIQ, CONFERENCE_XMLNS, 'iq', "get");
-
             //_logger.warn("Conference iq handler. registered.");
         }
     },
-
+    
     handleRtcMessage: function (msginfo, status, conn) {
         var self = this;
         if (!msginfo) {return}
         var messageBodyMessage = WebIM.conn.context.root.lookup("easemob.pb.ConferenceBody");
         var thirdMessage = messageBodyMessage.decode(msginfo.payload);
-        //console.log('反回来的payload', thirdMessage)
-        //console.log('反回来的content', JSON.parse(thirdMessage.content))
+        
         var id = msginfo.id;
         var from = msginfo.from.name|| '';
 
@@ -189,7 +179,6 @@ var _RtcHandler = {
         return true;
     },
 
-
     onRecvRtcMessage: function (from, rtcOptions, rtkey, tsxId, fromSessionId) {
         _logger.debug(' form : ' + from + " \r\n json :" + _util.stringifyJSON(rtcJSON));
     },
@@ -272,10 +261,8 @@ var _RtcHandler = {
 
     /**
      * rt: { id: , to: , rtKey: , rtflag: , sid: , tsxId: , type: , }
-     *
      * rtcOptions: { data : { op : 'reqP2P', video : 1, audio : 1, peer :
      * curChatUserId, //appKey + "_" + curChatUserId + "@" + this.domain, } }
-     *
      */
     sendRtcMessage: function (rt, options, callback) {
 
@@ -284,21 +271,18 @@ var _RtcHandler = {
         var tsxId = _conn.getUniqueId()//rt.tsxId || _conn.getUniqueId();
 
         var to = rt.to&&rt.to || _conn.domain;
-
-        var sid = rt.sid || self._fromSessionID && self._fromSessionID[to];
-
-        //sid = sid || ((self._fromSessionID || (self._fromSessionID = {}))[to] = _conn.getUniqueId("CONFR_"));
-        sid = sid || _conn.getUniqueId("CONFR_");
-
-        (self._fromSessionID || (self._fromSessionID = {}))[to] = sid;
-        self.myid = sid
-
         if (to.indexOf("@") >= 0) {
+            to = to.split('_')[1].split('@')[0]
             if (self._connectedSid == '' && options.data.op == 102) {
                 self._connectedSid = sid;
             }
-            to = to.split('_')[1].split('@')[0]
         }
+        var sid = rt.sid || self._fromSessionID && self._fromSessionID[to];
+        sid = sid || ((self._fromSessionID || (self._fromSessionID = {}))[to] = _conn.getUniqueId("CONFR_"));
+ 
+        //sid = sid || _conn.getUniqueId("CONFR_");
+
+        (self._fromSessionID || (self._fromSessionID = {}))[to] = sid;
 
         var rtKey = rt.rtKey || rt.rtkey;
         // rtKey && delete rt.rtKey;
@@ -394,12 +378,10 @@ var _RtcHandler = {
 
             _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
         }
-
     },
 
     _sendMessage: function(messageOption, conn){
         var self = conn;
-
         var emptyMessage = [];
 
         //构造 content
@@ -411,35 +393,35 @@ var _RtcHandler = {
         if (messageOption.content.op == 0) {
             content = {
                 op: messageOption.content.op,
-                callVersion: "2.0.0",
+                callVersion: "2.0.0", 
                 audio: messageOption.content.audio,
                 video: messageOption.content.video,
                 //sessId: messageOption.sid,
                 tsxId: String(messageOption.content.tsxId),
                 peer: messageOption.content.peer + "/",
-                "push":0
+                push: 0
             }
-        } else {
+        } else if(messageOption.content.op == 400){
+            content = messageOption.content
+        }else {
             content = messageOption.content;
             content.tsxId = String(messageOption.content.tsxId);
         }
-
+        var op = messageOption.content.op;
         fifthMessage.content = JSON.stringify(content)
         fifthMessage.routeFlag = messageOption.rtflag;
-        //fifthMessage.peer_name = messageOption.from.name;
-        //fifthMessage.type = messageOption.stream_type;
         fifthMessage.operation = 7;
-
         fifthMessage.sessionId = String(messageOption.sid) //和content里的sid不同？ 都是什么
-
         fifthMessage.type = messageOption.type
 
-        var op = messageOption.content.op;
-        if (op == 102 || op == 104 || op == 105 || op == 107) {
+        if (op == 102 || op == 104 || op == 105 || op == 107 || op == 400) {
             fifthMessage.routeKey = '--X--';
             fifthMessage.routeFlag = messageOption.rtflag;
             fifthMessage.peerName = messageOption.from.name;
-           // fifthMessage.type = messageOption.content.video //0 audio  1 video
+        }
+
+        if(op == 107){
+            fifthMessage.endReason = 0
         }
 
         fifthMessage = contentMessage.encode(fifthMessage).finish();
@@ -457,13 +439,12 @@ var _RtcHandler = {
             domain: messageOption.from.domain,
             name: messageOption.to
         }
-
         if (messageOption.content.op == 102) {
             thirdMessage.from = messageOption.from//.appKey+'_'+messageOption.from.name+'@'+messageOption.from.domain
         }
-        
-        thirdMessage.payload = fifthMessage;
 
+        thirdMessage.payload = fifthMessage;
+ 
         var commSyncULMessage = conn.context.root.lookup("easemob.pb.CommSyncUL");
         var secondMessage = commSyncULMessage.decode(emptyMessage);
         secondMessage.meta = thirdMessage;
@@ -482,10 +463,9 @@ var _RtcHandler = {
     }
 };
 
-
 var RTCIQHandler = function (initConfigs) {
     _util.extend(true, this, _RtcHandler, initConfigs || {});
-
     this.init();
 };
+
 module.exports = RTCIQHandler;
