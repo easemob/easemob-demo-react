@@ -33,7 +33,7 @@ var config = {
     /*
      * XMPP server
      */
-    xmppURL: "http://39.107.54.56:8280/ws",
+    xmppURL: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws",
     // xmppURL: "im-api.easemob.com",
     // xmppURL: '172.17.2.139:5280',
     /*
