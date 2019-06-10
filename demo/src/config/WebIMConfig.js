@@ -56,7 +56,7 @@ var config = {
      * Whether to use HTTPS
      * @parameter {Boolean} true or false
      */
-    https: false,
+    https: true,
     isHttpDNS: false,
     /*
      * isMultiLoginSessions
