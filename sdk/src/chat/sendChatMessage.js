@@ -272,7 +272,7 @@
                 sendMessage(me.msg, conn);
                 return;
             }
-            var _tmpComplete = this.msg.onFileUploadComplete;
+            var _tmpComplete = me.msg.onFileUploadComplete;
             var _complete = function (data) {
                 if (data.entities[0]['file-metadata']) {
                     var file_len = data.entities[0]['file-metadata']['content-length'];
