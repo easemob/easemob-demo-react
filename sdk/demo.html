@@ -93,6 +93,7 @@
          * Created by clock on 16-11-25.
          */
         var conn = {};
+        WebIM.config = config;
         conn = new WebIM.connection({
             isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
             https: typeof WebIM.config.https === 'boolean' ? WebIM.config.https : location.protocol ===
