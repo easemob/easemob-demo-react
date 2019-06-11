@@ -211,18 +211,18 @@ class Chat extends React.Component {
         let tabs = null
         if (selectTab == "contact") {
             tabs = [
-                ["0", `${I18n.t("block")}`, "iconfont icon-circle-minus"],
-                ["1", `${I18n.t("delAFriend")}`, "iconfont icon-trash"]
+                [ "0", `${I18n.t("block")}`, "iconfont icon-circle-minus" ],
+                [ "1", `${I18n.t("delAFriend")}`, "iconfont icon-trash" ]
             ]
         } else {
             // stranger
             tabs = [
-                ["2", `${I18n.t("addFriend")}`, "anticon anticon-user-add"],
-                ["3", `${I18n.t("delete")}`, "iconfont icon-trash"]
+                [ "2", `${I18n.t("addFriend")}`, "anticon anticon-user-add" ],
+                [ "3", `${I18n.t("delete")}`, "iconfont icon-trash" ]
             ]
         }
 
-        const tabsItem = tabs.map(([key, name, icon]) =>
+        const tabsItem = tabs.map(([ key, name, icon ]) =>
             <Menu.Item key={key}>
                 <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: "middle" }} />
                 <span>
@@ -246,31 +246,31 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const search = history.location.search
         switch (key) {
-            case "0":
-                // block a friend
-                this.props.doAddBlacklist(selectItem)
-                history.push("/contact" + search)
-                break
-            case "1":
-                // delete a friend
-                this.props.removeContact(selectItem)
-                break
-            case "2":
-                // add a friend
-                this.props.addContact(selectItem)
-                message.success(`${I18n.t("addFriendMessage")}`)
-                break
-            case "3":
-                // delete
-                this.props.deleteStranger(selectItem)
-                history.push("/stranger" + search)
-                break
-            default:
+        case "0":
+            // block a friend
+            this.props.doAddBlacklist(selectItem)
+            history.push("/contact" + search)
+            break
+        case "1":
+            // delete a friend
+            this.props.removeContact(selectItem)
+            break
+        case "2":
+            // add a friend
+            this.props.addContact(selectItem)
+            message.success(`${I18n.t("addFriendMessage")}`)
+            break
+        case "3":
+            // delete
+            this.props.deleteStranger(selectItem)
+            history.push("/stranger" + search)
+            break
+        default:
         }
     }
 
     onClearMessage = () => {
-        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
+        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
         console.log(selectItem, selectTab)
         const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
         const chatType = chatTypes[selectTab]
@@ -305,7 +305,7 @@ class Chat extends React.Component {
     }
 
     callVideo = () => {
-        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
+        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
         const { confrModal, avModal } = this.props
         if (selectTab === "contact") {
             this.setState({
@@ -325,7 +325,7 @@ class Chat extends React.Component {
             }
             this.props.showConfrModal()
             const pwd = Math.random().toString(36).substr(2)
-            this.props.updateConfrInfo(selectItem);
+            this.props.updateConfrInfo(selectItem)
         }
     }
 
@@ -335,7 +335,7 @@ class Chat extends React.Component {
 
     callVoice = () => {
 
-        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
+        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
         console.log("sendWrapper::callVoice", WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
 
         this.setState({
@@ -352,7 +352,7 @@ class Chat extends React.Component {
             setTimeout(function () {
                 console.log(_this.props.messageList)
                 const offset = _this.props.messageList ? _this.props.messageList.length : 0
-                const { selectItem, selectTab } = _.get(_this.props, ["match", "params"], {})
+                const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
                 const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
                 const chatType = chatTypes[selectTab]
 
@@ -388,7 +388,7 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
 
         const back = () => {
-            const redirectPath = "/" + [selectTab].join("/") + location.search
+            const redirectPath = "/" + [ selectTab ].join("/") + location.search
             history.push(redirectPath)
         }
 
@@ -439,7 +439,7 @@ class Chat extends React.Component {
                                 ? <Dropdown
                                     overlay={this.renderContactMenu(selectTab)}
                                     placement="bottomRight"
-                                    trigger={["click"]}
+                                    trigger={[ "click" ]}
                                 >
                                     <Icon type="ellipsis" />
                                 </Dropdown>

@@ -88,7 +88,7 @@ WebIM.conn.listen({
             message.error(`group${msg.gid} was destroyed.`)
             store.dispatch(GroupActions.getGroups())
             break
-        case 'removedFromGroup':
+        case "removedFromGroup":
         case "leaveGroup": // dismissed by admin
             message.error(
                 `${msg.kicked || I18n.t("you")} ${I18n.t("dismissed")}${I18n.t("by")}${msg.owner ||
@@ -96,7 +96,7 @@ WebIM.conn.listen({
             )
             store.dispatch(GroupActions.getGroups())
             break
-        case 'direct_joined': //被拉进群
+        case "direct_joined": //被拉进群
         case "joinPublicGroupSuccess":
             message.success(`${I18n.t("joinGroup")} ${msg.from} ${I18n.t("successfully")}`)
             store.dispatch(GroupActions.getGroups())
@@ -267,7 +267,7 @@ WebIM.conn.listen({
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
         const chatId = bySelf || type !== "chat" ? to : from
         if (type === "chat" &&(( _.get(rootState,"entities.roster.byName["+chatId+"].subscription")  === "none") || !(_.get(rootState,"entities.roster.byName["+chatId+"].subscription")))){
-            message.type = "stranger";
+            message.type = "stranger"
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,"txt"))            
         }
         store.dispatch(MessageActions.addMessage(message, "txt"))        
@@ -277,14 +277,14 @@ WebIM.conn.listen({
         case "chat":
             store.dispatch(RosterActions.topRoster(from))
             //新的会议要求消息，使用text message实现
-            if(WebIM && WebIM.call && message && message.ext && message.ext.conferenceId){
+            if(WebIM && WebIM.call && message && message.ext && message.ext[0].key === "conferenceId"){
                 var options = {
-                    confrId: message.ext.conferenceId,
-                    password: message.ext.password,
+                    confrId: message.ext[0].stringValue,
+                    password: message.ext.password || "",
                     gid: message.ext.msg_extension && message.ext.msg_extension.group_id,
-                    inviter: message.ext.inviter
+                    inviter: message.from
                 }
-                WebIM.call.listener.onInvite(from, options);
+                WebIM.call.listener.onInvite(from, options)
             }
             break
         case "groupchat":
@@ -400,12 +400,12 @@ const { Types, Creators } = createActions({
     logout: () => {
         return (dispatch, state) => {
             let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
-            WebIM.conn.close("logout");
+            WebIM.conn.close("logout")
             message.success(I18N.logoutSuccessfully)
             dispatch(CommonActions.fetching())
             dispatch(LoginActions.logout())
             // if (WebIM.conn.isOpened()) {
-                // WebIM.conn.close("logout")
+            // WebIM.conn.close("logout")
             // }
         }
     }
