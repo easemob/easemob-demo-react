@@ -350,6 +350,31 @@ var _RtcHandler = {
         if (options.data.op == 202){
             var msg = _util.list("Invite", self.getShortId(to), "join conference:", options.data.confrId).join(" ");
             var id = _conn.getUniqueId("CONFR_INVITE");                 // 生成本地消息id
+            //msg = '快来加入会议'+' - 13 ' + options.data.confrId
+            var inviteMessage = {
+                msg: msg,
+                id: id,
+                to: to,
+                from: _conn.context.jid,
+                contents: [{
+                    contenttype: 'TEXT',
+                    text: msg
+                }],
+                exts: {
+                    key: "conferenceId",
+                    type: 7,
+                    value: options.data.confrId
+                  }
+                // exts: [{
+                //     conferenceId: options.data.confrId,
+                //     msg_extension: {
+                //         inviter: _conn.context.jid
+                //     },
+                //     password: options.data.password
+                // }]
+            }
+            return this._sendGroupInviteMsg(inviteMessage, WebIM.conn)
+
             var inviteMessage = $msg({
                 xmlns: 'jabber:client',
                 id: id,
@@ -376,8 +401,82 @@ var _RtcHandler = {
                 to: self.getShortId(to)
             }));
 
+            
+
             _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
         }
+    },
+
+    _sendGroupInviteMsg: function(messageOption, conn){
+        var emptyMessage = [];
+        var contentMessage = conn.context.root.lookup("easemob.pb.MessageBody.Content");
+        var fifthMessage = contentMessage.decode(emptyMessage);
+
+        fifthMessage.type = 0;
+        fifthMessage.text = messageOption.msg;
+   
+        var messageBody = conn.context.root.lookup("easemob.pb.MessageBody");
+        var fourthMessage = messageBody.decode(emptyMessage);
+
+            fourthMessage.from = {
+                name: messageOption.from.name
+            };
+            fourthMessage.to = {
+                name: messageOption.to
+            }
+ 
+        fourthMessage.contents = [fifthMessage];
+
+        var extMsg = conn.context.root.lookup("easemob.pb.KeyValue");
+        var ext = extMsg.decode(emptyMessage);
+        var ext2 = extMsg.decode(emptyMessage);
+        //ext = messageOption.exts
+
+
+        ext.key = 'conferenceId'
+        ext.type = 7;
+        ext.stringValue = messageOption.exts.value
+
+        ext2.
+ 
+        fourthMessage.ext = [ext]
+        fourthMessage.type = 1;
+        fourthMessage = messageBody.encode(fourthMessage).finish();
+
+        var MetaMessage = conn.context.root.lookup("easemob.pb.Meta");
+        var thirdMessage = MetaMessage.decode(emptyMessage);
+
+        thirdMessage.id = messageOption.id;
+            thirdMessage.from = messageOption.from
+            // {
+            //     appKey: conn.appKey,
+            //     name: messageOption.from,
+            //     domain: "easemob.com"
+            // }
+            thirdMessage.to = {
+                appKey: conn.appKey,
+                name: messageOption.to,
+                domain: "easemob.com",
+                // clientResource: conn.clientResource
+            }
+        
+        thirdMessage.ns = 1;
+        thirdMessage.type = 1;
+        thirdMessage.payload = fourthMessage;
+        var commSyncULMessage = conn.context.root.lookup("easemob.pb.CommSyncUL");
+        var secondMessage = commSyncULMessage.decode(emptyMessage);
+        secondMessage.meta = thirdMessage;
+        secondMessage = commSyncULMessage.encode(secondMessage).finish();
+        var msyncMessage = conn.context.root.lookup("easemob.pb.MSync");
+        var firstMessage = msyncMessage.decode(emptyMessage);
+
+        firstMessage.version = conn.version;
+        firstMessage.encryptType = conn.encryptType;
+        firstMessage.command = 0;
+        firstMessage.guid = conn.context.jid;
+        firstMessage.payload = secondMessage;
+        firstMessage = msyncMessage.encode(firstMessage).finish();
+        conn.sendMSync(firstMessage);
     },
 
     _sendMessage: function(messageOption, conn){
