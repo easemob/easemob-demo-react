@@ -360,50 +360,15 @@ var _RtcHandler = {
                     contenttype: 'TEXT',
                     text: msg
                 }],
+                gid: options.data.gid,
+                password: options.data.password,
                 exts: {
                     key: "conferenceId",
                     type: 7,
                     value: options.data.confrId
                   }
-                // exts: [{
-                //     conferenceId: options.data.confrId,
-                //     msg_extension: {
-                //         inviter: _conn.context.jid
-                //     },
-                //     password: options.data.password
-                // }]
             }
             return this._sendGroupInviteMsg(inviteMessage, WebIM.conn)
-
-            var inviteMessage = $msg({
-                xmlns: 'jabber:client',
-                id: id,
-                type: 'chat',
-                to: to,
-                from: _conn.context.jid
-            }).c('body').t(JSON.stringify({
-                data: msg,
-                bodies:[
-                    {
-                        msg: msg,
-                        type: "txt"
-                    }
-                ],
-                ext: {
-                    conferenceId: options.data.confrId,
-                    password: options.data.password,
-                    msg_extension: {
-                        group_id: options.data.gid,
-                        inviter: self.getShortId(_conn.context.jid)
-                    }
-                },
-                from: self.getShortId(_conn.context.jid),
-                to: self.getShortId(to)
-            }));
-
-            
-
-            _conn.sendCommand(inviteMessage.tree(), inviteMessage.id);
         }
     },
 
@@ -430,16 +395,23 @@ var _RtcHandler = {
         var extMsg = conn.context.root.lookup("easemob.pb.KeyValue");
         var ext = extMsg.decode(emptyMessage);
         var ext2 = extMsg.decode(emptyMessage);
-        //ext = messageOption.exts
-
-
+        var ext3 = extMsg.decode(emptyMessage);
         ext.key = 'conferenceId'
         ext.type = 7;
         ext.stringValue = messageOption.exts.value
-
-        ext2.
  
-        fourthMessage.ext = [ext]
+        ext2.key = 'msg_extension'
+        ext2.type = 7
+        ext2.stringValue = JSON.stringify({
+            "inviter": messageOption.from.name,
+            "group_id": messageOption.gid
+          })
+        
+        ext3.key = 'password'
+        ext3.type = 7
+        ext3.stringValue = messageOption.password
+
+        fourthMessage.ext = [ext, ext2, ext3]
         fourthMessage.type = 1;
         fourthMessage = messageBody.encode(fourthMessage).finish();
 
@@ -448,11 +420,7 @@ var _RtcHandler = {
 
         thirdMessage.id = messageOption.id;
             thirdMessage.from = messageOption.from
-            // {
-            //     appKey: conn.appKey,
-            //     name: messageOption.from,
-            //     domain: "easemob.com"
-            // }
+
             thirdMessage.to = {
                 appKey: conn.appKey,
                 name: messageOption.to,
