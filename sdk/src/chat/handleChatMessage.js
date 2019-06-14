@@ -110,7 +110,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                     , from: from
                     , to: to
                     ,
-                    url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                    url: msgBody.remotePath && self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))
                     , secret: msgBody.secretKey
                     , filename: msgBody.displayName
                     , thumb: msgBody.thumbnailRemotePath
@@ -136,7 +136,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                     , from: from
                     , to: to
                     ,
-                    url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                    url: msgBody.remotePath && self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))
                     , secret: msgBody.secretKey
                     , filename: msgBody.displayName
                     , length: msgBody.duration || ''
@@ -177,7 +177,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                     , from: from
                     , to: to
                     ,
-                    url: msgBody.remotePath && (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                    url: msgBody.remotePath && self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))
                     , secret: msgBody.secretKey
                     , filename: msgBody.displayName
                     , file_length: msgBody.fileLength || ''
@@ -199,7 +199,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
                     , from: from
                     , to: to
                     ,
-                    url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))) : msgBody.remotePath
+                    url: msgBody.remotePath && self.apiUrl + msgBody.remotePath.substr(msgBody.remotePath.indexOf("/", 9))
                     , secret: msgBody.secretKey
                     , filename: msgBody.displayName
                     , file_length: msgBody.fileLength
@@ -231,7 +231,7 @@ var handleMessage = function(meta, status, conn, ignoreCallback){
             //     break;
             }
         } catch (e) {
-            this.onError({
+            conn.onError({
                 type: _code.WEBIM_CONNCTION_CALLBACK_INNER_ERROR
                 , data: e
             });
