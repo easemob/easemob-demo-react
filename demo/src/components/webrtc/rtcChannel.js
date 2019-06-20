@@ -22,7 +22,8 @@ var Channel = React.createClass({
             accept_display: this.props.hideAccept ? "none" : "block",
             mute_left: 0,
             mute_bottom: 6,
-            mute_display: "none"
+            mute_display: "none",
+            hasVideo: false
         }
     },
 
@@ -181,6 +182,7 @@ var Channel = React.createClass({
             this.setState({
                 full_width: video.videoWidth,
                 full_height: video.videoHeight,
+                hasVideo: true
             })
         }
         if (hasAudio && !hasVideo) { //voice only
@@ -190,7 +192,8 @@ var Channel = React.createClass({
             })
             this.setState({
                 toggle_display: "none",
-                localVideo_display: "none"
+                localVideo_display: "none",
+                hasVideo: false
             })
         }
     },
@@ -222,6 +225,7 @@ var Channel = React.createClass({
                 this.setState({
                     full_width: this.props.collapsed ? video.videoWidth / 2 : video.videoWidth,
                     full_height: this.props.collapsed ? video.videoHeight / 2 : video.videoHeight,
+                    hasVideo: true
                 })
             }
             if (hasAudio && !hasVideo) { //voice only
@@ -231,7 +235,8 @@ var Channel = React.createClass({
                 })
                 this.setState({
                     toggle_display: "none",
-                    localVideo_display: "none"
+                    localVideo_display: "none",
+                    hasVideo: false
                 })
             }
         }
@@ -300,7 +305,7 @@ var Channel = React.createClass({
                     }} onClick={this.controlStream.bind(this, "audioControl")}>u</i>
                 <i ref='video' isopen={true} className='font small mute'
                     style={{
-                        display: this.state.mute_display,
+                        display: (this.state.mute_display == "block" && this.state.hasVideo)?"block": "none",
                         left: this.state.toggle_right + 60 + "px",
                         right: "auto",
                         top: "auto",
@@ -328,7 +333,7 @@ export default (dom, collapsed) => {
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close} localStream={this.localStream}
-                    remoteStream={this.remoteStream}
+                    remoteStream={this.remoteStream} 
                     title={title} hideAccept={hideAccept} localFullRemoteCorner={localFullRemoteCorner}/>,
                 me.dom
             )
@@ -344,7 +349,7 @@ export default (dom, collapsed) => {
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close} localStream={this.localStream}
-                    remoteStream={this.remoteStream}
+                    remoteStream={this.remoteStream} 
                     title={title} localFullRemoteCorner={localFullRemoteCorner}/>,
                 me.dom
             )

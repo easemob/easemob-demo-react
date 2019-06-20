@@ -7,7 +7,6 @@ var _logger = _util.logger;
 var API = require('./api');
 var RouteTo = API.RouteTo;
 var CONFERENCE_XMLNS = "urn:xmpp:media-conference";
-
 var _RtcHandler = {
     _apiCallbacks: {},
     imConnection: null,
@@ -39,7 +38,7 @@ var _RtcHandler = {
         if (!msginfo) {return}
         var messageBodyMessage = WebIM.conn.context.root.lookup("easemob.pb.ConferenceBody");
         var thirdMessage = messageBodyMessage.decode(msginfo.payload);
-        
+        console.log('%c'+JSON.stringify(thirdMessage), 'color: blue')
         var id = msginfo.id;
         var from = msginfo.from.name|| '';
 
@@ -77,18 +76,17 @@ var _RtcHandler = {
 
         _logger.debug("Recv [op = " + rtcOptions.op + "] [tsxId=" + tsxId + "]\r\n json :", msginfo);
 
-
         //if a->b already, c->a/b should be termiated with 'busy' reason
-        if (from.indexOf("@") >= 0) {
-            if (self._connectedSid == '' && (rtcOptions.op == 102 || rtcOptions.op == 202)) {
+        //if (from.indexOf("@") >= 0) {
+            if (self._connectedSid == '' && (rtcOptions.result == 0 || rtcOptions.op ==102|| rtcOptions.op ==202)) {
                 self._connectedSid = fromSessionId;
             } else {
                 if (self._connectedSid != fromSessionId) {
                     _logger.debug("Error recv [op = " + rtcOptions.op + "] [tsxId=" + tsxId + "]. caused by _connectedSid != fromSessionId :",
-                        self._connectedSid, fromSessionId);
+                    self._connectedSid, fromSessionId);
 
                     //onInitC
-                    if (rtcOptions.op == 102) {
+                    if (rtcOptions.op == 102 && fromSessionId && self._connectedSid) {
                         var rt = new RouteTo({
                             to: from,
                             rtKey: rtkey,
@@ -117,16 +115,25 @@ var _RtcHandler = {
                     return;
                 }
             }
-        }
+        //}
 
         //onTermC
         if (rtcOptions.op == 107) {
             self._connectedSid = '';
-            self._fromSessionID = {};
-
-            var reasonObj = msginfo.endReason;
-            //var endReason = msginfo.getElementsByTagName('reason')[0].innerHTML;
-            reasonObj && reasonObj.length > 0 && (rtcOptions.reason =  '失败了');
+            _fromSessionID = {};
+            // "ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
+            // *               "decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
+            var endreasonCode = {
+                0: "hangup",
+                1: "noresponse",
+                2: "reject",
+                3: "busy",
+                4: "fail",
+                5: "unsupported",
+                6: "offline"
+              }
+            var reasonCode = thirdMessage.endReason;
+            rtcOptions.reason = reasonCode !=undefined && endreasonCode[reasonCode]
         }
 
         if (rtcOptions.sdp) {
@@ -297,7 +304,6 @@ var _RtcHandler = {
 
         self.ctx && (options.data.ctx = self.ctx);
         self.convertRtcOptions(options);
-
         var streamType = options.streamType || self.singalStreamType || "VIDEO"; // "VIDEO"; //VOICE, VIDEO
         if (options.data.op == 102) {
             self.singalStreamType = streamType;
@@ -311,17 +317,6 @@ var _RtcHandler = {
             }
         );
 
-        // var completeFn = function (result) {
-        //         rt.success(result);
-        //     } || function (result) {
-        //         _logger.debug("send result. op:" + options.data.op + ".", result);
-        //     };
-
-        // var errFn = function (ele) {
-        //         rt.fail(ele);
-        //     } || function (ele) {
-        //         _logger.debug(ele);
-        //     };
         var sendOptions = {
             id: id,
             to: to,
@@ -331,12 +326,12 @@ var _RtcHandler = {
             stream_type: streamType,
             sid: sid,
             content: options.data,
-            reason: options.reason
+            reason: options.reason,
+            rtKey: rtKey
         }
 
         if(options.data.op != 202){
             this._sendMessage(sendOptions, WebIM.conn)
-            //_conn.context.stropheConn.sendIQ(iq.tree(), completeFn, errFn);
         }
 
         //onTermC
@@ -470,7 +465,7 @@ var _RtcHandler = {
             }
         } else if(messageOption.content.op == 400){
             content = messageOption.content
-        }else {
+        } else {
             content = messageOption.content;
             content.tsxId = String(messageOption.content.tsxId);
         }
@@ -482,25 +477,34 @@ var _RtcHandler = {
         fifthMessage.type = messageOption.type
 
         if (op == 102 || op == 104 || op == 105 || op == 107 || op == 400) {
-            fifthMessage.routeKey = '--X--';
+            fifthMessage.routeKey = messageOption.rtKey;
             fifthMessage.routeFlag = messageOption.rtflag;
             fifthMessage.peerName = messageOption.from.name;
         }
 
         if(op == 107){
-            fifthMessage.endReason = 0
+        //"ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
+        //"decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
+            var endreasonCode = {
+                success: 0,
+                ok: 0,
+                timeout: 1,
+                decline: 2,
+                busy: 3,
+                "failed-transport": 4,
+                unsupported: 5,
+                offline: 6
+            }
+            fifthMessage.endReason = endreasonCode[messageOption.reason]
         }
+        console.log("%c"+JSON.stringify(fifthMessage),"color: pink")
 
         fifthMessage = contentMessage.encode(fifthMessage).finish();
-        // var messageBody = conn.context.root.lookup("easemob.pb.ConferenceBody");
-        // var fourthMessage = messageBody.decode(emptyMessage);
-        // fourthMessage.payload = fifthMessage;
         var MetaMessage = conn.context.root.lookup("easemob.pb.Meta");
         var thirdMessage = MetaMessage.decode(emptyMessage);
         thirdMessage.id = String(messageOption.id);
 
         thirdMessage.ns = 4;
-
         thirdMessage.to = {
             appKey: messageOption.from.appKey,
             domain: messageOption.from.domain,
@@ -511,7 +515,6 @@ var _RtcHandler = {
         }
 
         thirdMessage.payload = fifthMessage;
- 
         var commSyncULMessage = conn.context.root.lookup("easemob.pb.CommSyncUL");
         var secondMessage = commSyncULMessage.decode(emptyMessage);
         secondMessage.meta = thirdMessage;
