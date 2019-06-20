@@ -4434,30 +4434,8 @@ connection.prototype.blockGroup = function (opt) {
     options.error = opt.error || _utils.emptyfn;
     WebIM.utils.ajax(options);
 };
-/**
- * 通过RestFul API发出入群申请
- * @param {Object} opt -
- * @param {String} opt.groupId - 加入群组ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- * @since 1.4.11
- */
-connection.prototype.joinGroup = function (opt) {
-    var options = {
-        url: this.apiUrl + '/' + this.orgName + '/'
-        + this.appName + '/' + 'chatgroups' + '/' + opt.groupId + '/' + 'apply',
-        type: 'POST',
-        dataType: 'json',
-        data: JSON.stringify({ message: 'join group' }),    // 后端参数变更，申请入群需要填写入群消息
-        headers: {
-            'Authorization': 'Bearer ' + this.token,
-            'Content-Type': 'application/json'
-        }
-    };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
+
+
 /**
  * 通过RestFul API分页获取群组列表
  * @param {Object} opt -
@@ -4493,6 +4471,30 @@ connection.prototype.listGroups = function (opt) {
 };
 
 /**
+ * 通过RestFul API列出某用户所加入的所有群组
+ * @param {Object} opt - 
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ * @since 1.4.11
+ */
+connection.prototype.getGroup = function (opt) {
+    var options = {
+        url: this.apiUrl + '/' + this.orgName +
+        '/' + this.appName + '/' + 'users' + '/' +
+        this.user + '/' + 'joined_chatgroups',
+        dataType: 'json',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Content-Type': 'application/json'
+        }
+    };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
  * 通过RestFul API根据groupId获取群组详情
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
@@ -4516,24 +4518,31 @@ connection.prototype.getGroupInfo = function (opt) {
 };
 
 /**
- * 通过RestFul API列出某用户所加入的所有群组
- * @param {Object} opt - 
+ * 通过RestFul API修改群信息
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {string} opt.groupName - 群组名
+ * @param {string} opt.description - 群组简介
  * @param {Function} opt.success - 成功之后的回调，默认为空
  * @param {Function} opt.error - 失败之后的回调，默认为空
- * @since 1.4.11
  */
-connection.prototype.getGroup = function (opt) {
-    var options = {
-        url: this.apiUrl + '/' + this.orgName +
-        '/' + this.appName + '/' + 'users' + '/' +
-        this.user + '/' + 'joined_chatgroups',
-        dataType: 'json',
-        type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + this.token,
-            'Content-Type': 'application/json'
-        }
-    };
+connection.prototype.modifyGroup = function (opt) {
+    var groupId = opt.groupId,
+        requestData = {
+            groupname: opt.groupName,
+            description: opt.description
+        },
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId,
+            type: 'PUT',
+            data: JSON.stringify(requestData),
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
     options.success = opt.success || _utils.emptyfn;
     options.error = opt.error || _utils.emptyfn;
     WebIM.utils.ajax(options);
@@ -4580,65 +4589,6 @@ connection.prototype.listGroupMember = function (opt) {
 };
 
 /**
- * 通过RestFul API禁止群用户发言
- * @param {Object} opt -
- * @param {string} opt.username - 被禁言的群成员的ID
- * @param {Number} opt.muteDuration - 被禁言的时长，单位ms
- * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- * @since 1.4.11
- */
-connection.prototype.mute = function (opt) {
-    var groupId = opt.groupId,
-        requestData = {
-            "usernames": [opt.username],
-            "mute_duration": opt.muteDuration
-        },
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/' + 'chatgroups'
-            + '/' + groupId + '/' + 'mute',
-            dataType: 'json',
-            type: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify(requestData)
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API取消对用户禁言
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {string} opt.username - 被取消禁言的群用户ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- * @since 1.4.11
- */
-connection.prototype.removeMute = function (opt) {
-    var groupId = opt.groupId,
-        username = opt.username;
-    var options = {
-        url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/' + 'chatgroups'
-        + '/' + groupId + '/' + 'mute' + '/' + username,
-        dataType: 'json',
-        type: 'DELETE',
-        headers: {
-            'Authorization': 'Bearer ' + this.token,
-            'Content-Type': 'application/json'
-        }
-    };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
  * 通过RestFul API获取群组下所有管理员
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
@@ -4651,30 +4601,6 @@ connection.prototype.getGroupAdmin = function (opt) {
     var options = {
         url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/chatgroups'
         + '/' + groupId + '/admin',
-        dataType: 'json',
-        type: 'GET',
-        headers: {
-            'Authorization': 'Bearer ' + this.token,
-            'Content-Type': 'application/json'
-        }
-    };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API获取群组下所有被禁言成员
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.getMuted = function (opt) {
-    var groupId = opt.groupId;
-    var options = {
-        url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/chatgroups'
-        + '/' + groupId + '/mute',
         dataType: 'json',
         type: 'GET',
         headers: {
@@ -4743,6 +4669,109 @@ connection.prototype.removeAdmin = function (opt) {
 };
 
 /**
+ * 通过RestFul API解散群组
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.dissolveGroup = function (opt) {
+    var groupId = opt.groupId,
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '?version=v3',
+            type: 'DELETE',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API离开群组
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.quitGroup = function (opt) {
+    var groupId = opt.groupId,
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'quit',
+            type: 'DELETE',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API邀请群成员
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组名
+ * @param {string[]} opt.users - 用户ID数组
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.inviteToGroup = function (opt) {
+    var groupId = opt.groupId,
+        users = opt.users,
+        requestData = {
+            usernames: users
+        },
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'invite',
+            type: 'POST',
+            data: JSON.stringify(requestData),
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API发出入群申请
+ * @param {Object} opt -
+ * @param {String} opt.groupId - 加入群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ * @since 1.4.11
+ */
+connection.prototype.joinGroup = function (opt) {
+    var options = {
+        url: this.apiUrl + '/' + this.orgName + '/'
+        + this.appName + '/' + 'chatgroups' + '/' + opt.groupId + '/' + 'apply',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify({ message: 'join group' }),    // 后端参数变更，申请入群需要填写入群消息
+        headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Content-Type': 'application/json'
+        }
+    };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
  * 通过RestFul API同意用户加入群
  * @param {Object} opt -
  * @param {string} opt.applicant - 申请加群的用户ID
@@ -4803,6 +4832,146 @@ connection.prototype.rejectJoinGroup = function (opt) {
     options.error = opt.error || _utils.emptyfn;
     WebIM.utils.ajax(options);
 };
+
+
+/**
+ * 通过RestFul API删除单个群成员
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {string} opt.username - 用户ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.removeSingleGroupMember = function (opt) {
+    var groupId = opt.groupId,
+        username = opt.username,
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'users' + '/'
+            + username,
+            type: 'DELETE',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API删除多个群成员
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {string[]} opt.users - 用户ID数组
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.removeMultiGroupMember = function (opt) {
+    var groupId = opt.groupId,
+        users = opt.users.join(','),
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'users' + '/'
+            + users,
+            type: 'DELETE',
+            dataType: 'json',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API禁止群用户发言
+ * @param {Object} opt -
+ * @param {string} opt.username - 被禁言的群成员的ID
+ * @param {Number} opt.muteDuration - 被禁言的时长，单位ms，如果是“-1000”代表永久
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ * @since 1.4.11
+ */
+connection.prototype.mute = function (opt) {
+    var groupId = opt.groupId,
+        requestData = {
+            "usernames": [opt.username],
+            "mute_duration": opt.muteDuration
+        },
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/' + 'chatgroups'
+            + '/' + groupId + '/' + 'mute',
+            dataType: 'json',
+            type: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(requestData)
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API取消对用户禁言
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {string} opt.username - 被取消禁言的群用户ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ * @since 1.4.11
+ */
+connection.prototype.removeMute = function (opt) {
+    var groupId = opt.groupId,
+        username = opt.username;
+    var options = {
+        url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/' + 'chatgroups'
+        + '/' + groupId + '/' + 'mute' + '/' + username,
+        dataType: 'json',
+        type: 'DELETE',
+        headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Content-Type': 'application/json'
+        }
+    };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API获取群组下所有被禁言成员
+ * @param {Object} opt -
+ * @param {string} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.getMuted = function (opt) {
+    var groupId = opt.groupId;
+    var options = {
+        url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/chatgroups'
+        + '/' + groupId + '/mute',
+        dataType: 'json',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Content-Type': 'application/json'
+        }
+    };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+
 
 /**
  * 通过RestFul API添加用户至群组黑名单(单个)
@@ -4893,7 +5062,7 @@ connection.prototype.removeGroupBlockSingle = function (opt) {
  * 通过RestFul API将用户从群黑名单移除（批量）
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID
- * @param {string[]} opt.username - 用户ID数组
+ * @param {string} opt.username - 多个用户ID逗号分隔
  * @param {Function} opt.success - 成功之后的回调，默认为空
  * @param {Function} opt.error - 失败之后的回调，默认为空
  */
@@ -4916,29 +5085,6 @@ connection.prototype.removeGroupBlockMulti = function (opt) {
     WebIM.utils.ajax(options);
 };
 
-/**
- * 通过RestFul API解散群组
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.dissolveGroup = function (opt) {
-    var groupId = opt.groupId,
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId + '?version=v3',
-            type: 'DELETE',
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
 
 /**
  * 通过RestFul API获取群组黑名单
@@ -4964,144 +5110,6 @@ connection.prototype.getGroupBlacklistNew = function (opt) {
     WebIM.utils.ajax(options);
 };
 
-/**
- * 通过RestFul API离开群组
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.quitGroup = function (opt) {
-    var groupId = opt.groupId,
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId + '/' + 'quit',
-            type: 'DELETE',
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API修改群信息
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {string} opt.groupName - 群组名
- * @param {string} opt.description - 群组简介
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.modifyGroup = function (opt) {
-    var groupId = opt.groupId,
-        requestData = {
-            groupname: opt.groupName,
-            description: opt.description
-        },
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId,
-            type: 'PUT',
-            data: JSON.stringify(requestData),
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API删除单个群成员
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {string} opt.username - 用户ID
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.removeSingleGroupMember = function (opt) {
-    var groupId = opt.groupId,
-        username = opt.username,
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId + '/' + 'users' + '/'
-            + username,
-            type: 'DELETE',
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API删除多个群成员
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组ID
- * @param {string[]} opt.users - 用户ID数组
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.removeMultiGroupMember = function (opt) {
-    var groupId = opt.groupId,
-        users = opt.users.join(','),
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId + '/' + 'users' + '/'
-            + users,
-            type: 'DELETE',
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
-
-/**
- * 通过RestFul API邀请群成员
- * @param {Object} opt -
- * @param {string} opt.groupId - 群组名
- * @param {string[]} opt.users - 用户ID数组
- * @param {Function} opt.success - 成功之后的回调，默认为空
- * @param {Function} opt.error - 失败之后的回调，默认为空
- */
-connection.prototype.inviteToGroup = function (opt) {
-    var groupId = opt.groupId,
-        users = opt.users,
-        requestData = {
-            usernames: users
-        },
-        options = {
-            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
-            + '/' + 'chatgroups' + '/' + groupId + '/' + 'invite',
-            type: 'POST',
-            data: JSON.stringify(requestData),
-            dataType: 'json',
-            headers: {
-                'Authorization': 'Bearer ' + this.token,
-                'Content-Type': 'application/json'
-            }
-        };
-    options.success = opt.success || _utils.emptyfn;
-    options.error = opt.error || _utils.emptyfn;
-    WebIM.utils.ajax(options);
-};
 
 // function _setText(valueDom, v) {
 //     if ('textContent' in valueDom) {
