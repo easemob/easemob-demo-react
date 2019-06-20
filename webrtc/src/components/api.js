@@ -609,7 +609,8 @@ var _clazz = {
 
         var rtcOptions = {
             data: {
-                op: 107
+                op: 107,
+                reason: reason
             }
         };
 

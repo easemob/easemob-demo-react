@@ -70,20 +70,20 @@ class WebRTCModal extends React.Component {
                     //"ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
                     //"decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
                     // TODO reason undefine if reason is busy
-                    console.log("onTermCall")
+                    console.log("onTermCall", reason)
                     if (reason && (reason == "busy" || reason == "BUSY")) {
                         message.error("Target is busy. Try it later.")
                     }
-                    if (reason && (reason == "timeout" || reason == "NORESPONSE")) {
+                    if (reason && (reason == "timeout" || reason == "noresponse")) {
                         message.error("Target no response. Try it later.")
                     }
-                    if (reason && (reason == "decline" || reason == "REJECT")) {
-                        message.error("Target reject.")
+                    if (reason && (reason == "decline" || reason == "reject")) {
+                        message.error("Target reject.") 
                     }
-                    if (reason && (reason == "failed-transport" || reason == "FAIL")) {
+                    if (reason && (reason == "failed-transport" || reason == "fail")) {
                         message.error("Call failed. Try it later.")
                     }
-                    if (reason && (reason == "ok" || reason == "success" || reason == "HANGUP")) {
+                    if (reason && (reason == "ok" || reason == "success" || reason == "hangup")) {
                         message.success("Target hangup. ")
                     }
 

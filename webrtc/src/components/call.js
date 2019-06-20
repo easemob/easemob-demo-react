@@ -118,7 +118,7 @@ var _Call = {
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
         self.mediaStreamConstaints.video = true;
 
-        this.call(callee, mediaStreamConstaints, accessSid);
+        this.call(callee,self.mediaStreamConstaints, accessSid);
     },
 
     makeVoiceCall: function (callee, accessSid) {
@@ -129,7 +129,7 @@ var _Call = {
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
         self.mediaStreamConstaints.video = false;
 
-        self.call(callee, mediaStreamConstaints, accessSid);
+        self.call(callee, self.mediaStreamConstaints, accessSid);
     },
 
     acceptCall: function () {
