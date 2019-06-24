@@ -161,6 +161,10 @@ WebIM.conn.listen({
             console.log("your admin has been canceled", msg)
             message.success(`"your admin has been canceled": ${msg}`)
             break
+        case "changeOwner":
+            console.log("You've become group managerd", msg)
+            message.success(`"You've become group managerd": ${msg}`)
+            break
         default:
             break
         }

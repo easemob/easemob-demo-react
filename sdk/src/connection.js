@@ -4495,6 +4495,33 @@ connection.prototype.getGroup = function (opt) {
 };
 
 /**
+* 通过restful api转让群组
+* @param {Object} opt
+* @param {String}opt.groupId - 群组id
+* @param {String}opt.newOwner - 群组的新管理员 ID
+* @param {Function} opt.success - 成功之后的回调，默认为空
+* @param {Function} opt.error - 失败之后的回调，默认为空
+*/
+connection.prototype.changeOwner = function (opt) {
+   var requestData = {
+       newowner: opt.newOwner
+   }
+   var options = {
+       url: this.apiUrl + '/' + this.orgName + '/' + this.appName + '/chatgroups/' + opt.groupId,
+       type: 'PUT',
+       dataType: 'json',
+       headers: {
+           'Authorization': 'Bearer ' + this.token,
+           'Content-Type': 'application/json'
+       },
+       data: JSON.stringify(requestData)
+   }
+   options.success = opt.success || _utils.emptyfn;
+   options.error = opt.error || _utils.emptyfn;
+   WebIM.utils.ajax(options);
+},
+
+/**
  * 通过RestFul API根据groupId获取群组详情
  * @param {Object} opt -
  * @param {string} opt.groupId - 群组ID

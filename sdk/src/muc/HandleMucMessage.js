@@ -36,6 +36,10 @@ var handleMessage = function(meta, status, conn){
                 info.type = 'addAdmin'; //成为管理员
                 conn.onPresence(info);
             },
+            20: () => {
+                info.type = 'changeOwner'; //转让群组
+                conn.onPresence(info);
+            },
             19: () => {
                 info.type = 'direct_joined'; //直接拉进群了
                 conn.onPresence(info);
