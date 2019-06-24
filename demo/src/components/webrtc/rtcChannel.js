@@ -325,11 +325,16 @@ export default (dom, collapsed) => {
             var title = ""
             var hideAccept = false
             var localFullRemoteCorner = false
+            if(WebIM.call.callee.indexOf("@") > 0){
+                var callee = WebIM.call.callee.split("@")[0].split("_")[1]
+            }else{
+                var callee = WebIM.call.callee
+            }
             if (WebIM.conn.context.userId == WebIM.call.caller) {
-                title = I18n.t("waiting") + WebIM.call.callee.split("@")[0].split("_")[1] + (streamType == "VOICE" ? I18n.t("waitingVoice") : I18n.t("waitingVideo") )
+                title = I18n.t("waiting") + callee + (streamType == "VOICE" ? I18n.t("waitingVoice") : I18n.t("waitingVideo") )
                 hideAccept = true
             } else {
-                title = WebIM.call.callee.split("@")[0].split("_")[1]
+                title = callee
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close} localStream={this.localStream}
@@ -342,10 +347,15 @@ export default (dom, collapsed) => {
             this.remoteStream = stream
             var title = ""
             var localFullRemoteCorner = false
+            if(WebIM.call.callee.indexOf("@") > 0){
+                var callee = WebIM.call.callee.split("@")[0].split("_")[1]
+            }else{
+                var callee = WebIM.call.callee
+            }
             if (WebIM.call.caller != "" && WebIM.call.caller == WebIM.conn.context.userId) {
-                title = WebIM.call.callee
+                title = callee
             } else {
-                title = WebIM.call.callee + (streamType == "VOICE" ? I18n.t("requestVoice") : I18n.t("requestVideo"))
+                title = callee + (streamType == "VOICE" ? I18n.t("requestVoice") : I18n.t("requestVideo"))
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close} localStream={this.localStream}
