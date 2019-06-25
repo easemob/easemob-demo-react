@@ -64,6 +64,21 @@ var handleMessage = function(meta, status, conn){
                 info.kicked = info.to;
                 conn.onPresence(info);
             },
+            9: () => {
+                info.type = 'INVITE_DECLINE'; //拒绝加群邀请
+                info.kicked = info.to;
+                conn.onPresence(info);
+            },
+            8: () => {
+                info.type = 'INVITE_ACCEPT'; //接受加群邀请
+                info.kicked = info.to;
+                conn.onPresence(info);
+            },
+            7: () => {
+                info.type = 'invite'; //手机端邀请入群 "INVITE_ACCEPT": 8, "INVITE_DECLINE": 9,
+                info.kicked = info.to;
+                conn.onPresence(info);
+            },
             6:  () => {
                 info.type = 'joinPublicGroupDeclined'; //加群被拒绝
                 conn.onPresence(info);
