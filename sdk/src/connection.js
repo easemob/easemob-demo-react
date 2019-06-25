@@ -4860,6 +4860,65 @@ connection.prototype.rejectJoinGroup = function (opt) {
     WebIM.utils.ajax(options);
 };
 
+/**
+ * 通过RestFul API同意加群邀请
+ * @param {Object} opt -
+ * @param {string} opt.invitee - 处理群邀请用户的用户名
+ * @param {Object} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.agreeInviteIntoGroup = function (opt) {
+    var groupId = opt.groupId,
+        requestData = {
+            "invitee": opt.invitee,
+            "verifyResult": true
+        },
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'invite_verify',
+            type: 'POST',
+            dataType: "json",
+            data: JSON.stringify(requestData),
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
+
+/**
+ * 通过RestFul API拒绝加群邀请
+ * @param {Object} opt -
+ * @param {string} opt.invitee - 处理群邀请用户的用户名
+ * @param {Object} opt.groupId - 群组ID
+ * @param {Function} opt.success - 成功之后的回调，默认为空
+ * @param {Function} opt.error - 失败之后的回调，默认为空
+ */
+connection.prototype.rejectInviteIntoGroup = function (opt) {
+    var groupId = opt.groupId,
+        requestData = {
+            "invitee": opt.invitee,
+            "verifyResult": false
+        },
+        options = {
+            url: this.apiUrl + '/' + this.orgName + '/' + this.appName
+            + '/' + 'chatgroups' + '/' + groupId + '/' + 'invite_verify',
+            type: 'POST',
+            dataType: "json",
+            data: JSON.stringify(requestData),
+            headers: {
+                'Authorization': 'Bearer ' + this.token,
+                'Content-Type': 'application/json'
+            }
+        };
+    options.success = opt.success || _utils.emptyfn;
+    options.error = opt.error || _utils.emptyfn;
+    WebIM.utils.ajax(options);
+};
 
 /**
  * 通过RestFul API删除单个群成员

@@ -20,7 +20,7 @@ import { I18n } from "react-redux-i18n"
 import RTCChannel from "@/components/webrtc/rtcChannel"
 import WebRTCModal from "@/components/webrtc/WebRTCModal"
 
-import { message } from "antd"
+import { message, Modal } from "antd"
 
 const logger = WebIM.loglevel.getLogger("WebIMRedux")
 
@@ -88,13 +88,21 @@ WebIM.conn.listen({
             message.error(`group${msg.gid} was destroyed.`)
             store.dispatch(GroupActions.getGroups())
             break
+        case "leaveGroup": // 某人离开群
+            message.error(
+                `${msg.from}${I18n.t("LeaveGroup")}${msg.gid}.`
+            )
+            break
         case "removedFromGroup":
-        case "leaveGroup": // dismissed by admin
             message.error(
                 `${msg.kicked || I18n.t("you")} ${I18n.t("dismissed")}${I18n.t("by")}${msg.owner ||
                     I18n.t("admin")} .`
             )
             store.dispatch(GroupActions.getGroups())
+            break
+        case "invite": //手机端邀请入群
+            store.dispatch(CommonActions.setShowGroupInviteModal(true))
+            store.dispatch(GroupRequestActions.addGroupRequest(msg))
             break
         case "direct_joined": //被拉进群
         case "joinPublicGroupSuccess":

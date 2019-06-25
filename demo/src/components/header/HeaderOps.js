@@ -18,6 +18,7 @@ import AddGroupModal from "@/components/group/AddGroupModal"
 import BlacklistModal from "@/components/blacklist/BlacklistModal"
 import JoinGroupModal from "@/components/group/JoinGroupModal"
 import GroupRequestModal from "@/components/group/GroupRequestModal"
+import GroupInviteModal from "@/components/group/GroupInviteModal"
 
 class HeaderOps extends Component {
     constructor(props) {
@@ -81,10 +82,11 @@ class HeaderOps extends Component {
     handleModalClose(e) {
         this.setState({ modal: "" })
         this.props.setShowGroupRequestModal(false)
+        this.props.setShowGroupInviteModal(false)
     }
 
     render() {
-        const { title, doLogout, subscribes, groupRequests, showGroupRequestModal } = this.props
+        const { title, doLogout, subscribes, groupRequests, showGroupRequestModal, showGroupInviteModal } = this.props
         const { modal } = this.state
 
         const tabsLeft = [
@@ -213,6 +215,15 @@ class HeaderOps extends Component {
                         onModalClose={this.handleModalClose}
                     />
                 }
+                {
+                    <ModalComponent
+                        width={460}
+                        title={I18n.t("groupInvite")}
+                        visible={showGroupInviteModal}
+                        component={GroupInviteModal}
+                        onModalClose={this.handleModalClose}
+                    />
+                }
             </div>
         )
     }
@@ -227,10 +238,12 @@ export default connect(
     (state) => ({
         subscribes: state.entities.subscribe.byFrom,
         groupRequests: state.entities.groupRequest.byGid,
-        showGroupRequestModal: state.common.showGroupRequestModal
+        showGroupRequestModal: state.common.showGroupRequestModal,
+        showGroupInviteModal: state.common.showGroupInviteModal
     }),
     dispatch => ({
         doLogout: () => dispatch(WebIMActions.logout()),
-        setShowGroupRequestModal: (status) => dispatch(CommonActions.setShowGroupRequestModal(status))
+        setShowGroupRequestModal: (status) => dispatch(CommonActions.setShowGroupRequestModal(status)),
+        setShowGroupInviteModal: (status) => dispatch(CommonActions.setShowGroupInviteModal(status))
     })
 )(HeaderOps)

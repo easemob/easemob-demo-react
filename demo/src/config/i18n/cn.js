@@ -50,6 +50,7 @@ export const cn = {
     you: "你",
     admin: "管理员",
     dismissed: "已被踢出",
+    LeaveGroup: "离开群组：",
     muted: "已被禁言",
     // 订阅
     refuse: "请求被拒绝",
@@ -72,7 +73,9 @@ export const cn = {
     groupName: "群组名称",
     groupNameWaring: "请输入群组名称！",
     inviteToGroup: "邀请群成员",
+    inviteIntoGroup: "邀请你加入群组：",
     groupRequest: "加群申请",
+    groupInvite: "加群邀请",
     modifyGroupInfo: "修改群信息",
     groupBlacklist: "群组黑名单",
     removeFromGroupBlackList: "移出黑名单",
