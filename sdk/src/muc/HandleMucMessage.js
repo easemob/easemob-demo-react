@@ -20,6 +20,22 @@ var handleMessage = function(meta, status, conn){
         }
 
         return({
+            28: () => {
+                info.type = 'deleteFile';
+                conn.onPresence(info);
+            },
+            27: () => {
+                info.type = 'uploadFile';
+                conn.onPresence(info);
+            },
+            26: () => {
+                info.type = 'deleteAnnouncement';
+                conn.onPresence(info);
+            },
+            25: () => {
+                info.type = 'updateAnnouncement';
+                conn.onPresence(info);
+            },
             24: () => {
                 info.type = 'removeMute';//解除禁言
                 conn.onPresence(info);
@@ -54,9 +70,29 @@ var handleMessage = function(meta, status, conn){
                 //info.type = 'presence'; //进群了
                 conn.onPresence(info);
             },
+            16: () => {
+                info.type = 'unblock';
+                conn.onPresence(info);
+            },
+            15: () => {
+                info.type = 'block';
+                conn.onPresence(info);
+            },
+            14: () => {
+                info.type = 'update';
+                conn.onPresence(info);
+            },
             13: () => {
                 info.type = 'allow'; //移除黑名单
                 info.reason = thirdMessage.reason;
+                conn.onPresence(info);
+            },
+            12: () => {
+                info.type = 'ban';
+                conn.onPresence(info);
+            },
+            11: () => {
+                info.type = 'getBlackList';
                 conn.onPresence(info);
             },
             10: () => {
@@ -65,12 +101,12 @@ var handleMessage = function(meta, status, conn){
                 conn.onPresence(info);
             },
             9: () => {
-                info.type = 'INVITE_DECLINE'; //拒绝加群邀请
+                info.type = 'invite_decline'; //拒绝加群邀请
                 info.kicked = info.to;
                 conn.onPresence(info);
             },
             8: () => {
-                info.type = 'INVITE_ACCEPT'; //接受加群邀请
+                info.type = 'invite_accept'; //接受加群邀请
                 info.kicked = info.to;
                 conn.onPresence(info);
             },
@@ -90,6 +126,14 @@ var handleMessage = function(meta, status, conn){
             4: () => {
                 info.type = 'joinGroupNotifications'; //申请加群
                 info.reason = thirdMessage.reason;
+                conn.onPresence(info);
+            },
+            3: () => {
+                info.type = 'leave';
+                conn.onPresence(info);
+            },
+            2: () => {
+                info.type = 'join';
                 conn.onPresence(info);
             },
             1: () => {
