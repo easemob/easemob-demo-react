@@ -450,7 +450,15 @@ class Chat extends React.Component {
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
                     {this.state.isLoaded && <div style={{ width: "150px", height: "30px", lineHeight: "30px", backgroundColor: "#888", color: "#fff", borderRadius: "15px", textAlign: "center", margin: "10px auto" }}>{I18n.t("noMoreMessage")}</div>}
-                    {_.map(messageList, (message,i) => <ChatMessage key={i} {...message} />)}
+                    {_.map(messageList, (message,i) =>{
+                        if(i > 0){
+                            if(message.id != messageList[i-1].id){
+                                return <ChatMessage key={i} {...message} />
+                            }
+                        }else{
+                            return <ChatMessage key={i} {...message} />
+                        }
+                    } )}
                 </div>
                 <div className="x-chat-footer">
                     <div className="x-list-item x-chat-ops">

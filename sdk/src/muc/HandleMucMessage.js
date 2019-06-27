@@ -67,7 +67,7 @@ var handleMessage = function(meta, status, conn){
             },
             17: () => {
                 info.type = thirdMessage.isChatroom ? 'memberJoinChatRoomSuccess' : 'memberJoinPublicGroupSuccess';
-                //info.type = 'presence'; //进群了
+                //info.type = 'presence'; // 有人进群了
                 conn.onPresence(info);
             },
             16: () => {
