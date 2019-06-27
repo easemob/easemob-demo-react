@@ -105,6 +105,8 @@ WebIM.conn.listen({
             store.dispatch(GroupRequestActions.addGroupRequest(msg))
             break
         case "direct_joined": //被拉进群
+            message.success(`${msg.from}${I18n.t("invite")}${I18n.t("you")}${I18n.t("join")}${msg.gid}`)
+            store.dispatch(GroupActions.getGroups())
             break
         case "joinPublicGroupSuccess":
             message.success(`${I18n.t("joinGroup")} ${msg.from} ${I18n.t("successfully")}`)
