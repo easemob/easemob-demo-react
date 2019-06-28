@@ -1,6 +1,6 @@
 {
   "name": "easemob-websdk",
-  "version": "1.11.2",
+  "version": "2.9.2",
   "description": "Easemob IM websdk",
   "main": "index.js",
   "scripts": {
