@@ -7,36 +7,6 @@ packing(){
     cd ../
     echo -e "\nINSTALL DONE.\n"
 
-    cd ./sdk
-    npm link
-    cd ../
-    echo -e "\nCREATE [WEBRTC] GLOBAL LINK DONE.\n"
-
-    cd ./webrtc
-    npm link
-    cd ../
-    echo -e "\nCREATE [WEBRTC] GLOBAL LINK DONE.\n"
-
-    cd ./emedia
-    npm link
-    cd ../
-    echo -e "\nCREATE [EMEDIA] GLOBAL LINK DONE.\n"
-
-    cd ./demo
-    npm link easemob-websdk
-    cd ../
-    echo -e "\nLINK [WEBRTC] DONE.\n"
-
-    cd ./demo
-    npm link easemob-webrtc
-    cd ../
-    echo -e "\nLINK [WEBRTC] DONE.\n"
-
-    cd ./demo
-    npm link easemob-emedia
-    cd ../
-    echo -e "\nLINK [EMEDIA] DONE.\n"
-
     cd ./demo
     TRAVIS=true TAG_NAME=$TRAVIS_TAG npm run build
     cd ../
