@@ -5239,7 +5239,7 @@ WebIM.debug = function (bool) {
     // }
 
 }
-
+window.WebIM = WebIM;
 if (module.hot) {
     module.hot.accept();
 }
