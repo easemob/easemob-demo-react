@@ -1,7 +1,0 @@
-.idea/*
-.DS_Store
-.swp
-.map
-node_modules/
-dist/
-.cache/
