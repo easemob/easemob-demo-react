@@ -272,6 +272,9 @@ WebIM.conn.listen({
     onRecallMessage: message => {
         logger.info("onRecallMessage", message)
     },
+    onLocationMessage: message =>{ //位置消息
+        logger.info("onLocationMessage", message)
+    },
     onTextMessage: message => {
         console.log("onTextMessage", message)
         const { from, to } = message 
