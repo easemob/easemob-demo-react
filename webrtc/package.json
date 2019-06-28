@@ -1,42 +1,31 @@
 {
   "name": "easemob-webrtc",
-  "version": "1.4.12",
+  "version": "3.0.3",
   "description": "Easemob IM webrtc",
   "main": "index.js",
   "scripts": {
-    "build": "gulp",
+    "build": "parcel build ./index.js --out-file EMedia_x1v1.js --global webrtc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/easemob/web-im.git"
+    "url": ""
   },
   "keywords": [
     "realtime",
     "im",
     "easemob",
-    "xmpp",
-    "strophe",
     "webrtc"
   ],
-  "devDependencies": {
-    "browserify": "^13.1.1",
-    "gulp": "^3.9.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^2.2.0",
-    "gulp-uglify": "^2.0.0",
-    "gulp-util": "^3.0.7",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3",
-    "webpack-stream": "^3.2.0"
-  },
+  "devDependencies": {},
   "author": "easemob",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/easemob/web-im/issues"
   },
   "homepage": "https://github.com/easemob/web-im#readme",
-  "dependencies": {}
+  "dependencies": {
+    "easemob-emedia": "^2.0.1",
+    "parcel-bundler": "^1.12.3"
+  }
 }
