@@ -13,15 +13,19 @@
 
 function getUrl(){
     var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-    var xmppUrl = "im-api.easemob.com"
-    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 || window.location.href.indexOf("localhost") !== -1 || window.location.href.indexOf("172.17.2.168") !== -1){
-        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb-ly.easemob.com"
-        xmppUrl = "im-api.easemob.com"
+    var xmppUrl = "im-api.easemob.com/ws"
+    if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 ){
+        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
+        xmppUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api.easemob.com/ws"
     }
-    // else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
-    //     apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-    //     xmppUrl = "im-api-hsb.easemob.com"
-    // }
+    else if(window.location.href.indexOf("webim-hsb.easemob.com") !== -1){
+        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
+        xmppUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws"
+    }
+    else if(window.location.href.indexOf("webim-hsb-ly.easemob.com/") !== -1 || window.location.href.indexOf("localhost") !== -1){
+        apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
+        xmppUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws"
+    }
     return {
         apiUrl: apiUrl,
         xmppUrl: xmppUrl
@@ -33,7 +37,7 @@ var config = {
     /*
      * XMPP server
      */
-    xmppURL: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws",
+    xmppURL: getUrl().xmppUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws",
     // xmppURL: "im-api.easemob.com",
     // xmppURL: '172.17.2.139:5280',
     /*
@@ -42,7 +46,7 @@ var config = {
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     // ios must be https!!! by lwz
     // apiURL: "https://a1.easemob.com",
-    apiURL: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com",
+    apiURL: getUrl().apiUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com",
     // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//172.17.3.155:8080',
     /*
      * Application AppKey
@@ -134,5 +138,4 @@ var config = {
      */
     enableLocalStorage: true
 }
-
 export default config
