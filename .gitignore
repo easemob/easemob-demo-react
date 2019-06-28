@@ -3,6 +3,8 @@ node_modules
 /.project
 .idea/*
 *.swp
+*.map
+*.vscode
 publish/*
 npm-debug.log
 web-im
