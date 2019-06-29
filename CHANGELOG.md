@@ -1,14 +1,18 @@
 # 版本更新说明:
+## v3.0.0 @2019-06-29
+### Feature
+
+* [demo] 使用最新基于私有协议的sdk
+* [demo] 拆分sdk源码为单独repo
+* [demo] 修复部分bug
 
 ## v1.11.1 @2019-03-18
-
 ###Feature
 
 * [sdk] 通过设置isHttpDNS为true，从服务端获取DNS配置文件
 * [demo] 配置文件文件增加配置isHttpDNS
 * [demo] 项目初始化sdk增加isHttpDNS
 * [demo] 解决safari视频无图片、无声音问题
-
 
 
 ###BugFix
