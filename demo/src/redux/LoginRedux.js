@@ -36,7 +36,6 @@ const { Types, Creators } = createActions({
                 //  accessToken: password,
                 appKey: WebIM.config.appkey,
                 success(token) {
-                    console.log(token, 9999);
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                     message.success(I18N.loginSuccessfully, 1)
 
@@ -57,7 +56,6 @@ const { Types, Creators } = createActions({
             // if (WebIM.conn.isOpened()) {
             //     WebIM.conn.close("logout")
             // }
-            console.log("open", username, token)
             WebIM.conn.open({
                 apiUrl: WebIM.config.apiURL,
                 user: username.trim().toLowerCase(),
@@ -91,7 +89,6 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 export const setLoginToken = (state = INITIAL_STATE, { username, token }) => {
-    console.log("setLoginToken")
     Cookie.set("web_im_" + username, token)
     return Immutable.merge(state, {
         username: username,
@@ -130,7 +127,6 @@ export const failure = (state, { error }) => {
 
 // we've logged out
 export const logout = (state = INITIAL_STATE) => {
-    console.log("reducer logout")
     return state.merge({ username: null, password: null, token: null, isLogin: false })
 }
 

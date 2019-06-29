@@ -41,8 +41,6 @@ class AuthorizedComponent extends Component {
     render() {
         const { token, ...rest } = this.props
 
-        console.log("auth", token)
-
         if (!token && !debug) {
             return <Redirect to="/login" />
         }
@@ -93,7 +91,7 @@ class App extends Component {
     render() {
         const { isLogin, token, isLoading } = this.props
         const { hasToken } = this.state
-        console.log("App render:", isLogin, token, isLoading, hasToken)
+        //console.log("App render:", isLogin, token, isLoading, hasToken)
         if (!isLogin && hasToken && !debug) return <Loading show={true} />
 
         // const authorizedComponent = <AuthorizedComponent {...this.props} token={token} Layout={Layout} />

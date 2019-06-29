@@ -30,7 +30,6 @@ WebIM.conn.listen({
         const username = store.getState().login.username
         const token = utils.getToken()
         const hash = utils.getHash()
-        console.log(history)
         // TODO all path could visited by anonymous should be declared directly
         const path = history.location.pathname.indexOf("login") !== -1 ? "/contact" : history.location.pathname
         const redirectUrl = `${path}?username=${username}`
@@ -157,23 +156,18 @@ WebIM.conn.listen({
         case "leaveChatRoom": // Leave the chat room
             break
         case "addMute":
-            console.log("you was muted", msg)
             message.warning(`you was muted: ${msg}`)
             break
         case "removeMute":
-            console.log("you was unmuted", msg)
             message.success(`you was unmuted: ${msg}`)
             break
         case "addAdmin":
-            console.log("you were set to be an admin", msg)
             message.success(`"you were set to be an admin": ${msg}`)
             break
         case "removeAdmin":
-            console.log("your admin has been canceled", msg)
             message.success(`"your admin has been canceled": ${msg}`)
             break
         case "changeOwner":
-            console.log("You've become group managerd", msg)
             message.success(`"You've become group managerd": ${msg}`)
             break
         default:
@@ -182,7 +176,6 @@ WebIM.conn.listen({
     },
     // handle all exception
     onError: error => {
-        console.log(error)
         // 16: server-side close the websocket connection
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_DISCONNECTED) {
             console.log(
@@ -213,31 +206,26 @@ WebIM.conn.listen({
         }
         // 8: offline by multi login
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_SERVER_ERROR) {
-            console.log("WEBIM_CONNCTION_SERVER_ERROR")
             message.error(`${I18n.t("offlineByMultiLogin")}`)
             history.push("/login")
             return
         }
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_REMOVED) {
-            console.log("WEBIM_CONNCTION_USER_REMOVED")
             message.error("用户下线")
             history.push("/login")
             return
         }
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_LOGIN_ANOTHER_DEVICE) {
-            console.log("WEBIM_CONNCTION_USER_LOGIN_ANOTHER_DEVICE")
             message.error("账户在另外一台设备登录")
             history.push("/login")
             return
         }
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_KICKED_BY_CHANGE_PASSWORD) {
-            console.log("WEBIM_CONNCTION_USER_KICKED_BY_CHANGE_PASSWORD")
             message.error("用户修改密码")
             history.push("/login")
             return
         }
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_USER_KICKED_BY_OTHER_DEVICE) {
-            console.log("WEBIM_CONNCTION_USER_KICKED_BY_OTHER_DEVICE")
             message.error("用户被其他设备踢掉")
             history.push("/login")
             return
@@ -276,7 +264,7 @@ WebIM.conn.listen({
         logger.info("onLocationMessage", message)
     },
     onTextMessage: message => {
-        console.log("onTextMessage", message)
+        //console.log("onTextMessage", message)
         const { from, to } = message 
         let { type } = message       
         const rootState = store.getState()

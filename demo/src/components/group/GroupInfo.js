@@ -92,7 +92,6 @@ class GroupInfo extends React.Component {
             this.showModal()
             break
         case "4":
-            console.log(this.props)
             this.props.getGroupBlackListAsync(this.props.room.groupId)
             this.setState({ blackListVisible: true })
             break

@@ -204,7 +204,7 @@ const { Types, Creators } = createActions({
                 msg,
                 to,
                 roomType: chatroom,
-                chatType: 'singleChat',
+                chatType: "singleChat",
                 success: function () {
                     dispatch(Creators.updateMessageStatus(pMessage, "sent"))
                 },
@@ -249,7 +249,6 @@ const { Types, Creators } = createActions({
                 to,
                 roomType: chatType === "chatroom",
                 onFileUploadError: function (error) {
-                    console.log("shibai");
                     console.log(error)
                     // dispatch(Creators.updateMessageStatus(pMessage, "fail"))
                     pMessage.body.status = "fail"
@@ -257,7 +256,6 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 onFileUploadComplete: function (data) {
-                    console.log(data)
                     let url = data.uri + "/" + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = "sent"
@@ -265,7 +263,6 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 success: function (id) {
-                    console.log(id)
                 }
             })
 
@@ -320,7 +317,6 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 onFileUploadComplete: function (data) {
-                    console.log("Data: ", data)
                     let url = data.uri + "/" + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = "sent"
@@ -328,7 +324,6 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 success: function (id) {
-                    console.log(id)
                 }
             })
 
@@ -345,8 +340,6 @@ const { Types, Creators } = createActions({
             // url at local only
             pMessage.body.url = source.url
             pMessage.body.file_length = source.data.size
-            console.log("pMessage: ", pMessage)
-            console.log("source: ", source)
             dispatch(Creators.addMessage(pMessage, type))
         }
     },
@@ -363,7 +356,6 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.addMessage(message, bodyType))
                 },
                 onFileDownloadError: function () {
-                    console.log("Audio Error")
                 }
             }
             WebIM.utils.download.call(WebIM.conn, options)
@@ -470,7 +462,6 @@ export const INITIAL_STATE = Immutable({
  * @returns {*}
  */
 export const addMessage = (state, { message, bodyType = "txt" }) => {
-    console.log("redux addMessage", message)
     !message.status && (message = parseFromServer(message, bodyType))
     const rootState = store.getState()
     const username = _.get(rootState, "login.username", "")
@@ -481,10 +472,10 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     // bySelf is true when sent by current user, otherwise is false
     const bySelf = from == username
     // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
-    let chatId = bySelf || type !== "chat" ? to : from;
+    let chatId = bySelf || type !== "chat" ? to : from
     // chatId = type === "stranger" ? from
     if(type === "stranger"){
-        chatId = from;
+        chatId = from
     }
 
     // change type as stranger
@@ -561,7 +552,7 @@ export const updateMessageStatus = (state, { message, status = "" }) => {
         const found = _.find(messages, { id: parseInt(id) })
         const msg = found.setIn([ "status" ], status)
         messages.splice(messages.indexOf(found), 1, msg)
-        AppDB.updateMessageStatus(id, status).then(res => console.log(""))
+        AppDB.updateMessageStatus(id, status).then(res => {})
         state = state.setIn([ type, chatId ], messages)
     }
     return state

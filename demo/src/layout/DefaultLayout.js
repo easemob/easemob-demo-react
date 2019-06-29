@@ -151,7 +151,6 @@ class DefaultLayout extends Component {
     changeItem(e, opt) {
         var selectTab
         opt = opt || {}
-        console.log("changeItem", e)
         if(opt.defaultItem){
             this.setSelectStatus(e,{ defaultItem:true })
         }
@@ -228,7 +227,6 @@ class DefaultLayout extends Component {
 
     handleCloseRightSiderClick(e) {
         e.preventDefault()
-        console.log(e.target)
         this.props.switchRightSider({ rightSiderOffset: 0 })
     }
 

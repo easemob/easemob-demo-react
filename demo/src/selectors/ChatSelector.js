@@ -17,7 +17,6 @@ const getTabMessageArray = (state, props) => {
 const getTabMessages = createSelector(
     [ getTabMessageArray ],
     (TabMessageArray) => {
-        console.log("getTabMessages", TabMessageArray)
         return TabMessageArray
     }
 )
