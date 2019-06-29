@@ -14,6 +14,7 @@
     <!-- <script src="./dist/websdk-1.11.3.js"></script> -->
     <!-- <script src="./websdk-1.4.13.js"></script> -->
      <script src="./webimSDK.js"></script>
+     <script src="./EMedia_x1v1.js"></script>
 
 </head>
 
@@ -128,9 +129,8 @@
         <button id="endConVideo">EndConVideo</button>
         </video>
     </div>
-    <script src="./EMedia_x1v1.js"></script>
+    
     <script>
-
         var conn = {};
         console.log(WebIM, window.WebIM);
         WebIM.config = config;
@@ -303,7 +303,7 @@
 
         //初始化单人视频
         // 初始化WebRTC Call
-        var rtcCall = null
+        window.rtcCall = null
         if (WebIM.WebRTC) {
             rtcCall = new WebIM.WebRTC.Call({
                 connection: conn,
@@ -471,15 +471,20 @@
         */
         //文本消息
         var conf = WebIM.config
-        var WebIM = WebIM.default
+        //var WebIM = WebIM.default
         WebIM.config = conf
+        WebIM.message = WebIM.default.message
+        WebIM.utils = WebIM.default.utils
+        WebIM.debug = WebIM.default.debug
+        WebIM.statusCode = WebIM.default.statusCode
+
         var myDate = new Date().toLocaleString();
         document.getElementById('privateText').onclick = function () {
             var uname = document.getElementById("name").value;
             var tname = document.getElementById("toname").value;
             var tmsg = document.getElementById("msg").value;
             var id = conn.getUniqueId();                 // 生成本地消息id
-            var msg = new WebIM.message('txt', id);      // 创建文本消息
+            var msg = new WebIM.default.message('txt', id);      // 创建文本消息
             msg.set({
                 msg: tmsg,                  // 消息内容
                 to: tname,
@@ -507,7 +512,7 @@
             var tname = document.getElementById("toname").value;
             var tmsg = document.getElementById("msg").value;
             var id = conn.getUniqueId();                 // 生成本地消息id
-            var msg = new WebIM.message('location', id);      // 创建位置消息
+            var msg = new WebIM.default.message('location', id);      // 创建位置消息
             msg.set({
                 to: tname,                          // 接收消息对象（用户id）
                 roomType: false,
@@ -523,7 +528,7 @@
             var tname = document.getElementById("toname").value;
             var tmsg = document.getElementById("msg").value;
             var id = conn.getUniqueId();            //生成本地消息id
-            var msg = new WebIM.message('cmd', id); //创建命令消息
+            var msg = new WebIM.default.message('cmd', id); //创建命令消息
             msg.set({
                 msg: tmsg,
                 to: tname,                       //接收消息对象
@@ -547,9 +552,9 @@
         document.getElementById('privateImg').onclick = function () {
             var tname = document.getElementById("toname").value;
             var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('img', id);        // 创建图片消息
+            var msg = new WebIM.default.message('img', id);        // 创建图片消息
             var input = document.getElementById('image');  // 选择图片的input
-            var file = WebIM.utils.getFileUrl(input);      // 将图片转化为二进制文件
+            var file = WebIM.default.utils.getFileUrl(input);      // 将图片转化为二进制文件
             var allowType = {
                 'jpg': true,
                 'gif': true,
@@ -585,9 +590,9 @@
         //音频消息
         document.getElementById("privateAudio").onclick = function () {
             var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('audio', id);      // 创建音频消息
+            var msg = new WebIM.default.message('audio', id);      // 创建音频消息
             var input = document.getElementById('audio');  // 选择音频的input
-            var file = WebIM.utils.getFileUrl(input);      // 将音频转化为二进制文件
+            var file = WebIM.default.utils.getFileUrl(input);      // 将音频转化为二进制文件
             var allowType = {
                 'mp3': true,
                 'amr': true,
@@ -626,9 +631,9 @@
         document.getElementById("privateFile").onclick = function () {
             var tname = document.getElementById("toname").value;
             var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('file', id);        // 创建文件消息
+            var msg = new WebIM.default.message('file', id);        // 创建文件消息
             var input = document.getElementById('file');  // 选择文件的input
-            var file = WebIM.utils.getFileUrl(input);      // 将文件转化为二进制文件
+            var file = WebIM.default.utils.getFileUrl(input);      // 将文件转化为二进制文件
             var allowType = {
                 'jpg': true,
                 'gif': true,
@@ -1307,7 +1312,7 @@
         document.getElementById("rtCall").onclick = function () {
             var tname = document.getElementById("toname").value;
 
-            rtcCall.caller = 'test3';
+            rtcCall.caller = 'zdtest';
             rtcCall.makeVideoCall(tname);
             console.log("呼叫：" + tname)
 
