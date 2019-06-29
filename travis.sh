@@ -3,11 +3,11 @@ echo nexus_auth: ${nexus_auth}
 
 packing(){
     echo "11111"
-    echo pwd  
+    echo $PWD 
     echo "2222"
     cd ./demo
     echo "3333"
-    echo pwd
+    echo $PWD 
     echo "4444"
 	npm install
     cd ../
