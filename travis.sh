@@ -2,13 +2,8 @@ echo TAG: $TRAVIS_TAG
 echo nexus_auth: ${nexus_auth}
 
 packing(){
-    echo "11111"
-    echo $PWD 
-    echo "2222"
     cd ./demo
-    echo "3333"
     echo $PWD 
-    echo "4444"
 	npm install
     cd ../
     echo -e "\nINSTALL DONE.\n"
