@@ -4,7 +4,6 @@ echo nexus_auth: ${nexus_auth}
 packing(){
     cd ./demo
     echo $PWD 
-    npm i -g npm
 	npm install
     cd ../
     echo -e "\nINSTALL DONE.\n"
@@ -13,7 +12,7 @@ packing(){
     TRAVIS=true TAG_NAME=$TRAVIS_TAG npm run build
     cd ../
     echo -e "\nBUILD DONE.\n"
-    # sed -i "s/{#version}/${TRAVIS_TAG}/g"  ./demo/build/index.html
+    sed -i "s/{#version}/${TRAVIS_TAG}/g"  ./demo/build/index.html
 }
 
 upload(){
