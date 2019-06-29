@@ -4,6 +4,7 @@ echo nexus_auth: ${nexus_auth}
 packing(){
     cd ./demo
     echo $PWD 
+    npm i -g npm
 	npm install
     cd ../
     echo -e "\nINSTALL DONE.\n"
