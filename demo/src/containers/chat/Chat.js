@@ -82,7 +82,6 @@ class Chat extends React.Component {
 
         // console.log(e, e.target)
         let file = WebIM.utils.getFileUrl(e.target)
-        console.log(file)
 
         if (!file.filename) {
             this.image.value = null
@@ -107,7 +106,6 @@ class Chat extends React.Component {
         const isRoom = chatType[selectTab] == "chatroom" || chatType[selectTab] == "groupchat"
 
         let file = WebIM.utils.getFileUrl(e.target)
-        console.log(file)
 
         if (!file.filename) {
             this.image.value = null
@@ -271,7 +269,6 @@ class Chat extends React.Component {
 
     onClearMessage = () => {
         const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
-        console.log(selectItem, selectTab)
         const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
         const chatType = chatTypes[selectTab]
         this.props.clearMessage(chatType, selectItem)
@@ -350,7 +347,6 @@ class Chat extends React.Component {
         if (e.target.scrollTop === 0) {
             // TODO: optimization needed
             setTimeout(function () {
-                console.log(_this.props.messageList)
                 const offset = _this.props.messageList ? _this.props.messageList.length : 0
                 const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
                 const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }

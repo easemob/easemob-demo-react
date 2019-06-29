@@ -75,7 +75,6 @@ export const INITIAL_STATE = Immutable({
 /* ------------- Reducers ------------- */
 
 export const updateBlacklist = (state, { list }) => {
-    console.log("updateBlacklist", list)
     return state.merge({
         byName: Object(list),
         names: Object.keys(list).sort()

@@ -34,7 +34,6 @@ class GroupInviteModal extends React.Component {
             invitee: WebIM.conn.user,
             success: function(resp) {
                 me.props.upDateGroupList()
-                console.log(resp)
             },
             error: function(e) {}
         }

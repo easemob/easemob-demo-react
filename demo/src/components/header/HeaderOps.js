@@ -39,7 +39,6 @@ class HeaderOps extends Component {
     }
 
     handleLogout() {
-        console.log("handleLogout")
 
         this.props.doLogout()
     }

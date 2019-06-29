@@ -27,13 +27,13 @@ class AddGroupModal extends React.Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 const {
-                 name,
+                    name,
                     description,
                     members,
                     type,
                     canJoin,
                     allowInvite = true
-             } = values
+                } = values
                 if (!name) {
                     return message.error("Please input Group Name !", 1)
                 }
@@ -53,7 +53,6 @@ class AddGroupModal extends React.Component {
                         // invite_need_confirm // default: member
                     },
                     success: () => {
-                        console.log("success")
                         message.success(`Group ${name} created`)
                         this.props.getGroups()
                         this.props.onCancel()
@@ -109,18 +108,18 @@ class AddGroupModal extends React.Component {
                 <div style={{ display: screen === 1 ? "block" : "none" }}>
                     <FormItem>
                         {getFieldDecorator("name", {
-                            rules: [{ message: "Please input Group Name !" }]
+                            rules: [ { message: "Please input Group Name !" } ]
                         })(<Input placeholder={I18n.t("groupName")} />)}
                     </FormItem>
                     <FormItem>
                         {getFieldDecorator("description", {
-                            rules: [{ message: "Please enter description ！" }]
+                            rules: [ { message: "Please enter description ！" } ]
                         })(
                             <Input.TextArea
                                 placeholder={I18n.t("description")}
                                 autosize={{ minRows: 4, maxRows: 6 }}
                             />
-                            )}
+                        )}
                     </FormItem>
                     <FormItem style={{ marginBottom: 10 }}>
                         <p>{I18n.t("groupType")}</p>
