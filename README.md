@@ -1,4 +1,9 @@
 ## 说明
+WebIM 3 (webim-h5) 在2.x的基础上, 主要做了以下更新:
+1. 更换新版基于私有协议重写的sdk
+2. 群组增加接受邀请/拒绝加群邀请功能
+3. 修复部分bug
+
 WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 1. 响应式布局, 一套Demo同时支持PC和H5,自适应不同终端屏幕尺寸
 2. 完全基于React + Redux的单向数据流
@@ -45,15 +50,8 @@ Error: connect ETIMEDOUT 54.231.113.227:443
 
 FIX: 这个问题，可以尝试PHANTOMJS_CDNURL=https://npm.taobao.org/mirrors/phantomjs/ npm install --save-dev phantomjs-prebuilt来解决
 
+
 ### 2. 执行npm start时如果出现
-
-    ```
-    ./src/config/WebIM.js
-    Module not found: Can't resolve 'easemob-websdk/dist/strophe-1.2.8-g.js' in '<YourRootDir>/demo/src/config'
-    ```
-FIX: 没有执行 npm link easemob-websdk
-
-### 3. 执行npm start时如果出现
 
 ```
 > node scripts/start.js
@@ -74,7 +72,7 @@ SyntaxError: Unexpected token {
 ```
 FIX: 请检查node版本是否是v6.0+ 
 
-### 4. Redux State 的数据结构如下：
+### 3. Redux State 的数据结构如下：
 
 
 ```
