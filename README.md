@@ -10,6 +10,10 @@ WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
 3. 引入ant-design组件库，方便开发者后续开发
 4. 支持所有的现代浏览器(不支持IE6-11)
 
++ sdk 文件夹下 webimSDK为即时通讯sdk, EMedia_x1v1为单人音视频sdk, EMedia_sdk-dev为多人音视频sdk,同时EMedia_x1v1依赖webimSDK, 音视频必须用https
++ simpleDemo 为简单demo，提供最简单直接的api调用示例
++ demo 为基于react+redux写的完整功能的demo
+
 ## 安装
 
 1. 初始化安装
