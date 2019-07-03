@@ -126,9 +126,9 @@ WebIM.conn.listen({
         case "subscribe":
             // jion friend action is subscribe/publish pattern，so when you agree to add a friend
             // it will notify the other side automatic，when state equasl [resp:true], do nothing
-            if (msg.status === "[resp:true]") {
-                return
-            }
+            // if (msg.status === "[resp:true]") {
+            //     return
+            // }
 
             store.dispatch(SubscribeActions.addSubscribe(msg))
             break
