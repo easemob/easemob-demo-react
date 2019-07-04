@@ -130,6 +130,7 @@
         console.log(WebIM, window.WebIM);
         WebIM.config = config;
         conn = WebIM.conn = new WebIM.default.connection({
+            appKey: WebIM.config.appkey,
             isHttpDNS: WebIM.config.isHttpDNS,
             isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
             host: WebIM.config.Host,
