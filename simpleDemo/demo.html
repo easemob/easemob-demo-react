@@ -14,8 +14,6 @@
 </head>
 
 <body>
-    <input type="text" id="txt1" value="">
-
     <div>
         用户名：<input type="text" name="name" id="name"> </br>
         密 码：<input type="text" name="pwd" id="pwd"></br>
@@ -25,7 +23,7 @@
     </div>
     <div>
         <h3>Registered login</h3>
-        <button id="register" onclick="rek()">Register</button>
+        <button id="register">Register</button>
         <button id="login">Login</button>
         <button id="logout">Logout</button>
     </div>
@@ -45,11 +43,6 @@
         <br> audio:
         <input type="file" id="audio">
         <button id="privateAudio">PrivateAudio</button>
-    </div>
-    <div>
-        <br> files:
-        <input type="file" id="file">
-        <button id="privateFile">PrivateFile </button>
     </div>
     <br>
     <h3>Roasters</h3>
@@ -120,11 +113,13 @@
     <h3>Confer</h3>
     <div>
         <button id="createConfer">CreateConfer</button>
+        <button id="pushVideo">PushVideo</button>
         <button id="inviteUser">InviteUser</button>
+        <button id="txtInviteUser">TxtInviteUser</button>
         <button id="endConVideo">EndConVideo</button>
         </video>
     </div>
-    
+
     <script>
         var conn = {};
         console.log(WebIM, window.WebIM);
@@ -160,6 +155,16 @@
             },         //连接关闭回调
             onTextMessage: function (message) {
                 console.log('onTextMessage: ', message);
+                if (message.ext.conferenceId != undefined) {
+                    var truthBeTold = window.confirm((message.from + "邀请您加入会议"));
+                    if (truthBeTold) {
+                        emedia.mgr.joinConference(message.ext.conferenceId, message.ext.password, "进入会议").then(function () {
+                            console.log("********加入会议成功*******")
+                        }).catch(function (error) {
+                            console.log("加入会议失败")
+                        })
+                    }
+                }
 
             },    //收到文本消息
 
@@ -345,80 +350,79 @@
 
 
         //有人加入会议，其他人调用joinXX等方法，如果加入成功，已经在会议中的人将会收到
-        // emedia.mgr.onMemberJoined = function (member) {
-        //     console.log("某某加入会议");
-        // };
-        // //有人退出会议
-        // emedia.mgr.onMemberExited = function (member) {
-        //     console.log("某某退出会议");
-        // };
-        // //有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
-        // emedia.mgr.onStreamAdded = function (member, stream) {
-        //     console.log("媒体流加入");
-        //     if (stream.located() === true) {
-        //         var videoTag = document.getElementById("video");
-        //         emedia.mgr.streamBindVideo(stream, videoTag);
-        //     } else {
-        //         var videoTag = document.getElementById("localVideo");
-        //         emedia.mgr.streamBindVideo(stream, videoTag)
-        //     }
-        // }
-        // //有媒体流移除
-        // emedia.mgr.onStreamRemoved = function (member, stream) {
-        //     console.log("媒体流退出");
-        // };
-        // //角色改变
-        // emedia.mgr.onRoleChanged = function (role) {
-        //     console.log("角色改变成功");
-        //     //会议退出；自己主动退 或 服务端主动关闭；
-        //     emedia.mgr.onConferenceExit = function (reason, failed) {
-        //         reason = (reason || 0);
-        //         switch (reason) {
-        //             case 0:
-        //                 reason = "正常挂断";
-        //                 break;
-        //             case 1:
-        //                 reason = "没响应";
-        //                 break;
-        //             case 2:
-        //                 reason = "服务器拒绝";
-        //                 break;
-        //             case 3:
-        //                 reason = "对方忙";
-        //                 break;
-        //             case 4:
-        //                 reason = "失败,可能是网络或服务器拒绝";
-        //                 if (failed === -9527) {
-        //                     reason = "失败,网络原因";
-        //                 }
-        //                 if (failed === -500) {
-        //                     reason = "Ticket失效";
-        //                 }
-        //                 if (failed === -502) {
-        //                     reason = "Ticket过期";
-        //                 }
-        //                 if (failed === -504) {
-        //                     reason = "链接已失效";
-        //                 }
-        //                 if (failed === -508) {
-        //                     reason = "会议无效";
-        //                 }
-        //                 if (failed === -510) {
-        //                     reason = "服务端限制";
-        //                 }
-        //                 break;
-        //             case 5:
-        //                 reason = "不支持";
-        //                 break;
-        //             case 10:
-        //                 reason = "其他设备登录";
-        //                 break;
-        //             case 11:
-        //                 reason = "会议关闭";
-        //                 break;
-        //         }
-        //     };
-        // };
+        emedia.mgr.onMemberJoined = function (member) {
+            console.log(member.name, "加入会议");
+        };
+        //有人退出会议
+        emedia.mgr.onMemberExited = function (member) {
+            console.log(member.name, "退出会议");
+        };
+        //有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
+        emedia.mgr.onStreamAdded = function (member, stream) {
+            console.log("媒体流加入");
+            var located = stream.located();
+            if (located) {
+
+            } else {
+                emedia.mgr.subscribe(member, stream, true, true, localVideo);
+            }
+        }
+        //有媒体流移除
+        emedia.mgr.onStreamRemoved = function (member, stream) {
+            console.log("媒体流退出");
+        };
+        //角色改变
+        emedia.mgr.onRoleChanged = function (role) {
+            console.log("角色改变成功");
+            //会议退出；自己主动退 或 服务端主动关闭；
+            emedia.mgr.onConferenceExit = function (reason, failed) {
+                reason = (reason || 0);
+                switch (reason) {
+                    case 0:
+                        reason = "正常挂断";
+                        break;
+                    case 1:
+                        reason = "没响应";
+                        break;
+                    case 2:
+                        reason = "服务器拒绝";
+                        break;
+                    case 3:
+                        reason = "对方忙";
+                        break;
+                    case 4:
+                        reason = "失败,可能是网络或服务器拒绝";
+                        if (failed === -9527) {
+                            reason = "失败,网络原因";
+                        }
+                        if (failed === -500) {
+                            reason = "Ticket失效";
+                        }
+                        if (failed === -502) {
+                            reason = "Ticket过期";
+                        }
+                        if (failed === -504) {
+                            reason = "链接已失效";
+                        }
+                        if (failed === -508) {
+                            reason = "会议无效";
+                        }
+                        if (failed === -510) {
+                            reason = "服务端限制";
+                        }
+                        break;
+                    case 5:
+                        reason = "不支持";
+                        break;
+                    case 10:
+                        reason = "其他设备登录";
+                        break;
+                    case 11:
+                        reason = "会议关闭";
+                        break;
+                }
+            };
+        };
 
     </script>
     <script>
@@ -429,14 +433,14 @@
         //     var option = {
         //         username: uname,
         //         password: upwd,
-        //         appKey: WebIMConfig.appkey,
+        //         appKey: WebIM.config.appkey,
         //         success: function () {
         //             console.log('注册成功');
         //         },
         //         error: function () {
         //             console.log('注册失败');
         //         },
-        //         apiUrl: WebIMConfig.apiURL
+        //         apiUrl: WebIM.config.apiURL
         //     };
         //     conn.signup(option);
         // };
@@ -498,8 +502,6 @@
             msg.body.chatType = 'singleChat';
             conn.send(msg.body);
             console.log(msg);
-            //赋值显示到input
-            document.getElementById("txt1").value = msg.body.msg
 
         };
 
@@ -559,7 +561,7 @@
             };
             if (file.filetype.toLowerCase() in allowType) {
                 var option = {
-                    apiUrl: WebIMConfig.apiURL,
+                    apiUrl: WebIM.config.apiURL,
                     file: file,
                     to: tname,
                     ext: {
@@ -585,6 +587,7 @@
 
         //音频消息
         document.getElementById("privateAudio").onclick = function () {
+            var tname = document.getElementById("toname").value;
             var id = conn.getUniqueId();                   // 生成本地消息id
             var msg = new WebIM.default.message('audio', id);      // 创建音频消息
             var input = document.getElementById('audio');  // 选择音频的input
@@ -597,7 +600,7 @@
             };
             if (file.filetype.toLowerCase() in allowType) {
                 var option = {
-                    apiUrl: WebIMConfig.apiURL,
+                    apiUrl: WebIM.config.apiURL,
                     file: file,
                     to: tname,
                     ext: {
@@ -623,50 +626,6 @@
             }
         };
 
-        //附件信息
-        document.getElementById("privateFile").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.default.message('file', id);        // 创建文件消息
-            var input = document.getElementById('file');  // 选择文件的input
-            var file = WebIM.default.utils.getFileUrl(input);      // 将文件转化为二进制文件
-            var allowType = {
-                'jpg': true,
-                'gif': true,
-                'png': true,
-                'bmp': true,
-                'zip': true,
-                'txt': true,
-                'doc': true,
-                'docx': true,
-                'pdf': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIMConfig.apiURL,
-                    file: file,
-                    to: tname,                       // 接收消息对象
-                    ext: {
-                        'time': myDate,
-                    },
-                    roomType: false,
-                    chatType: 'singleChat',
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('sendFile Success');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                conn.send(msg.body);
-            }
-        };
-
         //消息撤回
         document.getElementById("recMessage").onclick = function () {
             var tname = document.getElementById("toname").value;
@@ -681,6 +640,8 @@
                 }
             })
         }
+
+
     </script>
     <script>
         /*
@@ -952,7 +913,7 @@
             };
             if (file.filetype.toLowerCase() in allowType) {
                 var option = {
-                    apiUrl: WebIMConfig.apiURL,
+                    apiUrl: WebIM.config.apiURL,
                     file: file,
                     to: '64951207133185',                       // 接收消息对象
                     roomType: false,
@@ -1263,7 +1224,7 @@
             };
             if (file.filetype.toLowerCase() in allowType) {
                 var option = {
-                    apiUrl: WebIMConfig.apiURL,
+                    apiUrl: WebIM.config.apiURL,
                     file: file,
                     to: '64843481677825',                       // 接收消息对象
                     ext: {
@@ -1332,31 +1293,6 @@
     <script>
         var resultCon = {}
 
-        //构造消息
-        // function sendext() {
-        //     var uname = document.getElementById("name").value;
-        //     var tname = document.getElementById("toname").value;
-        //     var id = conn.getUniqueId();                 // 生成本地消息id
-        //     var msg = new WebIM.message('txt', id);      // 创建文本消息
-        //     msg.set({
-        //         msg: name + "邀请您加入会议:",                  // 消息内容
-        //         to: tname,
-        //         ext: {
-        //             confrId: resultCon.confrId, //会议ID
-        //             password: resultCon.password,
-        //             jid: appkey + '_' + tname + '@' + host
-        //         },                       // 接收消息对象（用户id）
-        //         success: function (id, serverMsgId) {
-        //             console.log('send private text Success');
-
-        //         },
-        //         fail: function (e) { }
-        //     });
-        //     msg.body.chatType = 'singleChat';
-        //     conn.send(msg.body);
-        //     console.log("*******8" + msg)
-        // }
-
         //创建会议
         document.getElementById("createConfer").onclick = function () {
             emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX).then(function (confr) {
@@ -1365,8 +1301,16 @@
                 resultCon = confr;
                 emedia.mgr.joinConference(resultCon.confrId, resultCon.password, "加入").then(function (confr) {
                     console.log("加入成功");
-                    emedia.mgr.shareVideoWithAudio({
-                    });
+                    var videoCreate = document.getElementById("video");
+                    var constaints = { audio: true, video: true };
+                    emedia.mgr
+                        .publish(constaints, videoCreate, "发布视频流")
+                        .then(function (pushedStream) {
+                            //stream 对象
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
 
                 }).catch(function (error) {
                     console.log("加入失败");
@@ -1375,6 +1319,20 @@
                 console.log("创建会议失败");
             })
         }
+        //发布视频流
+        document.getElementById("pushVideo").onclick = function () {
+            var videoPush = document.getElementById("video");
+            var constaints = { audio: true, video: true };
+            emedia.mgr
+                .publish(constaints, videoPush, "创建者加入会议")
+                .then(function (pushedStream) {
+                    //stream 对象
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+        //cmd 扩展邀请
         document.getElementById("inviteUser").onclick = function () {
             var uname = document.getElementById("name").value;
             var tname = document.getElementById("toname").value;
@@ -1401,14 +1359,21 @@
             msg.body.chatType = 'singleChat';
             conn.send(msg.body);
         }
+        //文本邀请
+        document.getElementById("txtInviteUser").onclick = function () {
+            var toname = document.getElementById("toname").value;
+            var jid = WebIM.config.appkey + "_" + toname + "@" + WebIM.config.Host;
+            rtcCall.inviteConference(resultCon.confrId, resultCon.password, jid);
+        },
 
-        //挂断视频
-        document.getElementById("endConVideo").onclick = function () {
-            var rtn = confirm("确定退出会议吗？");
-            if (rtn) {
-                emedia.mgr.exit();
+
+            //挂断视频
+            document.getElementById("endConVideo").onclick = function () {
+                var rtn = confirm("确定退出会议吗？");
+                if (rtn) {
+                    emedia.mgr.exit();
+                }
             }
-        }
 
     </script>
 
