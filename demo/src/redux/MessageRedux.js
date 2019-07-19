@@ -183,6 +183,7 @@ function copy(message, tpl) {
 
 const { Types, Creators } = createActions({
     addMessage: [ "message", "bodyType" ],
+    deleteMessage: [ "id"],
     updateMessageStatus: [ "message", "status" ],
     updateMessageMid: [ "id", "mid" ],
     muteMessage: [ "mid" ],
@@ -535,6 +536,44 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
     return state
 }
 
+export const deleteMessage = (state,{id, isSelf}) => {
+    id = id.mid || id
+    const byId = state.getIn([ "byId", id ])
+    if(byId){
+        const { type, chatId } = byId
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: id })
+        const index = messages.indexOf(found)
+        if(found.getIn([ "body", 'type' ]) != 'txt'){
+            messages.splice(index, 1)
+            messages.splice(index,0,{
+                body: {
+                    type: 'txt',
+                    msg: isSelf?'消息已撤回':found.getIn(['from'])+'撤回了一条消息'
+                },
+                time: found.getIn(['time']),
+                from: found.getIn(['from']),
+                id: found.getIn(['id']),
+                isUnread: found.getIn(['isUnread']),
+                status: 'read',
+                time: found.getIn(['time']),
+                to: found.getIn(['to']),
+                toJid: "",
+                type: "chat"
+            })
+        }else{
+            let message = found.setIn([ "body", 'msg' ], found.from+'撤回了一条消息')
+           // message = found.setIn([ "status",], 'read')
+            //console.log('删除了这条消息',message)
+            messages.splice(messages.indexOf(found), 1, message)
+        }
+
+        state = state.setIn([ type, chatId ], messages)
+        AppDB.deleteMessage(id)
+    }
+    return state
+}
+
 /**
  * update message status
  * @param state
@@ -544,13 +583,22 @@ export const addMessage = (state, { message, bodyType = "txt" }) => {
  */
 export const updateMessageStatus = (state, { message, status = "" }) => {
     let { id } = message
-    if (!id) id = state.getIn([ "byMid", message.mid, "id" ])
+    if (!id) id = state.getIn([ "byMid", message.mid, "id" ]) //消息体里根本没有mid ... 也不可能没有id ...
+    let mids = state.getIn([ "byMid" ])||{}
+    let mid
+    for( var i in mids){
+        console.log('ii',i)
+        if(mids[i].id == id){
+            mid = i
+        }
+    }
     const byId = state.getIn([ "byId", id ])
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
-        const messages = state.getIn([ type, chatId ]).asMutable()
-        const found = _.find(messages, { id: parseInt(id) })
-        const msg = found.setIn([ "status" ], status)
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: parseInt(id) })
+        let msg = found.setIn([ "status" ], status)
+        msg = found.setIn([ "toJid" ], mid)
         messages.splice(messages.indexOf(found), 1, msg)
         AppDB.updateMessageStatus(id, status).then(res => {})
         state = state.setIn([ type, chatId ], messages)
@@ -569,6 +617,7 @@ export const clearUnread = (state, { chatType, id }) => {
 }
 
 export const updateMessageMid = (state, { id, mid }) => {
+    AppDB.updateMessageMid(mid, Number(id))
     return state.setIn([ "byMid", mid ], { id })
 }
 
@@ -602,6 +651,7 @@ export const fetchMessage = (state, { id, chatType, messages, offset }) => {
 
 export const reducer = createReducer(INITIAL_STATE, {
     [Types.ADD_MESSAGE]: addMessage,
+    [Types.DELETE_MESSAGE]: deleteMessage,
     [Types.UPDATE_MESSAGE_STATUS]: updateMessageStatus,
     [Types.UPDATE_MESSAGE_MID]: updateMessageMid,
     [Types.MUTE_MESSAGE]: muteMessage,

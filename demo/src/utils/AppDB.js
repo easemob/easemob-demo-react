@@ -8,7 +8,7 @@ const DB_ENABLE = WebIMConfig.enableLocalStorage
 const DB_VERSION = "2.0"
 
 const TABLE_NAME = "webim_history"
-const TABLE_INDEX_KEYS = [ "id", "from", "to", "type", "isUnread", "status" ]
+const TABLE_INDEX_KEYS = [ "id", "from", "to", "type", "isUnread", "status", "toJid" ]
 const { PAGE_NUM } = config
 
 const AppDB = {
@@ -102,6 +102,29 @@ const AppDB = {
         })
     },
 
+    deleteMessage(id){
+        console.log('ddddd', id)
+        const $_TABLE = this.$_TABLE
+        return this.exec(resolve => {
+            $_TABLE.where("id")
+                .equals(id)
+                .delete()
+                .then(res => resolve(res))
+        })
+    },
+
+    updateMessageMid(mid, id){
+        setTimeout(() => {
+            const $_TABLE = this.$_TABLE
+                return this.exec(resolve => {
+                    $_TABLE.where("id")
+                        .equals(id)
+                        .modify({ "toJid": mid })
+                        .then(res => console.log('res',res))
+                })
+        }, 1000)
+        
+    },
     // add a message to the database
     addMessage(message, isUnread = 0) {
         const $_TABLE = this.$_TABLE

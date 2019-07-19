@@ -369,18 +369,20 @@ class Chat extends React.Component {
             }, 500)
         }
     }
-
+    ok = (id) => {
+        this.props.deleteMessage(id,true)
+    }
     render() {
         this.logger.info("chat component render")
-        const {
+        let {
             collapsed,
             match,
             history,
             location,
             messageList,
+            messageListByMid,
             confrModal
         } = this.props
-
         const { selectItem, selectTab } = match.params
 
         const back = () => {
@@ -449,10 +451,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message,i) =>{
                         if(i > 0){
                             if(message.id != messageList[i-1].id){
-                                return <ChatMessage key={i} {...message} />
+                                return <ChatMessage key={i} ok={this.ok}{...message}/>
                             }
                         }else{
-                            return <ChatMessage key={i} {...message} />
+                            return <ChatMessage key={i} {...message}/>
                         }
                     } )}
                 </div>
@@ -531,13 +533,15 @@ class Chat extends React.Component {
 
 export default connect(
     (state, props) => ({
-        messageList: getTabMessages(state, props),
+        messageList: getTabMessages(state, props).TabMessageArray,
+        messageListByMid: state.entities.message.byMid,
         confrModal: state.multiAV.confrModal,
         avModal: state.multiAV.ifShowMultiAVModal
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
+        deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id)),
         sendImgMessage: (chatType, id, message, source) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source)),
         sendFileMessage: (chatType, id, message, source) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),
