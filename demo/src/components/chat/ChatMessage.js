@@ -48,11 +48,15 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
     const localFormat = renderTime(time)
 
     let content = null
+    
     function oncontextmenu(toJid){
+        if(!toJid){
+            return message.error('撤回失败')
+        }
         WebIM.conn.recallMessage({
             to: to,
             mid: toJid,
-            group: type,
+            type: type,
             success: function(){
                 ok(id)
             },
