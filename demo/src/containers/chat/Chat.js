@@ -454,7 +454,7 @@ class Chat extends React.Component {
                                 return <ChatMessage key={i} ok={this.ok}{...message}/>
                             }
                         }else{
-                            return <ChatMessage key={i} {...message}/>
+                            return <ChatMessage key={i} ok={this.ok} {...message}/>
                         }
                     } )}
                 </div>
