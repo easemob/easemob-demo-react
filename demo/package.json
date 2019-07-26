@@ -35,7 +35,7 @@
     "dotenv": "4.0.0",
     "easemob-emedia": "^2.1.1",
     "easemob-webrtc": "^3.0.5",
-    "easemob-websdk": "^3.0.2",
+    "easemob-websdk": "^3.0.4",
     "eruda": "^1.2.5",
     "eslint": "4.4.1",
     "eslint-config-react-app": "^2.0.0",
