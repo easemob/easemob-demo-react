@@ -44,6 +44,13 @@
         <input type="file" id="audio">
         <button id="privateAudio">PrivateAudio</button>
     </div>
+    <div>
+        <br> video:
+        <input type="file" id="chatVideo">
+        <button id="privateVideo">PrivateVideo</button>
+        <br>
+        <video id="getVideo" style="border: 1px solid red" autoplay>
+    </div>
     <br>
     <h3>Roasters</h3>
     <div>
@@ -176,16 +183,6 @@
             }, //收到图片消息
             onCmdMessage: function (message) {
                 console.log('onCmdMessage: ', message);
-                var truthBeTold = window.confirm((message.from + "邀请您加入会议"));
-                if (truthBeTold) {
-                    emedia.mgr.joinConference(message.ext.confrId, message.ext.password, ext).then(function () {
-                        console.log("********加入会议成功*******")
-                        // var videoTag = document.getElementById("localVideo")
-                        // emedia.mgr.streamBindVideo(stream, videoTag);
-                    })
-                } else {
-
-                }
             },     //收到命令消息
             onAudioMessage: function (message) {
                 console.log('onAudioMessage: ', message);
@@ -201,7 +198,7 @@
             }, //消息撤回
             onVideoMessage: function (message) {
                 console.log('onVideoMessage: ', message);
-                var node = document.getElementById('privateVideo');
+                var node = document.getElementById('getVideo');
                 var option = {
                     url: message.url,
                     headers: {
@@ -617,7 +614,6 @@
                     },
                     success: function () {                // 消息发送成功
                         console.log('Success');
-                        console.log(url)
                     },
                     flashUpload: WebIM.flashUpload
                 };
@@ -626,6 +622,41 @@
             }
         };
 
+        //视频消息
+        document.getElementById("privateVideo").onclick = function () {
+            var tname = document.getElementById("toname").value;
+            var id = conn.getUniqueId();                   // 生成本地消息id
+            var msg = new WebIM.message('video', id);      // 创建视频消息
+            var input = document.getElementById('chatVideo');  // 选择视频的input
+            var file = WebIM.utils.getFileUrl(input);      // 将视频转化为二进制文件
+            var allowType = {
+                'mp4': true,
+                'wmv': true,
+                'avi': true,
+                'rmvb': true,
+                'mkv': true
+            };
+            if (file.filetype.toLowerCase() in allowType) {
+                var option = {
+                    apiUrl: WebIM.config.apiURL,
+                    file: file,
+                    to: tname,                       // 接收消息对象
+                    roomType: false,
+                    onFileUploadError: function () {      // 消息上传失败
+                        console.log('onFileUploadError');
+                    },
+                    onFileUploadComplete: function () {   // 消息上传成功
+                        console.log('onFileUploadComplete');
+                    },
+                    success: function () {                // 消息发送成功
+                        console.log('Success');
+                    },
+                    flashUpload: WebIM.flashUpload
+                };
+                msg.set(option);
+                conn.send(msg.body);
+            }
+        };
         //消息撤回
         document.getElementById("recMessage").onclick = function () {
             var tname = document.getElementById("toname").value;
