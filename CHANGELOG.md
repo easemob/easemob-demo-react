@@ -1,4 +1,20 @@
 # 版本更新说明:
+## v3.0.2 @2019-07-09
+### Feature
+* [demo] 优化部分简单demo
+* [sdk] 下上传文件走dns
+* [sdk] 修复无法拉取历史消息bug
+* [sdk] 修复loc/cmd消息 messageId bug
+
+## v3.0.1 @2019-07-09
+### Feature
+
+* [demo] 修复简单demo未设置appkey问题
+* [demo] 基于3.0sdk添加好友去掉反添加好友过程
+* [demo] 根据需求调整项目结构
+* [demo] 解决起服务是打印警告问题
+
+
 ## v3.0.0 @2019-06-29
 ### Feature
 
