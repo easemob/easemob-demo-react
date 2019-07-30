@@ -61,7 +61,7 @@ var config = {
      * @parameter {Boolean} true or false
      */
     https: true,
-    isHttpDNS: true,
+    isHttpDNS: false,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
