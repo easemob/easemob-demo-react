@@ -75,6 +75,26 @@ class Chat extends React.Component {
         }
     }
 
+    // todo: 1. bindthis需要重构 2. 这个文件都不是纯函数，最好优化一下
+    snapshotListener = (e) => {
+        const { selectItem, selectTab } = this.state;
+        if (e.clipboardData && e.clipboardData.types) {
+            if (e.clipboardData.items.length > 0) {
+                if (/^image\/\w+$/.test(e.clipboardData.items[0].type)) {
+                    const blob = e.clipboardData.items[0].getAsFile();
+                    const url = window.URL.createObjectURL(blob);
+                    const file = { data: blob, url: url };
+                    this.props.sendSnapshotMessage(chatType[selectTab], selectItem, file)
+                }
+            }
+        }
+    }
+
+    componentWillMount() {
+        // IE unsupport
+        document.addEventListener('paste', this.snapshotListener)
+    }
+
     pictureChange(e) {
         const { match } = this.props
         const { selectItem, selectTab } = match.params
@@ -117,7 +137,7 @@ class Chat extends React.Component {
         })
     }
 
-    handleEmojiSelect(v) {       
+    handleEmojiSelect(v) {
         this.setState({
             value: (this.state.value || "") + v.key
         }, () => {
@@ -209,18 +229,18 @@ class Chat extends React.Component {
         let tabs = null
         if (selectTab == "contact") {
             tabs = [
-                [ "0", `${I18n.t("block")}`, "iconfont icon-circle-minus" ],
-                [ "1", `${I18n.t("delAFriend")}`, "iconfont icon-trash" ]
+                ["0", `${I18n.t("block")}`, "iconfont icon-circle-minus"],
+                ["1", `${I18n.t("delAFriend")}`, "iconfont icon-trash"]
             ]
         } else {
             // stranger
             tabs = [
-                [ "2", `${I18n.t("addFriend")}`, "anticon anticon-user-add" ],
-                [ "3", `${I18n.t("delete")}`, "iconfont icon-trash" ]
+                ["2", `${I18n.t("addFriend")}`, "anticon anticon-user-add"],
+                ["3", `${I18n.t("delete")}`, "iconfont icon-trash"]
             ]
         }
 
-        const tabsItem = tabs.map(([ key, name, icon ]) =>
+        const tabsItem = tabs.map(([key, name, icon]) =>
             <Menu.Item key={key}>
                 <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: "middle" }} />
                 <span>
@@ -244,31 +264,31 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const search = history.location.search
         switch (key) {
-        case "0":
-            // block a friend
-            this.props.doAddBlacklist(selectItem)
-            history.push("/contact" + search)
-            break
-        case "1":
-            // delete a friend
-            this.props.removeContact(selectItem)
-            break
-        case "2":
-            // add a friend
-            this.props.addContact(selectItem)
-            message.success(`${I18n.t("addFriendMessage")}`)
-            break
-        case "3":
-            // delete
-            this.props.deleteStranger(selectItem)
-            history.push("/stranger" + search)
-            break
-        default:
+            case "0":
+                // block a friend
+                this.props.doAddBlacklist(selectItem)
+                history.push("/contact" + search)
+                break
+            case "1":
+                // delete a friend
+                this.props.removeContact(selectItem)
+                break
+            case "2":
+                // add a friend
+                this.props.addContact(selectItem)
+                message.success(`${I18n.t("addFriendMessage")}`)
+                break
+            case "3":
+                // delete
+                this.props.deleteStranger(selectItem)
+                history.push("/stranger" + search)
+                break
+            default:
         }
     }
 
     onClearMessage = () => {
-        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
         const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
         const chatType = chatTypes[selectTab]
         this.props.clearMessage(chatType, selectItem)
@@ -299,10 +319,11 @@ class Chat extends React.Component {
 
     componentWillUnmount() {
         if (this.timer) clearTimeout(this.timer)
+        document.removeEventListener("paste", this.snapshotListener)
     }
 
     callVideo = () => {
-        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
         const { confrModal, avModal } = this.props
         if (selectTab === "contact") {
             this.setState({
@@ -332,7 +353,7 @@ class Chat extends React.Component {
 
     callVoice = () => {
 
-        const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
+        const { selectItem, selectTab } = _.get(this.props, ["match", "params"], {})
         console.log("sendWrapper::callVoice", WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
 
         this.setState({
@@ -348,7 +369,7 @@ class Chat extends React.Component {
             // TODO: optimization needed
             setTimeout(function () {
                 const offset = _this.props.messageList ? _this.props.messageList.length : 0
-                const { selectItem, selectTab } = _.get(_this.props, [ "match", "params" ], {})
+                const { selectItem, selectTab } = _.get(_this.props, ["match", "params"], {})
                 const chatTypes = { "contact": "chat", "group": "groupchat", "chatroom": "chatroom", "stranger": "stranger" }
                 const chatType = chatTypes[selectTab]
 
@@ -370,7 +391,7 @@ class Chat extends React.Component {
         }
     }
     ok = (id) => {
-        this.props.deleteMessage(id,true)
+        this.props.deleteMessage(id, true)
     }
     render() {
         this.logger.info("chat component render")
@@ -386,7 +407,7 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
 
         const back = () => {
-            const redirectPath = "/" + [ selectTab ].join("/") + location.search
+            const redirectPath = "/" + [selectTab].join("/") + location.search
             history.push(redirectPath)
         }
 
@@ -437,7 +458,7 @@ class Chat extends React.Component {
                                 ? <Dropdown
                                     overlay={this.renderContactMenu(selectTab)}
                                     placement="bottomRight"
-                                    trigger={[ "click" ]}
+                                    trigger={["click"]}
                                 >
                                     <Icon type="ellipsis" />
                                 </Dropdown>
@@ -448,15 +469,15 @@ class Chat extends React.Component {
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
                     {this.state.isLoaded && <div style={{ width: "150px", height: "30px", lineHeight: "30px", backgroundColor: "#888", color: "#fff", borderRadius: "15px", textAlign: "center", margin: "10px auto" }}>{I18n.t("noMoreMessage")}</div>}
-                    {_.map(messageList, (message,i) =>{
-                        if(i > 0){
-                            if(message.id != messageList[i-1].id){
-                                return <ChatMessage key={i} ok={this.ok}{...message}/>
+                    {_.map(messageList, (message, i) => {
+                        if (i > 0) {
+                            if (message.id != messageList[i - 1].id) {
+                                return <ChatMessage key={i} ok={this.ok}{...message} />
                             }
-                        }else{
-                            return <ChatMessage key={i} ok={this.ok} {...message}/>
+                        } else {
+                            return <ChatMessage key={i} ok={this.ok} {...message} />
                         }
-                    } )}
+                    })}
                 </div>
                 <div className="x-chat-footer">
                     <div className="x-list-item x-chat-ops">
@@ -541,6 +562,7 @@ export default connect(
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
+        sendSnapshotMessage: (chatType, id, message) => dispatch(MessageActions.sendSnapshotMessage(chatType, id, message)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id)),
         sendImgMessage: (chatType, id, message, source) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source)),
         sendFileMessage: (chatType, id, message, source) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source)),
