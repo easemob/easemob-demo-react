@@ -41,9 +41,9 @@ const { Types, Creators } = createActions({
                     dispatch(CommonActions.fetched())
                     dispatch(Creators.getContacts())
 
-                    WebIM.conn.unsubscribed({
-                        to: id
-                    })
+                    // WebIM.conn.unsubscribed({
+                    //     to: id
+                    // })
                 },
                 error: function() {
                     //TODO ERROR

@@ -8,7 +8,7 @@
     <title>环信测试demo</title>
 
     <script src="./WebIMConfig.js"></script>
-    <script src="../sdk/webimSDK3.0.4.js"></script>
+    <script src="../sdk/webimSDK3.0.5.js"></script>
     <script src="../sdk/EMedia_x1v1.js"></script>
 
 </head>
@@ -724,9 +724,9 @@
             conn.removeRoster({
                 to: tname,
                 success: function () {  // 删除成功
-                    conn.unsubscribed({
-                        to: tname
-                    });
+                    // conn.unsubscribed({
+                    //     to: tname
+                    // });
                     console.log("删除成功");
                 },
                 error: function () {    // 删除失败
@@ -735,62 +735,9 @@
         };
 
         //添加黑名单
-        // list的结构为{username_1: {}, username_2: {}...}，拉黑好友需要将拉黑后的黑名单里的好友信息全部传入，
-        // 如黑名单此时已有A，B两位好友，现想将C也拉进黑名单，正确的操作是同时将ABC的信息都传入接口中。
-        /*
-         var list = {
-         username_1:{
-         jid: 'appKey_'+username_1+'@easemob.com',
-         name: username_1,
-         subscription: 'both',
-         order: 2
-         },
-         username_2:{
-         jid: 'appKey_'+username_2+'@easemob.com',
-         name: username_2,
-         subscription: 'both',
-         order: 3,
-         type: 'jid'
-         },
-         username_3:{
-         jid: 'appKey_'+username_3+'@easemob.com',
-         name: username_3,
-         subscription: 'both',
-         order: 4,
-         type: 'jid'
-         }
-         }
-         jid, username, subscription均在获取好友列表时已获取到，用户可根据好友列表动态获取这些参数，
-         order不重复即可
-         */
         document.getElementById("addToBlackList").onclick = function () {
-            var list = {
-                // user_1
-                asdfghj: {
-                    jid: 'easemob-demo#chatdemoui_asdfghj@easemob.com',
-                    name: 'asdfghj',
-                    subscription: 'both',
-                    order: 2,
-                    type: 'jid'
-                },
-                // user_2
-                wjy6: {
-                    jid: 'easemob-demo#chatdemoui_wjy6@easemob.com',
-                    name: 'wjy6',
-                    subscription: 'both',
-                    order: 3,
-                    type: 'jid'
-                }
-            };
             conn.addToBlackList({
-                list: list,
-                type: 'jid',
-                success: function () {
-                    console.log('Add friend to black list success');
-                },
-                error: function () {
-                    console.log('Add friend to black list error');
-                }
+                name: ["1q1q","yss001","liuyun01"]
             });
         };
 
@@ -802,33 +749,8 @@
 
         //移除好友黑名单
         document.getElementById("removeFromBlackList").onclick = function () {
-            var list = [
-                {
-                    wjy6: {
-                        jid: 'easemob-demo#chatdemoui_mengyuanyuan01@easemob.com',
-                        name: 'mengyuanyuan01',
-                        order: '2',
-                        type: 'jid'
-                    }
-                },
-                {
-                    mengyuanyuan: {
-                        jid: 'easemob-demo#chatdemoui_wjy6@easemob.com',
-                        name: 'wjy6',
-                        order: '4',
-                        type: 'jid',
-                    }
-                }
-            ];
             conn.removeFromBlackList({
-                list: list,
-                type: 'jid',
-                success: function () {
-                    console.log('Remove from black list success.');
-                },
-                error: function () {
-                    console.log('Remove from black list error.')
-                }
+                name: ["1q1q","yss001","liuyun01"],
             });
         };
     </script>
