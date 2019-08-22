@@ -587,7 +587,6 @@ export const updateMessageStatus = (state, { message, status = "" }) => {
     let mids = state.getIn([ "byMid" ])||{}
     let mid
     for( var i in mids){
-        console.log('ii',i)
         if(mids[i].id == id){
             mid = i
         }

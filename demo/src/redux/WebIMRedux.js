@@ -256,9 +256,9 @@ WebIM.conn.listen({
         logger.info("onReceivedMessage", message)
         const { id, mid } = message
         store.dispatch(MessageActions.updateMessageMid(id, mid))
+        store.dispatch(MessageActions.updateMessageStatus(message, "sent"))
     },
     onRecallMessage: message => {
-        console.log("撤回消息", message)
         store.dispatch(MessageActions.deleteMessage(message)) 
         logger.info("onRecallMessage", message)
     },

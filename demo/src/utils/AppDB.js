@@ -103,7 +103,6 @@ const AppDB = {
     },
 
     deleteMessage(id){
-        console.log('ddddd', id)
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
             $_TABLE.where("id")
@@ -120,7 +119,7 @@ const AppDB = {
                     $_TABLE.where("id")
                         .equals(id)
                         .modify({ "toJid": mid })
-                        .then(res => console.log('res',res))
+                        .then(res => {})
                 })
         }, 1000)
         
