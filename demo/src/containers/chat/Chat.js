@@ -252,6 +252,7 @@ class Chat extends React.Component {
         case "1":
             // delete a friend
             this.props.removeContact(selectItem)
+            history.push("/contact" + search)
             break
         case "2":
             // add a friend

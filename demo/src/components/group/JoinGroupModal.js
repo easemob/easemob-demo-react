@@ -123,7 +123,10 @@ class JoinGroupModal extends React.Component {
         this.setState({ groupDetail: false })
     }
 
+    // TOOD 不符合react数据流思想
     showDetail = gid => {
+        console.log('111111')
+        
         this.setState({
             bodyLoading: true
         })
@@ -132,7 +135,7 @@ class JoinGroupModal extends React.Component {
             success: function(resp) {
                 var groupName = resp.data[0].name,
                     desc = resp.data[0].description,
-                    owner = "",
+                    owner = '',
                     affiliations = resp.data[0].affiliations,
                     membersOnly = resp.data[0].membersonly
 
