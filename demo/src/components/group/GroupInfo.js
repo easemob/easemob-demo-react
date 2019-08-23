@@ -7,6 +7,7 @@ import { Button, Card, Col, Dropdown, Form, Icon, Input, Menu, Modal, Popconfirm
 import GroupActions from "@/redux/GroupRedux"
 import GroupMemberActions from "@/redux/GroupMemberRedux"
 import "./style/index.less"
+import { history } from "@/utils"
 
 const iconStyle = { fontSize: 16 }
 
@@ -25,7 +26,7 @@ const GroupInfoForm = Form.create()(props => {
             <Form>
                 <Form.Item label={I18n.t("groupName")}>
                     {getFieldDecorator("name", {
-                        rules: [ { required: true, message: I18n.t("groupName") } ]
+                        rules: [{ required: true, message: I18n.t("groupName") }]
                     })(<Input />)}
                 </Form.Item>
             </Form>
@@ -83,30 +84,32 @@ class GroupInfo extends React.Component {
 
     handleMenuClick = ({ item, key, selectedKeys }) => {
         switch (key) {
-        case "1":
-            break
-        case "2":
-            this.setState({ showInviteToGroupModal: true })
-            break
-        case "3":
-            this.showModal()
-            break
-        case "4":
-            this.props.getGroupBlackListAsync(this.props.room.groupId)
-            this.setState({ blackListVisible: true })
-            break
-        case "5":
-            const { groupId, groupName } = this.props.room
-            this.props.switchRightSider({ rightSiderOffset: 0 })
-            this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
-            break
-        case "6":
-            const { login } = this.props
-            const username = _.get(login, "username")
-            this.props.quitGroupAsync(this.props.room.groupId, username)
-            break
-        default:
-            break
+            case "1":
+                break
+            case "2":
+                this.setState({ showInviteToGroupModal: true })
+                break
+            case "3":
+                this.showModal()
+                break
+            case "4":
+                this.props.getGroupBlackListAsync(this.props.room.groupId)
+                this.setState({ blackListVisible: true })
+                break
+            case "5":
+                const search = history.location.search
+                const { groupId, groupName } = this.props.room
+                this.props.switchRightSider({ rightSiderOffset: 0 })
+                this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
+                history.push('/group' + search)
+                break
+            case "6":
+                const { login } = this.props
+                const username = _.get(login, "username")
+                this.props.quitGroupAsync(this.props.room.groupId, username)
+                break
+            default:
+                break
         }
     }
 
@@ -116,7 +119,7 @@ class GroupInfo extends React.Component {
         this.setState({ blackListVisible: true })
     }
 
-    onChangeUsers = e => this.setState({ users: [ e.target.value ] })
+    onChangeUsers = e => this.setState({ users: [e.target.value] })
 
     add = () => {
         const value = this.state.users
@@ -135,13 +138,17 @@ class GroupInfo extends React.Component {
 
     renderGroupOperationMenu = () => {
         const { login, groupMember, room } = this.props
-        const user = _.get(groupMember, [ room.groupId, "byName", _.get(login, "username").toLowerCase() ], {
+
+        let groupId = room.groupId
+        this.props.newGetGroupInfoAsync(groupId)
+        const user = _.get(groupMember, [room.groupId, "byName", _.get(login, "username").toLowerCase()], {
             name: null,
             affiliation: null
         })
         const isAdmin = user.affiliation === "owner"
-        return isAdmin
-            ? <Menu onClick={this.handleMenuClick}>
+        // TOOD 代码结构需优化
+        if (isAdmin) {
+            return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
                     <Tooltip title={I18n.t("inviteToGroup")} placement="left">
                         <i className="iconfont icon-users" /> {I18n.t("inviteToGroup")}
@@ -163,7 +170,16 @@ class GroupInfo extends React.Component {
                     </Tooltip>
                 </Menu.Item>
             </Menu>
-            : <Menu onClick={this.handleMenuClick}>
+        } else if (this.props.group.allowinvites) { //成员邀请判断
+            return <Menu onClick={this.handleMenuClick}>
+                <Menu.Item key="6">
+                    <Tooltip title={I18n.t("quitGroup")} placement="left">
+                        <i className="iconfont icon-exit" /> {I18n.t("quitGroup")}
+                    </Tooltip>
+                </Menu.Item>
+            </Menu>
+        } else {
+            return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
                     <Tooltip title={I18n.t("inviteToGroup")} placement="left">
                         <i className="iconfont icon-users" /> {I18n.t("inviteToGroup")}
@@ -175,8 +191,8 @@ class GroupInfo extends React.Component {
                     </Tooltip>
                 </Menu.Item>
             </Menu>
+        }
     }
-
     render() {
         const {
             title,
@@ -189,7 +205,7 @@ class GroupInfo extends React.Component {
             // entities
         } = this.props
         const isLoading = _.get(this.props, "entities.group.isLoading", false)
-        const blacklist = _.get(groupMember, [ room.groupId, "blacklist" ], [])
+        const blacklist = _.get(groupMember, [room.groupId, "blacklist"], [])
 
         const menu = this.renderGroupOperationMenu()
 
@@ -237,7 +253,7 @@ class GroupInfo extends React.Component {
                 <h3>
                     {I18n.t("groupName")}
                     <span className="fr">
-                        <Dropdown overlay={menu} trigger={[ "click" ]}>
+                        <Dropdown overlay={menu} trigger={["click"]}>
                             <Icon type="setting" style={iconStyle} />
                         </Dropdown>
                     </span>
@@ -292,16 +308,16 @@ class GroupInfo extends React.Component {
 }
 
 export default connect(
-    ({ entities, login }) => ({ login, groupMember: entities.groupMember }),
+    ({ entities, login }) => ({ login, groupMember: entities.groupMember, group: entities.group }),
     dispatch => ({
         listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
         updateGroupInfoAsync: info => dispatch(GroupActions.updateGroupInfoAsync(info)),
-        dissolveGroupAsync: ({ groupId, groupName }) =>
-            dispatch(GroupActions.dissolveGroupAsync({ groupId, groupName })),
+        dissolveGroupAsync: ({ groupId, groupName }) => dispatch(GroupActions.dissolveGroupAsync({ groupId, groupName })),
         getGroupBlackListAsync: groupId => dispatch(GroupMemberActions.getGroupBlackListAsync(groupId)),
         removeGroupBlockSingleAsync: (groupId, username) => dispatch(GroupMemberActions.removeGroupBlockSingleAsync(groupId, username)),
         inviteToGroupAsync: (groupId, users) => dispatch(GroupMemberActions.inviteToGroupAsync(groupId, users)),
         quitGroupAsync: (groupId, username) => dispatch(GroupMemberActions.quitGroupAsync(groupId, username)),
-        switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset }))
+        switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
+        newGetGroupInfoAsync: options => dispatch(GroupActions.newGetGroupInfoAsync(options))
     })
 )(GroupInfo)

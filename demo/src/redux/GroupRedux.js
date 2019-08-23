@@ -13,14 +13,15 @@ const logger = WebIM.loglevel.getLogger("GroupRedux")
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    updateGroupInfo: [ "info" ],
-    setLoading: [ "isLoading" ],
-    setLoadingFailed: [ "loadingFailed" ],
-    deleteGroup: [ "groupId" ],
-    updateGroup: [ "groups" ],
-    dissolveGroup: [ "group" ],
-    switchRightSider: [ "width" ],
-    topGroup: [ "groupId" ],
+    updateGroupInfo: ["info"],
+    setLoading: ["isLoading"],
+    setLoadingFailed: ["loadingFailed"],
+    deleteGroup: ["groupId"],
+    updateGroup: ["groups"],
+    dissolveGroup: ["group"],
+    switchRightSider: ["width"],
+    topGroup: ["groupId"],
+    newGetGroupInfo: ["response"],
     // ---------------async------------------
     createGroups: options => {
         return (dispatch, getState) => {
@@ -31,12 +32,12 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             store.dispatch(CommonActions.getGroupAlready())
             WebIM.conn.getGroup({
-                success: function(response) {
+                success: function (response) {
                     logger.info(response.data)
                     dispatch(Creators.updateGroup(response.data))
                 },
-                error: function(e) {
-                   //WebIM.conn.setPresence()
+                error: function (e) {
+                    //WebIM.conn.setPresence()
                 }
             })
         }
@@ -108,6 +109,18 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             WebIM.conn.getGroupInfo(options)
         }
+    },
+
+    newGetGroupInfoAsync: groupId => {
+        return (dispatch, getState) => {
+            WebIM.conn.getGroupInfo({
+                groupId: groupId,
+                success: response => {
+                    dispatch(Creators.newGetGroupInfo(response))
+                },
+                error: e => console.log(e)
+            })
+        }
     }
 })
 
@@ -125,7 +138,7 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 export const deleteGroup = (state, { groupId }) => {
-    const byId = state.getIn([ "byId" ]).without(groupId)
+    const byId = state.getIn(["byId"]).without(groupId)
     const names = []
     _.forEach(byId, (v, k) => {
         names.push(v.groupName + "_#-#_" + v.groupId)
@@ -163,6 +176,13 @@ export const updateGroup = (state, { groups }) => {
     })
 }
 
+export const newGetGroupInfo = (state, { response }) => {
+    let allowinvites
+    response.data.map((v, i) => {
+        return allowinvites = v.allowinvites
+    })
+    return state.merge({ allowinvites:allowinvites })
+}
 /**
  * 
  * @param {*} state 
@@ -172,13 +192,13 @@ export const updateGroup = (state, { groups }) => {
  * @param {String} info.description
  */
 export const updateGroupInfo = (state, { info }) => {
-    const group = state.getIn([ "byId", info.groupId ])
+    const group = state.getIn(["byId", info.groupId])
     const oldName = `${group.groupName}_#-#_${group.roomId || group.groupId}`
     const newName = `${info.groupName}_#-#_${group.roomId || group.groupId}`
-    const names = state.getIn([ "names" ]).asMutable()
+    const names = state.getIn(["names"]).asMutable()
     names.splice(names.indexOf(oldName), 1, newName)
 
-    return state.setIn([ "byId", info.groupId, "groupName" ], info.groupName).set("names", names.sort())
+    return state.setIn(["byId", info.groupId, "groupName"], info.groupName).set("names", names.sort())
 }
 
 /**
@@ -190,8 +210,8 @@ export const updateGroupInfo = (state, { info }) => {
  */
 export const dissolveGroup = (state, { group }) => {
     const { groupId, groupName } = group
-    let byId = state.getIn([ "byId" ]).without(groupId)
-    const names = state.getIn([ "names" ]).asMutable()
+    let byId = state.getIn(["byId"]).without(groupId)
+    const names = state.getIn(["names"]).asMutable()
     names.splice(names.indexOf(`${groupName}_#-#_${groupId}`), 1)
     return state.merge({
         byId,
@@ -207,7 +227,7 @@ export const switchRightSider = (state, { width }) => {
 }
 
 export const topGroup = (state, { groupId }) => {
-    let names = state.getIn([ "names" ], Immutable([])).asMutable()
+    let names = state.getIn(["names"], Immutable([])).asMutable()
     for (let i = 0; i < names.length; i++) {
         const name = names[i]
         if (name.split("_#-#_")[1] === groupId) {
@@ -230,7 +250,8 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.UPDATE_GROUP_INFO]: updateGroupInfo,
     [Types.DISSOLVE_GROUP]: dissolveGroup,
     [Types.SWITCH_RIGHT_SIDER]: switchRightSider,
-    [Types.TOP_GROUP]: topGroup
+    [Types.TOP_GROUP]: topGroup,
+    [Types.NEW_GET_GROUP_INFO]: newGetGroupInfo
 })
 
 /* ------------- Selectors ------------- */

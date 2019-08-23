@@ -1,14 +1,14 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import moment from "moment"
-import { I18n } from "react-redux-i18n"
-import { Badge, Button, Menu, Dropdown, Icon } from "antd"
-import { renderTime } from "@/utils"
-import emoji from "@/config/emoji"
-import { Card, Tag, message } from "antd"
-import Audio from "@/components/chat/Audio"
-import WebIM from "@/config/WebIM"
+import React from 'react'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
+import moment from 'moment'
+import { I18n } from 'react-redux-i18n'
+import { Badge, Button, Menu, Dropdown, Icon } from 'antd'
+import { renderTime } from '@/utils'
+import emoji from '@/config/emoji'
+import { Card, Tag, message } from 'antd'
+import Audio from '@/components/chat/Audio'
+import WebIM from '@/config/WebIM'
 
 const renderTxt = txt => {
     let rnTxt = []
@@ -41,10 +41,10 @@ const renderTxt = txt => {
     return rnTxt
 }
 
-export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...other}) => {
+export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...other }) => {
     // x-message-right
 
-    const cls = classNames("x-message-group", bySelf ? "x-message-right" : "")
+    const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
     const localFormat = renderTime(time)
 
     let content = null
@@ -68,9 +68,9 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
             </Menu.Item>
         </Menu>
     )
-    if (body.type == "txt") {
+    if (body.type == 'txt') {
         content = bySelf?(
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={[ 'click' ]}>
                 <p className="x-message-text" >
                     {renderTxt(body.msg||body.url)}
                 </p>
@@ -80,14 +80,14 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                 {renderTxt(body.msg)}
             </p>
         )
-    } else if (body.type == "img") {
+    } else if (body.type == 'img') {
         content = bySelf?(
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={[ 'click' ]}>
                 <div className="x-message-img">
                     <img
                         src={body.url}
                         width="100%"
-                        style={{ verticalAlign: "middle" }}
+                        style={{ verticalAlign: 'middle' }}
                     />
                 </div>
             </Dropdown>
@@ -96,23 +96,23 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                 <img
                     src={body.url}
                     width="100%"
-                    style={{ verticalAlign: "middle" }}
+                    style={{ verticalAlign: 'middle' }}
                 />
             </div>
         )
-    } else if (body.type == "file") {
+    } else if (body.type == 'file') {
         const readablizeBytes = bytes => {
-            let s = [ "Bytes", "KB", "MB", "GB", "TB", "PB" ]
+            let s = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB' ]
             var e = Math.floor(Math.log(bytes) / Math.log(1024))
             return (
-                (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + " " + s[e]
+                (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + ' ' + s[e]
             )
         }
         content = bySelf?(
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={[ 'click' ]}>
                 <Card
-                    title={I18n.t("file")}
-                    style={{ width: 240, margin: "2px 2px 2px 0" }}
+                    title={I18n.t('file')}
+                    style={{ width: 240, margin: '2px 2px 2px 0' }}
                 >
                     <div className="x-message-file">
                         <h3 title={body.filename}>
@@ -126,7 +126,7 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                             </div>
                             <div className="ant-col-12">
                                 <a href={body.url} download={body.filename}>
-                                    {I18n.t("download")}
+                                    {I18n.t('download')}
                                 </a>
                             </div>
                         </div>
@@ -135,8 +135,8 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
             </Dropdown>
         ):(
             <Card
-                title={I18n.t("file")}
-                style={{ width: 240, margin: "2px 2px 2px 0" }}
+                title={I18n.t('file')}
+                style={{ width: 240, margin: '2px 2px 2px 0' }}
             >
                 <div className="x-message-file">
                     <h3 title={body.filename}>
@@ -150,16 +150,16 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                         </div>
                         <div className="ant-col-12">
                             <a href={body.url} download={body.filename}>
-                                {I18n.t("download")}
+                                {I18n.t('download')}
                             </a>
                         </div>
                     </div>
                 </div>
             </Card>
         )
-    } else if (body.type == "video") {
+    } else if (body.type == 'video') {
         content = bySelf?(
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={[ 'click' ]}>
                 <div className="x-message-video">
                     <video src={body.url} width="100%" controls />
                 </div>
@@ -169,9 +169,9 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                 <video src={body.url} width="100%" controls />
             </div>
         )
-    } else if (body.type == "audio") {
+    } else if (body.type == 'audio') {
         content = bySelf?(
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown overlay={menu} trigger={[ 'click' ]}>
                 <div className="x-message-audio">
                     <Audio url={body.url} length={body.length} />
                 </div>
@@ -185,17 +185,17 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
 
     let statusTag
     switch (status) {
-    case "sent":
-        statusTag = <Tag color="#f39c12">{I18n.t("unread")}</Tag>
+    case 'sent':
+        statusTag = <Tag color="#f39c12">{I18n.t('unread')}</Tag>
         break
-    case "muted":
-        statusTag = <Tag color="#f50">{I18n.t("muted")}</Tag>
+    case 'muted':
+        statusTag = <Tag color="#f50">{I18n.t('muted')}</Tag>
         break
-    case "fail":
-        statusTag = <Tag color="#f50">{I18n.t("sentFailed")}</Tag>
+    case 'fail':
+        statusTag = <Tag color="#f50">{I18n.t('sentFailed')}</Tag>
         break
     default:
-        statusTag = ""
+        statusTag = ''
         break
     }
 
@@ -205,7 +205,7 @@ export default ({ bySelf, from, time, body, status, id, toJid, to, ok, type, ...
                 {from}
             </div>
             <div className="x-message-content">
-                {bySelf ? statusTag : "" } {content}
+                {bySelf ? statusTag : '' } {content}
             </div>
             {bySelf
                 ? <div className="x-message-time">
