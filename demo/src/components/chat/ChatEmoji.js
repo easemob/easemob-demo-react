@@ -1,8 +1,8 @@
-import React from "react"
-import PropTypes from "prop-types"
-import { Menu, Icon, Dropdown } from "antd"
-import emoji from "@/config/emoji"
-import "./style/ChatEmoji.less"
+import React from 'react'
+import PropTypes from 'prop-types'
+import { Menu, Icon, Dropdown } from 'antd'
+import emoji from '@/config/emoji'
+import './style/ChatEmoji.less'
 
 const SubMenu = Menu.SubMenu
 const MenuItem = Menu.Item
@@ -10,8 +10,8 @@ const path = emoji.path
 
 class ChatEmoji extends React.Component {
  state = {
-     tabPosition: "bottom",
-     size: "",
+     tabPosition: 'bottom',
+     size: '',
      emojiPadding: 5,
      emojiWidth: 25,
      lineNum: 10
@@ -72,12 +72,12 @@ class ChatEmoji extends React.Component {
 
      return (
          <div className="ib">
-             <Dropdown overlay={menu} trigger={[ "click" ]}>
+             <Dropdown overlay={menu} trigger={[ 'click' ]}>
                  <a className="ant-dropdown-link" href="#">
                      {/*<Icon type="down" />*/}
                      <i
                          className="iconfont icon-smile"
-                         style={{ color: "rgba(0, 0, 0, 0.65)" }}
+                         style={{ color: 'rgba(0, 0, 0, 0.65)' }}
                      />
                  </a>
              </Dropdown>

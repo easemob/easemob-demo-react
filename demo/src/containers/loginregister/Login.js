@@ -1,11 +1,11 @@
-import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { Button, Row, Form, Input, Checkbox } from "antd"
-import { config } from "@/config"
-import styles from "./index.less"
-import LoginActions from "@/redux/LoginRedux"
-import WebIM from "@/config/WebIM"
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Button, Row, Form, Input, Checkbox } from 'antd'
+import { config } from '@/config'
+import styles from './index.less'
+import LoginActions from '@/redux/LoginRedux'
+import WebIM from '@/config/WebIM'
 
 const FormItem = Form.Item
 
@@ -37,7 +37,7 @@ const Login = ({
     // const b = a.b.c
     // console.log(messageList, "---")
 
-    const logo = WebIM.config.i18n == "cn" ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
+    const logo = WebIM.config.i18n == 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
         <div className="form x-login">
             <div className="logo">
@@ -46,7 +46,7 @@ const Login = ({
             </div>
             <form>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("username", {
+                    {getFieldDecorator('username', {
                         rules: [
                             {
                                 required: true
@@ -55,7 +55,7 @@ const Login = ({
                     })(<Input size="large" onPressEnter={handleOk} placeholder={I18N.username}/>)}
                 </FormItem>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("password", {
+                    {getFieldDecorator('password', {
                         rules: [
                             {
                                 required: true
@@ -63,7 +63,7 @@ const Login = ({
                         ]
                     })(<Input size="large" type="password" onPressEnter={handleOk} placeholder={I18N.password}/>)}
                 </FormItem>
-                <FormItem hasFeedback>{getFieldDecorator("type")(<Checkbox>{I18N.tokenSignin}</Checkbox>)}</FormItem>
+                <FormItem hasFeedback>{getFieldDecorator('type')(<Checkbox>{I18N.tokenSignin}</Checkbox>)}</FormItem>
                 <Row>
                     <Button type="primary" size="large" onClick={handleOk} loading={loginLoading}>
                         {I18N.signIn}

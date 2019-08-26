@@ -1,14 +1,14 @@
 /* eslint-disable */
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
-import websdk from "easemob-websdk"
-import webrtc from "easemob-webrtc"
-import emedia from "easemob-emedia"
-import config from "WebIMConfig"
-import emoji from "./emoji"
-import Api from "axios"
-import { message } from "antd"
-import loglevel from "@/utils/loglevel"
+import websdk from 'easemob-websdk'
+import webrtc from 'easemob-webrtc'
+import emedia from 'easemob-emedia'
+import config from 'WebIMConfig'
+import emoji from './emoji'
+import Api from 'axios'
+import { message } from 'antd'
+import loglevel from '@/utils/loglevel'
 
 console = console || {}
 console.group = console.group || function () {}
@@ -43,7 +43,7 @@ if (!WebIM.conn.apiUrl) {
 
 websdk.debug(true)
 
-const appKeyPair = WebIM.config.appkey.split("#")
+const appKeyPair = WebIM.config.appkey.split('#')
 export let api = Api.create({
     baseURL: `${WebIM.config.apiURL}/${appKeyPair[0]}/${appKeyPair[1]}`,
     validateStatus: function (status) {
@@ -57,7 +57,7 @@ function requestFail(data) {
     } else if (data.data && data.data.data && data.data.data.error_description) {
         data.msg = data.data.data.error_description
     }
-    message.error("Error:" + data.status + ", " + data.msg)
+    message.error('Error:' + data.status + ', ' + data.msg)
     return Promise.reject(data)
 }
 

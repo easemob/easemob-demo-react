@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 import {
     // BrowserRouter as Router,
     HashRouter as Router,
@@ -7,19 +7,19 @@ import {
     Redirect,
     Switch,
     withRouter
-} from "react-router-dom"
-import AsyncComponents from "@/components/common/AsyncComponent"
+} from 'react-router-dom'
+import AsyncComponents from '@/components/common/AsyncComponent'
 
 // import { asyncComponent } from "./utils"
 // import App from "./App"
 
 
 const LoadableMyComponent = AsyncComponents({
-    loader: () => import("./App")
+    loader: () => import('./App')
 })
 
 const LoadableMyComponent2 = AsyncComponents({
-    loader: () => import("./components/contact/ContactItem")
+    loader: () => import('./components/contact/ContactItem')
 })
 
 // const AsyncApp = asyncComponent(() => import("./App"))

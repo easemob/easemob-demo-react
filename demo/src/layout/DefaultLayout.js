@@ -1,25 +1,25 @@
-import React, { Component } from "react"
-import ReactDOM from "react-dom"
-import { Icon } from "antd"
-import Layout from "./Layout"
-import { connect } from "react-redux"
-import { I18n } from "react-redux-i18n"
-import { withRouter, Route } from "react-router-dom"
-import _ from "lodash"
-import classNames from "classnames"
+import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
+import { Icon } from 'antd'
+import Layout from './Layout'
+import { connect } from 'react-redux'
+import { I18n } from 'react-redux-i18n'
+import { withRouter, Route } from 'react-router-dom'
+import _ from 'lodash'
+import classNames from 'classnames'
 //import ContactItem from "@/components/contact/ContactItem"
-import ChatRoomActions from "@/redux/ChatRoomRedux"
-import Contact from "@/containers/contact/Contact"
-import Chat from "@/containers/chat/Chat"
-import HeaderTab from "@/components/header/HeaderTab"
-import HeaderOps from "@/components/header/HeaderOps"
-import MultiAVModal from "@/components/webrtc/MultiAVModal"
-import GroupActions from "@/redux/GroupRedux"
-import GroupMemberActions from "@/redux/GroupMemberRedux"
-import MessageActions from "@/redux/MessageRedux"
-import { config } from "@/config"
-import WebRTCModal from "@/components/webrtc/WebRTCModal"
-import getCurrentContacts from "@/selectors/ContactSelector"
+import ChatRoomActions from '@/redux/ChatRoomRedux'
+import Contact from '@/containers/contact/Contact'
+import Chat from '@/containers/chat/Chat'
+import HeaderTab from '@/components/header/HeaderTab'
+import HeaderOps from '@/components/header/HeaderOps'
+import MultiAVModal from '@/components/webrtc/MultiAVModal'
+import GroupActions from '@/redux/GroupRedux'
+import GroupMemberActions from '@/redux/GroupMemberRedux'
+import MessageActions from '@/redux/MessageRedux'
+import { config } from '@/config'
+import WebRTCModal from '@/components/webrtc/WebRTCModal'
+import getCurrentContacts from '@/selectors/ContactSelector'
 
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
@@ -30,7 +30,7 @@ let chat_message_status = {}
 class DefaultLayout extends Component {
     constructor({ breakpoint, match , entities }) {
         super()
-        const { selectTab, selectItem = "" } = match.params
+        const { selectTab, selectItem = '' } = match.params
 
 
         // console.log(selectTab, selectItem, "-----")
@@ -42,24 +42,24 @@ class DefaultLayout extends Component {
             entities: entities,
             headerTabs: [
                 {
-                    key: "contact",
-                    name: `${I18n.t("friends")}`,
-                    icon: "fontello icon-comment"
+                    key: 'contact',
+                    name: `${I18n.t('friends')}`,
+                    icon: 'fontello icon-comment'
                 },
                 {
-                    key: "group",
-                    name: `${I18n.t("groups")}`,
-                    icon: "fontello icon-chat"
+                    key: 'group',
+                    name: `${I18n.t('groups')}`,
+                    icon: 'fontello icon-chat'
                 },
                 {
-                    key: "chatroom",
-                    name: `${I18n.t("chatrooms")}`,
-                    icon: "fontello icon-users-1"
+                    key: 'chatroom',
+                    name: `${I18n.t('chatrooms')}`,
+                    icon: 'fontello icon-users-1'
                 },
                 {
-                    key: "stranger",
-                    name: `${I18n.t("strangers")}`,
-                    icon: "fontello icon-address-book-1"
+                    key: 'stranger',
+                    name: `${I18n.t('strangers')}`,
+                    icon: 'fontello icon-address-book-1'
                 }
             ],
             rightSiderOffset: -1 * RIGHT_SIDER_WIDTH,
@@ -92,11 +92,11 @@ class DefaultLayout extends Component {
 
         const { history, location , entities } = this.props
         const { selectItem, selectTab } = this.state
-        const redirectPath = "/" + [ e.key ].join("/")
+        const redirectPath = '/' + [ e.key ].join('/')
         if (selectTab == e.key) return
 
         // quite previous chatroom
-        if (selectItem && selectTab == "chatroom") this.props.quitChatRoom(selectItem)
+        if (selectItem && selectTab == 'chatroom') this.props.quitChatRoom(selectItem)
 
         this.props.switchRightSider({ rightSiderOffset: 0 })
         history.push(redirectPath + location.search)
@@ -111,37 +111,37 @@ class DefaultLayout extends Component {
         //     this.changeItem(info,{ defaultItem:true })
         // }
         // 选择tab时，默认打开第一个item
-        if(e.key == "contact"){
+        if(e.key == 'contact'){
             var contacts = entities.roster.friends.toString()
-            var newcontacts = contacts.split(",")
+            var newcontacts = contacts.split(',')
             if(newcontacts && newcontacts[0]){
                 this.defaultSelectItem = newcontacts[0]
                 info.key = newcontacts[0]
-                info.tab = "contact"
+                info.tab = 'contact'
                 this.changeItem(info,{ defaultItem:true })
             }
-        }else if(!opt.multiAV && e.key == "group"){
+        }else if(!opt.multiAV && e.key == 'group'){
             var obj = entities.group.names
             if(obj && obj[0]){
-                this.defaultGroupItem = obj[0].split("_#-#_")[1]
+                this.defaultGroupItem = obj[0].split('_#-#_')[1]
                 info.key = this.defaultGroupItem
-                info.tab = "group"
+                info.tab = 'group'
                 this.changeItem(info,{ defaultItem:true })
             }
-        }else if(e.key == "chatroom"){
+        }else if(e.key == 'chatroom'){
             var obj = entities.chatroom.names
             if(obj && obj[0]){
-                this.defaultChatroomItem = obj[0].split("_#-#_")[1]
+                this.defaultChatroomItem = obj[0].split('_#-#_')[1]
                 info.key = this.defaultChatroomItem
-                info.tab = "chatroom"
+                info.tab = 'chatroom'
                 this.changeItem(info,{ defaultItem:true })
             }
-        }else if(e.key == "stranger"){
+        }else if(e.key == 'stranger'){
             var obj = entities.stranger.names
             if(obj && obj[0]){
-                this.defaultStrangerItem = obj[0].split("_#-#_")[1]
+                this.defaultStrangerItem = obj[0].split('_#-#_')[1]
                 info.key = this.defaultStrangerItem
-                info.tab = "stranger"
+                info.tab = 'stranger'
                 this.changeItem(info,{ defaultItem:true })
             }
         }
@@ -161,11 +161,11 @@ class DefaultLayout extends Component {
         }else{
             selectTab = this.state.selectTab
         }
-        const redirectPath = "/" + [ selectTab, e.key ].join("/")
-        const typeMap = { contact: "chat", group: "groupchat", chatroom: "chatroom", stranger: "stranger" }
+        const redirectPath = '/' + [ selectTab, e.key ].join('/')
+        const typeMap = { contact: 'chat', group: 'groupchat', chatroom: 'chatroom', stranger: 'stranger' }
 
         // chatroom will push recent messages automatically
-        if (!chat_message_status[e.key] && typeMap[selectTab] !== "chatroom") {
+        if (!chat_message_status[e.key] && typeMap[selectTab] !== 'chatroom') {
             this.props.fetchMessage(e.key, typeMap[selectTab])
             chat_message_status[e.key] = true
         }
@@ -176,7 +176,7 @@ class DefaultLayout extends Component {
             return
         }
 
-        if (selectTab === "group") {
+        if (selectTab === 'group') {
             const groupId = e.key
             if (groupId) {
                 this.setState({ roomId: groupId })
@@ -193,7 +193,7 @@ class DefaultLayout extends Component {
             }
         }
 
-        if (selectTab == "chatroom") {
+        if (selectTab == 'chatroom') {
             // moved to changeTab
             //quit previous chatroom
             // if (selectItem) {
@@ -209,7 +209,7 @@ class DefaultLayout extends Component {
     setSelectStatus(defaultItem,opt) {
         const { history, location, match } = this.props
         // console.log(location.patchname, match)
-        const { selectTab, selectItem = "" } = match.params
+        const { selectTab, selectItem = '' } = match.params
         // console.log(match)
         opt = opt || {}
         if(!opt.defaultItem){
@@ -238,7 +238,7 @@ class DefaultLayout extends Component {
         var hash = location.hash
         if(reg.test(hash)){
 
-            var groupId = hash.slice(hash.indexOf("group")+6,hash.indexOf("?"))
+            var groupId = hash.slice(hash.indexOf('group')+6,hash.indexOf('?'))
 
             const { group } = this.props
             this.setState({ roomId: groupId })
@@ -276,37 +276,37 @@ class DefaultLayout extends Component {
             }else{
                 selectTab = match.params.selectTab
             }
-            if(selectTab == "contact" && entities.roster && !this.defaultSelectItem){
+            if(selectTab == 'contact' && entities.roster && !this.defaultSelectItem){
 	            var contacts = entities.roster.friends.toString()
-	            var newcontacts = contacts.split(",")
+	            var newcontacts = contacts.split(',')
 	            if(newcontacts && newcontacts[0]){
 	                this.defaultSelectItem = newcontacts[0]
 	                info.key = newcontacts[0]
-	                info.tab = "contact"
+	                info.tab = 'contact'
 	                this.changeItem(info,{ defaultItem:true })
 	            }
-	        }else if(selectTab == "group" && !this.defaultGroupItem){
+	        }else if(selectTab == 'group' && !this.defaultGroupItem){
 	            var obj = entities.group.names
 	            if(obj && obj[0]){
-	                this.defaultGroupItem = obj[0].split("_#-#_")[1]
+	                this.defaultGroupItem = obj[0].split('_#-#_')[1]
 	                info.key = this.defaultGroupItem
-	                info.tab = "group"
+	                info.tab = 'group'
 	                this.changeItem(info,{ defaultItem:true })
 	            }
-	        }else if(selectTab == "chatroom" && !this.defaultChatroomItem){
+	        }else if(selectTab == 'chatroom' && !this.defaultChatroomItem){
 	            var obj = entities.chatroom.names
 	            if(obj && obj[0]){
-	                this.defaultChatroomItem = obj[0].split("_#-#_")[1]
+	                this.defaultChatroomItem = obj[0].split('_#-#_')[1]
 	                info.key = this.defaultChatroomItem
-	                info.tab = "chatroom"
+	                info.tab = 'chatroom'
 	                this.changeItem(info,{ defaultItem:true })
 	            }
-	        }else if(selectTab == "stranger" && !this.defaultStrangerItem){
+	        }else if(selectTab == 'stranger' && !this.defaultStrangerItem){
 	            var obj = entities.stranger.names
 	            if(obj && obj[0]){
-	                this.defaultStrangerItem = obj[0].split("_#-#_")[1]
+	                this.defaultStrangerItem = obj[0].split('_#-#_')[1]
 	                info.key = this.defaultStrangerItem
-	                info.tab = "stranger"
+	                info.tab = 'stranger'
 	                this.changeItem(info,{ defaultItem:true })
 	            }
 	        }
@@ -320,12 +320,12 @@ class DefaultLayout extends Component {
             var groupId = byId[gid] && byId[gid].groupId
             if(groupId && !this.multiGroupSelectItem){
                 this.multiGroupSelectItem = groupId
-                info.tab = "group"
+                info.tab = 'group'
 	            info.key = groupId
 	            this.changeItem(info,{ defaultItem:true })
             }
-            if(!groupId && match.params.selectTab != "group"){
-                info.key = "group"
+            if(!groupId && match.params.selectTab != 'group'){
+                info.key = 'group'
                 this.changeTab(info,{ multiAV:true })
             }
         }
@@ -347,7 +347,7 @@ class DefaultLayout extends Component {
             if(groupId){
                 this.multiAVSelectItem = groupId
                 info.key = groupId
-		        info.tab = "group"
+		        info.tab = 'group'
 		        this.changeItem(info,{ defaultItem:true })
             }
         }
@@ -368,9 +368,9 @@ class DefaultLayout extends Component {
                         className="x-layout-sider"
                         style={{
                             // sider full display when breakpoint
-                            width: collapsed ? "100%" : SIDER_WIDTH,
+                            width: collapsed ? '100%' : SIDER_WIDTH,
                             // sider display to left when breakpoint and has selectItem
-                            left: selectItem && collapsed ? "-100%" : 0
+                            left: selectItem && collapsed ? '-100%' : 0
                         }}
                     >
                         <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[ selectItem ]}
@@ -378,8 +378,8 @@ class DefaultLayout extends Component {
                     </div>
                     <div className="x-layout-video"
                         style={{
-                            position: "absolute",
-                            zIndex: "100"
+                            position: 'absolute',
+                            zIndex: '100'
                         }}
                     >
                         <WebRTCModal collapsed={false} visible={true} />
@@ -387,8 +387,8 @@ class DefaultLayout extends Component {
                     <Content
                         className="x-layout-chat"
                         style={{
-                            overflow: "scroll",
-                            margin: collapsed ? "0" : `0 0 0 ${SIDER_WIDTH}px`
+                            overflow: 'scroll',
+                            margin: collapsed ? '0' : `0 0 0 ${SIDER_WIDTH}px`
                         }}
                     >
                         <Route
@@ -397,7 +397,7 @@ class DefaultLayout extends Component {
                         />
                     </Content>
                     <div
-                        className={classNames("x-layout-right-sider", { "hide": this.props.rightSiderOffset === 0 })}
+                        className={classNames('x-layout-right-sider', { 'hide': this.props.rightSiderOffset === 0 })}
                         style={{
                             width: `${RIGHT_SIDER_WIDTH}px`,
                             marginLeft: `${rightSiderOffset}px`

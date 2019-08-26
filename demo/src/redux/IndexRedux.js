@@ -1,5 +1,5 @@
-export const MATCH_MEDIA = "INDEX::MATCH_MEDIA"
-export const USER_LOGOUT = "INDEX::LOGOUT"
+export const MATCH_MEDIA = 'INDEX::MATCH_MEDIA'
+export const USER_LOGOUT = 'INDEX::LOGOUT'
 
 const defaultState = {}
 

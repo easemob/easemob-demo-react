@@ -1,14 +1,14 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import WebIM from '@/config/WebIM'
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    addSubscribe: [ "msg" ],
-    removeSubscribe: [ "name" ],
+    addSubscribe: [ 'msg' ],
+    removeSubscribe: [ 'name' ],
     // ----------------async------------------
     
     // accept add friend action
@@ -18,7 +18,7 @@ const { Types, Creators } = createActions({
 
             WebIM.conn.subscribed({
                 to: name,
-                message: "[resp:true]"
+                message: '[resp:true]'
             })
         }
     },
@@ -48,12 +48,12 @@ export const INITIAL_STATE = Immutable({
 /* ------------- Reducers ------------- */
 
 export const subscribe = (state, { msg }) => {
-    return Immutable.setIn(state, [ "byFrom", msg.from ], msg)
+    return Immutable.setIn(state, [ 'byFrom', msg.from ], msg)
 }
 
 export const removeSubscribe = (state, { name }) => {
     let byFrom = Immutable.without(state.byFrom, name)
-    return Immutable.set(state, [ "byFrom" ], byFrom)
+    return Immutable.set(state, [ 'byFrom' ], byFrom)
 }
 
 /* ------------- Hookup Reducers To Types ------------- */

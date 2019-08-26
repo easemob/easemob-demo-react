@@ -1,14 +1,14 @@
 
 
-import Dexie from "dexie"
-import WebIMConfig from "WebIMConfig"
-import { config } from "@/config/"
+import Dexie from 'dexie'
+import WebIMConfig from 'WebIMConfig'
+import { config } from '@/config/'
 
 const DB_ENABLE = WebIMConfig.enableLocalStorage
-const DB_VERSION = "2.0"
+const DB_VERSION = '2.0'
 
-const TABLE_NAME = "webim_history"
-const TABLE_INDEX_KEYS = [ "id", "from", "to", "type", "isUnread", "status", "toJid" ]
+const TABLE_NAME = 'webim_history'
+const TABLE_INDEX_KEYS = [ 'id', 'from', 'to', 'type', 'isUnread', 'status', 'toJid' ]
 const { PAGE_NUM } = config
 
 const AppDB = {
@@ -25,7 +25,7 @@ const AppDB = {
         
         // create a table, use TABLE_NAME as table name
         db.version(DB_VERSION).stores({
-            [TABLE_NAME] : TABLE_INDEX_KEYS.join(",")
+            [TABLE_NAME] : TABLE_INDEX_KEYS.join(',')
         })
 
         this.db = db
@@ -46,21 +46,21 @@ const AppDB = {
     getUnreadList() {
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
-            $_TABLE.where("isUnread").equals(1).toArray().then(res => resolve(res))
+            $_TABLE.where('isUnread').equals(1).toArray().then(res => resolve(res))
         })
     },
 
     // get lastest mumber of message by start index
-    fetchMessage(id, chatType = "chat", offset = 0, limit = PAGE_NUM) {
+    fetchMessage(id, chatType = 'chat', offset = 0, limit = PAGE_NUM) {
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
-            $_TABLE.where("type")
+            $_TABLE.where('type')
                 .equals(chatType)
                 .filter(item => {
                     if (item.error) {
                         return false
                     }
-                    if (chatType === "chat") {
+                    if (chatType === 'chat') {
                         return item.from == id || item.to == id
                     } else {
                         return item.to == id
@@ -69,7 +69,7 @@ const AppDB = {
                 .reverse()
                 .offset(offset)
                 .limit(limit)
-                .sortBy("time")
+                .sortBy('time')
                 .then(res => {
                     resolve(res.reverse())
                 })
@@ -79,10 +79,10 @@ const AppDB = {
     // read all messages of conversation
     readMessage(chatType, id) {
         const $_TABLE = this.$_TABLE
-        const key = chatType === "chat" ? "from" : "to"
+        const key = chatType === 'chat' ? 'from' : 'to'
         return this.exec(resolve => {
-            $_TABLE.where({ "type": chatType, [key]: id, "isUnread": 1 })
-                .modify({ "isUnread": 0 })
+            $_TABLE.where({ 'type': chatType, [key]: id, 'isUnread': 1 })
+                .modify({ 'isUnread': 0 })
                 .then(res => {
                     resolve(res)
                 })
@@ -93,9 +93,9 @@ const AppDB = {
     updateMessageStatus(id, status) {
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
-            $_TABLE.where("id")
+            $_TABLE.where('id')
                 .equals(id)
-                .modify({ "status": status })
+                .modify({ 'status': status })
                 .then(res => {
                     resolve(res)
                 })
@@ -106,7 +106,7 @@ const AppDB = {
         console.log('ddddd', id)
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
-            $_TABLE.where("id")
+            $_TABLE.where('id')
                 .equals(id)
                 .delete()
                 .then(res => resolve(res))
@@ -116,12 +116,12 @@ const AppDB = {
     updateMessageMid(mid, id){
         setTimeout(() => {
             const $_TABLE = this.$_TABLE
-                return this.exec(resolve => {
-                    $_TABLE.where("id")
-                        .equals(id)
-                        .modify({ "toJid": mid })
-                        .then(res => console.log('res',res))
-                })
+            return this.exec(resolve => {
+                $_TABLE.where('id')
+                    .equals(id)
+                    .modify({ 'toJid': mid })
+                    .then(res => console.log('res',res))
+            })
         }, 1000)
         
     },
@@ -130,12 +130,12 @@ const AppDB = {
         const $_TABLE = this.$_TABLE
         if (!message.error) {
             return this.exec(resolve => {
-                $_TABLE.where("id").equals(message.id).count().then(res => {
+                $_TABLE.where('id').equals(message.id).count().then(res => {
                     if (res === 0 ) {
                         message.isUnread = isUnread
                         $_TABLE.add(message)
                             .then(res => resolve(res))
-                            .catch(e => console.log("add messaga:", e))
+                            .catch(e => console.log('add messaga:', e))
                     }
                 })
             })
@@ -146,10 +146,10 @@ const AppDB = {
     clearMessage(chatType, id) {
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
-            $_TABLE.where("type")
+            $_TABLE.where('type')
                 .equals(chatType)
                 .filter(item => {
-                    if (chatType === "chat") {
+                    if (chatType === 'chat') {
                         return item.from == id || item.to == id
                     } else {
                         return item.to == id

@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import { connect } from "react-redux"
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import {
     // BrowserRouter as Router,
     // HashRouter as Router,
@@ -8,16 +8,16 @@ import {
     Fade,
     Redirect,
     withRouter
-} from "react-router-dom"
-import Layout from "@/layout/DefaultLayout"
-import Login from "@/containers/loginregister/Login"
-import Chat from "@/containers/chat/Chat"
-import ChinaMobile from "@/containers/chinamobile/Chinamobile"
-import Register from "@/containers/loginregister/Register"
-import LoginActions from "@/redux/LoginRedux"
-import Loading from "@/components/common/LoadingComponent"
-import { store } from "@/redux"
-import utils from "@/utils"
+} from 'react-router-dom'
+import Layout from '@/layout/DefaultLayout'
+import Login from '@/containers/loginregister/Login'
+import Chat from '@/containers/chat/Chat'
+import ChinaMobile from '@/containers/chinamobile/Chinamobile'
+import Register from '@/containers/loginregister/Register'
+import LoginActions from '@/redux/LoginRedux'
+import Loading from '@/components/common/LoadingComponent'
+import { store } from '@/redux'
+import utils from '@/utils'
 
 const debug = false
 

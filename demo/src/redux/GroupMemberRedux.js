@@ -1,23 +1,23 @@
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import _ from "lodash"
-import { WebIM } from "@/config"
-import { history } from "@/utils"
-import GroupActions from "@/redux/GroupRedux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import _ from 'lodash'
+import { WebIM } from '@/config'
+import { history } from '@/utils'
+import GroupActions from '@/redux/GroupRedux'
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    setAdmins: [ "groupId", "admins" ],
-    operateAdmin: [ "groupId", "admin", "operation" ],
-    setMuted: [ "groupId", "muted" ],
-    operateMuted: [ "groupId", "muted", "operation" ],
-    setBlacklist: [ "groupId", "blacklist" ],
+    setAdmins: [ 'groupId', 'admins' ],
+    operateAdmin: [ 'groupId', 'admin', 'operation' ],
+    setMuted: [ 'groupId', 'muted' ],
+    operateMuted: [ 'groupId', 'muted', 'operation' ],
+    setBlacklist: [ 'groupId', 'blacklist' ],
     // addToGroupBlock: [ "groupId", "username" ],
     // removeFromGroupBlock: [ "groupId", "username" ],
-    operateBlacklist: [ "groupId", "username", "operation" ],
-    setGroupMember: [ "groupId", "members" ],
-    operateGroupMember: [ "groupId", "username", "operation" ],
+    operateBlacklist: [ 'groupId', 'username', 'operation' ],
+    setGroupMember: [ 'groupId', 'members' ],
+    operateGroupMember: [ 'groupId', 'username', 'operation' ],
     // ---------------async------------------
     getGroupMember: id => {
         return (dispatch, getState) => {
@@ -37,15 +37,15 @@ const { Types, Creators } = createActions({
     },
     quitGroupAsync: (groupId, username) => {
         return (dispatch, getState) => {
-            const logger = WebIM.loglevel.getLogger("Group Member Redux - quit group")
+            const logger = WebIM.loglevel.getLogger('Group Member Redux - quit group')
             WebIM.conn.quitGroup({
                 groupId,
                 success: response => {
                     logger.info(response)
                     dispatch(GroupActions.switchRightSider({ rightSiderOffset: 0 }))
-                    dispatch(Creators.operateGroupMember(groupId, username, "del"))
+                    dispatch(Creators.operateGroupMember(groupId, username, 'del'))
                     dispatch(GroupActions.deleteGroup(groupId))
-                    history.push("/group")
+                    history.push('/group')
                 },
                 error: e => logger.error(`an error found while invoking resultful quitGroup: ${e.message}`)
             })
@@ -111,7 +111,7 @@ const { Types, Creators } = createActions({
                 success: response => {
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(false))
-                    dispatch(Creators.operateGroupMember(groupId, username, "del"))
+                    dispatch(Creators.operateGroupMember(groupId, username, 'del'))
                 },
                 error: e => {
                     console.log(`an error found while invoking resultful mute: ${e.message}`)
@@ -132,7 +132,7 @@ const { Types, Creators } = createActions({
                     const groupId = groupid
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(false))
-                    dispatch(Creators.operateBlacklist(groupId, user, "del"))
+                    dispatch(Creators.operateBlacklist(groupId, user, 'del'))
                 },
                 error: e => {
                     // dispatch(Creators.setLoading(false))
@@ -154,7 +154,7 @@ const { Types, Creators } = createActions({
                     //        result: 'success'
                     //    }
                     // }
-                    dispatch(Creators.operateAdmin(groupId, response.data.newadmin, "add"))
+                    dispatch(Creators.operateAdmin(groupId, response.data.newadmin, 'add'))
                 },
                 error: e => console.log(`an error found while invoking restful setAdmin: ${e}`)
             })
@@ -168,7 +168,7 @@ const { Types, Creators } = createActions({
                 username,
                 muteDuration,
                 success: response => {
-                    dispatch(Creators.operateMuted(groupId, response.data, "add"))
+                    dispatch(Creators.operateMuted(groupId, response.data, 'add'))
                 },
                 error: e => console.log(`an error found while invoking resultful mute: ${e}`)
             })
@@ -179,7 +179,7 @@ const { Types, Creators } = createActions({
             WebIM.conn.removeAdmin({
                 groupId,
                 username,
-                success: response => dispatch(Creators.operateAdmin(groupId, response.data.oldadmin, "del")),
+                success: response => dispatch(Creators.operateAdmin(groupId, response.data.oldadmin, 'del')),
                 error: e => console.log(`an error found while invoking resultful removeAdmin: ${e}`)
             })
         }
@@ -189,7 +189,7 @@ const { Types, Creators } = createActions({
             WebIM.conn.removeMute({
                 groupId,
                 username,
-                success: response => dispatch(Creators.operateMuted(groupId, response.data, "del")),
+                success: response => dispatch(Creators.operateMuted(groupId, response.data, 'del')),
                 error: e => console.log(`an error found while invoking resultful removeMute: ${e}`)
             })
         }
@@ -199,7 +199,7 @@ const { Types, Creators } = createActions({
             WebIM.conn.removeSingleGroupMember({
                 groupId,
                 username,
-                success: response => dispatch(Creators.operateGroupMember(groupId, username, "del")),
+                success: response => dispatch(Creators.operateGroupMember(groupId, username, 'del')),
                 error: e => console.log(`an error found while invoking resultful removeSingleGroupMember: ${e}`)
             })
         }
@@ -260,8 +260,8 @@ export const setAdmins = (state, { groupId, admins }) => {
  * @returns 
  */
 export const operateAdmin = (state, { groupId, admin, operation }) => {
-    let admins = state.getIn([ groupId, "admins" ], Immutable([])).asMutable()
-    operation === "add"
+    let admins = state.getIn([ groupId, 'admins' ], Immutable([])).asMutable()
+    operation === 'add'
         ? admins = _.uniq(_.concat(admins, admin))
         : admins = _.without(admins, admin)
     const group = state.getIn([ groupId ]).merge({ admins })
@@ -298,11 +298,11 @@ export const setMuted = (state, { groupId, muted }) => {
  * @param {String} operation 'add' | 'del'
  */
 export const operateMuted = (state, { groupId, muted, operation }) => {
-    let byName = state.getIn([ groupId, "muted", "byName" ], Immutable({}))
-    operation === "add"
-        ? _.forEach(muted, val => (byName = byName.merge({ [val.user]: _.omit(val, "result") })))
+    let byName = state.getIn([ groupId, 'muted', 'byName' ], Immutable({}))
+    operation === 'add'
+        ? _.forEach(muted, val => (byName = byName.merge({ [val.user]: _.omit(val, 'result') })))
         : _.forEach(muted, val => (byName = byName.without(val.user)))
-    return state.setIn([ groupId, "muted", "byName" ], byName)
+    return state.setIn([ groupId, 'muted', 'byName' ], byName)
 }
 
 /**
@@ -315,7 +315,7 @@ export const operateMuted = (state, { groupId, muted, operation }) => {
  * @returns 
  */
 export const setBlacklist = (state, { groupId, blacklist }) => {
-    return state.setIn([ groupId, "blacklist" ], blacklist)
+    return state.setIn([ groupId, 'blacklist' ], blacklist)
 }
 
 /**
@@ -328,8 +328,8 @@ export const setBlacklist = (state, { groupId, blacklist }) => {
  * @returns new state
  */
 export const operateBlacklist = (state, { groupId, username, operation }) => {
-    let blacklist = state.getIn([ groupId, "blacklist" ], Immutable([])).asMutable()
-    operation === "add"
+    let blacklist = state.getIn([ groupId, 'blacklist' ], Immutable([])).asMutable()
+    operation === 'add'
         ? blacklist.push(username)
         : blacklist = _.without(blacklist, username)
     const group = state.getIn([ groupId ]).merge({ blacklist })
@@ -352,7 +352,7 @@ export const setGroupMember = (state, { groupId, members }) => {
         (acc, val) => {
             const { member, owner } = val
             const name = member || owner
-            const affiliation = owner ? "owner" : "member"
+            const affiliation = owner ? 'owner' : 'member'
             acc[name] = { name, affiliation }
             return acc
         },
@@ -373,12 +373,12 @@ export const setGroupMember = (state, { groupId, members }) => {
  * @returns new state
  */
 export const operateGroupMember = (state, { groupId, username, operation }) => {
-    if (operation === "del") {
-        let byName = state.getIn([ groupId, "byName" ], Immutable({}))
+    if (operation === 'del') {
+        let byName = state.getIn([ groupId, 'byName' ], Immutable({}))
         byName = byName.without(username)
         return state
-            .setIn([ groupId, "byName" ], byName)
-            .setIn([ groupId, "names" ], Object.keys(byName).sort())
+            .setIn([ groupId, 'byName' ], byName)
+            .setIn([ groupId, 'names' ], Object.keys(byName).sort())
     }
     return state
 }

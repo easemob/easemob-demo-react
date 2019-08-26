@@ -1,15 +1,15 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import BlacklistActions from "@/redux/BlacklistRedux"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
-import "./style/BlacklistModal.less"
+import React from 'react'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
+import { connect } from 'react-redux'
+import BlacklistActions from '@/redux/BlacklistRedux'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
+import './style/BlacklistModal.less'
 
 class BlacklistModal extends React.Component {
     state = {
-        name: "",
+        name: '',
         screen: 1
     }
 
@@ -21,7 +21,7 @@ class BlacklistModal extends React.Component {
                     {name}
                     <i
                         style={{
-                            cursor: "pointer", "margin-right": "16px"
+                            cursor: 'pointer', 'margin-right': '16px'
                         }}
                         className="fr iconfont icon-circle-minus"
                         onClick={() => {

@@ -1,22 +1,22 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
-import Cookie from "js-cookie"
-import { message } from "antd"
-import { history } from "@/utils"
-import { store } from "@/redux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import WebIM from '@/config/WebIM'
+import Cookie from 'js-cookie'
+import { message } from 'antd'
+import { history } from '@/utils'
+import { store } from '@/redux'
 
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    setLoginToken: [ "username", "token" ],
-    setLoging: [ "username", "password", "token" ],
+    setLoginToken: [ 'username', 'token' ],
+    setLoging: [ 'username', 'password', 'token' ],
     stopLoging: null,
-    setLoginSuccess: [ "username" ],
-    loginFailure: [ "error" ],
+    setLoginSuccess: [ 'username' ],
+    loginFailure: [ 'error' ],
     jumpRegister: null,
     logout: null,
 
@@ -89,7 +89,7 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 export const setLoginToken = (state = INITIAL_STATE, { username, token }) => {
-    Cookie.set("web_im_" + username, token)
+    Cookie.set('web_im_' + username, token)
     return Immutable.merge(state, {
         username: username,
         token
@@ -131,7 +131,7 @@ export const logout = (state = INITIAL_STATE) => {
 }
 
 export const jumpRegister = (state) => {
-    history.push("/register")
+    history.push('/register')
     return state
 }
 

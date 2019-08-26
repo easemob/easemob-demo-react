@@ -1,15 +1,15 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
-import CommonActions from "@/redux/CommonRedux"
-import GroupActions from "@/redux/GroupRedux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import WebIM from '@/config/WebIM'
+import CommonActions from '@/redux/CommonRedux'
+import GroupActions from '@/redux/GroupRedux'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    addGroupRequest: [ "msg" ],
-    removeGroupRequest: [ "gid", "invitee" ],
+    addGroupRequest: [ 'msg' ],
+    removeGroupRequest: [ 'gid', 'invitee' ],
     // ----------------async------------------
     agreeInviteIntoGroup: (gid, options) => {
         return (dispatch, getState) => {
@@ -42,12 +42,12 @@ export const INITIAL_STATE = Immutable({
 /* ------------- Reducers ------------- */
 
 export const addGroupRequest = (state, { msg }) => {
-    return state.setIn([ "byGid", msg.gid, msg.from ], msg)
+    return state.setIn([ 'byGid', msg.gid, msg.from ], msg)
 }
 
 export const removeGroupRequest = (state, { gid, applicant }) => {
-    const byGid = state.getIn([ "byGid", gid ], Immutable({})).without(applicant)
-    return state.setIn([ "byGid", gid ], byGid)
+    const byGid = state.getIn([ 'byGid', gid ], Immutable({})).without(applicant)
+    return state.setIn([ 'byGid', gid ], byGid)
 }
 
 /* ------------- Hookup Reducers To Types ------------- */

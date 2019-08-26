@@ -1,10 +1,10 @@
-import WebIM from "@/config/WebIM"
-import "../common/style/webrtc.less"
-import { I18n } from "react-redux-i18n"
+import WebIM from '@/config/WebIM'
+import '../common/style/webrtc.less'
+import { I18n } from 'react-redux-i18n'
 
-var React = require("react")
-var ReactDOM = require("react-dom")
-var Drag = require("./drag")
+var React = require('react')
+var ReactDOM = require('react-dom')
+var Drag = require('./drag')
 var Channel = React.createClass({
     getInitialState: function () {
         return {
@@ -14,15 +14,15 @@ var Channel = React.createClass({
             full_height: 360,
             toggle_right: 0,
             toggle_top: 0,
-            toggle_display: "none",
+            toggle_display: 'none',
             close_right: 0,
             close_bottom: 0,
             accept_left: 0,
             accept_bottom: 0,
-            accept_display: this.props.hideAccept ? "none" : "block",
+            accept_display: this.props.hideAccept ? 'none' : 'block',
             mute_left: 0,
             mute_bottom: 6,
-            mute_display: "none",
+            mute_display: 'none',
             hasVideo: false
         }
     },
@@ -34,7 +34,7 @@ var Channel = React.createClass({
         try {
             WebIM.call.endCall()
         } catch (e) {
-            console.log("endCall error1:", e)
+            console.log('endCall error1:', e)
         }
 
 
@@ -65,25 +65,25 @@ var Channel = React.createClass({
         this.refs.remoteVideo.muted = !this.refs.remoteVideo.muted
         var muted = this.refs.remoteVideo.muted
         if (muted) {
-            this.refs.mute.style.color = "#4eb1f4"
+            this.refs.mute.style.color = '#4eb1f4'
         } else {
-            this.refs.mute.style.color = "#eeeeee"
+            this.refs.mute.style.color = '#eeeeee'
         }
     },
 
     controlStream: function(type){
         var controlType
-        if(type === "audioControl"){
+        if(type === 'audioControl'){
             controlType = this.refs.audio.isopen?0:1
-            this.refs.audio.style.color = this.refs.audio.isopen?"#eeeeee":"#4eb1f4"
+            this.refs.audio.style.color = this.refs.audio.isopen?'#eeeeee':'#4eb1f4'
             this.refs.audio.isopen = !this.refs.audio.isopen
         }else{
             controlType = this.refs.video.isopen?3:2
-            this.refs.video.style.color = this.refs.video.isopen?"#eeeeee":"#4eb1f4"
+            this.refs.video.style.color = this.refs.video.isopen?'#eeeeee':'#4eb1f4'
             this.refs.video.isopen = !this.refs.video.isopen
         }
-        console.log("controlType", controlType)
-        var to = WebIM.call.callee.split("@")[0].split("_")[1]
+        console.log('controlType', controlType)
+        var to = WebIM.call.callee.split('@')[0].split('_')[1]
         WebIM.call.controlStream(controlType, to)
     },
 
@@ -108,16 +108,16 @@ var Channel = React.createClass({
         var remoteVideo = this.refs.remoteVideo
 
 
-        remoteVideo.addEventListener("canplay", this.canplayRemoteHandler)
+        remoteVideo.addEventListener('canplay', this.canplayRemoteHandler)
 
         //caution: |this| differ between addEventListener + anonymous function and addEventListener + non-anonymous function
-        localVideo.addEventListener("loadedmetadata", this.loadedmetadataLocalHandler)
+        localVideo.addEventListener('loadedmetadata', this.loadedmetadataLocalHandler)
 
-        remoteVideo.addEventListener("loadedmetadata", this.loadedmetadataRemoteHandler)
+        remoteVideo.addEventListener('loadedmetadata', this.loadedmetadataRemoteHandler)
 
-        localVideo.addEventListener("resize", this.resizeLocalHandler)
+        localVideo.addEventListener('resize', this.resizeLocalHandler)
 
-        remoteVideo.addEventListener("resize", this.resizeRemoteHandler)
+        remoteVideo.addEventListener('resize', this.resizeRemoteHandler)
 
 
     },
@@ -127,23 +127,23 @@ var Channel = React.createClass({
         var remoteVideo = this.refs.remoteVideo
 
 
-        remoteVideo.removeEventListener("canplay", this.canplayRemoteHandler)
+        remoteVideo.removeEventListener('canplay', this.canplayRemoteHandler)
 
-        localVideo.removeEventListener("loadedmetadata", this.loadedmetadataLocalHandler)
+        localVideo.removeEventListener('loadedmetadata', this.loadedmetadataLocalHandler)
 
-        remoteVideo.removeEventListener("loadedmetadata", this.loadedmetadataRemoteHandler)
+        remoteVideo.removeEventListener('loadedmetadata', this.loadedmetadataRemoteHandler)
 
-        localVideo.removeEventListener("resize", this.resizeLocalHandler)
+        localVideo.removeEventListener('resize', this.resizeLocalHandler)
 
-        remoteVideo.removeEventListener("resize", this.resizeRemoteHandler)
+        remoteVideo.removeEventListener('resize', this.resizeRemoteHandler)
     },
 
     canplayRemoteHandler: function () {
 
         this.setState({
-            toggle_display: "block",
-            mute_display: "block",
-            accept_display: "none"
+            toggle_display: 'block',
+            mute_display: 'block',
+            accept_display: 'none'
         })
     },
 
@@ -156,8 +156,8 @@ var Channel = React.createClass({
 
         if (this.local_width == 0 && this.local_height == 0) {
             this.setState({
-                toggle_display: "none",
-                localVideo_display: "none"
+                toggle_display: 'none',
+                localVideo_display: 'none'
             })
 
             return
@@ -191,8 +191,8 @@ var Channel = React.createClass({
                 full_height: 90,
             })
             this.setState({
-                toggle_display: "none",
-                localVideo_display: "none",
+                toggle_display: 'none',
+                localVideo_display: 'none',
                 hasVideo: false
             })
         }
@@ -234,8 +234,8 @@ var Channel = React.createClass({
                     full_height: 90,
                 })
                 this.setState({
-                    toggle_display: "none",
-                    localVideo_display: "none",
+                    toggle_display: 'none',
+                    localVideo_display: 'none',
                     hasVideo: false
                 })
             }
@@ -255,62 +255,62 @@ var Channel = React.createClass({
     },
 
     render: function () {
-        var localClassName = this.state.localFullRemoteCorner ? "full" : "corner"
-        var remoteClassName = this.state.localFullRemoteCorner ? "corner" : "full"
+        var localClassName = this.state.localFullRemoteCorner ? 'full' : 'corner'
+        var remoteClassName = this.state.localFullRemoteCorner ? 'corner' : 'full'
         return (
             <div ref='rtc' className='webim-rtc-video'
                 style={{
-                    width: this.state.full_width + "px",
-                    height: this.state.full_height + "px"
+                    width: this.state.full_width + 'px',
+                    height: this.state.full_height + 'px'
                 }}>
                 <video ref='localVideo' className={localClassName} muted autoPlay playsInline/>
                 <video ref='remoteVideo' className={remoteClassName} autoPlay playsInline/>
                 <span>{this.props.title}</span>
                 <i ref='close' id='webrtc_close' className='font small close' style={{
-                    left: "auto",
-                    right: this.state.close_right + "px",
-                    top: "auto",
-                    bottom: this.state.close_bottom + "px"
+                    left: 'auto',
+                    right: this.state.close_right + 'px',
+                    top: 'auto',
+                    bottom: this.state.close_bottom + 'px'
                 }} onClick={this.close}>Q</i>
                 <i ref='accept' className='font small accept' style={{
                     display: this.state.accept_display,
-                    left: this.state.accept_left + "px",
-                    right: "auto",
-                    top: "auto",
-                    bottom: this.state.accept_bottom + "px"
+                    left: this.state.accept_left + 'px',
+                    right: 'auto',
+                    top: 'auto',
+                    bottom: this.state.accept_bottom + 'px'
                 }} onClick={this.accept}>z</i>
                 <i ref='toggle' className='font small toggle'
                     style={{
                         display: this.state.toggle_display,
-                        left: "auto",
-                        right: this.state.toggle_right + "px",
-                        top: this.state.toggle_top + "px",
-                        bottom: "auto"
+                        left: 'auto',
+                        right: this.state.toggle_right + 'px',
+                        top: this.state.toggle_top + 'px',
+                        bottom: 'auto'
                     }} onClick={this.toggle}>d</i>
                 <i ref='mute' className='font small mute'
                     style={{
                         display: this.state.mute_display,
-                        left: this.state.toggle_right + "px",
-                        right: "auto",
-                        top: "auto",
-                        bottom: this.state.mute_bottom + "px"
+                        left: this.state.toggle_right + 'px',
+                        right: 'auto',
+                        top: 'auto',
+                        bottom: this.state.mute_bottom + 'px'
                     }} onClick={this.mute}>m</i>
                 <i ref='audio' isopen={true} className='font small mute'
                     style={{
                         display: this.state.mute_display,
-                        left: this.state.toggle_right + 30 + "px",
-                        right: "auto",
-                        top: "auto",
-                        bottom: this.state.mute_bottom + "px"
-                    }} onClick={this.controlStream.bind(this, "audioControl")}>u</i>
+                        left: this.state.toggle_right + 30 + 'px',
+                        right: 'auto',
+                        top: 'auto',
+                        bottom: this.state.mute_bottom + 'px'
+                    }} onClick={this.controlStream.bind(this, 'audioControl')}>u</i>
                 <i ref='video' isopen={true} className='font small mute'
                     style={{
-                        display: (this.state.mute_display == "block" && this.state.hasVideo)?"block": "none",
-                        left: this.state.toggle_right + 60 + "px",
-                        right: "auto",
-                        top: "auto",
-                        bottom: this.state.mute_bottom + "px"
-                    }} onClick={this.controlStream.bind(this,"videoControl")}>v</i>
+                        display: (this.state.mute_display == 'block' && this.state.hasVideo)?'block': 'none',
+                        left: this.state.toggle_right + 60 + 'px',
+                        right: 'auto',
+                        top: 'auto',
+                        bottom: this.state.mute_bottom + 'px'
+                    }} onClick={this.controlStream.bind(this,'videoControl')}>v</i>
             </div>
         )
     }
@@ -322,16 +322,16 @@ export default (dom, collapsed) => {
     return {
         setLocal: function (stream, streamType) {
             this.localStream = stream
-            var title = ""
+            var title = ''
             var hideAccept = false
             var localFullRemoteCorner = false
-            if(WebIM.call.callee.indexOf("@") > 0){
-                var callee = WebIM.call.callee.split("@")[0].split("_")[1]
+            if(WebIM.call.callee.indexOf('@') > 0){
+                var callee = WebIM.call.callee.split('@')[0].split('_')[1]
             }else{
                 var callee = WebIM.call.callee
             }
             if (WebIM.conn.context.userId == WebIM.call.caller) {
-                title = I18n.t("waiting") + callee + (streamType == "VOICE" ? I18n.t("waitingVoice") : I18n.t("waitingVideo") )
+                title = I18n.t('waiting') + callee + (streamType == 'VOICE' ? I18n.t('waitingVoice') : I18n.t('waitingVideo') )
                 hideAccept = true
             } else {
                 title = callee
@@ -345,17 +345,17 @@ export default (dom, collapsed) => {
         },
         setRemote: function (stream, streamType) {
             this.remoteStream = stream
-            var title = ""
+            var title = ''
             var localFullRemoteCorner = false
-            if(WebIM.call.callee.indexOf("@") > 0){
-                var callee = WebIM.call.callee.split("@")[0].split("_")[1]
+            if(WebIM.call.callee.indexOf('@') > 0){
+                var callee = WebIM.call.callee.split('@')[0].split('_')[1]
             }else{
                 var callee = WebIM.call.callee
             }
-            if (WebIM.call.caller != "" && WebIM.call.caller == WebIM.conn.context.userId) {
+            if (WebIM.call.caller != '' && WebIM.call.caller == WebIM.conn.context.userId) {
                 title = callee
             } else {
-                title = callee + (streamType == "VOICE" ? I18n.t("requestVoice") : I18n.t("requestVideo"))
+                title = callee + (streamType == 'VOICE' ? I18n.t('requestVoice') : I18n.t('requestVideo'))
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close} localStream={this.localStream}
@@ -365,12 +365,12 @@ export default (dom, collapsed) => {
             )
         },
         ringing: function (caller, streamType) {
-            var title = ""
+            var title = ''
             var localFullRemoteCorner = false
-            if (WebIM.call.caller != "" && WebIM.call.caller == WebIM.conn.context.userId) {
+            if (WebIM.call.caller != '' && WebIM.call.caller == WebIM.conn.context.userId) {
                 title = WebIM.call.callee
             } else {
-                title = WebIM.call.callee + (streamType == "VOICE" ? I18n.t("requestVoice") : I18n.t("requestVideo"))
+                title = WebIM.call.callee + (streamType == 'VOICE' ? I18n.t('requestVoice') : I18n.t('requestVideo'))
             }
             ReactDOM.render(
                 <Channel collapsed={collapsed} close={this.close}
@@ -395,7 +395,7 @@ export default (dom, collapsed) => {
             }
 
             // must set video tag's srcObject as null，otherwise firefox will get in trouble.
-            var videoObjs = me.dom.getElementsByTagName("video")
+            var videoObjs = me.dom.getElementsByTagName('video')
             if (videoObjs && videoObjs.length > 0) {
                 for (var i = 0; i < videoObjs.length; i++) {
                     videoObjs[i].srcObject = null

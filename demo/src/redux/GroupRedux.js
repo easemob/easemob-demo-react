@@ -1,27 +1,27 @@
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
-import { history } from "@/utils"
-import GroupMemberActions from "@/redux/GroupMemberRedux"
-import CommonActions from "@/redux/CommonRedux"
-import _ from "lodash"
-import { config } from "@/config"
-import { store } from "@/redux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import WebIM from '@/config/WebIM'
+import { history } from '@/utils'
+import GroupMemberActions from '@/redux/GroupMemberRedux'
+import CommonActions from '@/redux/CommonRedux'
+import _ from 'lodash'
+import { config } from '@/config'
+import { store } from '@/redux'
 
-const logger = WebIM.loglevel.getLogger("GroupRedux")
+const logger = WebIM.loglevel.getLogger('GroupRedux')
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    updateGroupInfo: ["info"],
-    setLoading: ["isLoading"],
-    setLoadingFailed: ["loadingFailed"],
-    deleteGroup: ["groupId"],
-    updateGroup: ["groups"],
-    dissolveGroup: ["group"],
-    switchRightSider: ["width"],
-    topGroup: ["groupId"],
-    newGetGroupInfo: ["response"],
+    updateGroupInfo: [ 'info' ],
+    setLoading: [ 'isLoading' ],
+    setLoadingFailed: [ 'loadingFailed' ],
+    deleteGroup: [ 'groupId' ],
+    updateGroup: [ 'groups' ],
+    dissolveGroup: [ 'group' ],
+    switchRightSider: [ 'width' ],
+    topGroup: [ 'groupId' ],
+    newGetGroupInfo: [ 'response' ],
     // ---------------async------------------
     createGroups: options => {
         return (dispatch, getState) => {
@@ -138,10 +138,10 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 export const deleteGroup = (state, { groupId }) => {
-    const byId = state.getIn(["byId"]).without(groupId)
+    const byId = state.getIn([ 'byId' ]).without(groupId)
     const names = []
     _.forEach(byId, (v, k) => {
-        names.push(v.groupName + "_#-#_" + v.groupId)
+        names.push(v.groupName + '_#-#_' + v.groupId)
     })
     return state.merge({ byId, names })
 }
@@ -168,7 +168,7 @@ export const updateGroup = (state, { groups }) => {
             groupId: v.groupid,
             groupName: v.groupname
         }
-        names.push(v.groupname + "_#-#_" + v.groupid)
+        names.push(v.groupname + '_#-#_' + v.groupid)
     })
     return state.merge({
         byId,
@@ -192,13 +192,13 @@ export const newGetGroupInfo = (state, { response }) => {
  * @param {String} info.description
  */
 export const updateGroupInfo = (state, { info }) => {
-    const group = state.getIn(["byId", info.groupId])
+    const group = state.getIn([ 'byId', info.groupId ])
     const oldName = `${group.groupName}_#-#_${group.roomId || group.groupId}`
     const newName = `${info.groupName}_#-#_${group.roomId || group.groupId}`
-    const names = state.getIn(["names"]).asMutable()
+    const names = state.getIn([ 'names' ]).asMutable()
     names.splice(names.indexOf(oldName), 1, newName)
 
-    return state.setIn(["byId", info.groupId, "groupName"], info.groupName).set("names", names.sort())
+    return state.setIn([ 'byId', info.groupId, 'groupName' ], info.groupName).set('names', names.sort())
 }
 
 /**
@@ -210,8 +210,8 @@ export const updateGroupInfo = (state, { info }) => {
  */
 export const dissolveGroup = (state, { group }) => {
     const { groupId, groupName } = group
-    let byId = state.getIn(["byId"]).without(groupId)
-    const names = state.getIn(["names"]).asMutable()
+    let byId = state.getIn([ 'byId' ]).without(groupId)
+    const names = state.getIn([ 'names' ]).asMutable()
     names.splice(names.indexOf(`${groupName}_#-#_${groupId}`), 1)
     return state.merge({
         byId,
@@ -227,10 +227,10 @@ export const switchRightSider = (state, { width }) => {
 }
 
 export const topGroup = (state, { groupId }) => {
-    let names = state.getIn(["names"], Immutable([])).asMutable()
+    let names = state.getIn([ 'names' ], Immutable([])).asMutable()
     for (let i = 0; i < names.length; i++) {
         const name = names[i]
-        if (name.split("_#-#_")[1] === groupId) {
+        if (name.split('_#-#_')[1] === groupId) {
             if (i === 0) return state // if already top, return directly
             names = _.without(names, name)
             names.unshift(name)
