@@ -13,7 +13,7 @@
 
 function getUrl(){
     var apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com"
-    var xmppUrl = "im-api.easemob.com/ws"
+    var xmppUrl = "//im-api.easemob.com/ws"
     if(window.location.href.indexOf("webim-h5.easemob.com") !== -1 ){
         apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com"
         xmppUrl = (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws"
