@@ -1,13 +1,12 @@
-import React from "react"
-import { connect } from "react-redux"
-import _ from "lodash"
-import Immutable from "seamless-immutable"
-import { I18n } from "react-redux-i18n"
-import { Button, Card, Col, Dropdown, Form, Icon, Input, Menu, Modal, Popconfirm, Row, Table, Tooltip } from "antd"
-import GroupActions from "@/redux/GroupRedux"
-import GroupMemberActions from "@/redux/GroupMemberRedux"
-import "./style/index.less"
-import { history } from "@/utils"
+import React from 'react'
+import { connect } from 'react-redux'
+import _ from 'lodash'
+import { I18n } from 'react-redux-i18n'
+import { Button, Card, Col, Dropdown, Form, Icon, Input, Menu, Modal, Popconfirm, Row, Table, Tooltip } from 'antd'
+import GroupActions from '@/redux/GroupRedux'
+import GroupMemberActions from '@/redux/GroupMemberRedux'
+import './style/index.less'
+import { history } from '@/utils'
 
 const iconStyle = { fontSize: 16 }
 
@@ -17,16 +16,16 @@ const GroupInfoForm = Form.create()(props => {
     return (
         <Modal
             visible={visible}
-            title={I18n.t("modifyGroupInfo")}
-            okText={I18n.t("modify")}
+            title={I18n.t('modifyGroupInfo')}
+            okText={I18n.t('modify')}
             confirmLoading={loading}
             onCancel={onCancel}
             onOk={onCreate}
         >
             <Form>
-                <Form.Item label={I18n.t("groupName")}>
-                    {getFieldDecorator("name", {
-                        rules: [{ required: true, message: I18n.t("groupName") }]
+                <Form.Item label={I18n.t('groupName')}>
+                    {getFieldDecorator('name', {
+                        rules: [ { required: true, message: I18n.t('groupName') } ]
                     })(<Input />)}
                 </Form.Item>
             </Form>
@@ -84,32 +83,32 @@ class GroupInfo extends React.Component {
 
     handleMenuClick = ({ item, key, selectedKeys }) => {
         switch (key) {
-            case "1":
-                break
-            case "2":
-                this.setState({ showInviteToGroupModal: true })
-                break
-            case "3":
-                this.showModal()
-                break
-            case "4":
-                this.props.getGroupBlackListAsync(this.props.room.groupId)
-                this.setState({ blackListVisible: true })
-                break
-            case "5":
-                const search = history.location.search
-                const { groupId, groupName } = this.props.room
-                this.props.switchRightSider({ rightSiderOffset: 0 })
-                this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
-                history.push('/group' + search)
-                break
-            case "6":
-                const { login } = this.props
-                const username = _.get(login, "username")
-                this.props.quitGroupAsync(this.props.room.groupId, username)
-                break
-            default:
-                break
+        case '1':
+            break
+        case '2':
+            this.setState({ showInviteToGroupModal: true })
+            break
+        case '3':
+            this.showModal()
+            break
+        case '4':
+            this.props.getGroupBlackListAsync(this.props.room.groupId)
+            this.setState({ blackListVisible: true })
+            break
+        case '5':
+            const search = history.location.search
+            const { groupId, groupName } = this.props.room
+            this.props.switchRightSider({ rightSiderOffset: 0 })
+            this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
+            history.push('/group' + search)
+            break
+        case '6':
+            const { login } = this.props
+            const username = _.get(login, 'username')
+            this.props.quitGroupAsync(this.props.room.groupId, username)
+            break
+        default:
+            break
         }
     }
 
@@ -119,7 +118,7 @@ class GroupInfo extends React.Component {
         this.setState({ blackListVisible: true })
     }
 
-    onChangeUsers = e => this.setState({ users: [e.target.value] })
+    onChangeUsers = e => this.setState({ users: [ e.target.value ] })
 
     add = () => {
         const value = this.state.users
@@ -141,53 +140,53 @@ class GroupInfo extends React.Component {
 
         let groupId = room.groupId
         this.props.newGetGroupInfoAsync(groupId)
-        const user = _.get(groupMember, [room.groupId, "byName", _.get(login, "username").toLowerCase()], {
+        const user = _.get(groupMember, [ room.groupId, 'byName', _.get(login, 'username').toLowerCase() ], {
             name: null,
             affiliation: null
         })
-        const isAdmin = user.affiliation === "owner"
+        const isAdmin = user.affiliation === 'owner'
         // TOOD 代码结构需优化
         if (isAdmin) {
             return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
-                    <Tooltip title={I18n.t("inviteToGroup")} placement="left">
-                        <i className="iconfont icon-users" /> {I18n.t("inviteToGroup")}
+                    <Tooltip title={I18n.t('inviteToGroup')} placement="left">
+                        <i className="iconfont icon-users" /> {I18n.t('inviteToGroup')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="3">
-                    <Tooltip title={I18n.t("modifyGroupInfo")} placement="left">
-                        <i className="iconfont icon-pencil" /> {I18n.t("modifyGroupInfo")}
+                    <Tooltip title={I18n.t('modifyGroupInfo')} placement="left">
+                        <i className="iconfont icon-pencil" /> {I18n.t('modifyGroupInfo')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="4">
-                    <Tooltip title={I18n.t("groupBlacklist")} placement="left">
-                        <Icon type="frown" /> {I18n.t("groupBlacklist")}
+                    <Tooltip title={I18n.t('groupBlacklist')} placement="left">
+                        <Icon type="frown" /> {I18n.t('groupBlacklist')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="5">
-                    <Tooltip title={I18n.t("dissovleGroup")} placement="left">
-                        <Icon type="poweroff" /> {I18n.t("dissovleGroup")}
+                    <Tooltip title={I18n.t('dissovleGroup')} placement="left">
+                        <Icon type="poweroff" /> {I18n.t('dissovleGroup')}
                     </Tooltip>
                 </Menu.Item>
             </Menu>
         } else if (this.props.group.allowinvites) { //成员邀请判断
             return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="6">
-                    <Tooltip title={I18n.t("quitGroup")} placement="left">
-                        <i className="iconfont icon-exit" /> {I18n.t("quitGroup")}
+                    <Tooltip title={I18n.t('quitGroup')} placement="left">
+                        <i className="iconfont icon-exit" /> {I18n.t('quitGroup')}
                     </Tooltip>
                 </Menu.Item>
             </Menu>
         } else {
             return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
-                    <Tooltip title={I18n.t("inviteToGroup")} placement="left">
-                        <i className="iconfont icon-users" /> {I18n.t("inviteToGroup")}
+                    <Tooltip title={I18n.t('inviteToGroup')} placement="left">
+                        <i className="iconfont icon-users" /> {I18n.t('inviteToGroup')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="6">
-                    <Tooltip title={I18n.t("quitGroup")} placement="left">
-                        <i className="iconfont icon-exit" /> {I18n.t("quitGroup")}
+                    <Tooltip title={I18n.t('quitGroup')} placement="left">
+                        <i className="iconfont icon-exit" /> {I18n.t('quitGroup')}
                     </Tooltip>
                 </Menu.Item>
             </Menu>
@@ -196,16 +195,12 @@ class GroupInfo extends React.Component {
     render() {
         const {
             title,
-            name,
-            description,
-            joinPermission,
             room,
             groupMember
             // login,
             // entities
         } = this.props
-        const isLoading = _.get(this.props, "entities.group.isLoading", false)
-        const blacklist = _.get(groupMember, [room.groupId, "blacklist"], [])
+        const blacklist = _.get(groupMember, [ room.groupId, 'blacklist' ], [])
 
         const menu = this.renderGroupOperationMenu()
 
@@ -215,21 +210,21 @@ class GroupInfo extends React.Component {
 
         const columns = [
             {
-                title: "Name",
-                key: "name",
-                dataIndex: "name"
+                title: 'Name',
+                key: 'name',
+                dataIndex: 'name'
             },
             {
-                title: "Action",
-                key: "action",
+                title: 'Action',
+                key: 'action',
                 render: (text, record) => {
                     return ds.length > 0
                         ? <Popconfirm
-                            title={I18n.t("confirm") + " " + I18n.t("removeFromGroupBlackList")}
+                            title={I18n.t('confirm') + ' ' + I18n.t('removeFromGroupBlackList')}
                             onConfirm={() => this.onRemoveGroupBlockSingle(record.name)}
                         >
                             <a href="#" className="fr">
-                                {I18n.t("removeFromGroupBlackList")}
+                                {I18n.t('removeFromGroupBlackList')}
                             </a>
                         </Popconfirm>
                         : null
@@ -243,7 +238,7 @@ class GroupInfo extends React.Component {
             <Card
                 title={title}
                 extra={
-                    <Tooltip title={I18n.t("close")} placement="left">
+                    <Tooltip title={I18n.t('close')} placement="left">
                         <Icon type="close-circle-o" onClick={this.handleSiderClick} style={iconStyle} />
                     </Tooltip>
                 }
@@ -251,9 +246,9 @@ class GroupInfo extends React.Component {
                 noHovering={true}
             >
                 <h3>
-                    {I18n.t("groupName")}
+                    {I18n.t('groupName')}
                     <span className="fr">
-                        <Dropdown overlay={menu} trigger={["click"]}>
+                        <Dropdown overlay={menu} trigger={[ 'click' ]}>
                             <Icon type="setting" style={iconStyle} />
                         </Dropdown>
                     </span>
@@ -271,14 +266,14 @@ class GroupInfo extends React.Component {
                     onCreate={this.handleCreate}
                 />
                 <Modal
-                    title={I18n.t("groupBlacklist")}
+                    title={I18n.t('groupBlacklist')}
                     visible={this.state.blackListVisible}
-                    okText={I18n.t("close")}
+                    okText={I18n.t('close')}
                     onOk={this.handleCloseBlacklistModal}
                     onCancel={this.handleCloseBlacklistModal}
                     footer={[
                         <Button key="submit" type="primary" onClick={this.handleCloseBlacklistModal}>
-                            {I18n.t("close")}
+                            {I18n.t('close')}
                         </Button>
                     ]}
                 >
@@ -286,18 +281,18 @@ class GroupInfo extends React.Component {
                 </Modal>
                 <Modal
                     width={460}
-                    title={I18n.t("inviteToGroup")}
+                    title={I18n.t('inviteToGroup')}
                     visible={this.state.showInviteToGroupModal}
                     footer={null}
                     onCancel={this.closeInviteModal}
                 >
                     <Row>
                         <Col span={20}>
-                            <Input size="large" placeholder={I18n.t("username")} onChange={this.onChangeUsers} />
+                            <Input size="large" placeholder={I18n.t('username')} onChange={this.onChangeUsers} />
                         </Col>
                         <Col span={4}>
                             <Button style={{ height: 32 }} className="fr" type="primary" onClick={this.add}>
-                                {I18n.t("invite")}
+                                {I18n.t('invite')}
                             </Button>
                         </Col>
                     </Row>

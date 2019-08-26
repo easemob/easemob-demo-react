@@ -1,18 +1,15 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import { Modal, Input, Button, Row, Col } from "antd"
-import WebIM from "@/config/WebIM"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
-import GroupRequestActions from "@/redux/GroupRequestRedux"
+import React from 'react'
+import { connect } from 'react-redux'
+import { Button, Row, Col } from 'antd'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
+import GroupRequestActions from '@/redux/GroupRequestRedux'
 
 class GroupRequestModal extends React.Component {
     state = {
-        toNick: "",
-        groupName: "",
-        reason: ""
+        toNick: '',
+        groupName: '',
+        reason: ''
     }
     onRefuse = (gid, applicant) => {
         // const { from } = this.props.groupRequests[gid] || {}
@@ -49,7 +46,7 @@ class GroupRequestModal extends React.Component {
                 requests.push(
                     <Row key={from}>
                         <Col span={14}>
-                            {`${from}${I18n.t("apply")}${I18n.t("joinGroup")}`}
+                            {`${from}${I18n.t('apply')}${I18n.t('joinGroup')}`}
                             <p>
                                 {reason}
                             </p>
@@ -64,7 +61,7 @@ class GroupRequestModal extends React.Component {
                                 type="primary"
                                 onClick={() => this.onAgree(gid, from)}
                             >
-                                {I18n.t("agree")}
+                                {I18n.t('agree')}
                             </Button>
                             <Button
                                 style={{
@@ -74,7 +71,7 @@ class GroupRequestModal extends React.Component {
                                 type="danger"
                                 onClick={() => this.onRefuse(gid, from)}
                             >
-                                {I18n.t("reject")}
+                                {I18n.t('reject')}
                             </Button>
                         </Col>
                     </Row>

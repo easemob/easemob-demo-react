@@ -1,21 +1,21 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import { api } from "@/config/WebIM"
-import Cookie from "js-cookie"
-import { message } from "antd"
-import { history } from "@/utils"
-import { store } from "@/redux"
-import WebIM from "@/config/WebIM"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import { api } from '@/config/WebIM'
+import Cookie from 'js-cookie'
+import { message } from 'antd'
+import { history } from '@/utils'
+import { store } from '@/redux'
+import WebIM from '@/config/WebIM'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
 
     jumpLogin: null,
-    registerRequest: [ "username", "password", "nickname" ],
-    registerSuccess: [ "username" ],
-    registerFailure: [ "registerError" ],
+    registerRequest: [ 'username', 'password', 'nickname' ],
+    registerSuccess: [ 'username' ],
+    registerFailure: [ 'registerError' ],
     // ------------- async -----------------
 
     register: (username, password, nickname) => {
@@ -25,7 +25,7 @@ const { Types, Creators } = createActions({
                 // apiUrl: WebIM.config.apiURL,
                 username: username.trim().toLowerCase(),
                 password: password,
-                nickname: nickname ? nickname.trim().toLowerCase() : "",
+                nickname: nickname ? nickname.trim().toLowerCase() : '',
                 success: function(){
                     dispatch(Creators.registerSuccess(username))
                 }
@@ -50,7 +50,7 @@ export const INITIAL_STATE = Immutable({})
 
 /* ------------- Reducers ------------- */
 export const jumpLogin = (state) => {
-    history.push("/login")
+    history.push('/login')
     return state
 }
 
@@ -65,13 +65,13 @@ export const registerRequest = (state = INITIAL_STATE,
 
 export const registerSuccess = (state = INITIAL_STATE, { username }) => {
     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
-    message.success(username + ", " + I18N.signUpSuccessfully)
-    history.push("/login")
+    message.success(username + ', ' + I18N.signUpSuccessfully)
+    history.push('/login')
     return Immutable.merge(state, { fetching: false, registerError: null })
 }
 
 export const registerFailure = (state = INITIAL_STATE, { registerError }) => {
-    console.log("registerFailure", registerError)
+    console.log('registerFailure', registerError)
     return Immutable.merge(state, { fetching: false, registerError })
 }
 

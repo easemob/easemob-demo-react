@@ -1,28 +1,28 @@
-import "babel-polyfill"
-import React from "react"
-import ReactDOM from "react-dom"
+import 'babel-polyfill'
+import React from 'react'
+import ReactDOM from 'react-dom'
 // antd theme
-import "./App.css"
-import "./themes/theme.less"
-import registerServiceWorker from "./registerServiceWorker"
-import { history } from "@/utils"
+import './App.css'
+import './themes/theme.less'
+import registerServiceWorker from './registerServiceWorker'
+import { history } from '@/utils'
 
 import {
     // BrowserRouter as Router,
     // HashRouter as Router
     Router
-} from "react-router-dom"
+} from 'react-router-dom'
 // redux
-import { Provider } from "react-redux"
-import { store } from "@/redux"
-import App from "./App"
+import { Provider } from 'react-redux'
+import { store } from '@/redux'
+import App from './App'
 // fix android browsers compatibilities
-import "babel-polyfill"
+import 'babel-polyfill'
 
-var FastClick = require("fastclick")
+var FastClick = require('fastclick')
 FastClick.attach(document.body)
 
-const rootEl = document.getElementById("root")
+const rootEl = document.getElementById('root')
 const render = Component =>
     ReactDOM.render(
         <Provider store={store}>
@@ -36,5 +36,5 @@ const render = Component =>
     )
 
 render(App)
-if (module.hot) module.hot.accept("./App", () => render(App))
+if (module.hot) module.hot.accept('./App', () => render(App))
 registerServiceWorker()

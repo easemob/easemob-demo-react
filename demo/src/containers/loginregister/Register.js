@@ -1,11 +1,10 @@
-import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { Button, Row, Form, Input } from "antd"
-import { config } from "@/config"
-import styles from "./index.less"
-import RegisterActions from "@/redux/RegisterRedux"
-import WebIM from "@/config/WebIM"
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Button, Row, Form, Input } from 'antd'
+import { config } from '@/config'
+import RegisterActions from '@/redux/RegisterRedux'
+import WebIM from '@/config/WebIM'
 
 const FormItem = Form.Item
 
@@ -29,7 +28,7 @@ const Register = ({
         })
     }
 
-    const logo = WebIM.config.i18n == "cn" ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
+    const logo = WebIM.config.i18n == 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
         <div className="form x-login">
             <div className="logo">
@@ -40,7 +39,7 @@ const Register = ({
             </div>
             <form>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("username", {
+                    {getFieldDecorator('username', {
                         rules: [
                             {
                                 required: true
@@ -55,7 +54,7 @@ const Register = ({
                     )}
                 </FormItem>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("password", {
+                    {getFieldDecorator('password', {
                         rules: [
                             {
                                 required: true
@@ -71,7 +70,7 @@ const Register = ({
                     )}
                 </FormItem>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("nickname")(
+                    {getFieldDecorator('nickname')(
                         <Input
                             size="large"
                             onPressEnter={handleOk}

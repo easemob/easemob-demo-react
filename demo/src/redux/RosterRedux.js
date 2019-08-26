@@ -1,17 +1,17 @@
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import _ from "lodash"
-import WebIM from "@/config/WebIM"
-import { I18n } from "react-redux-i18n"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import _ from 'lodash'
+import WebIM from '@/config/WebIM'
+import { I18n } from 'react-redux-i18n'
 
-import CommonActions from "@/redux/CommonRedux"
+import CommonActions from '@/redux/CommonRedux'
 
 /* ------------- Types and Action Creators ------------- */
 const { Types, Creators } = createActions({
-    updateRoster: [ "roster" ],
-    prependRoster: [ "name" ],
-    removeRoster: [ "name" ],
-    topRoster: [ "name" ],
+    updateRoster: [ 'roster' ],
+    prependRoster: [ 'name' ],
+    removeRoster: [ 'name' ],
+    topRoster: [ 'name' ],
     // ----------------async------------------
     // get contacts list
     getContacts: () => {
@@ -58,7 +58,7 @@ const { Types, Creators } = createActions({
             const u = getState().login.username
             WebIM.conn.subscribe({
                 to: id,
-                message: u + I18n.t("request")
+                message: u + I18n.t('request')
             })
         }
     }
@@ -76,7 +76,7 @@ export const INITIAL_STATE = Immutable({
 
 /* ------------- Reducers ------------- */
 function isFriend(v) {
-    return v.subscription != "none"
+    return v.subscription != 'none'
 }
 
 export const updateRoster = (state, { roster }) => {
@@ -96,19 +96,19 @@ export const updateRoster = (state, { roster }) => {
 }
 
 export const prependRoster = (state, { name }) => {
-    const friends = state.getIn([ "friends" ], Immutable([])).asMutable()
+    const friends = state.getIn([ 'friends' ], Immutable([])).asMutable()
     friends.unshift(name)
     return state.merge({ friends })
 }
 
 export const removeRoster = (state, { name }) => {
-    let friends = state.getIn([ "friends" ], Immutable([])).asMutable()
+    let friends = state.getIn([ 'friends' ], Immutable([])).asMutable()
     friends = _.without(friends, name)
     return state.merge({ friends })
 }
 
 export const topRoster = (state, { name }) => {
-    let friends = state.getIn([ "friends" ], Immutable([])).asMutable()
+    let friends = state.getIn([ 'friends' ], Immutable([])).asMutable()
     if (friends[0] === name) return state // if already top, return directly
     friends = _.without(friends, name)
     friends.unshift(name)

@@ -1,7 +1,7 @@
-import React from "react"
-import classNames from "classnames"
+import React from 'react'
+import classNames from 'classnames'
 // import Sider from "./Sider"
-import RightSider from "./RightSider"
+import RightSider from './RightSider'
 
 function generator(props) {
     return BacicComponent => {
@@ -10,7 +10,7 @@ function generator(props) {
    static Header
    static Footer
    static Content
-            // static Sider
+   // static Sider
 
    render() {
        const { prefixCls } = props
@@ -42,19 +42,19 @@ class Basic extends React.Component {
 }
 
 const Layout = generator({
-    prefixCls: "x-layout"
+    prefixCls: 'x-layout'
 })(Basic)
 
 const Header = generator({
-    prefixCls: "x-layout-header"
+    prefixCls: 'x-layout-header'
 })(Basic)
 
 const Footer = generator({
-    prefixCls: "x-layout-footer"
+    prefixCls: 'x-layout-footer'
 })(Basic)
 
 const Content = generator({
-    prefixCls: "x-layout-content"
+    prefixCls: 'x-layout-content'
 })(Basic)
 
 Layout.Header = Header

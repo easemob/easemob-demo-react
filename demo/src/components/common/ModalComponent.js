@@ -1,8 +1,6 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { Modal } from "antd"
-import "./style/ModalComponent.less"
+import React from 'react'
+import { Modal } from 'antd'
+import './style/ModalComponent.less'
 
 export default class ModalComponent extends React.Component {
     constructor(props) {
@@ -28,7 +26,7 @@ export default class ModalComponent extends React.Component {
         this.setState({
             visible: false
         })
-        if (typeof this.props.onModalClose === "function") this.props.onModalClose()
+        if (typeof this.props.onModalClose === 'function') this.props.onModalClose()
     }
 
     onChangeTitle = v => {

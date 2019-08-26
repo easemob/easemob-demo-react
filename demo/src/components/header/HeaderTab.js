@@ -1,17 +1,14 @@
-import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { Menu, Icon, Badge } from "antd"
-import _ from "lodash"
-import "./style/HeaderTab.less"
-
-const SubMenu = Menu.SubMenu
-const MenuItemGroup = Menu.ItemGroup
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Menu, Badge } from 'antd'
+import _ from 'lodash'
+import './style/HeaderTab.less'
 
 class HeaderTab extends React.Component {
     render() {
         const { collapsed, items, unread, ...rest } = this.props
-        const typeMap = { contact: "chat", group: "groupchat", chatroom: "chatroom", stranger: "stranger" }
+        const typeMap = { contact: 'chat', group: 'groupchat', chatroom: 'chatroom', stranger: 'stranger' }
         const hadUnread = { contact: false, group: false, chatroom: false, stranger: false }
         _.forEach(typeMap, (v, k) => {
             const m = _.get(unread, v)
@@ -20,7 +17,7 @@ class HeaderTab extends React.Component {
 
         const tabs = items || {}
         const tabsLen = tabs.length
-        const tabCls = collapsed ? `ant-col-${Math.floor(24 / tabsLen)}` : ""
+        const tabCls = collapsed ? `ant-col-${Math.floor(24 / tabsLen)}` : ''
 
         const tabsItem = tabs.map(({ key, name, icon }) =>
             <Menu.Item key={key} className={tabCls}>
@@ -29,12 +26,12 @@ class HeaderTab extends React.Component {
                     ? <Badge dot style={{ marginRight: 12 }} className="x-header-tab__badge">
                         <i
                             className={icon}
-                            style={{ fontSize: 20, marginRight: -5, marginTop: -4, verticalAlign: "middle" }}
+                            style={{ fontSize: 20, marginRight: -5, marginTop: -4, verticalAlign: 'middle' }}
                         />
                     </Badge>
-                    : <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: "middle" }}/>}
+                    : <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: 'middle' }}/>}
                 {collapsed
-                    ? ""
+                    ? ''
                     : <span className="nav-text">
                         {name}
                     </span>}

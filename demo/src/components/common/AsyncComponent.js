@@ -1,7 +1,7 @@
-import React from "react"
-import { I18n } from "react-redux-i18n"
-import Loadable from "react-loadable"
-import NProgress from "nprogress"
+import React from 'react'
+import { I18n } from 'react-redux-i18n'
+import Loadable from 'react-loadable'
+import NProgress from 'nprogress'
 
 export default function MyLoadable(opts) {
     return Loadable(
@@ -29,7 +29,7 @@ function MyLoadingComponent(props) {
             // In case we've timed out loading our other component.
             return (
                 <div>
-                    {I18n.t("LoadTimeout")}
+                    {I18n.t('LoadTimeout')}
                 </div>
             )
         } else if (props.pastDelay) {
@@ -47,7 +47,7 @@ function MyLoadingComponent(props) {
         // If we aren't loading, maybe
         return (
             <div>
-                {I18n.t("loadFailded")}
+                {I18n.t('loadFailded')}
             </div>
         )
     } else {

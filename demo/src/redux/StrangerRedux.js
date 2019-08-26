@@ -1,14 +1,14 @@
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import _ from "lodash"
-import { parseFromServer } from "@/redux/MessageRedux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import _ from 'lodash'
+import { parseFromServer } from '@/redux/MessageRedux'
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    updateStrangerMessage: [ "stranger", "message", "bodyType" ],
-    deleteStranger: [ "stranger" ],
-    topStranger: [ "name" ],
+    updateStrangerMessage: [ 'stranger', 'message', 'bodyType' ],
+    deleteStranger: [ 'stranger' ],
+    topStranger: [ 'name' ],
     // ---------------async------------------
 })
 
@@ -19,12 +19,12 @@ export default Creators
 
 export const INITIAL_STATE = Immutable({
     byId: {},
-    name: "",
+    name: '',
     stranger: []
 })
 
 export const topStranger = (state, { name }) => {
-    let stranger = state.getIn([ "stranger" ], Immutable([])).asMutable()
+    let stranger = state.getIn([ 'stranger' ], Immutable([])).asMutable()
     if (stranger[0] === name) return state // if already top, return directly
     stranger = _.without(stranger, name)
     stranger.unshift(name)
@@ -33,10 +33,10 @@ export const topStranger = (state, { name }) => {
 
 /* ------------- Reducers ------------- */
 
-export const updateStrangerMessage = (state, { stranger, message, bodyType = "txt" }) => {
+export const updateStrangerMessage = (state, { stranger, message, bodyType = 'txt' }) => {
     // TODO: when receiving friend request, it should move contact with his messages to roster
     !message.status && (message = parseFromServer(message, bodyType))
-    const { username = "" } = state.user || {}
+    const { username = '' } = state.user || {}
     const { id, to, status } = message
     let { type } = message
 
@@ -45,9 +45,9 @@ export const updateStrangerMessage = (state, { stranger, message, bodyType = "tx
     // true when the message was sent by current user, otherwise is false
     const bySelf = from == username
     // root id, is id of receiver when sent by current user, otherwise is id of sender
-    const chatId = bySelf || type !== "chat" ? to : from
+    const chatId = bySelf || type !== 'chat' ? to : from
 
-    state = state.setIn([ "byId", stranger, id ], {
+    state = state.setIn([ 'byId', stranger, id ], {
         ...message,
         bySelf,
         time: +new Date(),

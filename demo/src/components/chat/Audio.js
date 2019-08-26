@@ -1,8 +1,9 @@
+/* eslint-disable quotes */
 /**
  * Created by clock on 2017/8/28.
  */
-import React from "react"
-import { Button, Icon } from "antd"
+import React from 'react'
+import { Button, Icon } from 'antd'
 
 class Audio extends React.Component {
     constructor() {

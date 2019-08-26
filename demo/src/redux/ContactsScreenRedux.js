@@ -1,7 +1,7 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
 
 /* ------------- Types and Action Creators ------------- */
 

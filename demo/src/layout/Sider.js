@@ -1,12 +1,12 @@
 
 
-import React from "react"
-import classNames from "classnames"
-import omit from "omit.js"
-import PropTypes from "prop-types"
-import { Icon } from "antd"
-import { connect } from "react-redux"
-import { config } from "@/config"
+import React from 'react'
+import classNames from 'classnames'
+import omit from 'omit.js'
+import PropTypes from 'prop-types'
+import { Icon } from 'antd'
+import { connect } from 'react-redux'
+import { config } from '@/config'
 
 const { SIDER_COL_BREAK } = config
 
@@ -14,7 +14,7 @@ class Sider extends React.Component{
   static __ANT_LAYOUT_SIDER = true;
 
   static defaultProps = {
-      prefixCls: "x-layout-sider",
+      prefixCls: 'x-layout-sider',
       collapsible: false,
       defaultCollapsed: false,
       reverseArrow: false,
@@ -30,7 +30,7 @@ class Sider extends React.Component{
   constructor(props) {
       super(props)
       let collapsed
-      if ("collapsed" in props) {
+      if ('collapsed' in props) {
           collapsed = props.collapsed
       } else {
           collapsed = props.defaultCollapsed
@@ -52,12 +52,12 @@ class Sider extends React.Component{
 
       this.setState({ below: matches })
       if (this.state.collapsed !== matches) {
-          this.setCollapsed(matches, "responsive")
+          this.setCollapsed(matches, 'responsive')
       }
   }
 
   componentWillReceiveProps(nextProps) {
-      if ("collapsed" in nextProps) {
+      if ('collapsed' in nextProps) {
           this.setState({
               collapsed: nextProps.collapsed,
           })
@@ -74,7 +74,7 @@ class Sider extends React.Component{
   }
 
   setCollapsed = (collapsed, type) => {
-      if (!("collapsed" in this.props)) {
+      if (!('collapsed' in this.props)) {
           this.setState({
               collapsed,
           })
@@ -87,7 +87,7 @@ class Sider extends React.Component{
 
   toggle = () => {
       const collapsed = !this.state.collapsed
-      this.setCollapsed(collapsed, "clickTrigger")
+      this.setCollapsed(collapsed, 'clickTrigger')
   }
 
   belowShowChange = () => {
@@ -99,20 +99,20 @@ class Sider extends React.Component{
           collapsible, reverseArrow, trigger, style, width, collapsedWidth,
           ...others,
       } = this.props
-      const divProps = omit(others, [ "collapsed",
-          "defaultCollapsed", "onCollapse", "breakpoint" ])
+      const divProps = omit(others, [ 'collapsed',
+          'defaultCollapsed', 'onCollapse', 'breakpoint' ])
       const siderWidth = this.state.collapsed ? collapsedWidth : width
       // special trigger when collapsedWidth == 0
-      const zeroWidthTrigger = collapsedWidth === 0 || collapsedWidth === "0" ? (
+      const zeroWidthTrigger = collapsedWidth === 0 || collapsedWidth === '0' ? (
           <span onClick={this.toggle} className={`${prefixCls}-zero-width-trigger`}>
               <Icon type="bars" />
           </span>
       ) : null
       const iconObj = {
-          "expanded": reverseArrow ? <Icon type="right" /> : <Icon type="left" />,
-          "collapsed": reverseArrow ? <Icon type="left" /> : <Icon type="right" />,
+          'expanded': reverseArrow ? <Icon type="right" /> : <Icon type="left" />,
+          'collapsed': reverseArrow ? <Icon type="left" /> : <Icon type="right" />,
       }
-      const status = this.state.collapsed ? "collapsed" : "expanded"
+      const status = this.state.collapsed ? 'collapsed' : 'expanded'
       const defaultTrigger = iconObj[status]
       const triggerDom = (
           trigger !== null ?
@@ -125,14 +125,14 @@ class Sider extends React.Component{
       const divStyle = {
           ...style,
           // flex: `0 0 ${siderWidth}px`,
-          left: "0",
+          left: '0',
           width: `${siderWidth}px`,
       }
       const siderCls = classNames(className, prefixCls, {
           [`${prefixCls}-collapsed`]: !!this.state.collapsed,
           [`${prefixCls}-has-trigger`]: !!trigger,
           [`${prefixCls}-below`]: !!this.state.below,
-          [`${prefixCls}-zero-width`]: siderWidth === 0 || siderWidth === "0",
+          [`${prefixCls}-zero-width`]: siderWidth === 0 || siderWidth === '0',
       })
       return (
           <div className={siderCls} {...divProps} style={divStyle}>

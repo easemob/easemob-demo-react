@@ -1,18 +1,16 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import { Modal, Input, Button, Row, Col } from "antd"
-import WebIM from "@/config/WebIM"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
-import GroupInviteActions from "@/redux/GroupInviteRedux"
-import GroupActions from "@/redux/GroupRedux"
+import React from 'react'
+import { connect } from 'react-redux'
+import { Button, Row, Col } from 'antd'
+import WebIM from '@/config/WebIM'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
+import GroupInviteActions from '@/redux/GroupInviteRedux'
+import GroupActions from '@/redux/GroupRedux'
 class GroupInviteModal extends React.Component {
     state = {
-        toNick: "",
-        groupName: "",
-        reason: ""
+        toNick: '',
+        groupName: '',
+        reason: ''
     }
     onRefuse = (gid) => {
         var me = this
@@ -41,7 +39,7 @@ class GroupInviteModal extends React.Component {
     }
 
     render() {
-        console.log("this.props.groupRequests", this.props.groupRequests)
+        console.log('this.props.groupRequests', this.props.groupRequests)
         const requests = []
         _.forEach(this.props.groupRequests, val => {
             _.forEach(val, ({ from, status, toNick, reason, gid }) => {
@@ -49,7 +47,7 @@ class GroupInviteModal extends React.Component {
                 requests.push(
                     <Row key={from}>
                         <Col span={14}>
-                            {`${from}${I18n.t("inviteIntoGroup")}${gid}`}
+                            {`${from}${I18n.t('inviteIntoGroup')}${gid}`}
                             <p>
                                 {reason}
                             </p>
@@ -64,7 +62,7 @@ class GroupInviteModal extends React.Component {
                                 type="primary"
                                 onClick={() => this.onAgree(gid, from)}
                             >
-                                {I18n.t("agree")}
+                                {I18n.t('agree')}
                             </Button>
                             <Button
                                 style={{
@@ -74,7 +72,7 @@ class GroupInviteModal extends React.Component {
                                 type="danger"
                                 onClick={() => this.onRefuse(gid, from)}
                             >
-                                {I18n.t("reject")}
+                                {I18n.t('reject')}
                             </Button>
                         </Col>
                     </Row>

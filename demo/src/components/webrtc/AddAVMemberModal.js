@@ -1,12 +1,10 @@
-import React from "react"
-import { Button, Checkbox, Form } from "antd"
-import { I18n } from "react-redux-i18n"
-import GroupMemberActions from "@/redux/GroupMemberRedux"
-import MultiAVActions from "@/redux/MultiAVRedux"
-import { connect } from "react-redux"
-import WebIM from "@/config/WebIM"
-import _ from "lodash"
-import { store } from "@/redux"
+import React from 'react'
+import { Button, Checkbox, Form } from 'antd'
+import MultiAVActions from '@/redux/MultiAVRedux'
+import { connect } from 'react-redux'
+import WebIM from '@/config/WebIM'
+import _ from 'lodash'
+import { store } from '@/redux'
 
 const CheckboxGroup = Checkbox.Group
 const FormItem = Form.Item
@@ -21,7 +19,7 @@ class AddAVMemberModal extends React.Component {
 
     componentDidMount() {
         const { groupMember, gid, selected } = this.props
-        let gm = groupMember.getIn([gid, "byName"])
+        let gm = groupMember.getIn([ gid, 'byName' ])
         let options = []
         let joined = this.props.joined
         const username = store.getState().login.username
@@ -58,23 +56,23 @@ class AddAVMemberModal extends React.Component {
                 /* ------ 3 ------ */
                 setTimeout(() => {
                     const tkt = this.props.confr.ticket
-                    WebIM.EMService.joined(this.props.confr.confrId) || WebIM.EMService.joinConferenceWithTicket(this.props.confr.confrId, tkt, "user ext field").then(function () {
-                        WebIM.EMService.publish({audio: true, video: true}, "user ext field").catch(function (e) {
-                            console.error(e);
-                        });
+                    WebIM.EMService.joined(this.props.confr.confrId) || WebIM.EMService.joinConferenceWithTicket(this.props.confr.confrId, tkt, 'user ext field').then(function () {
+                        WebIM.EMService.publish({ audio: true, video: true }, 'user ext field').catch(function (e) {
+                            console.error(e)
+                        })
                     }).catch(function (e) {
-                        console.error(e);
-                    });
-                }, 0);
+                        console.error(e)
+                    })
+                }, 0)
 
                 const { members } = values
 
-                const { groupMember, gid, selected, joined } = this.props
+                const { gid, joined } = this.props
 
-                let seleted_members = _.difference(members,joined);
+                let seleted_members = _.difference(members,joined)
                 
                 this.props.setSelected(seleted_members)
-                this.props.setGid(gid);
+                this.props.setGid(gid)
                 let jids = []
                 const appkey = WebIM.config.appkey, spHost = WebIM.config.Host
                 if (seleted_members) {
@@ -93,12 +91,12 @@ class AddAVMemberModal extends React.Component {
     onChange = checkedValues => {
         const len = checkedValues.length
         let options = _.cloneDeep(this.state.options)
-        console.log("options",options);
+        console.log('options',options)
         if (len >= this.state.maxUsers) {
             this.setState({
                 disabled: true
             })
-            for (let [index, elem] of options.entries()) {
+            for (let [ index, elem ] of options.entries()) {
                 if (!checkedValues.includes(elem.label)) {
                     options[index].disabled = true
                 }
@@ -106,7 +104,7 @@ class AddAVMemberModal extends React.Component {
         } else {
             const disabled = this.state.disabled
             if (disabled) {
-                for (let [index, elem] of options.entries()) {
+                for (let [ index, elem ] of options.entries()) {
                     if (!checkedValues.includes(elem.label)) {
                         options[index].disabled = false
                     }
@@ -127,13 +125,13 @@ class AddAVMemberModal extends React.Component {
             this.setState({
                 disabled: true
             })
-            for (let [index, elem] of options.entries()) {
+            for (let [ index, elem ] of options.entries()) {
                 options[index].disabled = true
             }
         } else {
             const disabled = this.state.disabled
             if (disabled) {
-                for (let [index, elem] of options.entries()) {
+                for (let [ index, elem ] of options.entries()) {
                     if (!checkedValues.includes(elem.label)) {
                         options[index].disabled = false
                     }
@@ -149,23 +147,22 @@ class AddAVMemberModal extends React.Component {
     render() {
         let options = this.state.options
         const { getFieldDecorator } = this.props.form
-        const selected = this.props.selected
         const joined = this.props.joined
 
         return (
             <Form onSubmit={this.handleSubmit} className="x-add-group">
                 <div className="x-add-group-members">
                     <FormItem>
-                        {getFieldDecorator("members", { initialValue: joined })(
+                        {getFieldDecorator('members', { initialValue: joined })(
                             <CheckboxGroup
-                                style={{ display: "block" }}
+                                style={{ display: 'block' }}
                                 options={options}
                                 onChange={this.onChange}
                             />
                         )}
                     </FormItem>
                 </div>
-                <div style={{ overflow: "hidden" }}>
+                <div style={{ overflow: 'hidden' }}>
                     <Button
                         style={{
                             width: 100,

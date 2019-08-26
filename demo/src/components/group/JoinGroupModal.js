@@ -1,16 +1,11 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import { Input, Button, Row, Col, Form, Radio, Checkbox, message } from "antd"
-import GroupActions from "@/redux/GroupRedux"
-import GroupMemberActions from "@/redux/GroupMemberRedux"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
-import "./style/JoinGroupModal.less"
-const RadioGroup = Radio.Group
-const CheckboxGroup = Checkbox.Group
-const FormItem = Form.Item
+import React from 'react'
+import { connect } from 'react-redux'
+import { Input, Button, Row, Col, Form, Radio, Checkbox, message } from 'antd'
+import GroupActions from '@/redux/GroupRedux'
+import GroupMemberActions from '@/redux/GroupMemberRedux'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
+import './style/JoinGroupModal.less'
 
 class JoinGroupModal extends React.Component {
     state = {
@@ -21,11 +16,11 @@ class JoinGroupModal extends React.Component {
         groupsData: [],
         loading: false,
         bodyLoading: false,
-        groupName: "",
-        owner: "",
-        description: "",
-        membersOnly: "",
-        inputValue: ""
+        groupName: '',
+        owner: '',
+        description: '',
+        membersOnly: '',
+        inputValue: ''
     }
 
     onInputChange = e => {
@@ -43,11 +38,11 @@ class JoinGroupModal extends React.Component {
         var options = {
             groupId: this.state.gid,
             success: function(resp) {
-                message.success(`${I18n.t("groupRequest")}${I18n.t("successfully")}`)
+                message.success(`${I18n.t('groupRequest')}${I18n.t('successfully')}`)
             },
             error: function(e) {
                 if (e.type == 17) {
-                    message.error(`${I18n.t("already")}${I18n.t("in")}${I18n.t("group")}`)
+                    message.error(`${I18n.t('already')}${I18n.t('in')}${I18n.t('group')}`)
                 }
             }
         }
@@ -116,7 +111,7 @@ class JoinGroupModal extends React.Component {
     }
 
     close = () => {
-        typeof this.props.onCancel === "function" && this.props.onCancel()
+        typeof this.props.onCancel === 'function' && this.props.onCancel()
     }
 
     backToList = () => {
@@ -156,7 +151,7 @@ class JoinGroupModal extends React.Component {
                 })
             }.bind(this),
             error: function(e) {
-                if (e.type == 17) message.error(`${I18n.t("group")}${I18n.t("ID")}${I18n.t("notExist")}`)
+                if (e.type == 17) message.error(`${I18n.t('group')}${I18n.t('ID')}${I18n.t('notExist')}`)
                 this.setState({
                     bodyLoading: false
                 })
@@ -184,7 +179,7 @@ class JoinGroupModal extends React.Component {
                                     onChange={this.onInputChange}
                                 />
                             </Col>
-                            <Col span={6} style={{ textAlign: "right" }}>
+                            <Col span={6} style={{ textAlign: 'right' }}>
                                 <Button type="primary" onClick={this.search}>
                                     search
                                 </Button>
@@ -194,8 +189,8 @@ class JoinGroupModal extends React.Component {
                     <div
                         className={
                             this.state.groupDetail
-                                ? "hide"
-                                : "x-join-group-members"
+                                ? 'hide'
+                                : 'x-join-group-members'
                         }
                         onScroll={this.onScroll}
                         ref="groupList"
@@ -204,8 +199,8 @@ class JoinGroupModal extends React.Component {
                         <ul
                             className={
                                 this.state.groupDetail
-                                    ? "hide"
-                                    : "x-blacklist-wrapper"
+                                    ? 'hide'
+                                    : 'x-blacklist-wrapper'
                             }
                         >
                             {groups}
@@ -213,39 +208,39 @@ class JoinGroupModal extends React.Component {
                 
                     </div>
                     <div
-                        className={!this.state.groupDetail ? "hide" : ""}
-                        style={{ overflow: "hidden" }}
+                        className={!this.state.groupDetail ? 'hide' : ''}
+                        style={{ overflow: 'hidden' }}
                     >
                         <div>
-                            <span className="title">{I18n.t("groupName")}</span>
+                            <span className="title">{I18n.t('groupName')}</span>
                             <span className="content">
-                                {this.state.groupName || `${I18n.t("empty")}` }
+                                {this.state.groupName || `${I18n.t('empty')}` }
                             </span>
                         </div>
                         <div>
-                            <span className="title">{I18n.t("admin")}</span>
+                            <span className="title">{I18n.t('admin')}</span>
                             <span className="content">
-                                {this.state.owner || `${I18n.t("empty")}`}
+                                {this.state.owner || `${I18n.t('empty')}`}
                             </span>
                         </div>
                         <div>
-                            <span className="title">{I18n.t("description")}</span>
+                            <span className="title">{I18n.t('description')}</span>
                             <span className="content">
-                                {this.state.description || `${I18n.t("empty")}`}
+                                {this.state.description || `${I18n.t('empty')}`}
                             </span>
                         </div>
                         <div>
-                            <span className="title">{I18n.t("needApproval")}</span>
+                            <span className="title">{I18n.t('needApproval')}</span>
                             <span className="content">
-                                {this.state.membersOnly ? "[Y]" : "N"}
+                                {this.state.membersOnly ? '[Y]' : 'N'}
                             </span>
                         </div>
                         <div
                             className="fl"
-                            style={{ cursor: "pointer" }}
+                            style={{ cursor: 'pointer' }}
                             onClick={this.backToList}
                         >
-                            <i className="iconfont icon-arrow-left" /> {I18n.t("back")}
+                            <i className="iconfont icon-arrow-left" /> {I18n.t('back')}
                         </div>
                         <Button
                             style={{
@@ -257,7 +252,7 @@ class JoinGroupModal extends React.Component {
                             type="primary"
                             onClick={this.joinGroup}
                         >
-                            {I18n.t("joinGroup")}
+                            {I18n.t('joinGroup')}
                         </Button>
                     </div>
                 </div>

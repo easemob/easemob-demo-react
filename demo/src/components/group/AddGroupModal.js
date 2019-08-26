@@ -1,12 +1,10 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import { Input, Button, Row, Col, Form, Radio, Checkbox, message } from "antd"
-import GroupActions from "@/redux/GroupRedux"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
-import "./style/AddGrouModal.less"
+import React from 'react'
+import { connect } from 'react-redux'
+import { Input, Button, Form, Radio, Checkbox, message } from 'antd'
+import GroupActions from '@/redux/GroupRedux'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
+import './style/AddGrouModal.less'
 const RadioGroup = Radio.Group
 const CheckboxGroup = Checkbox.Group
 
@@ -14,7 +12,7 @@ const FormItem = Form.Item
 
 class AddGroupModal extends React.Component {
     state = {
-        name: "",
+        name: '',
         screen: 1
     }
 
@@ -35,11 +33,11 @@ class AddGroupModal extends React.Component {
                     allowInvite = true
                 } = values
                 if (!name) {
-                    return message.error("Please input Group Name !", 1)
+                    return message.error('Please input Group Name !', 1)
                 }
 
                 if (!description) {
-                    return message.error("Please enter description ！", 1)
+                    return message.error('Please enter description ！', 1)
                 }
 
                 this.props.createGroups({
@@ -47,8 +45,8 @@ class AddGroupModal extends React.Component {
                         groupname: name,
                         desc: description,
                         members: members,
-                        public: type === "public",
-                        approval: canJoin === "yes",
+                        public: type === 'public',
+                        approval: canJoin === 'yes',
                         allowinvites: allowInvite
                         // invite_need_confirm // default: member
                     },
@@ -69,10 +67,9 @@ class AddGroupModal extends React.Component {
     onCheck = e => { }
 
     render() {
-        const { name, screen } = this.state
+        const { screen } = this.state
         const { getFieldDecorator } = this.props.form
         const { roster } = this.props
-        const requests = []
 
         const items = []
         const options = []
@@ -105,57 +102,57 @@ class AddGroupModal extends React.Component {
 
         return (
             <Form onSubmit={this.handleSubmit} className="x-add-group">
-                <div style={{ display: screen === 1 ? "block" : "none" }}>
+                <div style={{ display: screen === 1 ? 'block' : 'none' }}>
                     <FormItem>
-                        {getFieldDecorator("name", {
-                            rules: [ { message: "Please input Group Name !" } ]
-                        })(<Input placeholder={I18n.t("groupName")} />)}
+                        {getFieldDecorator('name', {
+                            rules: [ { message: 'Please input Group Name !' } ]
+                        })(<Input placeholder={I18n.t('groupName')} />)}
                     </FormItem>
                     <FormItem>
-                        {getFieldDecorator("description", {
-                            rules: [ { message: "Please enter description ！" } ]
+                        {getFieldDecorator('description', {
+                            rules: [ { message: 'Please enter description ！' } ]
                         })(
                             <Input.TextArea
-                                placeholder={I18n.t("description")}
+                                placeholder={I18n.t('description')}
                                 autosize={{ minRows: 4, maxRows: 6 }}
                             />
                         )}
                     </FormItem>
                     <FormItem style={{ marginBottom: 10 }}>
-                        <p>{I18n.t("groupType")}</p>
-                        {getFieldDecorator("type", { initialValue: "public" })(
+                        <p>{I18n.t('groupType')}</p>
+                        {getFieldDecorator('type', { initialValue: 'public' })(
                             <RadioGroup>
                                 <Radio style={{ width: 100 }} value="private">
-                                    {I18n.t("private")}
+                                    {I18n.t('private')}
                                 </Radio>
                                 <Radio style={{ width: 100 }} value="public">
-                                    {I18n.t("public")}
+                                    {I18n.t('public')}
                                 </Radio>
                             </RadioGroup>
                         )}
                     </FormItem>
-                    {this.props.form.getFieldValue("type") === "private" &&
+                    {this.props.form.getFieldValue('type') === 'private' &&
                         <FormItem style={{ marginBottom: 10 }}>
-                            {getFieldDecorator("allowInvite", {
-                                valuePropName: "checked",
+                            {getFieldDecorator('allowInvite', {
+                                valuePropName: 'checked',
                                 initialValue: true
                             })(<Checkbox>Allow invite</Checkbox>)}
                         </FormItem>}
 
                     <FormItem style={{ marginBottom: 10 }}>
-                        <p>{I18n.t("permission")}</p>
-                        {getFieldDecorator("canJoin", { initialValue: "no" })(
+                        <p>{I18n.t('permission')}</p>
+                        {getFieldDecorator('canJoin', { initialValue: 'no' })(
                             <RadioGroup>
                                 <Radio style={{ width: 100 }} value="yes">
-                                    {I18n.t("approvalTrue")}
+                                    {I18n.t('approvalTrue')}
                                 </Radio>
                                 <Radio style={{ width: 100 }} value="no">
-                                    {I18n.t("approvalFalse")}
+                                    {I18n.t('approvalFalse')}
                                 </Radio>
                             </RadioGroup>
                         )}
                     </FormItem>
-                    <div style={{ overflow: "hidden" }}>
+                    <div style={{ overflow: 'hidden' }}>
                         <Button
                             style={{
                                 width: 100,
@@ -169,32 +166,32 @@ class AddGroupModal extends React.Component {
                                     screen: 2
                                 })}
                         >
-                            {I18n.t("next")}
+                            {I18n.t('next')}
                         </Button>
                     </div>
                 </div>
-                <div style={{ display: screen === 2 ? "block" : "none" }}>
+                <div style={{ display: screen === 2 ? 'block' : 'none' }}>
                     <div className="x-add-group-members">
                         <FormItem>
-                            {getFieldDecorator("members", { initialValue: [] })(
+                            {getFieldDecorator('members', { initialValue: [] })(
                                 <CheckboxGroup
-                                    style={{ display: "block" }}
+                                    style={{ display: 'block' }}
                                     options={options}
                                     onChange={this.onCheck}
                                 />
                             )}
                         </FormItem>
                     </div>
-                    <div style={{ overflow: "hidden" }}>
+                    <div style={{ overflow: 'hidden' }}>
                         <div
                             className="fl"
-                            style={{ cursor: "pointer" }}
+                            style={{ cursor: 'pointer' }}
                             onClick={() =>
                                 this.setState({
                                     screen: 1
                                 })}
                         >
-                            <i className="iconfont icon-arrow-left" /> {I18n.t("back")}
+                            <i className="iconfont icon-arrow-left" /> {I18n.t('back')}
                         </div>
                         <Button
                             style={{
@@ -206,7 +203,7 @@ class AddGroupModal extends React.Component {
                             type="primary"
                             htmlType="submit"
                         >
-                            {I18n.t("createGroup")}
+                            {I18n.t('createGroup')}
                         </Button>
                     </div>
                 </div>
