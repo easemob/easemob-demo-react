@@ -1,14 +1,14 @@
 // @flow
 
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import WebIM from "@/config/WebIM"
-import CommonActions from "./CommonRedux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import WebIM from '@/config/WebIM'
+import CommonActions from './CommonRedux'
 
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    updateBlacklist: [ "list" ],
+    updateBlacklist: [ 'list' ],
     // ----------------async------------------
     // update black list
     getBlacklist: () => {

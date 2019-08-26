@@ -1,14 +1,14 @@
-import { createReducer, createActions } from "reduxsauce"
-import Immutable from "seamless-immutable"
-import _ from "lodash"
-import { WebIM } from "@/config"
-import { store } from "@/redux"
-import CommonActions from "@/redux/CommonRedux"
+import { createReducer, createActions } from 'reduxsauce'
+import Immutable from 'seamless-immutable'
+import _ from 'lodash'
+import { WebIM } from '@/config'
+import { store } from '@/redux'
+import CommonActions from '@/redux/CommonRedux'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-    updateChatRooms: [ "rooms" ],
-    topChatroom: [ "roomId" ],
+    updateChatRooms: [ 'rooms' ],
+    topChatroom: [ 'roomId' ],
     // ---------------async------------------
     getChatRooms: () => {
         return (dispatch, getState) => {
@@ -63,7 +63,7 @@ export const updateChatRooms = (state, { rooms }) => {
     rooms.forEach(v => {
         // byName[v.name] = v
         byId[v.id] = v
-        names.push(v.name + "_#-#_" + v.id)
+        names.push(v.name + '_#-#_' + v.id)
     })
     return state.merge({
         byId: byId,
@@ -72,10 +72,10 @@ export const updateChatRooms = (state, { rooms }) => {
 }
 
 export const topChatroom = (state, { roomId }) => {
-    let names = state.getIn([ "names" ], Immutable([])).asMutable()
+    let names = state.getIn([ 'names' ], Immutable([])).asMutable()
     for (let i = 0; i < names.length; i++) {
         const name = names[i]
-        if (name.split("_#-#_")[1] === roomId) {
+        if (name.split('_#-#_')[1] === roomId) {
             if (i === 0) return state // if already top, return directly
             names = _.without(names, name)
             names.unshift(name)

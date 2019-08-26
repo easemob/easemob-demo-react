@@ -1,11 +1,11 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classnames from "classnames"
+import React from 'react'
+import PropTypes from 'prop-types'
+import classnames from 'classnames'
 
 const ContactHead = ({ width, imgUrl, name, className, ...rest }) => {
     let content = null
     if (name) {
-        let names = name.split("")
+        let names = name.split('')
         content = (
             <span>
                 {names[0].toUpperCase()}
@@ -16,11 +16,11 @@ const ContactHead = ({ width, imgUrl, name, className, ...rest }) => {
         content = <img src={imgUrl} />
     }
 
-    let size = width + "px"
+    let size = width + 'px'
 
     return (
         <div
-            className={classnames("contact-head", className)}
+            className={classnames('contact-head', className)}
             style={{
                 width: size,
                 height: size,

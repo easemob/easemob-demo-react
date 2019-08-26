@@ -1,18 +1,18 @@
-import React from "react"
+import React from 'react'
 
-import { storiesOf, addDecorator } from "@storybook/react"
-import { action } from "@storybook/addon-actions"
-import { linkTo } from "@storybook/addon-links"
-import { Welcome } from "@storybook/react/demo"
+import { storiesOf, addDecorator } from '@storybook/react'
+import { action } from '@storybook/addon-actions'
+import { linkTo } from '@storybook/addon-links'
+import { Welcome } from '@storybook/react/demo'
 
-import "../src/themes/theme.less"
+import '../src/themes/theme.less'
 
-import { Button, Modal, Menu, Icon, Dropdown } from "antd"
-import HeaderTab from "../src/components/header/HeaderTab"
-import ContactItem from "../src/components/contact/ContactItem"
-import ContactHead from "../src/components/contact/ContactHead"
-import ListItem from "../src/components/list/ListItem"
-import ChatEmoji from "../src/components/chat/ChatEmoji"
+import { Button, Modal, Menu, Icon, Dropdown } from 'antd'
+import HeaderTab from '../src/components/header/HeaderTab'
+import ContactItem from '../src/components/contact/ContactItem'
+import ContactHead from '../src/components/contact/ContactHead'
+import ListItem from '../src/components/list/ListItem'
+import ChatEmoji from '../src/components/chat/ChatEmoji'
 
 // NOTE
 // 1. action(x) when x was a circle-referenced object, system should be crashed.
@@ -30,41 +30,41 @@ import ChatEmoji from "../src/components/chat/ChatEmoji"
 //     </div>
 //   ))
 
-storiesOf("Welcome", module).add("to Storybook", () =>
-    <Welcome showApp={linkTo("Button")} />
+storiesOf('Welcome', module).add('to Storybook', () =>
+    <Welcome showApp={linkTo('Button')} />
 )
 
-storiesOf("Button", module)
-    .add("with text", () =>
-        <Button onClick={action("clicked")}>Hello Button</Button>
+storiesOf('Button', module)
+    .add('with text', () =>
+        <Button onClick={action('clicked')}>Hello Button</Button>
     )
-    .add("primary", () =>
-        <Button onClick={action("clicked")} type="primary">
+    .add('primary', () =>
+        <Button onClick={action('clicked')} type="primary">
 			Hello Button
         </Button>
     )
-    .add("with some emoji", () =>
-        <Button onClick={action("clicked")}>😀 😎 👍 💯</Button>
+    .add('with some emoji', () =>
+        <Button onClick={action('clicked')}>😀 😎 👍 💯</Button>
     )
 
-storiesOf("Header", module)
+storiesOf('Header', module)
     .addDecorator(story =>
-        <div style={{ width: "350px" }}>
+        <div style={{ width: '350px' }}>
             {story()}
         </div>
     )
-    .add("tab", () =>
+    .add('tab', () =>
         <HeaderTab
             onClick={e => {
-                return action("clicked")(e.key)
+                return action('clicked')(e.key)
             }}
         />
     )
-    .add("tab collapse", () =>
+    .add('tab collapse', () =>
         <HeaderTab
             collapse={true}
             onClick={e => {
-                return action("clicked")(e.key)
+                return action('clicked')(e.key)
             }}
         />
     )
@@ -73,33 +73,33 @@ storiesOf("Header", module)
  * Contact
  * 
  */
-storiesOf("Contact", module)
+storiesOf('Contact', module)
 // .addDecorator(story =>
 // 	<div style={{ width: "350px" }}>
 // 		{story()}
 // 	</div>
 // )
-    .add("item", () =>
+    .add('item', () =>
         <ContactItem
             onClick={e => {
-                return action("clicked")(e.key)
+                return action('clicked')(e.key)
             }}
         />
     )
-    .add("item collapse", () =>
+    .add('item collapse', () =>
         <ContactItem
             collapse={true}
             onClick={e => {
-                return action("clicked")(e.key)
+                return action('clicked')(e.key)
             }}
         />
     )
-    .add("item head", () => <ContactHead width={50} name={"中test"} />)
+    .add('item head', () => <ContactHead width={50} name={'中test'} />)
 
 /**
  *   Modal
  */
-storiesOf("Modal", module).add("item", (...args) => {
+storiesOf('Modal', module).add('item', (...args) => {
     const handleOk = () => {
         // this.setState({ loading: true })
         // setTimeout(() => {
@@ -149,18 +149,18 @@ storiesOf("Modal", module).add("item", (...args) => {
  */
 const confirm = Modal.confirm
 
-storiesOf("Confirm", module).add("item", (...args) => {
+storiesOf('Confirm', module).add('item', (...args) => {
     function showConfirm() {
         confirm({
-            title: "Do you Want to delete these items?",
-            content: "Some descriptions",
+            title: 'Do you Want to delete these items?',
+            content: 'Some descriptions',
             onOk() {
-                console.log("OK")
-                action("clicked")("ok")
+                console.log('OK')
+                action('clicked')('ok')
             },
             onCancel() {
-                console.log("Cancel")
-                action("clicked")("cancel")
+                console.log('Cancel')
+                action('clicked')('cancel')
             }
         })
     }
@@ -172,25 +172,25 @@ storiesOf("Confirm", module).add("item", (...args) => {
  *   ListItem
  */
 
-storiesOf("ListItem", module).add("item", () =>
+storiesOf('ListItem', module).add('item', () =>
     <div>
         <ListItem
             config={[
                 {
-                    mode: "left",
+                    mode: 'left',
                     component: () =>
-                        <div style={{ margin: "15px 20px 15px 0" }}>
-                            <ContactHead width={50} name={"中test"} />
+                        <div style={{ margin: '15px 20px 15px 0' }}>
+                            <ContactHead width={50} name={'中test'} />
                         </div>
                 },
                 {
-                    mode: "left",
-                    component: () => <div style={{ lineHeight: "80px" }}>123</div>
+                    mode: 'left',
+                    component: () => <div style={{ lineHeight: '80px' }}>123</div>
                 },
                 {
-                    mode: "right",
+                    mode: 'right',
                     component: () =>
-                        <span style={{ lineHeight: "80px", color: "#8798a4" }}>Admin</span>
+                        <span style={{ lineHeight: '80px', color: '#8798a4' }}>Admin</span>
                 }
             ]}
         />
@@ -199,22 +199,22 @@ storiesOf("ListItem", module).add("item", () =>
         <ListItem
             config={[
                 {
-                    mode: "left",
+                    mode: 'left',
                     component: () =>
                         <div
                             style={{
-                                lineHeight: "60px",
-                                fontSize: "20px",
-                                marginRight: "17px"
+                                lineHeight: '60px',
+                                fontSize: '20px',
+                                marginRight: '17px'
                             }}
                         >
                             <Icon type="link" />
                         </div>
                 },
                 {
-                    mode: "left",
+                    mode: 'left',
                     component: () =>
-                        <div style={{ lineHeight: "60px" }}>Delete Group</div>
+                        <div style={{ lineHeight: '60px' }}>Delete Group</div>
                 }
             ]}
         />
@@ -223,39 +223,39 @@ storiesOf("ListItem", module).add("item", () =>
         <ListItem
             config={[
                 {
-                    mode: "left",
+                    mode: 'left',
                     component: () =>
                         <div
                             style={{
                                 fontSize: 20,
                                 marginRight: 17,
                                 height: 60,
-                                lineHeight: "60px"
+                                lineHeight: '60px'
                             }}
                         >
 							Hyphenate
                         </div>
                 },
                 {
-                    mode: "left",
+                    mode: 'left',
                     component: () =>
                         <div
                             style={{
                                 fontSize: 14,
                                 height: 60,
-                                lineHeight: "25px"
+                                lineHeight: '25px'
                             }}
                         >
 							Group Invite
-                            <p style={{ color: "#8789a4", fontSize: 12 }}>
+                            <p style={{ color: '#8789a4', fontSize: 12 }}>
 								Jake invited you to 'a'
                             </p>
                         </div>
                 },
                 {
-                    mode: "right",
+                    mode: 'right',
                     component: () =>
-                        <div style={{ lineHeight: "60px", fontSize: 20 }}>
+                        <div style={{ lineHeight: '60px', fontSize: 20 }}>
                             <Icon type="ellipsis" />
                         </div>
                 }
@@ -268,9 +268,9 @@ storiesOf("ListItem", module).add("item", () =>
 /**
  *  
  */
-storiesOf("Dropdown", module).add("chatemoji", (...args) => {
+storiesOf('Dropdown', module).add('chatemoji', (...args) => {
     return (
-        <div style={{ position: "absolute", left: 0, bottom: 0 }}>
+        <div style={{ position: 'absolute', left: 0, bottom: 0 }}>
             <ChatEmoji />
         </div>
     )

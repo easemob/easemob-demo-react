@@ -1,6 +1,6 @@
 // @flow
 
-import { createActions } from "reduxsauce"
+import { createActions } from 'reduxsauce'
 
 /* ------------- Types and Action Creators ------------- */
 

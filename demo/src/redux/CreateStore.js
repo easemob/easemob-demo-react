@@ -1,13 +1,13 @@
-import { createStore, applyMiddleware, compose } from "redux"
-import { autoRehydrate } from "redux-persist"
-import createLogger from "redux-logger"
-import Config from "../Config/DebugSettings"
-import createSagaMiddleware from "redux-saga"
-import R from "ramda"
-import RehydrationServices from "../Services/RehydrationServices"
-import ReduxPersist from "../Config/ReduxPersist"
+import { createStore, applyMiddleware, compose } from 'redux'
+import { autoRehydrate } from 'redux-persist'
+import createLogger from 'redux-logger'
+import Config from '../Config/DebugSettings'
+import createSagaMiddleware from 'redux-saga'
+import R from 'ramda'
+import RehydrationServices from '../Services/RehydrationServices'
+import ReduxPersist from '../Config/ReduxPersist'
 //
-import thunkMiddleware from "redux-thunk"
+import thunkMiddleware from 'redux-thunk'
 
 // creates the store
 export default (rootReducer, rootSaga) => {
@@ -25,7 +25,7 @@ export default (rootReducer, rootSaga) => {
 
     /* ------------- Logger Middleware ------------- */
 
-    const SAGA_LOGGING_BLACKLIST = [ "EFFECT_TRIGGERED", "EFFECT_RESOLVED", "EFFECT_REJECTED", "persist/REHYDRATE" ]
+    const SAGA_LOGGING_BLACKLIST = [ 'EFFECT_TRIGGERED', 'EFFECT_RESOLVED', 'EFFECT_REJECTED', 'persist/REHYDRATE' ]
     if (__DEV__) {
     // the logger master switch
         const USE_LOGGING = Config.reduxLogging

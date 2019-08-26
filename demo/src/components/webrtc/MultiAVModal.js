@@ -1,13 +1,13 @@
-import React from "react"
-import { connect } from "react-redux"
-import WebIM from "@/config/WebIM"
-import Draggable from "react-draggable"
-import { message, Row, Col } from "antd"
-import MultiAVActions from "@/redux/MultiAVRedux"
-import Immutable from "seamless-immutable"
-import { store } from "@/redux"
+import React from 'react'
+import { connect } from 'react-redux'
+import WebIM from '@/config/WebIM'
+import Draggable from 'react-draggable'
+import { message, Row, Col } from 'antd'
+import MultiAVActions from '@/redux/MultiAVRedux'
+import Immutable from 'seamless-immutable'
+import { store } from '@/redux'
 
-let _ = require("lodash")
+let _ = require('lodash')
 
 class MultiAVModal extends React.Component {
     constructor(props) {
@@ -18,8 +18,8 @@ class MultiAVModal extends React.Component {
             minute: 0,
             second: 0,
             localVideo: {
-                stream: "",
-                localStreamId: "",
+                stream: '',
+                localStreamId: '',
                 openVideo: false,
                 openAudio: false,
             },
@@ -32,13 +32,13 @@ class MultiAVModal extends React.Component {
             // }),
             // rv: [],
             rv: new Array(5).fill({
-                nickName: "",
-                streamId: "",
+                nickName: '',
+                streamId: '',
                 openVideo: false,
                 video: <div className="default"></div>
             }),
             rvCount: 0,
-            toolsColor: [ "", "", "","" ]
+            toolsColor: [ '', '', '','' ]
         }
         this.closeModal = this.closeModal.bind(this)
         this.loadTime = this.loadTime.bind(this)
@@ -86,17 +86,17 @@ class MultiAVModal extends React.Component {
     loadTime() {
         const { hour, minute, second } = this.state
         const n2s = (n) => {
-            let s = ""
+            let s = ''
             if (n >= 0 && n < 10) {
-                s = "0" + n
+                s = '0' + n
             } else {
-                s = n + ""
+                s = n + ''
             }
             return s
         }
-        let str = ""
+        let str = ''
         let hs = n2s(hour), ms = n2s(minute), ss = n2s(second)
-        str = hs + ":" + ms + ":" + ss
+        str = hs + ':' + ms + ':' + ss
         return str
     }
 
@@ -107,10 +107,10 @@ class MultiAVModal extends React.Component {
                 // for (let i = index; i < 4; i++) {
                 //     rv[i] = rv[i + 1]
                 // }
-                let ref_ = "rv_" + index
+                let ref_ = 'rv_' + index
                 rv[index] = {
-		            nickName: "",
-		            streamId: "",
+		            nickName: '',
+		            streamId: '',
 		            video: <video autoPlay playsInline className="default" ref={ref_}/>
 		        }
                 break
@@ -120,7 +120,7 @@ class MultiAVModal extends React.Component {
             rvCount: --rvCount,
             rv: rv
         })
-        console.log("RemoveRV2: ", rv)
+        console.log('RemoveRV2: ', rv)
     }
 
     initEmedia() {
@@ -131,50 +131,50 @@ class MultiAVModal extends React.Component {
             reason = reason || 0
             switch (reason) {
             case 0:
-                reason = "正常挂断"
+                reason = '正常挂断'
                 break
             case 1:
-                reason = "没响应"
+                reason = '没响应'
                 break
             case 2:
-                reason = "服务器拒绝"
+                reason = '服务器拒绝'
                 break
             case 3:
-                reason = "对方忙"
+                reason = '对方忙'
                 break
             case 4:
-                reason = "失败,可能是网络或服务器拒绝"
+                reason = '失败,可能是网络或服务器拒绝'
                 if (failed === -9527) {
-                    reason = "失败,网络原因"
+                    reason = '失败,网络原因'
                 }
                 if (failed === -500) {
-                    reason = "Ticket失效"
+                    reason = 'Ticket失效'
                 }
                 if (failed === -502) {
-                    reason = "Ticket过期"
+                    reason = 'Ticket过期'
                 }
                 if (failed === -504) {
-                    reason = "链接已失效"
+                    reason = '链接已失效'
                 }
                 if (failed === -508) {
-                    reason = "会议无效"
+                    reason = '会议无效'
                 }
                 break
             case 5:
-                reason = "不支持"
+                reason = '不支持'
                 break
             case 10:
-                reason = "其他设备登录"
+                reason = '其他设备登录'
                 break
             case 11:
-                reason = "会议关闭"
+                reason = '会议关闭'
                 break
             }
-            console.log("Hangup reason " + (reason || 0))
+            console.log('Hangup reason ' + (reason || 0))
         }
 
         WebIM.EMService.onMemberJoined = function(member){
-            message.success(member.name + " 加入群聊.")
+            message.success(member.name + ' 加入群聊.')
             me.props.setJoinedMembers(member)
         }
         WebIM.EMService.onMemberExited = function(member, reason){
@@ -182,7 +182,7 @@ class MultiAVModal extends React.Component {
 
             //用户主动挂断时，不提示退出群聊
             if( reason !== undefined){
-                message.warning(member.name + " 退出群聊.")
+                message.warning(member.name + ' 退出群聊.')
             }
             me.props.updateJoinedMembers(member)
         }
@@ -215,8 +215,8 @@ class MultiAVModal extends React.Component {
                         localVideo: lv
                     })
 
-                    console.warn(stream.id, "voff:", this.getAttribute("voff"))
-                    console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
+                    console.warn(stream.id, 'voff:', this.getAttribute('voff'))
+                    console.warn(stream.id, 'aoff:', this.getAttribute('aoff'))
                 })
                 emedia.mgr.streamBindVideo(stream, localVideo)
 
@@ -240,7 +240,7 @@ class MultiAVModal extends React.Component {
                     var index
                     // 从0～5看哪个位置空着，就往哪里添加
                     for (let i = 0; i < 5; i++) {
-			            if(rv[i].nickName == ""){
+			            if(rv[i].nickName == ''){
                             index = i
                             if(index || index == 0){
                                 break
@@ -248,7 +248,7 @@ class MultiAVModal extends React.Component {
                         }
 			        }
                     rvCount++
-                    let video = me.refs["rv_" + index]
+                    let video = me.refs['rv_' + index]
                     const elem = {
                         nickName: nickName,
                         streamId: streamId,
@@ -274,8 +274,8 @@ class MultiAVModal extends React.Component {
                             rvCount: me.state.rvCount
                         })
 
-                        console.warn(streamId, "voff:", this.getAttribute("voff"))
-                        console.warn(streamId, "aoff:", this.getAttribute("aoff"))
+                        console.warn(streamId, 'voff:', this.getAttribute('voff'))
+                        console.warn(streamId, 'aoff:', this.getAttribute('aoff'))
                     })
                     //emedia.mgr.streamBindVideo(stream, video);
                     emedia.mgr.subscribe(member, stream, true, true, video)
@@ -309,7 +309,7 @@ class MultiAVModal extends React.Component {
     }
 
     remoteSound(id) {
-        console.log("remoteSound")
+        console.log('remoteSound')
 
     }
 
@@ -326,11 +326,11 @@ class MultiAVModal extends React.Component {
     remoteVideo(id) {
         let rv = _.cloneDeep(this.state.rv)
         let elem = rv[id]
-        if (elem.streamId === "") {
+        if (elem.streamId === '') {
             return
         }
 
-        let video = this.refs["rv_" + id]
+        let video = this.refs['rv_' + id]
         if(elem.openVideo){
             emedia.mgr.triggerPauseVideo(video)
         }else{
@@ -344,15 +344,15 @@ class MultiAVModal extends React.Component {
             byId = this.props.byId,
             toolsColor = this.state.toolsColor,
             rvCount = this.state.rvCount,
-            groupName = byId[gid] && byId[gid].groupName || "群组名称",
+            groupName = byId[gid] && byId[gid].groupName || '群组名称',
             remoteUsernames = this.state.remoteUsernames
 
         let rv = this.state.rv
         for (let i = 0; i < 5; i++) {
-            let ref_ = "rv_" + i
+            let ref_ = 'rv_' + i
             rv[i] = {
-                nickName: rv[i].nickName || "",
-                streamId: rv[i].streamId || "",
+                nickName: rv[i].nickName || '',
+                streamId: rv[i].streamId || '',
                 openVideo:	rv[i].openVideo || false,
                 video: <video autoPlay playsInline className="default" ref={ref_}/>,
             }
@@ -391,9 +391,9 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[0] && rv[0].video}
-                            <div className={rv[0].streamId ? "user-name" : "user-name remote-ajust"}>
+                            <div className={rv[0].streamId ? 'user-name' : 'user-name remote-ajust'}>
                                 <span>{rv[0].nickName}</span>
-                                <i className={rv[0].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[0].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
                                     onClick={this.remoteVideo.bind(this, 0)}
                                 >
                                 </i>
@@ -401,9 +401,9 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[1] && rv[1].video}
-                            <div className={rv[1].streamId ? "user-name" : "user-name remote-ajust"}>
+                            <div className={rv[1].streamId ? 'user-name' : 'user-name remote-ajust'}>
                                 <span>{rv[1].nickName}</span>
-                                <i className={rv[1].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[1].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
                                     onClick={this.remoteVideo.bind(this, 1)}
                                 ></i>
                             </div>
@@ -417,27 +417,27 @@ class MultiAVModal extends React.Component {
                     <Row gutter={10}>
                         <Col span={8} className="gutter-row">
                             {rv[2] && rv[2].video}
-                            <div className={rv[2].streamId ? "user-name" : "user-name remote-ajust"}>
+                            <div className={rv[2].streamId ? 'user-name' : 'user-name remote-ajust'}>
                                 <span>{rv[2].nickName}</span>
-                                <i className={rv[2].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[2].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
                                     onClick={this.remoteVideo.bind(this, 2)}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[3] && rv[3].video}
-                            <div className={rv[3].streamId ? "user-name" : "user-name remote-ajust"}>
+                            <div className={rv[3].streamId ? 'user-name' : 'user-name remote-ajust'}>
                                 <span>{rv[3].nickName}</span>
-                                <i className={rv[3].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[3].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
                                     onClick={this.remoteVideo.bind(this, 3)}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={8} className="gutter-row">
                             {rv[4] && rv[4].video}
-                            <div className={rv[4].streamId ? "user-name" : "user-name remote-ajust"}>
+                            <div className={rv[4].streamId ? 'user-name' : 'user-name remote-ajust'}>
                                 <span>{rv[4].nickName}</span>
-                                <i className={rv[4].openVideo ? "icon webim icon-s_off_camera camera" : "icon webim icon-s_off_camera camera-shut"}
+                                <i className={rv[4].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
                                     onClick={this.remoteVideo.bind(this, 4)}
                                 ></i>
                             </div>
@@ -452,10 +452,10 @@ class MultiAVModal extends React.Component {
                         {/* add another member */}
                         <Col span={4} offset={2}>
                             <div className="tools">
-                                <i className={"icon iconfont webim1-add-member " + toolsColor[3]}
+                                <i className={'icon iconfont webim1-add-member ' + toolsColor[3]}
                                     onMouseOver={(e) => {
-                                        if (toolsColor[3] === "") {
-                                            toolsColor[3] = "i-hover"
+                                        if (toolsColor[3] === '') {
+                                            toolsColor[3] = 'i-hover'
                                             this.setState({
                                                 toolsColor: toolsColor
                                             })
@@ -464,10 +464,10 @@ class MultiAVModal extends React.Component {
                                     }
 
                                     onClick={(e) => {
-                                        if (toolsColor[3] === "i-hover") {
-                                            toolsColor[3] = "i-act"
+                                        if (toolsColor[3] === 'i-hover') {
+                                            toolsColor[3] = 'i-act'
                                         } else {
-                                            toolsColor[3] = ""
+                                            toolsColor[3] = ''
                                         }
                                         this.addMember()
                                         this.setState({
@@ -476,8 +476,8 @@ class MultiAVModal extends React.Component {
                                     }}
 
                                     onMouseLeave={(e) => {
-                                        if (toolsColor[3] === "i-hover") {
-                                            toolsColor[3] = ""
+                                        if (toolsColor[3] === 'i-hover') {
+                                            toolsColor[3] = ''
                                         }
                                         this.setState({
                                             toolsColor: toolsColor
@@ -488,10 +488,10 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={4} >
                             <div className="tools">
-                                <i className={"icon webim1 webim1-off-microphone " + toolsColor[0]}
+                                <i className={'icon webim1 webim1-off-microphone ' + toolsColor[0]}
                                     onMouseOver={(e) => {
-                                        if (toolsColor[0] === "") {
-                                            toolsColor[0] = "i-hover"
+                                        if (toolsColor[0] === '') {
+                                            toolsColor[0] = 'i-hover'
                                             this.setState({
                                                 toolsColor: toolsColor
                                             })
@@ -500,10 +500,10 @@ class MultiAVModal extends React.Component {
                                     }
 
                                     onClick={(e) => {
-                                        if (toolsColor[0] === "i-hover") {
-                                            toolsColor[0] = "i-act"
+                                        if (toolsColor[0] === 'i-hover') {
+                                            toolsColor[0] = 'i-act'
                                         } else {
-                                            toolsColor[0] = ""
+                                            toolsColor[0] = ''
                                         }
                                         this.localMic()
                                         this.setState({
@@ -512,8 +512,8 @@ class MultiAVModal extends React.Component {
                                     }}
 
                                     onMouseLeave={(e) => {
-                                        if (toolsColor[0] === "i-hover") {
-                                            toolsColor[0] = ""
+                                        if (toolsColor[0] === 'i-hover') {
+                                            toolsColor[0] = ''
                                         }
                                         this.setState({
                                             toolsColor: toolsColor
@@ -524,10 +524,10 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={"icon webim1 webim1-Shut-down " + toolsColor[1]}
+                                <i className={'icon webim1 webim1-Shut-down ' + toolsColor[1]}
                                     onMouseOver={(e) => {
-                                        if (toolsColor[1] === "") {
-                                            toolsColor[1] = "i-hover"
+                                        if (toolsColor[1] === '') {
+                                            toolsColor[1] = 'i-hover'
                                             this.setState({
                                                 toolsColor: toolsColor
                                             })
@@ -536,10 +536,10 @@ class MultiAVModal extends React.Component {
                                     }
 
                                     onClick={(e) => {
-                                        if (toolsColor[1] === "i-hover") {
-                                            toolsColor[1] = "i-act"
+                                        if (toolsColor[1] === 'i-hover') {
+                                            toolsColor[1] = 'i-act'
                                         } else {
-                                            toolsColor[1] = ""
+                                            toolsColor[1] = ''
                                         }
                                         this.remoteSound()
                                         this.setState({
@@ -548,8 +548,8 @@ class MultiAVModal extends React.Component {
                                     }}
 
                                     onMouseLeave={(e) => {
-                                        if (toolsColor[1] === "i-hover") {
-                                            toolsColor[1] = ""
+                                        if (toolsColor[1] === 'i-hover') {
+                                            toolsColor[1] = ''
                                         }
                                         this.setState({
                                             toolsColor: toolsColor
@@ -561,10 +561,10 @@ class MultiAVModal extends React.Component {
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={"icon webim1 webim1-off-camera " + toolsColor[2]}
+                                <i className={'icon webim1 webim1-off-camera ' + toolsColor[2]}
                                     onMouseOver={(e) => {
-                                        if (toolsColor[2] === "") {
-                                            toolsColor[2] = "i-hover"
+                                        if (toolsColor[2] === '') {
+                                            toolsColor[2] = 'i-hover'
                                             this.setState({
                                                 toolsColor: toolsColor
                                             })
@@ -573,10 +573,10 @@ class MultiAVModal extends React.Component {
                                     }
 
                                     onClick={(e) => {
-                                        if (toolsColor[2] === "i-hover") {
-                                            toolsColor[2] = "i-act"
+                                        if (toolsColor[2] === 'i-hover') {
+                                            toolsColor[2] = 'i-act'
                                         } else {
-                                            toolsColor[2] = ""
+                                            toolsColor[2] = ''
                                         }
                                         this.localVideo()
                                         this.setState({
@@ -585,8 +585,8 @@ class MultiAVModal extends React.Component {
                                     }}
 
                                     onMouseLeave={(e) => {
-                                        if (toolsColor[2] === "i-hover") {
-                                            toolsColor[2] = ""
+                                        if (toolsColor[2] === 'i-hover') {
+                                            toolsColor[2] = ''
                                         }
                                         this.setState({
                                             toolsColor: toolsColor

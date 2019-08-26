@@ -1,12 +1,12 @@
-import React from "react"
-import PropTypes from "prop-types"
-import classNames from "classnames"
-import { connect } from "react-redux"
-import { Modal, Input, Button, Row, Col } from "antd"
-import WebIM from "@/config/WebIM"
-import SubscribeActions from "@/redux/SubscribeRedux"
-import { I18n } from "react-redux-i18n"
-import _ from "lodash"
+import React from 'react'
+import PropTypes from 'prop-types'
+import classNames from 'classnames'
+import { connect } from 'react-redux'
+import { Modal, Input, Button, Row, Col } from 'antd'
+import WebIM from '@/config/WebIM'
+import SubscribeActions from '@/redux/SubscribeRedux'
+import { I18n } from 'react-redux-i18n'
+import _ from 'lodash'
 
 class FriendsRequestModal extends React.Component {
     state = {}
@@ -19,7 +19,7 @@ class FriendsRequestModal extends React.Component {
             requests.push(
                 <Row key={from}>
                     <Col span={14}>
-                        {from + ": " + status}
+                        {from + ': ' + status}
                     </Col>
                     <Col span={10}>
                         <Button
@@ -31,7 +31,7 @@ class FriendsRequestModal extends React.Component {
                             type="primary"
                             onClick={() => acceptSubscribe(from)}
                         >
-                            {I18n.t("agree")}
+                            {I18n.t('agree')}
                         </Button>
                         <Button
                             style={{
@@ -41,7 +41,7 @@ class FriendsRequestModal extends React.Component {
                             type="danger"
                             onClick={() => declineSubscribe(from)}
                         >
-                            {I18n.t("reject")}
+                            {I18n.t('reject')}
                         </Button>
                     </Col>
                 </Row>

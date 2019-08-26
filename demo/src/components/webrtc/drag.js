@@ -13,17 +13,17 @@ module.exports = (function (window) {
             }
         } else if (document.attachEvent) {
             obj.bind = function (dom, event, fn) {
-                dom.attachEvent("on" + event, fn, false)
+                dom.attachEvent('on' + event, fn, false)
             }
             obj.unbind = function (dom, event, fn) {
                 dom.detachEvent(event, fn)
             }
         } else {
             obj.bind = function (dom, event, fn) {
-                dom["on" + event] = fn
+                dom['on' + event] = fn
             }
             obj.unbind = function (dom, event, fn) {
-                dom["on" + event] = null
+                dom['on' + event] = null
             }
         }
         return obj
@@ -68,7 +68,7 @@ module.exports = (function (window) {
                 height: data.height
             }
 
-            _ev.bind(document, "mousemove", _move)
+            _ev.bind(document, 'mousemove', _move)
         }
 
 
@@ -92,10 +92,10 @@ module.exports = (function (window) {
             } else if (e.clientY + me.rect.height - me._startPosition.y >= me._height) {//bottom
                 _y = 0
             }
-            me.dom.style.left = "auto"
-            me.dom.style.top = "auto"
-            me.dom.style.right = _x + "px"
-            me.dom.style.bottom = _y + "px"
+            me.dom.style.left = 'auto'
+            me.dom.style.top = 'auto'
+            me.dom.style.right = _x + 'px'
+            me.dom.style.bottom = _y + 'px'
 
             me.position = {
                 x: _x
@@ -108,22 +108,22 @@ module.exports = (function (window) {
 
         var _moveend = function () {
             me._dragFlag = false
-            _ev.unbind(document, "mousemove", _move)
+            _ev.unbind(document, 'mousemove', _move)
 
             if (!me.position) {
                 return false
             }
 
-            me.dom.style.left = "auto"
-            me.dom.style.top = "auto"
-            me.dom.style.right = me.position.x + "px"
-            me.dom.style.bottom = me.position.y + "px"
-            me.dom.style.display = "block"
+            me.dom.style.left = 'auto'
+            me.dom.style.top = 'auto'
+            me.dom.style.right = me.position.x + 'px'
+            me.dom.style.bottom = me.position.y + 'px'
+            me.dom.style.display = 'block'
         }
 
         var _resize = function () {
 
-            _ev.bind(window, "resize", function () {
+            _ev.bind(window, 'resize', function () {
                 if (!me.rect || !me.rect.width) {
                     return
                 }
@@ -135,32 +135,32 @@ module.exports = (function (window) {
 
                 //width
                 if (_width < me.rect.width) {
-                    me.dom.style.left = "auto"
+                    me.dom.style.left = 'auto'
                     me.dom.style.right = 0
                 } else if (_width - _right < me.rect.width) {
-                    me.dom.style.right = _width - me.rect.width + "px"
+                    me.dom.style.right = _width - me.rect.width + 'px'
                     me.dom.style.left = 0
                 } else {
-                    me.dom.style.left = "auto"
+                    me.dom.style.left = 'auto'
                 }
 
                 //height
                 if (_height < me.rect.height) {
-                    me.dom.style.top = "auto"
+                    me.dom.style.top = 'auto'
                     me.dom.style.bottom = 0
                 } else if (_height - _bottom < me.rect.height) {
-                    me.dom.style.bottom = _height - me.rect.height + "px"
+                    me.dom.style.bottom = _height - me.rect.height + 'px'
                     me.dom.style.top = 0
                 } else {
-                    me.dom.style.top = "auto"
+                    me.dom.style.top = 'auto'
                 }
             })
         }
 
 
-        _ev.bind(me.dom, "mousedown", _start)
-        _ev.bind(me.dom, "mouseup", _moveend)
-        _ev.bind(window, "resize", _resize)
+        _ev.bind(me.dom, 'mousedown', _start)
+        _ev.bind(me.dom, 'mouseup', _moveend)
+        _ev.bind(window, 'resize', _resize)
 
     }
 }(window))

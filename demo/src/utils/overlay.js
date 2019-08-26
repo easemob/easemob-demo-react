@@ -1,8 +1,8 @@
-import React from "react"
-import ReactDOM from "react-dom"
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 export default function overlay({ component, ...rest }) {
-    const dom = document.createElement("div")
+    const dom = document.createElement('div')
     document.body.appendChild(dom)
 
     function close() {

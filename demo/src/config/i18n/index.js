@@ -1,5 +1,5 @@
-import { cn } from "./cn.js"
-import { us } from "./us.js"
+import { cn } from './cn.js'
+import { us } from './us.js'
 
 export const translationsObject = {
     cn: cn,
