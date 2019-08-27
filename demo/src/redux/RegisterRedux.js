@@ -28,15 +28,14 @@ const { Types, Creators } = createActions({
                 nickname: nickname ? nickname.trim().toLowerCase() : '',
                 success: function(){
                     dispatch(Creators.registerSuccess(username))
+                },
+                error:()=>{
+                    let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
+                    message.error(I18N.registrationFailed, 1)
                 }
             }
             dispatch(Creators.registerRequest(username, password, nickname))
             WebIM.conn.registerUser(options)
-            // return api
-            //     .post("/users", options)
-            //     .then(({ data }) => {
-            //         dispatch(Creators.registerSuccess(username))
-            //     })
         }
     },
 })
