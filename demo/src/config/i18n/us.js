@@ -5,6 +5,7 @@ export const us = {
     tokenSignin: 'Sign in with token',
     nickname: 'Nickname',
     signUp: 'Sign Up',
+    registrationFailed:'Registration Failed',
     signUpSuccessfully: 'You\'ve signed up successfully!',
     loginSuccessfully: 'You\'ve login successfully!',
     logoutSuccessfully: 'You\'ve logout successfully!',

@@ -5,6 +5,7 @@ export const cn = {
     tokenSignin: '使用token登录',
     nickname: '昵称',
     signUp: '注册',
+    registrationFailed:'注册失败',
     signUpSuccessfully: '注册成功',
     loginSuccessfully: '登录成功',
     logoutSuccessfully: '退出登录成功',

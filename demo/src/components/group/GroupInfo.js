@@ -44,6 +44,11 @@ class GroupInfo extends React.Component {
             showInviteToGroupModal: false
         }
     }
+    componentDidMount(){
+        const { room } = this.props
+        let groupId = room.groupId
+        this.props.newGetGroupInfoAsync(groupId)
+    }
 
     handleSiderClick = () => this.props.switchRightSider({ rightSiderOffset: 0 })
 
@@ -84,32 +89,32 @@ class GroupInfo extends React.Component {
 
     handleMenuClick = ({ item, key, selectedKeys }) => {
         switch (key) {
-        case '1':
-            break
-        case '2':
-            this.setState({ showInviteToGroupModal: true })
-            break
-        case '3':
-            this.showModal()
-            break
-        case '4':
-            this.props.getGroupBlackListAsync(this.props.room.groupId)
-            this.setState({ blackListVisible: true })
-            break
-        case '5':
-            const search = history.location.search
-            const { groupId, groupName } = this.props.room
-            this.props.switchRightSider({ rightSiderOffset: 0 })
-            this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
-            history.push('/group' + search)
-            break
-        case '6':
-            const { login } = this.props
-            const username = _.get(login, 'username')
-            this.props.quitGroupAsync(this.props.room.groupId, username)
-            break
-        default:
-            break
+            case '1':
+                break
+            case '2':
+                this.setState({ showInviteToGroupModal: true })
+                break
+            case '3':
+                this.showModal()
+                break
+            case '4':
+                this.props.getGroupBlackListAsync(this.props.room.groupId)
+                this.setState({ blackListVisible: true })
+                break
+            case '5':
+                const search = history.location.search
+                const { groupId, groupName } = this.props.room
+                this.props.switchRightSider({ rightSiderOffset: 0 })
+                this.props.dissolveGroupAsync({ groupId: groupId, groupName: groupName })
+                history.push('/group' + search)
+                break
+            case '6':
+                const { login } = this.props
+                const username = _.get(login, 'username')
+                this.props.quitGroupAsync(this.props.room.groupId, username)
+                break
+            default:
+                break
         }
     }
 
@@ -138,10 +143,7 @@ class GroupInfo extends React.Component {
 
     renderGroupOperationMenu = () => {
         const { login, groupMember, room } = this.props
-
-        let groupId = room.groupId
-        this.props.newGetGroupInfoAsync(groupId)
-        const user = _.get(groupMember, [ room.groupId, 'byName', _.get(login, 'username').toLowerCase() ], {
+        const user = _.get(groupMember, [room.groupId, 'byName', _.get(login, 'username').toLowerCase()], {
             name: null,
             affiliation: null
         })
@@ -262,7 +264,7 @@ class GroupInfo extends React.Component {
                     {this.props.room.groupName}
                 </p>
                 {/* <h3>Group Description</h3>
-                <p className='gray fs-117em'>{this.props.room.description}</p> */}
+            <p className='gray fs-117em'>{this.props.room.description}</p> */}
 
                 <GroupInfoForm
                     ref={this.saveFormRef}
