@@ -66,3 +66,15 @@ export default {
         return false
     }
 }
+
+/**
+ * 取值函数，避免出现undefined后再点出现的error
+ * object 数据源
+ * path 取值的path
+ * defaultValue 默认值
+ * */
+export const deepGet = (object, path, defaultValue) => {
+    const res = (!Array.isArray(path) ? path.replace(/\[/g, '.').replace(/]/g, '').split('.') : path)
+        .reduce((o, k) => (o || {})[k], object)
+    return (res !== undefined && res !== null) ? res : defaultValue
+}
