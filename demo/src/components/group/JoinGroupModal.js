@@ -125,8 +125,6 @@ class JoinGroupModal extends React.Component {
 
     // TOOD 不符合react数据流思想
     showDetail = gid => {
-        console.log('111111')
-        
         this.setState({
             bodyLoading: true
         })
@@ -156,7 +154,13 @@ class JoinGroupModal extends React.Component {
                 })
             }.bind(this),
             error: function(e) {
-                if (e.type == 17) message.error(`${I18n.t('group')}${I18n.t('ID')}${I18n.t('notExist')}`)
+                let errorData = JSON.parse(e.data)
+                if (e.type === 17) {
+                    if (errorData.error === 'group_authorization') {
+                        return message.error('该群为私有群')
+                    }
+                    return message.error(`${I18n.t('group')}${I18n.t('ID')}${I18n.t('notExist')}`)
+                }
                 this.setState({
                     bodyLoading: false
                 })
@@ -200,7 +204,7 @@ class JoinGroupModal extends React.Component {
                         onScroll={this.onScroll}
                         ref="groupList"
                     >
-       
+
                         <ul
                             className={
                                 this.state.groupDetail
@@ -210,7 +214,7 @@ class JoinGroupModal extends React.Component {
                         >
                             {groups}
                         </ul>
-                
+
                     </div>
                     <div
                         className={!this.state.groupDetail ? 'hide' : ''}
