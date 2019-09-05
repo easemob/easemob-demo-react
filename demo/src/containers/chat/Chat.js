@@ -305,12 +305,19 @@ class Chat extends React.Component {
     callVideo = () => {
         const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
         const { confrModal, avModal } = this.props
+        const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))
+        const recMerge = videoSetting&&videoSetting.recMerge || false
+        const rec = videoSetting&&videoSetting.rec || false
         if (selectTab === "contact") {
             this.setState({
                 showWebRTC: true
             })
             WebIM.call.caller = WebIM.conn.context.userId
-            WebIM.call.makeVideoCall(selectItem)
+            WebIM.call.makeVideoCall(selectItem, null, rec, recMerge)
+            setTimeout(()=>{
+                var confrId = WebIM.call.getServerRecordId()
+            },1000)
+            
         } else if (selectTab === "group") {
             // Create Confrence
             if (avModal) {
@@ -323,7 +330,7 @@ class Chat extends React.Component {
             }
             this.props.showConfrModal()
             const pwd = Math.random().toString(36).substr(2)
-            this.props.updateConfrInfo(selectItem)
+            this.props.updateConfrInfo(selectItem, rec, recMerge)
         }
     }
 
@@ -336,11 +343,14 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = _.get(this.props, [ "match", "params" ], {})
         console.log("sendWrapper::callVoice", WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
 
+        const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))
+        const recMerge = videoSetting&&videoSetting.recMerge || false
+        const rec = videoSetting&&videoSetting.rec || false
         this.setState({
             showWebRTC: true
         })
         WebIM.call.caller = WebIM.conn.context.userId
-        WebIM.call.makeVoiceCall(selectItem)
+        WebIM.call.makeVoiceCall(selectItem, null, rec, recMerge)
     }
 
     handleScroll = (e) => {
@@ -554,7 +564,7 @@ export default connect(
         deleteStranger: id => dispatch(StrangerActions.deleteStranger(id)),
         doAddBlacklist: id => dispatch(BlacklistActions.doAddBlacklist(id)),
         fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),
-        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid)),
+        updateConfrInfo: (gid, rec, recMerge) => dispatch(MultiAVActions.updateConfrInfoAsync(gid, rec, recMerge)),
         showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
         closeConfrModal: (gid) => dispatch(MultiAVActions.closeConfrModal())
     })

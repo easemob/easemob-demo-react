@@ -19,13 +19,14 @@ import BlacklistModal from '@/components/blacklist/BlacklistModal'
 import JoinGroupModal from '@/components/group/JoinGroupModal'
 import GroupRequestModal from '@/components/group/GroupRequestModal'
 import GroupInviteModal from '@/components/group/GroupInviteModal'
+import VideoSetting from '@/components/videoSetting/videoSettingModal'
 
 class HeaderOps extends Component {
     constructor(props) {
         super()
 
         this.state = {
-            modal: ''
+            modal: '',
         }
 
         // showAddFriendsModal: false,
@@ -53,6 +54,10 @@ class HeaderOps extends Component {
         case '1':
             this.handleLogout()
             break
+        case '2':
+            this.setState({
+                modal: "showVideoSettingModal"
+            })
         }
     }
 
@@ -89,6 +94,7 @@ class HeaderOps extends Component {
         const { modal } = this.state
 
         const tabsLeft = [
+            [ '2', `音视频会议设置`, 'video-camera'],
             [ '0', `${I18n.t('friends')}${I18n.t('blacklist')}`, 'minus-circle-o' ],
             [ '1', `${I18n.t('quit')}(${title})`, 'logout' ]
         ]
@@ -220,6 +226,15 @@ class HeaderOps extends Component {
                         title={I18n.t('groupInvite')}
                         visible={showGroupInviteModal}
                         component={GroupInviteModal}
+                        onModalClose={this.handleModalClose}
+                    />
+                }
+                {
+                    <ModalComponent
+                        width={460}
+                        title="发起音视频会议设置"
+                        visible={modal === 'showVideoSettingModal'}
+                        component={VideoSetting}
                         onModalClose={this.handleModalClose}
                     />
                 }
