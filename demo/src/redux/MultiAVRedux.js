@@ -24,12 +24,14 @@ const { Types, Creators } = createActions({
     resetAll: null,
 
     /* ------async------ */
-    updateConfrInfoAsync: (gid) => {
+    // 发起群会议
+    updateConfrInfoAsync: (gid, rec, recMerge) => {
         return (dispatch, getState) => {
             dispatch(Creators.setGid(gid))
             var pwd = Math.random().toString(36).substr(2)
             pwd = '';
-            emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd).then(function (confr) {
+            emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd, rec, recMerge).then(function (confr) {
+                //console.log("%c会议的信息", "color: red", confr) 可以在这里拿到会议id confrId 来查服务端录制 
                 dispatch(Creators.updateConfrInfo(confr))
             })
         }
@@ -86,7 +88,6 @@ export const updateConfrInfo = (state, { confr }) => {
 }
 
 export const showConfrModal = (state) => {
-    console.log('SSSSSSSSSSSSSSSSss......')
     return state.setIn([ 'confrModal' ], true)
 }
 
