@@ -39,6 +39,22 @@ class WebRTCModal extends React.Component {
         WebIM.call = new WebIM.WebRTC.Call({
             connection: WebIM.conn,
 
+            // 自定义分辨率 采样率
+            // mediaStreamConstaints: {
+            //     audio: {
+            //         sampleRate: 44100,
+            //         sampleSize: 16
+            //     },
+            //     video: {
+            //         width: {
+            //             exact: 1280
+            //         },
+            //         height: {
+            //             exact: 720
+            //         }
+            //     }
+            // },
+
             mediaStreamConstaints: {
                 audio: true,
                 video: true
