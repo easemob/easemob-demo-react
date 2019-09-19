@@ -108,12 +108,12 @@ class Chat extends React.Component {
         let file = WebIM.utils.getFileUrl(e.target)
 
         if (!file.filename) {
-            this.image.value = null
+            this.file.value = null
             return false
         }
 
         this.props.sendFileMessage(chatType[selectTab], selectItem, { isRoom }, file, () => {
-            this.image.value = null
+            this.file.value = null
         })
     }
 
@@ -553,8 +553,8 @@ export default connect(
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id)),
-        sendImgMessage: (chatType, id, message, source) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source)),
-        sendFileMessage: (chatType, id, message, source) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source)),
+        sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
+        sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),
         listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
         getMutedAsync: groupId => dispatch(GroupMemberActions.getMutedAsync(groupId)),
