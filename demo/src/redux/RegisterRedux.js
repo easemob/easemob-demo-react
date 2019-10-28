@@ -29,9 +29,17 @@ const { Types, Creators } = createActions({
                 success: function(){
                     dispatch(Creators.registerSuccess(username))
                 },
-                error:()=>{
-                    let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
-                    message.error(I18N.registrationFailed, 1)
+
+                error: (err) => {
+                    if (JSON.parse(err.data).error === 'duplicate_unique_property_exists') {
+                        message.error('用户已存在！')
+                    } else if (JSON.parse(err.data).error === 'illegal_argument') {
+                        message.error('用户名不合法！')
+                    } else if (JSON.parse(err.data).error === 'unauthorized') {
+                        message.error('注册失败，无权限！')
+                    } else if (JSON.parse(err.data).error === 'resource_limited') {
+                        message.error('您的App用户注册数量已达上限,请升级至企业版！')
+                    }
                 }
             }
             dispatch(Creators.registerRequest(username, password, nickname))
