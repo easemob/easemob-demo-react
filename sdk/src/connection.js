@@ -1128,18 +1128,8 @@ connection.prototype.getHttpDNS = function (options, type) {
     var self = this;
     var suc = function (data, xhr) {
         data = new DOMParser().parseFromString(data, "text/xml").documentElement;
-        //get rest ips
-        var restHosts = self.getHostsByTag(data, 'rest');
-        if (!restHosts) {
-            console.log('rest hosts error3');
-            return;
-        }
-        self.restHosts = restHosts;
-        self.restTotal = restHosts.length;
-
-        //get xmpp ips
         var makeArray = function(obj){    //伪数组转为数组
-          return Array.prototype.slice.call(obj,0); 
+        return Array.prototype.slice.call(obj,0); 
         } 
         try{ 
             Array.prototype.slice.call(document.documentElement.childNodes, 0)[0].nodeType; 
@@ -1147,11 +1137,30 @@ connection.prototype.getHttpDNS = function (options, type) {
             makeArray = function(obj){ 
                 var res = []; 
                 for(var i=0,len=obj.length; i<len; i++){
-                   res.push(obj[i]); 
+                    res.push(obj[i]); 
                 } 
-              return res; 
-          } 
+                return res; 
+            } 
         } 
+        //get rest ips
+        var restHosts = self.getHostsByTag(data, 'rest');
+        if (!restHosts) {
+            console.log('rest hosts error3');
+            return;
+        }
+        for(var i = 0; i< restHosts.length; i++){
+            var httpType = self.https ? 'https' : 'http';
+            if(_utils.getXmlFirstChild(restHosts[i], 'protocol').textContent === httpType ){
+                var currentPost = restHosts[i];
+                restHosts.splice(i,1);
+                restHosts.unshift(currentPost);
+            }
+        }
+        self.restHosts = restHosts;
+        self.restTotal = restHosts.length;
+
+        //get xmpp ips
+        
         var xmppHosts = makeArray(self.getHostsByTag(data, 'xmpp'));
         if (!xmppHosts) {
             console.log('xmpp hosts error3');
