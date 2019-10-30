@@ -1,5 +1,5 @@
 /* eslint-disable */
-import "script-loader!easemob-websdk/dist/strophe-1.2.8.min.js"
+import "script-loader!easemob-websdk/dist/strophe-1.2.8-g.js"
 /* eslint-enable */
 import webrtc from "easemob-webrtc"
 import websdk from "easemob-websdk"

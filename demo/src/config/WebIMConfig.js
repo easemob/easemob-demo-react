@@ -23,8 +23,8 @@ function getUrl(){
         xmppUrl = "im-api-hsb.easemob.com"
     }
     return {
-        apiUrl: apiUrl,
-        xmppUrl: xmppUrl
+        apiUrl: (location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+        xmppUrl: "im-api.easemob.com"
     }
 }
 
