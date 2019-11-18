@@ -283,8 +283,7 @@ const { Types, Creators } = createActions({
             dispatch(Creators.addMessage(pMessage, type))
         }
     },
-    sendFileMessage: (chatType, chatId, message = {}, source = {}, callback = () => {
-    }) => {
+    sendFileMessage: (chatType, chatId, message = {}, source = {}, callback = () => {}) => {
         return (dispatch, getState) => {
             let pMessage = null
             const id = WebIM.conn.getUniqueId()
@@ -342,6 +341,46 @@ const { Types, Creators } = createActions({
             pMessage.body.url = source.url
             pMessage.body.file_length = source.data.size
             dispatch(Creators.addMessage(pMessage, type))
+        }
+    },
+    sendRecorder:(obj) =>{
+        return (dispatch) =>{
+            let pMessage = null
+            let bodyType = 'audio'
+            const { chatId, chatType, file } = obj
+            const id = WebIM.conn.getUniqueId()
+            const msgObj = new WebIM.message('audio', id)
+            let isRoom = chatType === 'chatroom' || chatType === 'groupchat'
+            msgObj.set({
+                apiUrl: WebIM.config.apiURL,
+                file: file,
+                to: chatId,
+                type: 'audio',
+                roomType: isRoom,
+
+                onFileUploadError: function(error){
+                    console.log('语音上传失败', error)
+                },
+                onFileUploadComplete: function(data){
+                    console.log('上传成功', data)
+                    let url = data.uri + '/' + data.entities[0].uuid
+                    pMessage.body.url = url
+                    pMessage.body.status = 'sent'
+                    dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
+                },
+                success: function(data){
+                    console.log('语音发送成功', data)
+                },
+                flashUpload: WebIM.flashUpload
+            })
+            if(chatType === 'group' || chatType === 'chatroom'){
+                msgObj.setGroup('groupchat')
+            }
+            WebIM.conn.send(msgObj.body)
+            pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'audio')
+            pMessage.id = id
+            pMessage.body.url = file.url
+            dispatch(Creators.addMessage(pMessage, bodyType))
         }
     },
     addAudioMessage: (message, bodyType) => {
@@ -532,7 +571,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     }
 
     state = state.setIn([ 'byId', id ], { type, chatId })
-
+    
     return state
 }
 

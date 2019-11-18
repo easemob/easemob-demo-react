@@ -42,10 +42,10 @@ class GroupInviteModal extends React.Component {
 
     render() {
         console.log('this.props.groupRequests', this.props.groupRequests)
+        // 过滤一下groupRequests的id，防止相同的进群邀请
         const requests = []
         _.forEach(this.props.groupRequests, val => {
             _.forEach(val, ({ from, status, toNick, reason, gid }) => {
-
                 requests.push(
                     <Row key={from}>
                         <Col span={14}>

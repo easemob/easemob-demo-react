@@ -89,75 +89,51 @@ export default class ChatMessage extends Component {
             </Menu>
         )
         switch (body.type) {
-            case 'txt':
-                content = bySelf ? (
-                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                        <p className="x-message-text" >
-                            {this.renderTxt(body.msg || body.url)}
-                        </p>
-                    </Dropdown>
-                ) : (
+        case 'txt':
+            content = bySelf ? (
+                <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <p className="x-message-text" >
-                        {this.renderTxt(body.msg)}
+                        {this.renderTxt(body.msg || body.url)}
                     </p>
-                )
-                break
-            case 'img':
-                content = bySelf ? (
-                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                        <div className="x-message-img">
-                            <img
-                                src={body.url}
-                                width="100%"
-                                style={{ verticalAlign: 'middle' }}
-                            />
-                        </div>
-                    </Dropdown>
-                ) : (
+                </Dropdown>
+            ) : (
+                <p className="x-message-text" >
+                    {this.renderTxt(body.msg)}
+                </p>
+            )
+            break
+        case 'img':
+            content = bySelf ? (
+                <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-img">
                         <img
-                            onDoubleClick={this.imgClick}
                             src={body.url}
                             width="100%"
                             style={{ verticalAlign: 'middle' }}
                         />
                     </div>
+                </Dropdown>
+            ) : (
+                <div className="x-message-img">
+                    <img
+                        onDoubleClick={this.imgClick}
+                        src={body.url}
+                        width="100%"
+                        style={{ verticalAlign: 'middle' }}
+                    />
+                </div>
+            )
+            break
+        case 'file':
+            const readablizeBytes = bytes => {
+                let s = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB' ]
+                var e = Math.floor(Math.log(bytes) / Math.log(1024))
+                return (
+                    (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + ' ' + s[e]
                 )
-                break
-            case 'file':
-                const readablizeBytes = bytes => {
-                    let s = [ 'Bytes', 'KB', 'MB', 'GB', 'TB', 'PB' ]
-                    var e = Math.floor(Math.log(bytes) / Math.log(1024))
-                    return (
-                        (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + ' ' + s[e]
-                    )
-                }
-                content = bySelf ? (
-                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                        <Card
-                            title={I18n.t('file')}
-                            style={{ width: 240, margin: '2px 2px 2px 0' }}
-                        >
-                            <div className="x-message-file">
-                                <h3 title={body.filename}>
-                                    {body.filename}
-                                </h3>
-                                <div className="ant-row">
-                                    <div className="ant-col-12">
-                                        <p>
-                                            {readablizeBytes(body.file_length)}
-                                        </p>
-                                    </div>
-                                    <div className="ant-col-12">
-                                        <a href={body.url} download={body.filename}>
-                                            {I18n.t('download')}
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    </Dropdown>
-                ) : (
+            }
+            content = bySelf ? (
+                <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <Card
                         title={I18n.t('file')}
                         style={{ width: 240, margin: '2px 2px 2px 0' }}
@@ -180,52 +156,76 @@ export default class ChatMessage extends Component {
                             </div>
                         </div>
                     </Card>
-                )
-                break
-            case 'video':
-                content = bySelf ? (
-                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                        <div className="x-message-video">
-                            <video src={body.url} width="100%" controls />
+                </Dropdown>
+            ) : (
+                <Card
+                    title={I18n.t('file')}
+                    style={{ width: 240, margin: '2px 2px 2px 0' }}
+                >
+                    <div className="x-message-file">
+                        <h3 title={body.filename}>
+                            {body.filename}
+                        </h3>
+                        <div className="ant-row">
+                            <div className="ant-col-12">
+                                <p>
+                                    {readablizeBytes(body.file_length)}
+                                </p>
+                            </div>
+                            <div className="ant-col-12">
+                                <a href={body.url} download={body.filename}>
+                                    {I18n.t('download')}
+                                </a>
+                            </div>
                         </div>
-                    </Dropdown>
-                ) : (
+                    </div>
+                </Card>
+            )
+            break
+        case 'video':
+            content = bySelf ? (
+                <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-video">
                         <video src={body.url} width="100%" controls />
                     </div>
-                )
-                break
-            case 'audio':
-                content = bySelf ? (
-                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                        <div className="x-message-audio">
-                            <Audio url={body.url} length={body.length} />
-                        </div>
-                    </Dropdown>
-                ) : (
+                </Dropdown>
+            ) : (
+                <div className="x-message-video">
+                    <video src={body.url} width="100%" controls />
+                </div>
+            )
+            break
+        case 'audio':
+            content = bySelf ? (
+                <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-audio">
                         <Audio url={body.url} length={body.length} />
                     </div>
-                )
-                break
-            default:
-                break
+                </Dropdown>
+            ) : (
+                <div className="x-message-audio">
+                    <Audio url={body.url} length={body.length} />
+                </div>
+            )
+            break
+        default:
+            break
         }
 
         let statusTag
         switch (status) {
-            case 'sent':
-                statusTag = <Tag color="#f39c12">{I18n.t('unread')}</Tag>
-                break
-            case 'muted':
-                statusTag = <Tag color="#f50">{I18n.t('muted')}</Tag>
-                break
-            case 'fail':
-                statusTag = <Tag color="#f50">{I18n.t('sentFailed')}</Tag>
-                break
-            default:
-                statusTag = ''
-                break
+        case 'sent':
+            statusTag = <Tag color="#f39c12">{I18n.t('unread')}</Tag>
+            break
+        case 'muted':
+            statusTag = <Tag color="#f50">{I18n.t('muted')}</Tag>
+            break
+        case 'fail':
+            statusTag = <Tag color="#f50">{I18n.t('sentFailed')}</Tag>
+            break
+        default:
+            statusTag = ''
+            break
         }
 
         return <div className={cls}>
@@ -250,6 +250,7 @@ export default class ChatMessage extends Component {
                 onCancel={this.handleCancel}
                 footer={null}
                 width={'800'}
+                bodyStyle={{ textAlign:'center' }}
             >
                 <img
                     src={body.url}
