@@ -353,7 +353,7 @@ var CryptoJS = require('crypto-js');
                 me.msg.body = {
                     type: me.msg.type || 'file'
                     ,
-                    url: ((location.protocol != 'https:' && conn.isHttpDNS) ? (conn.apiUrl + data.uri.substr(data.uri.indexOf("/", 9))) : data.uri) + '/' + data.entities[0]['uuid']
+                    url: ((conn.isHttpDNS) ? (conn.apiUrl + data.uri.substr(data.uri.indexOf("/", 9))) : data.uri) + '/' + data.entities[0]['uuid']
                     , secret: data.entities[0]['share-secret']
                     , filename: me.msg.file.filename || me.msg.filename
                     , size: {

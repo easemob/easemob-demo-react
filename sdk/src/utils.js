@@ -464,7 +464,7 @@
             }
 
             var apiUrl = options.apiUrl;
-            if(location.protocol != 'https:' && this.isHttpDNS){
+            if(this.isHttpDNS){
                 apiUrl = this.apiUrl
             }
             var uploadUrl = apiUrl + '/' + orgName + '/' + appName + '/chatfiles';

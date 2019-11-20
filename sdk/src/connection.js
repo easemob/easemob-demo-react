@@ -814,7 +814,7 @@ var connection = function (options) {
  */
 
 connection.prototype.registerUser = function (options) {
-    if (location.protocol != 'https:' && this.isHttpDNS) {
+    if (this.isHttpDNS) {
         this.dnsIndex = 0;
         this.getHttpDNS(options, 'signup');
     } else {
@@ -1034,7 +1034,7 @@ connection.prototype.cacheReceiptsMessage = function (options) {
  */
 
 connection.prototype.getStrophe = function () {
-    if (location.protocol != 'https:' && this.isHttpDNS) {
+    if (this.isHttpDNS) {
         //TODO: try this.xmppTotal times on fail
         var url = '';
         var host = this.xmppHosts[this.xmppIndex];
@@ -1229,7 +1229,7 @@ connection.prototype.signup = function (options) {
     }
 
     var error = function (res, xhr, msg) {
-        if (location.protocol != 'https:' && self.isHttpDNS) {
+        if (self.isHttpDNS) {
             if ((self.restIndex + 1) < self.restTotal) {
                 self.restIndex++;
                 self.getRestFromHttpDNS(options, 'signup');
@@ -1287,7 +1287,7 @@ connection.prototype.open = function (options) {
     if (options.xmppURL) {
         this.url = _getXmppUrl(options.xmppURL, this.https);
     }
-    if (location.protocol != 'https:' && this.isHttpDNS) {
+    if (this.isHttpDNS) {
         this.dnsIndex = 0;
         this.getHttpDNS(options, 'login');
     } else {
@@ -1337,7 +1337,7 @@ connection.prototype.login = function (options) {
         var error = function (res, xhr, msg) {
             if (options.error)
                 options.error();
-            if (location.protocol != 'https:' && conn.isHttpDNS) {
+            if (conn.isHttpDNS) {
                 if ((conn.restIndex + 1) < conn.restTotal) {
                     conn.restIndex++;
                     conn.getRestFromHttpDNS(options, 'login');
@@ -1924,7 +1924,7 @@ connection.prototype.handleMessage = function (msginfo) {
                         , from: from
                         , to: too
                         ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+                        url: (self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
                         , secret: msgBody.secret
                         , filename: msgBody.filename
                         , thumb: msgBody.thumb
@@ -1950,7 +1950,7 @@ connection.prototype.handleMessage = function (msginfo) {
                         , from: from
                         , to: too
                         ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+                        url: (self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
                         , secret: msgBody.secret
                         , filename: msgBody.filename
                         , length: msgBody.length || ''
@@ -1973,7 +1973,7 @@ connection.prototype.handleMessage = function (msginfo) {
                         , from: from
                         , to: too
                         ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+                        url: (self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
                         , secret: msgBody.secret
                         , filename: msgBody.filename
                         , file_length: msgBody.file_length
@@ -2012,7 +2012,7 @@ connection.prototype.handleMessage = function (msginfo) {
                         , from: from
                         , to: too
                         ,
-                        url: (location.protocol != 'https:' && self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
+                        url: (self.isHttpDNS) ? (self.apiUrl + msgBody.url.substr(msgBody.url.indexOf("/", 9))) : msgBody.url
                         , secret: msgBody.secret
                         , filename: msgBody.filename
                         , file_length: msgBody.file_length
