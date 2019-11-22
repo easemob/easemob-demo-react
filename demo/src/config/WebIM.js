@@ -3,7 +3,6 @@
 /* eslint-enable */
 import websdk from 'easemob-websdk'
 import webrtc from 'easemob-webrtc'
-import emedia from 'easemob-emedia'
 import config from 'WebIMConfig'
 import emoji from './emoji'
 import Api from 'axios'
@@ -36,7 +35,7 @@ WebIM.conn = new websdk.connection({
     appKey: WebIM.config.appkey
 })
 
-// for downward compatibility 
+// for downward compatibility
 if (!WebIM.conn.apiUrl) {
     WebIM.conn.apiUrl = WebIM.config.apiURL
 }
@@ -79,8 +78,12 @@ api.interceptors.response.use(
     }
 )
 
+emedia.config({
+    forceUseVideoCodecs:["VP8", "H264"]
+});
+
 WebIM.api = api
 WebIM.emoji = emoji
 WebIM.WebRTC = webrtc
-WebIM.EMedia = emedia
+WebIM.EMedia = emedia || webrtc.emedia
 export default WebIM
