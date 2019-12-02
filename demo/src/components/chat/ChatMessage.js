@@ -198,7 +198,7 @@ export default class ChatMessage extends Component {
         case 'audio':
             content = bySelf ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                    <div className="x-message-audio">
+                    <div className="x-message-audio" style={bySelf&&{display:'inline-block'}}>
                         <Audio url={body.url} length={body.length} />
                     </div>
                 </Dropdown>

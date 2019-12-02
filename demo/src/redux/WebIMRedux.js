@@ -278,9 +278,8 @@ WebIM.conn.listen({
             message.type = 'stranger'
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,'txt'))            
         }
-        store.dispatch(MessageActions.addMessage(message, 'txt'))        
-        store.dispatch(MessageActions.sendRead(message))   
-
+        store.dispatch(MessageActions.addMessage(message, 'txt'))     
+        type === 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))
@@ -314,10 +313,10 @@ WebIM.conn.listen({
         }
     },
     onPictureMessage: message => {
+        const { type, from, to } = message
         console.log('onPictureMessage', message)
         store.dispatch(MessageActions.addMessage(message, 'img'))
-        store.dispatch(MessageActions.sendRead(message))
-        const { type, from, to } = message
+        type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))
@@ -333,9 +332,9 @@ WebIM.conn.listen({
         }
     },
     onFileMessage: message => {
-        store.dispatch(MessageActions.addMessage(message, 'file'))
-        store.dispatch(MessageActions.sendRead(message))
         const { type, from, to } = message
+        store.dispatch(MessageActions.addMessage(message, 'file'))
+        type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))
@@ -351,9 +350,10 @@ WebIM.conn.listen({
         }
     },
     onAudioMessage: message => {
-        store.dispatch(MessageActions.addAudioMessage(message, 'audio'))
-        store.dispatch(MessageActions.sendRead(message))
         const { type, from, to } = message
+        store.dispatch(MessageActions.addAudioMessage(message, 'audio'))
+        type === 'chat' && store.dispatch(MessageActions.sendRead(message))
+
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))
@@ -369,9 +369,9 @@ WebIM.conn.listen({
         }
     },
     onVideoMessage: message => {
-        store.dispatch(MessageActions.addMessage(message, 'video'))
-        store.dispatch(MessageActions.sendRead(message))
         const { type, from, to } = message
+        store.dispatch(MessageActions.addMessage(message, 'video'))
+        type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))
