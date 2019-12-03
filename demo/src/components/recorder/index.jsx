@@ -150,7 +150,7 @@ export default class RecordAudio extends Component {
     render() {
         const { recoderVisible } = this.state
         return (
-            <div style={{ display: 'inline-block' }}>
+            <div className="recorderWraper">
                 <Modal
                     width={300}
                     title={null}
