@@ -85,5 +85,5 @@ emedia.config({
 WebIM.api = api
 WebIM.emoji = emoji
 WebIM.WebRTC = webrtc
-WebIM.EMedia = emedia || webrtc.emedia
+WebIM.EMedia = webrtc.emedia
 export default WebIM
