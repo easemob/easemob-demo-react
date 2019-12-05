@@ -9,7 +9,7 @@ packing(){
     echo -e "\nINSTALL DONE.\n"
 
     cd ./demo
-    TRAVIS=true TAG_NAME=$TRAVIS_TAG sudo npm run build
+    TRAVIS=true TAG_NAME=$TRAVIS_TAG npm run build
     cd ../
     echo -e "\nBUILD DONE.\n"
     sed -i "s/{#version}/${TRAVIS_TAG}/g"  ./demo/build/index.html
