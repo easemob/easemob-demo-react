@@ -231,8 +231,17 @@ WebIM.conn.listen({
             return
         }
         if (error.type == 1) {
-            let data = error.data ? error.data.data : ''
-            data && message.error(data)
+            let data = error.data ? JSON.parse(error.data.data) : ''
+            // data && message.error(data)
+            if (data) {
+                if (data.error_description == "user not found") {
+                    message.error("用户名不存在！")
+                } else if (data.error_description == "invalid password") {
+                    message.error('密码无效！')
+                } else if (data.error_description == "user not activated") {
+                    message.error("用户已被封禁！")
+                }
+            }
             store.dispatch(LoginActions.loginFailure(error))
         }
     },
