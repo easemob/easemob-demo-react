@@ -511,7 +511,7 @@ class Chat extends React.Component {
                         </label>
                         {/* webrtc video && audio && 发送音频 */}
                         {webrtcButtons}
-                        {WebIM.config.isWebRTC && <RecordAudio match={match}/>}
+                        {WebIM.config.isWebRTC && selectTab === 'contact' && <RecordAudio match={match}/>}
                         {/* clear */}
                         <label htmlFor="clearMessage" className="x-chat-ops-icon ib" onClick={this.onClearMessage}>
                             <i className="icon iconfont icon-trash"></i>
