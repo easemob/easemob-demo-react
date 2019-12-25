@@ -260,7 +260,8 @@ const { Types, Creators } = createActions({
                     let url = data.uri + '/' + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = 'sent'
-                    dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
+                    dispatch(Creators.addMessage(pMessage, type))
+                    //dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                     callback()
                 },
                 success: function (id) {
@@ -279,8 +280,10 @@ const { Types, Creators } = createActions({
             pMessage.id = id
             // url at local only
             pMessage.body.url = source.url
+
+            // console.log('存储图片', source.url)
             // console.log('pMessage', pMessage, pMessage.body.uri)
-            dispatch(Creators.addMessage(pMessage, type))
+            //dispatch(Creators.addMessage(pMessage, type))
         }
     },
     sendFileMessage: (chatType, chatId, message = {}, source = {}, callback = () => {}) => {
