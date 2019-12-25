@@ -152,22 +152,22 @@ class GroupInfo extends React.Component {
         if (isAdmin) {
             return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
-                    <Tooltip title={I18n.t('inviteToGroup')} placement="left">
+                    <Tooltip placement="left">
                         <i className="iconfont icon-users" /> {I18n.t('inviteToGroup')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="3">
-                    <Tooltip title={I18n.t('modifyGroupInfo')} placement="left">
+                    <Tooltip placement="left">
                         <i className="iconfont icon-pencil" /> {I18n.t('modifyGroupInfo')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="4">
-                    <Tooltip title={I18n.t('groupBlacklist')} placement="left">
+                    <Tooltip placement="left">
                         <Icon type="frown" /> {I18n.t('groupBlacklist')}
                     </Tooltip>
                 </Menu.Item>
                 <Menu.Item key="5">
-                    <Tooltip title={I18n.t('dissovleGroup')} placement="left">
+                    <Tooltip placement="left">
                         <Icon type="poweroff" /> {I18n.t('dissovleGroup')}
                     </Tooltip>
                 </Menu.Item>
@@ -183,7 +183,7 @@ class GroupInfo extends React.Component {
         } else {
             return <Menu onClick={this.handleMenuClick}>
                 <Menu.Item key="2">
-                    <Tooltip title={I18n.t('inviteToGroup')} placement="left">
+                    <Tooltip placement="left">
                         <i className="iconfont icon-users" /> {I18n.t('inviteToGroup')}
                     </Tooltip>
                 </Menu.Item>
