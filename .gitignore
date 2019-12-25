@@ -3,6 +3,7 @@ node_modules
 /.project
 .idea/*
 *.swp
+demo/build/*
 *.map
 *.vscode
 publish/*

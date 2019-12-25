@@ -78,9 +78,9 @@ api.interceptors.response.use(
     }
 )
 
-emedia.config({
-    forceUseVideoCodecs:["VP8", "H264"]
-});
+// emedia.config({
+//     forceUseVideoCodecs:["VP8", "H264"]
+// });
 
 WebIM.api = api
 WebIM.emoji = emoji
