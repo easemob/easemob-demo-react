@@ -350,7 +350,7 @@ const { Types, Creators } = createActions({
             const { chatId, chatType, file } = obj
             const id = WebIM.conn.getUniqueId()
             const msgObj = new WebIM.message('audio', id)
-            let isRoom = chatType === 'chatroom' || chatType === 'groupchat'
+            let isRoom = chatType === 'chatroom'
             msgObj.set({
                 apiUrl: WebIM.config.apiURL,
                 file: file,
@@ -373,7 +373,7 @@ const { Types, Creators } = createActions({
                 },
                 flashUpload: WebIM.flashUpload
             })
-            if(chatType === 'group' || chatType === 'chatroom'){
+            if(chatType === 'groupchat' || chatType === 'chatroom'){
                 msgObj.setGroup('groupchat')
             }
             WebIM.conn.send(msgObj.body)
