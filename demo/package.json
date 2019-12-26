@@ -37,7 +37,7 @@
     "deepcopy": "^0.6.3",
     "dexie": "^2.0.0-rc.1",
     "dotenv": "4.0.0",
-    "easemob-webrtc": "^3.0.8-beta2",
+    "easemob-webrtc": "^3.0.8-beta4",
     "easemob-websdk": "^3.0.7-beta2",
     "eruda": "^1.2.5",
     "eslint-config-react-app": "^2.0.0",
