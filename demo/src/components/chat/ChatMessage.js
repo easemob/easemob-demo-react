@@ -233,7 +233,9 @@ export default class ChatMessage extends Component {
                 {from}
             </div>
             <div className="x-message-content">
-                {bySelf && this.props.type === 'chat' ? statusTag : ''} {content}
+                {/* 已读、未读Tag */}
+                {/* {bySelf && this.props.type === 'chat' ? statusTag : ''}  */}
+                {content}
             </div>
             {bySelf
                 ? <div className="x-message-time">
