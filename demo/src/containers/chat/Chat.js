@@ -77,7 +77,6 @@ class Chat extends React.Component {
     }
 
     pictureChange(e) {
-        e.preventDefault()
         const { match } = this.props
         const { selectItem, selectTab } = match.params
         const isRoom = chatType[selectTab] == 'chatroom' || chatType[selectTab] == 'groupchat'
@@ -103,7 +102,6 @@ class Chat extends React.Component {
     }
 
     fileChange(e) {
-        e.preventDefault()
         const { match } = this.props
         const { selectItem, selectTab } = match.params
         const isRoom = chatType[selectTab] == 'chatroom' || chatType[selectTab] == 'groupchat'
@@ -487,7 +485,7 @@ class Chat extends React.Component {
                         <label
                             htmlFor="uploadImage"
                             className="x-chat-ops-icon ib"
-                            onClick={() => this.image && this.image.click()}>
+                            onClick={() => this.image && this.image.focus()&&this.image.click()}>
                             <i className="iconfont icon-picture" />
                             <input
                                 id="uploadImage"
@@ -501,7 +499,7 @@ class Chat extends React.Component {
                         <label
                             htmlFor="uploadFile"
                             className="x-chat-ops-icon ib"
-                            onClick={() => this.file && this.file.click()}>
+                            onClick={() => this.file && this.file.focus() &&this.file.click()}>
                             <i className="icon iconfont icon-file-empty" />
                             <input
                                 id="uploadFile"
