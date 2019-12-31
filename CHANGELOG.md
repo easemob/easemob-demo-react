@@ -1,4 +1,13 @@
 # 版本更新说明:
+## v3.0.17 @2019-12-31
+### Feature
+* [demo] 去掉依赖多人音视频sdk emedia 只因用webrtc
+* [demo] 以及imsdk 去掉默认恢复deliver 只有单聊并且配置里设置为true才发送
+* [demo] 加发送语音
+* [demo] 用户注册失败加提示
+* [demo] 修复不能重复发送相同图片文件
+* [demo] 以及 emedia 修复在http下demo打不开
+
 ## v3.0.5 @2019-08-22
 ### Feature
 * [demo] 修改移除好友的回调
