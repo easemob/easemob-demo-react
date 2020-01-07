@@ -28,7 +28,9 @@ function getUrl(){
     }
     return {
         apiUrl: apiUrl,
-        xmppUrl: xmppUrl
+        xmppUrl: xmppUrl,
+        sandBoxApiUrl: 'https://a1-hsb.easemob.com',
+        sandboxXmppUrl: 'https://im-api-v2-hsb.easemob.com/ws'
     }
 }
 

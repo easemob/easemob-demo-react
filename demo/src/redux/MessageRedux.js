@@ -283,7 +283,7 @@ const { Types, Creators } = createActions({
 
             // console.log('存储图片', source.url)
             // console.log('pMessage', pMessage, pMessage.body.uri)
-            //dispatch(Creators.addMessage(pMessage, type))
+            dispatch(Creators.addMessage(pMessage, type))
         }
     },
     sendFileMessage: (chatType, chatId, message = {}, source = {}, callback = () => {}) => {

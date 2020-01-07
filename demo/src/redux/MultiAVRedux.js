@@ -30,7 +30,10 @@ const { Types, Creators } = createActions({
             dispatch(Creators.setGid(gid))
             var pwd = Math.random().toString(36).substr(2)
             pwd = '';
-            emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd, rec, recMerge).then(function (confr) {
+            var suportMiniProgarm = true
+            //emedia.mgr.createConference() 原来的创建会议的接口 创建的会议不支持小程序
+            //emedia.mgr.createConfr() 在原接口的基础上增加了suportMiniProgarm参数，用来表示是否需要支持小程序
+            emedia.mgr.createConfr(emedia.mgr.ConfrType.COMMUNICATION_MIX, pwd, rec, recMerge, suportMiniProgarm).then(function (confr) {
                 //console.log("%c会议的信息", "color: red", confr) 可以在这里拿到会议id confrId 来查服务端录制 
                 dispatch(Creators.updateConfrInfo(confr))
             })
