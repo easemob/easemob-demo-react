@@ -338,6 +338,11 @@ class MultiAVModal extends React.Component {
         }
     }
 
+    shareDesktop() {
+        console.log("emedia",emedia);
+        
+    }
+
     render() {
         const time = this.loadTime(),
             gid = this.props.gid,
@@ -454,7 +459,7 @@ class MultiAVModal extends React.Component {
 
                         <Col span={4}>
                             <div className="tools"
-                                onClick={ ()=>alert('shared desktop')}
+                                onClick={() => this.shareDesktop()}
                             >
                                 <i className='icon webim webim-d'></i>
                             </div>
