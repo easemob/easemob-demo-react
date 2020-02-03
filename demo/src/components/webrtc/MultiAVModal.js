@@ -449,8 +449,18 @@ class MultiAVModal extends React.Component {
                         </Col>
                     </Row>
                     <Row>
+
+                        {/* shared desktop button */}
+
+                        <Col span={4}>
+                            <div className="tools"
+                                onClick={ ()=>alert('shared desktop')}
+                            >
+                                <i className='icon webim webim-d'></i>
+                            </div>
+                        </Col>
                         {/* add another member */}
-                        <Col span={4} offset={2}>
+                        <Col span={4}>
                             <div className="tools">
                                 <i className={'icon iconfont webim1-add-member ' + toolsColor[3]}
                                     onMouseOver={(e) => {
