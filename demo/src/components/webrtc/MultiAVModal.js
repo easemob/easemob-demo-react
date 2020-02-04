@@ -17,6 +17,12 @@ class MultiAVModal extends React.Component {
             hour: 0,
             minute: 0,
             second: 0,
+            lastLocalVideo: {
+                stream: "",
+                localStreamId: "",
+                openVideo: false,
+                openAudio: false,
+            },
             localVideo: {
                 stream: '',
                 localStreamId: '',
@@ -38,7 +44,7 @@ class MultiAVModal extends React.Component {
                 video: <div className="default"></div>
             }),
             rvCount: 0,
-            toolsColor: [ '', '', '','' ]
+            toolsColor: [ '', '', '','','']
         }
         this.closeModal = this.closeModal.bind(this)
         this.loadTime = this.loadTime.bind(this)
@@ -51,6 +57,10 @@ class MultiAVModal extends React.Component {
         WebIM.EMService.onRoleChanged = undefined
         WebIM.EMService.onStreamAdded = undefined
         WebIM.EMService.onStreamRemoved = undefined
+
+        clearInterval(this.state.interval)
+        this.props.closeModal()
+        this.props.resetConfr()
     }
 
     componentDidMount() {
@@ -130,51 +140,51 @@ class MultiAVModal extends React.Component {
         WebIM.EMService.onConferenceExit = function(reason, failed){
             reason = reason || 0
             switch (reason) {
-            case 0:
-                reason = '正常挂断'
-                break
-            case 1:
-                reason = '没响应'
-                break
-            case 2:
-                reason = '服务器拒绝'
-                break
-            case 3:
-                reason = '对方忙'
-                break
-            case 4:
-                reason = '失败,可能是网络或服务器拒绝'
-                if (failed === -9527) {
-                    reason = '失败,网络原因'
-                }
-                if (failed === -500) {
-                    reason = 'Ticket失效'
-                }
-                if (failed === -502) {
-                    reason = 'Ticket过期'
-                }
-                if (failed === -504) {
-                    reason = '链接已失效'
-                }
-                if (failed === -508) {
-                    reason = '会议无效'
-                }
-                break
-            case 5:
-                reason = '不支持'
-                break
-            case 10:
-                reason = '其他设备登录'
-                break
-            case 11:
-                reason = '会议关闭'
-                break
+                case 0:
+                    reason = "正常挂断"
+                    break
+                case 1:
+                    reason = "没响应"
+                    break
+                case 2:
+                    reason = "服务器拒绝"
+                    break
+                case 3:
+                    reason = "对方忙"
+                    break
+                case 4:
+                    reason = "失败,可能是网络或服务器拒绝"
+                    if (failed === -9527) {
+                        reason = "失败,网络原因"
+                    }
+                    if (failed === -500) {
+                        reason = "Ticket失效"
+                    }
+                    if (failed === -502) {
+                        reason = "Ticket过期"
+                    }
+                    if (failed === -504) {
+                        reason = "链接已失效"
+                    }
+                    if (failed === -508) {
+                        reason = "会议无效"
+                    }
+                    break
+                case 5:
+                    reason = "不支持"
+                    break
+                case 10:
+                    reason = "其他设备登录"
+                    break
+                case 11:
+                    reason = "会议关闭"
+                    break
             }
-            console.log('Hangup reason ' + (reason || 0))
+            console.log("Hangup reason " + (reason || 0))
         }
 
         WebIM.EMService.onMemberJoined = function(member){
-            message.success(member.name + ' 加入群聊.')
+            message.success(member.name + " 加入群聊.")
             me.props.setJoinedMembers(member)
         }
         WebIM.EMService.onMemberExited = function(member, reason){
@@ -182,7 +192,7 @@ class MultiAVModal extends React.Component {
 
             //用户主动挂断时，不提示退出群聊
             if( reason !== undefined){
-                message.warning(member.name + ' 退出群聊.')
+                message.warning(member.name + " 退出群聊.")
             }
             me.props.updateJoinedMembers(member)
         }
@@ -215,8 +225,8 @@ class MultiAVModal extends React.Component {
                         localVideo: lv
                     })
 
-                    console.warn(stream.id, 'voff:', this.getAttribute('voff'))
-                    console.warn(stream.id, 'aoff:', this.getAttribute('aoff'))
+                    console.warn(stream.id, "voff:", this.getAttribute("voff"))
+                    console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
                 })
                 emedia.mgr.streamBindVideo(stream, localVideo)
 
@@ -240,15 +250,15 @@ class MultiAVModal extends React.Component {
                     var index
                     // 从0～5看哪个位置空着，就往哪里添加
                     for (let i = 0; i < 5; i++) {
-			            if(rv[i].nickName == ''){
+                        if(rv[i].nickName == ""){
                             index = i
                             if(index || index == 0){
                                 break
                             }
                         }
-			        }
+                    }
                     rvCount++
-                    let video = me.refs['rv_' + index]
+                    let video = me.refs["rv_" + index]
                     const elem = {
                         nickName: nickName,
                         streamId: streamId,
@@ -260,6 +270,12 @@ class MultiAVModal extends React.Component {
                         rv: rv,
                         rvCount: rvCount
                     })
+
+                    if(stream.type !== 1){
+                        me.setState({
+                            lastrv: rv,
+                        })
+                    }
 
                     emedia.mgr.onMediaChanaged(video, function (constaints){
                         const elem = {
@@ -274,16 +290,62 @@ class MultiAVModal extends React.Component {
                             rvCount: me.state.rvCount
                         })
 
-                        console.warn(streamId, 'voff:', this.getAttribute('voff'))
-                        console.warn(streamId, 'aoff:', this.getAttribute('aoff'))
+                        console.warn(streamId, "voff:", this.getAttribute("voff"))
+                        console.warn(streamId, "aoff:", this.getAttribute("aoff"))
                     })
                     //emedia.mgr.streamBindVideo(stream, video);
                     emedia.mgr.subscribe(member, stream, true, true, video)
+                }else{
+                    let lastVideo = me.refs["rv_" + ifContain]
+                    const elem = {
+                        nickName: nickName,
+                        streamId: streamId,
+                        openVideo: true,
+                        video: rv[ifContain].video
+                    }
+                    rv[ifContain] = elem
+                    if(stream.type !== 1){
+                        me.setState({
+                            lastrv: rv,
+                        })
+                        emedia.mgr.subscribe(member, stream, true, true)
+                    }else{
+                        me.setState({
+                            rv: rv
+                        })
+                        emedia.mgr.subscribe(member, stream, true, true, lastVideo)
+                    }
                 }
             }
         }
         WebIM.EMService.onStreamRemoved = function(member, stream){
+            if(stream.type === 1){
+                let rv = me.state.rv;
+                let lastrv = me.state.lastrv;
 
+                const nickName = member.name,
+                    streamId = stream.id
+                const contains = (nickName, arr) => {
+                    for (let [ index, elem ] of arr.entries()) {
+                        if (elem.nickName === nickName) {
+                            return index
+                        }
+                    }
+                    return false
+                }
+
+                const ifContain = contains(nickName, rv)
+                let lastVideo = me.refs["rv_" + ifContain]
+                if (ifContain === false) {
+                    return;
+                }
+
+                rv[ifContain] = lastrv[ifContain];
+                me.setState({
+                    rv: rv
+                })
+                emedia.mgr.streamBindVideo(rv[ifContain].streamId, lastVideo)
+            }
         }
     }
 
@@ -338,10 +400,79 @@ class MultiAVModal extends React.Component {
         }
     }
 
-    shareDesktop() {
-        console.log("emedia",emedia);
-        
+    async shareDesktop(toolsColor) {
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
+        let lv = {
+            stream: stream,
+            localStreamId: localStreamId,
+            openVideo: openAudio,
+            openAudio: openVideo,
+        }
+        this.setState({
+            lastLocalVideo: lv
+        })
+
+        try {
+            const stream = await emedia.mgr.shareDesktopWithAudio();
+
+        } catch (error) {
+            toolsColor[4] = ""
+            this.setState({ toolsColor })
+        }
     }
+
+
+    disShareDesktop(){
+
+        let me = this;
+        let localVideo = this.refs.local
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
+        if(!stream){
+            return;
+        }
+
+        console.log('%c localVideo', 'color:green;font-size:18px',localVideo);
+        console.log('%c stream', 'color:green;font-size:18px',stream);
+
+        // return;
+        
+        if(stream.type === 1){
+            emedia.mgr.triggerHungup(localVideo);
+            this.displayLastVideo()
+        }
+    }
+    displayLastVideo(){
+        let me = this;
+        let { stream, localStreamId, openAudio, openVideo } = me.state.lastLocalVideo
+        let lv = {
+            stream: stream,
+            localStreamId: localStreamId,
+            openVideo: openAudio,
+            openAudio: openVideo,
+        }
+        me.setState({
+            localVideo: lv
+        })
+
+        let localVideo = this.refs.local
+        emedia.mgr.onMediaChanaged(localVideo, function (constaints){
+            let lv = {
+                stream: stream,
+                localStreamId: stream.id,
+                openVideo: constaints.video,
+                openAudio: constaints.audio,
+            }
+            me.setState({
+                localVideo: lv
+            })
+
+            console.warn(stream.id, "voff:", this.getAttribute("voff"))
+            console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
+        })
+        emedia.mgr.streamBindVideo(stream, localVideo)
+    }
+
+
 
     render() {
         const time = this.loadTime(),
@@ -458,10 +589,51 @@ class MultiAVModal extends React.Component {
                         {/* shared desktop button */}
 
                         <Col span={4}>
-                            <div className="tools"
+                            {/* <div className="tools"
                                 onClick={() => this.shareDesktop()}
                             >
                                 <i className='icon webim webim-d'></i>
+
+
+                                
+                            </div> */}
+
+
+                            <div className="tools">
+                                <i className={"icon webim webim-d " + toolsColor[4]}
+                                   onMouseOver={(e) => {
+                                       if (toolsColor[4] === "") {
+                                           toolsColor[4] = "i-hover"
+                                           this.setState({
+                                               toolsColor: toolsColor
+                                           })
+                                       }
+                                   }
+                                   }
+
+                                   onClick={(e) => {
+                                       if (toolsColor[4] === "i-hover") {
+                                           toolsColor[4] = "i-act"
+                                           this.shareDesktop(toolsColor)
+                                       } else {
+                                           toolsColor[4] = ""
+                                           this.disShareDesktop(toolsColor)
+                                       }
+
+                                       this.setState({
+                                           toolsColor: toolsColor
+                                       })
+                                   }}
+
+                                   onMouseLeave={(e) => {
+                                       if (toolsColor[4] === "i-hover") {
+                                           toolsColor[4] = ""
+                                       }
+                                       this.setState({
+                                           toolsColor: toolsColor
+                                       })
+                                   }}
+                                ></i>
                             </div>
                         </Col>
                         {/* add another member */}
