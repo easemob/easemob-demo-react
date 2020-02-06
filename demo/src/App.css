@@ -168,15 +168,17 @@ body {
     font-size: 32px;
     line-height: 32px;
     color: rgba(83, 90, 93, 0.6);
+    cursor: pointer;
+
 }
 
-.multi-webim-rtc .tools i.i-hover{
+/* .multi-webim-rtc .tools i.i-hover{
     color: rgba(83, 90, 93, 0.4);
 }
 
 .multi-webim-rtc .tools i.i-act{
     color: rgba(83, 90, 93, 1);
-}
+} */
 
 .multi-webim-rtc .tools .hangup{
     height: 26px;

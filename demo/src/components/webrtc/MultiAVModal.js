@@ -29,6 +29,7 @@ class MultiAVModal extends React.Component {
                 openVideo: false,
                 openAudio: false,
             },
+            isShareDesktop:false, //共享桌面状态
             // rv: Array.apply(null, Array(5)).map(() => {
             //     return {
             //         nickName: "",
@@ -400,7 +401,7 @@ class MultiAVModal extends React.Component {
         }
     }
 
-    async shareDesktop(toolsColor) {
+    async shareDesktop() {
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         let lv = {
             stream: stream,
@@ -413,16 +414,15 @@ class MultiAVModal extends React.Component {
         })
 
         try {
-            const stream = await emedia.mgr.shareDesktopWithAudio();
-
+            await emedia.mgr.shareDesktopWithAudio();
+            this.setState({ isShareDesktop:true })
         } catch (error) {
-            toolsColor[4] = ""
-            this.setState({ toolsColor })
+            alert(error.errorMessage)
         }
     }
 
 
-    disShareDesktop(){
+    stopShareDesktop(){
 
         let me = this;
         let localVideo = this.refs.local
@@ -430,15 +430,12 @@ class MultiAVModal extends React.Component {
         if(!stream){
             return;
         }
-
-        console.log('%c localVideo', 'color:green;font-size:18px',localVideo);
-        console.log('%c stream', 'color:green;font-size:18px',stream);
-
         // return;
         
         if(stream.type === 1){
             emedia.mgr.triggerHungup(localVideo);
-            this.displayLastVideo()
+            this.displayLastVideo();
+            this.setState({ isShareDesktop:false })
         }
     }
     displayLastVideo(){
@@ -478,7 +475,7 @@ class MultiAVModal extends React.Component {
         const time = this.loadTime(),
             gid = this.props.gid,
             byId = this.props.byId,
-            toolsColor = this.state.toolsColor,
+            // toolsColor = this.state.toolsColor,
             rvCount = this.state.rvCount,
             groupName = byId[gid] && byId[gid].groupName || '群组名称',
             remoteUsernames = this.state.remoteUsernames
@@ -501,7 +498,9 @@ class MultiAVModal extends React.Component {
         //         video: <video autoPlay playsInline className="default" ref={ref_}/>,
         //     }
         // }
-
+        let { openAudio, openVideo } = this.state.localVideo;
+        let { isShareDesktop } = this.state;
+        
         return (
             <Draggable
                 defaultPosition={{ x: 300, y: 200 }}
@@ -586,199 +585,48 @@ class MultiAVModal extends React.Component {
                     </Row>
                     <Row>
 
-                        {/* shared desktop button */}
-
-                        <Col span={4}>
-                            {/* <div className="tools"
-                                onClick={() => this.shareDesktop()}
-                            >
-                                <i className='icon webim webim-d'></i>
-
-
-                                
-                            </div> */}
-
-
-                            <div className="tools">
-                                <i className={"icon webim webim-d " + toolsColor[4]}
-                                   onMouseOver={(e) => {
-                                       if (toolsColor[4] === "") {
-                                           toolsColor[4] = "i-hover"
-                                           this.setState({
-                                               toolsColor: toolsColor
-                                           })
-                                       }
-                                   }
-                                   }
-
-                                   onClick={(e) => {
-                                       if (toolsColor[4] === "i-hover") {
-                                           toolsColor[4] = "i-act"
-                                           this.shareDesktop(toolsColor)
-                                       } else {
-                                           toolsColor[4] = ""
-                                           this.disShareDesktop(toolsColor)
-                                       }
-
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
-
-                                   onMouseLeave={(e) => {
-                                       if (toolsColor[4] === "i-hover") {
-                                           toolsColor[4] = ""
-                                       }
-                                       this.setState({
-                                           toolsColor: toolsColor
-                                       })
-                                   }}
-                                ></i>
-                            </div>
-                        </Col>
                         {/* add another member */}
                         <Col span={4}>
                             <div className="tools">
-                                <i className={'icon iconfont webim1-add-member ' + toolsColor[3]}
-                                    onMouseOver={(e) => {
-                                        if (toolsColor[3] === '') {
-                                            toolsColor[3] = 'i-hover'
-                                            this.setState({
-                                                toolsColor: toolsColor
-                                            })
-                                        }
-                                    }
-                                    }
-
-                                    onClick={(e) => {
-                                        if (toolsColor[3] === 'i-hover') {
-                                            toolsColor[3] = 'i-act'
-                                        } else {
-                                            toolsColor[3] = ''
-                                        }
-                                        this.addMember()
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
-
-                                    onMouseLeave={(e) => {
-                                        if (toolsColor[3] === 'i-hover') {
-                                            toolsColor[3] = ''
-                                        }
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
+                                <i className='icon iconfont icon-add'
+                                    onClick={() => this.addMember()}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={4} >
                             <div className="tools">
-                                <i className={'icon webim1 webim1-off-microphone ' + toolsColor[0]}
-                                    onMouseOver={(e) => {
-                                        if (toolsColor[0] === '') {
-                                            toolsColor[0] = 'i-hover'
-                                            this.setState({
-                                                toolsColor: toolsColor
-                                            })
-                                        }
-                                    }
-                                    }
-
-                                    onClick={(e) => {
-                                        if (toolsColor[0] === 'i-hover') {
-                                            toolsColor[0] = 'i-act'
-                                        } else {
-                                            toolsColor[0] = ''
-                                        }
-                                        this.localMic()
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
-
-                                    onMouseLeave={(e) => {
-                                        if (toolsColor[0] === 'i-hover') {
-                                            toolsColor[0] = ''
-                                        }
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
+                                <i className={ 'icon iconfont ' + (openAudio ? 'icon-mic_on' : 'icon-mic_off') }
+                                    onClick={() => this.localMic()}
                                 ></i>
                             </div>
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={'icon webim1 webim1-Shut-down ' + toolsColor[1]}
-                                    onMouseOver={(e) => {
-                                        if (toolsColor[1] === '') {
-                                            toolsColor[1] = 'i-hover'
-                                            this.setState({
-                                                toolsColor: toolsColor
-                                            })
-                                        }
-                                    }
-                                    }
-
-                                    onClick={(e) => {
-                                        if (toolsColor[1] === 'i-hover') {
-                                            toolsColor[1] = 'i-act'
-                                        } else {
-                                            toolsColor[1] = ''
-                                        }
-                                        this.remoteSound()
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
-
-                                    onMouseLeave={(e) => {
-                                        if (toolsColor[1] === 'i-hover') {
-                                            toolsColor[1] = ''
-                                        }
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
+                                <i className='icon iconfont icon-speaker_on'
+                                    onClick={() => this.remoteSound()}
                                 >
                                 </i>
                             </div>
                         </Col>
                         <Col span={4}>
                             <div className="tools">
-                                <i className={'icon webim1 webim1-off-camera ' + toolsColor[2]}
-                                    onMouseOver={(e) => {
-                                        if (toolsColor[2] === '') {
-                                            toolsColor[2] = 'i-hover'
-                                            this.setState({
-                                                toolsColor: toolsColor
-                                            })
-                                        }
-                                    }
-                                    }
+                                <i className={ 'icon iconfont ' + (openVideo ? 'icon-video_on' : 'icon-video_off') }
+                                    onClick={() => this.localVideo()}
 
-                                    onClick={(e) => {
-                                        if (toolsColor[2] === 'i-hover') {
-                                            toolsColor[2] = 'i-act'
-                                        } else {
-                                            toolsColor[2] = ''
-                                        }
-                                        this.localVideo()
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
+                                ></i>
+                            </div>
+                        </Col>
+                        {/* shared desktop button */}
 
-                                    onMouseLeave={(e) => {
-                                        if (toolsColor[2] === 'i-hover') {
-                                            toolsColor[2] = ''
-                                        }
-                                        this.setState({
-                                            toolsColor: toolsColor
-                                        })
-                                    }}
+                        <Col span={4}>
+                            <div className="tools">
+                                <i className={ "icon iconfont " + 
+                                                (isShareDesktop ? "icon-stop-screen-share" : "icon-screen-share") }
+
+                                   onClick={(e) => isShareDesktop ? 
+                                        this.stopShareDesktop() : this.shareDesktop()
+                                   }
+
                                 ></i>
                             </div>
                         </Col>
