@@ -216,6 +216,7 @@ class MultiAVModal extends React.Component {
                 })
 
                 emedia.mgr.onMediaChanaged(localVideo, function (constaints){
+                    
                     let lv = {
                         stream: stream,
                         localStreamId: stream.id,
@@ -414,24 +415,19 @@ class MultiAVModal extends React.Component {
         })
 
         try {
-            await emedia.mgr.shareDesktopWithAudio({
-                onMediaInactive: function (mediaStream, event, service) {
-                    alert(" media stream inactive");
-                },
-                onMediaActive: function (mediaStream, event) {
-                    alert(" media stream Active");
-                }
-            });
+            var options = {
+                stopSharedCallback: this.stopShareDesktop
+            }
+            await emedia.mgr.shareDesktopWithAudio(options);
             this.setState({ isShareDesktop:true })
         } catch (error) {
-            alert(error.errorMessage)
+            console.log(error.errorMessage)
         }
     }
 
 
     stopShareDesktop(){
 
-        let me = this;
         let localVideo = this.refs.local
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         if(!stream){
@@ -460,6 +456,8 @@ class MultiAVModal extends React.Component {
 
         let localVideo = this.refs.local
         emedia.mgr.onMediaChanaged(localVideo, function (constaints){
+
+            
             let lv = {
                 stream: stream,
                 localStreamId: stream.id,
@@ -497,16 +495,9 @@ class MultiAVModal extends React.Component {
                 video: <video autoPlay playsInline className="default" ref={ref_}/>,
             }
         }
-        // for (let i = rvCount; i < 5; i++) {
-        //     let ref_ = "rv_" + i
-        //     rv[i] = {
-        //         nickName: "",
-        //         streamId: "",
-        //         video: <video autoPlay playsInline className="default" ref={ref_}/>,
-        //     }
-        // }
         let { openAudio, openVideo } = this.state.localVideo;
         let { isShareDesktop } = this.state;
+        
         
         return (
             <Draggable
