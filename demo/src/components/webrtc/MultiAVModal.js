@@ -414,7 +414,14 @@ class MultiAVModal extends React.Component {
         })
 
         try {
-            await emedia.mgr.shareDesktopWithAudio();
+            await emedia.mgr.shareDesktopWithAudio({
+                onMediaInactive: function (mediaStream, event, service) {
+                    alert(" media stream inactive");
+                },
+                onMediaActive: function (mediaStream, event) {
+                    alert(" media stream Active");
+                }
+            });
             this.setState({ isShareDesktop:true })
         } catch (error) {
             alert(error.errorMessage)
