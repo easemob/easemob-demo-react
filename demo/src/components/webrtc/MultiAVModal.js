@@ -20,14 +20,14 @@ class MultiAVModal extends React.Component {
             lastLocalVideo: {
                 stream: "",
                 localStreamId: "",
-                openVideo: false,
-                openAudio: false,
+                openVideo: true,
+                openAudio: true,
             },
             localVideo: {
                 stream: '',
                 localStreamId: '',
-                openVideo: false,
-                openAudio: false,
+                openVideo: true,
+                openAudio: true,
             },
             isShareDesktop:false, //共享桌面状态
             // rv: Array.apply(null, Array(5)).map(() => {
@@ -205,6 +205,7 @@ class MultiAVModal extends React.Component {
             const located = stream.located()
             if (located) {
                 let localVideo = me.refs.local
+
                 let lv = {
                     stream: stream,
                     localStreamId: stream.id,
@@ -216,6 +217,7 @@ class MultiAVModal extends React.Component {
                 })
 
                 emedia.mgr.onMediaChanaged(localVideo, function (constaints){
+                    
                     
                     let lv = {
                         stream: stream,
@@ -230,6 +232,7 @@ class MultiAVModal extends React.Component {
                     console.warn(stream.id, "voff:", this.getAttribute("voff"))
                     console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
                 })
+                
                 emedia.mgr.streamBindVideo(stream, localVideo)
 
             } else {
@@ -365,6 +368,8 @@ class MultiAVModal extends React.Component {
     localMic() {
         let localVideo = this.refs.local
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
+
+        
         if(openAudio){
             emedia.mgr.triggerPauseAudio(localVideo)
         }else{
@@ -403,33 +408,39 @@ class MultiAVModal extends React.Component {
     }
 
     async shareDesktop() {
+
+        
         let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         let lv = {
             stream: stream,
             localStreamId: localStreamId,
-            openVideo: openAudio,
-            openAudio: openVideo,
+            openVideo: openVideo,
+            openAudio: openAudio
         }
+
         this.setState({
             lastLocalVideo: lv
         })
 
         try {
+            let _this = this; 
+
             var options = {
-                stopSharedCallback: this.stopShareDesktop
+                stopSharedCallback: () => _this.stopShareDesktop()
             }
             await emedia.mgr.shareDesktopWithAudio(options);
-            this.setState({ isShareDesktop:true })
+            
+            this.setState({ isShareDesktop:true });
+            emedia.mgr.triggerPauseAudio(this.refs.local)// 关闭 mic
         } catch (error) {
             console.log(error.errorMessage)
         }
     }
 
-
     stopShareDesktop(){
 
         let localVideo = this.refs.local
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
+        let { stream } = this.state.localVideo
         if(!stream){
             return;
         }
@@ -473,8 +484,6 @@ class MultiAVModal extends React.Component {
         })
         emedia.mgr.streamBindVideo(stream, localVideo)
     }
-
-
 
     render() {
         const time = this.loadTime(),
