@@ -218,13 +218,19 @@ class MultiAVModal extends React.Component {
 
                 emedia.mgr.onMediaChanaged(localVideo, function (constaints){
                     
-                    
                     let lv = {
                         stream: stream,
                         localStreamId: stream.id,
                         openVideo: constaints.video,
                         openAudio: constaints.audio,
                     }
+
+                    let { isShareDesktop } = me.state;
+
+                    if( isShareDesktop ){ // 取巧的方式，暂时先这样，当是共享桌面时，取localVideo 的openAudio，不取标签的
+                        lv.openAudio = true;
+                    }
+                    
                     me.setState({
                         localVideo: lv
                     })
@@ -431,7 +437,6 @@ class MultiAVModal extends React.Component {
             await emedia.mgr.shareDesktopWithAudio(options);
             
             this.setState({ isShareDesktop:true });
-            emedia.mgr.triggerPauseAudio(this.refs.local)// 关闭 mic
         } catch (error) {
             console.log(error.errorMessage)
         }
