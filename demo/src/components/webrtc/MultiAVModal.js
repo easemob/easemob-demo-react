@@ -499,7 +499,8 @@ class MultiAVModal extends React.Component {
             groupName = byId[gid] && byId[gid].groupName || '群组名称',
             remoteUsernames = this.state.remoteUsernames
 
-        let rv = this.state.rv
+        let rv = this.state.rv;
+
         for (let i = 0; i < 5; i++) {
             let ref_ = 'rv_' + i
             rv[i] = {
@@ -509,128 +510,80 @@ class MultiAVModal extends React.Component {
                 video: <video autoPlay playsInline className="default" ref={ref_}/>,
             }
         }
+
+
         let { openAudio, openVideo } = this.state.localVideo;
         let { isShareDesktop } = this.state;
         
         
         return (
-            <Draggable
-                defaultPosition={{ x: 300, y: 200 }}
-                bounds="parent">
-                <div className="multi-webim-rtc">
-                    <Row>
-                        <Col span={24} className="groupname">
-                            {groupName}
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col span={24} className="time">
-                            {time}
-                        </Col>
-                    </Row>
-                    <Row gutter={10}>
-                        <Col span={8} className="gutter-row">
-                            <video ref="local" muted autoPlay playsInline/>
-                            <div className="user-name">
-                                <span>{WebIM.conn.context.userId}</span>
-                                {/* <i className="icon webim icon-s_sound"></i> */}
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[0] && rv[0].video}
-                            <div className={rv[0].streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                <span>{rv[0].nickName}</span>
-                                <i className={rv[0].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
-                                    onClick={this.remoteVideo.bind(this, 0)}
-                                >
-                                </i>
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[1] && rv[1].video}
-                            <div className={rv[1].streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                <span>{rv[1].nickName}</span>
-                                <i className={rv[1].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
-                                    onClick={this.remoteVideo.bind(this, 1)}
-                                ></i>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row gutter={6}>
-                        <Col span={24} className="gutter-row video-divisor">
+            <div>
+                <Draggable
+                    defaultPosition={{ x: 300, y: 200 }}
+                    bounds="parent"
+                    >
+                    <div className="multi-webim-rtc">
+                        <div className="groupname">{groupName}</div>
+                        <div className="time">{time}</div>
+                    
 
-                        </Col>
-                    </Row>
-                    <Row gutter={10}>
-                        <Col span={8} className="gutter-row">
-                            {rv[2] && rv[2].video}
-                            <div className={rv[2].streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                <span>{rv[2].nickName}</span>
-                                <i className={rv[2].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
-                                    onClick={this.remoteVideo.bind(this, 2)}
-                                ></i>
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[3] && rv[3].video}
-                            <div className={rv[3].streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                <span>{rv[3].nickName}</span>
-                                <i className={rv[3].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
-                                    onClick={this.remoteVideo.bind(this, 3)}
-                                ></i>
-                            </div>
-                        </Col>
-                        <Col span={8} className="gutter-row">
-                            {rv[4] && rv[4].video}
-                            <div className={rv[4].streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                <span>{rv[4].nickName}</span>
-                                <i className={rv[4].openVideo ? 'icon webim icon-s_off_camera camera' : 'icon webim icon-s_off_camera camera-shut'}
-                                    onClick={this.remoteVideo.bind(this, 4)}
-                                ></i>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row gutter={6}>
-                        <Col span={24} className="gutter-row tools-divisor">
+                        <Row gutter={8}>
+                            {/* 自己画面 */}
+                            <Col span={8}>
+                                <video ref="local" muted autoPlay playsInline/>
+                                <div className="user-name">
+                                    <span>{WebIM.conn.context.userId}</span>
+                                </div>
+                            </Col>
 
-                        </Col>
-                    </Row>
-                    <Row>
+                            {/* 对方画面 */}
+                            {rv.map((item, index) => {
+                                let icon_camera = '';
+                                if(item.streamId){
+                                    icon_camera = item.openVideo ? 
+                                    'icon webim icon-s_off_camera camera' : 
+                                    'icon webim icon-s_off_camera camera-shut'
+                                }
+                                return(
+                                    <Col span={8}>
+                                        {item && item.video}
+                                        <div className={item.streamId ? 'user-name' : 'user-name remote-ajust'}>
+                                            <span>{item.nickName}</span>
 
-                        {/* add another member */}
-                        <Col span={4}>
+                                            <i className={ icon_camera }
+                                                onClick={this.remoteVideo.bind(this, index)}
+                                            >
+                                            </i>
+                                        </div>
+                                    </Col>
+                                )
+                                
+                            })}
+                        </Row>
+
+                        <div className='action-wrap'>
                             <div className="tools">
                                 <i className='icon iconfont icon-add'
                                     onClick={() => this.addMember()}
                                 ></i>
                             </div>
-                        </Col>
-                        <Col span={4} >
                             <div className="tools">
                                 <i className={ 'icon iconfont ' + (openAudio ? 'icon-mic_on' : 'icon-mic_off') }
                                     onClick={() => this.localMic()}
                                 ></i>
                             </div>
-                        </Col>
-                        <Col span={4}>
                             <div className="tools">
                                 <i className='icon iconfont icon-speaker_on'
                                     onClick={() => this.remoteSound()}
                                 >
                                 </i>
                             </div>
-                        </Col>
-                        <Col span={4}>
                             <div className="tools">
                                 <i className={ 'icon iconfont ' + (openVideo ? 'icon-video_on' : 'icon-video_off') }
                                     onClick={() => this.localVideo()}
 
                                 ></i>
                             </div>
-                        </Col>
-                        {/* shared desktop button */}
-
-                        <Col span={4}>
                             <div className="tools">
                                 <i className={ "icon iconfont " + 
                                                 (isShareDesktop ? "icon-stop-screen-share" : "icon-screen-share") }
@@ -641,17 +594,16 @@ class MultiAVModal extends React.Component {
 
                                 ></i>
                             </div>
-                        </Col>
-                        <Col span={4}>
                             <div className="tools">
                                 <div className="hangup" onClick={this.closeModal}>
                                     挂断
                                 </div>
                             </div>
-                        </Col>
-                    </Row>
-                </div>
-            </Draggable>
+                        </div>
+                    </div>
+                </Draggable>
+            
+            </div>
         )
     }
 }

@@ -75,6 +75,11 @@ body {
     margin-bottom: 8px;
 }
 
+.multi-webim-rtc .action-wrap {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
 .multi-webim-rtc .time {
     font-size: 14px;
     color: #333333;
