@@ -17,11 +17,11 @@ class MultiAVModal extends React.Component {
             hour: 0,
             minute: 0,
             second: 0,
-            lastLocalVideo: {
+            localAV: {
                 stream: "",
                 localStreamId: "",
-                openVideo: true,
-                openAudio: true,
+                openVideo: false,
+                openAudio: false,
             },
             localVideo: {
                 stream: '',
@@ -30,14 +30,6 @@ class MultiAVModal extends React.Component {
                 openAudio: true,
             },
             isShareDesktop:false, //共享桌面状态
-            // rv: Array.apply(null, Array(5)).map(() => {
-            //     return {
-            //         nickName: "",
-            //         streamId: "",
-            //         video: <video autoPlay />
-            //     }
-            // }),
-            // rv: [],
             rv: new Array(5).fill({
                 nickName: '',
                 streamId: '',
@@ -212,12 +204,19 @@ class MultiAVModal extends React.Component {
                     openVideo: true,
                     openAudio: true,
                 }
-                me.setState({
-                    localVideo: lv
-                })
+
+                if(stream.type === 1){
+                    me.setState({
+                        localVideo: lv,
+                    });
+                }else{
+                    me.setState({
+                        localAV: lv,
+                        localVideo: lv
+                    });
+                }
 
                 emedia.mgr.onMediaChanaged(localVideo, function (constaints){
-                    
                     let lv = {
                         stream: stream,
                         localStreamId: stream.id,
@@ -225,19 +224,20 @@ class MultiAVModal extends React.Component {
                         openAudio: constaints.audio,
                     }
 
-                    let { isShareDesktop } = me.state;
-
-                    if( isShareDesktop ){ // 取巧的方式，暂时先这样，当是共享桌面时，取localVideo 的openAudio，不取标签的
-                        lv.openAudio = true;
+                    if(stream.type === 1){
+                        me.setState({
+                            localVideo: lv
+                        });
+                    }else{
+                        me.setState({
+                            localAV: lv,
+                            localVideo: lv
+                        });
                     }
-                    
-                    me.setState({
-                        localVideo: lv
-                    })
 
                     console.warn(stream.id, "voff:", this.getAttribute("voff"))
                     console.warn(stream.id, "aoff:", this.getAttribute("aoff"))
-                })
+                });
                 
                 emedia.mgr.streamBindVideo(stream, localVideo)
 
@@ -372,9 +372,32 @@ class MultiAVModal extends React.Component {
     }
 
     localMic() {
-        let localVideo = this.refs.local
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
+        if(!this.state.localAV){
+            return;
+        }
 
+        let me = this;
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localAV
+
+        let { isShareDesktop } = this.state;
+        if(isShareDesktop){
+            if(openAudio){
+                emedia.mgr.pauseAudio(stream).then(function () {
+                    me.setState({
+                        localAV: { stream, localStreamId, openAudio: false, openVideo }
+                    });
+                });
+            }else{
+                emedia.mgr.resumeAudio(stream).then(function () {
+                    me.setState({
+                        localAV: { stream, localStreamId, openAudio: true, openVideo }
+                    });
+                });
+            }
+            return;
+        }
+
+        let localVideo = this.refs.local
         
         if(openAudio){
             emedia.mgr.triggerPauseAudio(localVideo)
@@ -383,14 +406,38 @@ class MultiAVModal extends React.Component {
         }
     }
 
-    remoteSound(id) {
-        console.log('remoteSound')
+    // remoteSound(id) {
+    //     console.log('remoteSound')
 
-    }
+    // }
 
     localVideo() {
+        if(!this.state.localAV){
+        return;
+        }
+
+        let me = this;
+        let { stream, localStreamId, openAudio, openVideo } = this.state.localAV
+
+        let { isShareDesktop } = this.state;
+        if(isShareDesktop){
+            if(openVideo){
+                emedia.mgr.pauseVideo(stream).then(function () {
+                    me.setState({
+                        localAV: { stream, localStreamId, openAudio, openVideo: false }
+                    });
+                });
+            }else{
+                emedia.mgr.resumeVideo(stream).then(function () {
+                    me.setState({
+                        localAV: { stream, localStreamId, openAudio, openVideo: true }
+                    });
+                });
+            }
+            return;
+        }
+
         let localVideo = this.refs.local
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
         if(openVideo){
             emedia.mgr.triggerPauseVideo(localVideo)
         }else{
@@ -414,20 +461,6 @@ class MultiAVModal extends React.Component {
     }
 
     async shareDesktop() {
-
-        
-        let { stream, localStreamId, openAudio, openVideo } = this.state.localVideo
-        let lv = {
-            stream: stream,
-            localStreamId: localStreamId,
-            openVideo: openVideo,
-            openAudio: openAudio
-        }
-
-        this.setState({
-            lastLocalVideo: lv
-        })
-
         try {
             let _this = this; 
 
@@ -453,13 +486,13 @@ class MultiAVModal extends React.Component {
         
         if(stream.type === 1){
             emedia.mgr.triggerHungup(localVideo);
-            this.displayLastVideo();
+            this.displayAVStream();
             this.setState({ isShareDesktop:false })
         }
     }
-    displayLastVideo(){
+    displayAVStream(){
         let me = this;
-        let { stream, localStreamId, openAudio, openVideo } = me.state.lastLocalVideo
+        let { stream, localStreamId, openAudio, openVideo } = me.state.localAV;
         let lv = {
             stream: stream,
             localStreamId: localStreamId,
@@ -481,6 +514,7 @@ class MultiAVModal extends React.Component {
                 openAudio: constaints.audio,
             }
             me.setState({
+                localAV: lv,
                 localVideo: lv
             })
 
@@ -512,98 +546,98 @@ class MultiAVModal extends React.Component {
         }
 
 
-        let { openAudio, openVideo } = this.state.localVideo;
+        let { openAudio, openVideo } = this.state.localAV || {
+            openVideo: false,
+            openAudio: false,
+        };
         let { isShareDesktop } = this.state;
         
         
         return (
-            <div>
-                <Draggable
-                    defaultPosition={{ x: 300, y: 200 }}
-                    bounds="parent"
-                    >
-                    <div className="multi-webim-rtc">
-                        <div className="groupname">{groupName}</div>
-                        <div className="time">{time}</div>
-                    
+            <Draggable
+                defaultPosition={{ x: 300, y: 200 }}
+                bounds="parent"
+                >
+                <div className="multi-webim-rtc">
+                    <div className="groupname">{groupName}</div>
+                    <div className="time">{time}</div>
+                
 
-                        <Row gutter={8}>
-                            {/* 自己画面 */}
-                            <Col span={8}>
-                                <video ref="local" muted autoPlay playsInline/>
-                                <div className="user-name">
-                                    <span>{WebIM.conn.context.userId}</span>
-                                </div>
-                            </Col>
+                    <Row gutter={8}>
+                        {/* 自己画面 */}
+                        <Col span={8}>
+                            <video ref="local" muted autoPlay playsInline/>
+                            <div className="user-name">
+                                <span>{WebIM.conn.context.userId}</span>
+                            </div>
+                        </Col>
 
-                            {/* 对方画面 */}
-                            {rv.map((item, index) => {
-                                let icon_camera = '';
-                                if(item.streamId){
-                                    icon_camera = item.openVideo ? 
-                                    'icon webim icon-s_off_camera camera' : 
-                                    'icon webim icon-s_off_camera camera-shut'
+                        {/* 对方画面 */}
+                        {rv.map((item, index) => {
+                            let icon_camera = '';
+                            if(item.streamId){
+                                icon_camera = item.openVideo ? 
+                                'icon webim icon-s_off_camera camera' : 
+                                'icon webim icon-s_off_camera camera-shut'
+                            }
+                            return(
+                                <Col span={8}>
+                                    {item && item.video}
+                                    <div className={item.streamId ? 'user-name' : 'user-name remote-ajust'}>
+                                        <span>{item.nickName}</span>
+
+                                        <i className={ icon_camera }
+                                            onClick={this.remoteVideo.bind(this, index)}
+                                        >
+                                        </i>
+                                    </div>
+                                </Col>
+                            )
+                            
+                        })}
+                    </Row>
+
+                    <div className='action-wrap'>
+                        <div className="tools">
+                            <i className='icon iconfont icon-add'
+                                onClick={() => this.addMember()}
+                            ></i>
+                        </div>
+                        <div className="tools">
+                            <i className={ 'icon iconfont ' + (openAudio ? 'icon-mic_on' : 'icon-mic_off') }
+                                onClick={() => this.localMic()}
+                            ></i>
+                        </div>
+                        {/* <div className="tools">
+                            <i className='icon iconfont icon-speaker_on'
+                                onClick={() => this.remoteSound()}
+                            >
+                            </i>
+                        </div> */}
+                        <div className="tools">
+                            <i className={ 'icon iconfont ' + (openVideo ? 'icon-video_on' : 'icon-video_off') }
+                                onClick={() => this.localVideo()}
+
+                            ></i>
+                        </div>
+                        <div className="tools">
+                            <i className={ "icon iconfont " + 
+                                            (isShareDesktop ? "icon-stop-screen-share" : "icon-screen-share") }
+
+                                onClick={(e) => isShareDesktop ? 
+                                    this.stopShareDesktop() : this.shareDesktop()
                                 }
-                                return(
-                                    <Col span={8}>
-                                        {item && item.video}
-                                        <div className={item.streamId ? 'user-name' : 'user-name remote-ajust'}>
-                                            <span>{item.nickName}</span>
 
-                                            <i className={ icon_camera }
-                                                onClick={this.remoteVideo.bind(this, index)}
-                                            >
-                                            </i>
-                                        </div>
-                                    </Col>
-                                )
-                                
-                            })}
-                        </Row>
-
-                        <div className='action-wrap'>
-                            <div className="tools">
-                                <i className='icon iconfont icon-add'
-                                    onClick={() => this.addMember()}
-                                ></i>
-                            </div>
-                            <div className="tools">
-                                <i className={ 'icon iconfont ' + (openAudio ? 'icon-mic_on' : 'icon-mic_off') }
-                                    onClick={() => this.localMic()}
-                                ></i>
-                            </div>
-                            <div className="tools">
-                                <i className='icon iconfont icon-speaker_on'
-                                    onClick={() => this.remoteSound()}
-                                >
-                                </i>
-                            </div>
-                            <div className="tools">
-                                <i className={ 'icon iconfont ' + (openVideo ? 'icon-video_on' : 'icon-video_off') }
-                                    onClick={() => this.localVideo()}
-
-                                ></i>
-                            </div>
-                            <div className="tools">
-                                <i className={ "icon iconfont " + 
-                                                (isShareDesktop ? "icon-stop-screen-share" : "icon-screen-share") }
-
-                                   onClick={(e) => isShareDesktop ? 
-                                        this.stopShareDesktop() : this.shareDesktop()
-                                   }
-
-                                ></i>
-                            </div>
-                            <div className="tools">
-                                <div className="hangup" onClick={this.closeModal}>
-                                    挂断
-                                </div>
+                            ></i>
+                        </div>
+                        <div className="tools">
+                            <div className="hangup" onClick={this.closeModal}>
+                                挂断
                             </div>
                         </div>
                     </div>
-                </Draggable>
-            
-            </div>
+                </div>
+            </Draggable>
         )
     }
 }
