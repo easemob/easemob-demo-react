@@ -1,4 +1,10 @@
 # 版本更新说明:
+## v3.1.5 @2020-2-19
+### Feature
+* [demo] 音视频会议支持小程序
+* [demo] 增加共享桌面
+* [demo] 部分bug
+
 ## v3.0.17 @2019-12-31
 ### Feature
 * [demo] 去掉依赖多人音视频sdk emedia 只因用webrtc
