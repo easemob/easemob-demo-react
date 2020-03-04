@@ -294,7 +294,7 @@ WebIM.conn.listen({
             store.dispatch(RosterActions.topRoster(from))
             //新的会议要求消息，使用text message实现
             if(WebIM && WebIM.call && message && message.ext && message.ext.msg_extension){
-                var msgExtension = message.ext.msg_extension&&JSON.parse(message.ext.msg_extension)
+                var msgExtension = typeof(message.ext.msg_extension) == 'string'?JSON.parse(message.ext.msg_extension):message.ext.msg_extension
                 var options = {
                     confrId: message.ext.conferenceId,
                     password: message.ext.password || '',
