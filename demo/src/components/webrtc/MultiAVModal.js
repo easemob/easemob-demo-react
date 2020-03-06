@@ -471,7 +471,10 @@ class MultiAVModal extends React.Component {
             
             this.setState({ isShareDesktop:true });
         } catch (err) {
-            if(err.error == -201){
+            if( //用户取消也是 -201 所以两层判断
+                err.error == -201 &&
+                err.errorMessage.indexOf('ShareDesktopExtensionNotFound') > 0
+            ){
                 message.error('请确认已安装共享桌面插件');
             }
         }
