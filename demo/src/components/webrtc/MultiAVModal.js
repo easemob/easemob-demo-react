@@ -470,8 +470,10 @@ class MultiAVModal extends React.Component {
             await emedia.mgr.shareDesktopWithAudio(options);
             
             this.setState({ isShareDesktop:true });
-        } catch (error) {
-            console.log(error.errorMessage)
+        } catch (err) {
+            if(err.error == -201){
+                message.error('请确认已安装共享桌面插件');
+            }
         }
     }
 
