@@ -176,6 +176,7 @@ WebIM.conn.listen({
     },
     // handle all exception
     onError: error => {
+        console.log('error', error)
         // 16: server-side close the websocket connection
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_DISCONNECTED) {
             console.log(
@@ -275,7 +276,7 @@ WebIM.conn.listen({
         logger.info('onLocationMessage', message)
     },
     onTextMessage: message => {
-        //console.log("onTextMessage", message)
+        console.log("onTextMessage", message)
         const { from, to } = message 
         let { type } = message       
         const rootState = store.getState()
@@ -405,6 +406,9 @@ WebIM.conn.listen({
         console.log('onMutedMessage', msg)
         store.dispatch(MessageActions.muteMessage(msg.mid))
         message.error(`${I18n.t('you')}${I18n.t('muted')}`)
+    },
+    onCustomMessage: msg => {
+        console.log('onCustomMessage', msg)
     }
 })
 

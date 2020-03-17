@@ -1,7 +1,7 @@
 /* eslint-disable */
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
-import websdk from 'easemob-websdk'
+import websdk from './webimSDK3.0.7'
 import webrtc from './EMedia_x1v1'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
@@ -25,6 +25,7 @@ WebIM.loglevel = loglevel
 WebIM.conn = new websdk.connection({
     isHttpDNS: WebIM.config.isHttpDNS,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
+    isDebug: WebIM.config.isDebug,
     https: WebIM.config.https,
     url: WebIM.config.xmppURL,
     isAutoLogin: false,

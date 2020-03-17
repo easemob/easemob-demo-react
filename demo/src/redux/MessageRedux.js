@@ -85,6 +85,11 @@ const msgTpl = {
         url: '',
         thumb: '',
         thumb_secret: ''
+    },
+    custom: {
+        type: 'custom',
+        customEvent: '',
+        customExts: {}
     }
 }
 
@@ -170,6 +175,17 @@ export const parseFromServer = (message = {}, bodyType) => {
             }
         }
         break
+    case 'custom':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'custom'
+            }
+        }
+        break
     }
 }
 
@@ -195,6 +211,7 @@ const { Types, Creators } = createActions({
         // console.log('sendTxtMessage', chatType, chatId, message)
         return (dispatch, getState) => {
             const pMessage = parseFromLocal(chatType, chatId, message, 'txt')
+            // const pMessage = parseFromLocal(chatType, chatId, message, 'custom')
             const { body, id, to } = pMessage
             const { type, msg } = body
             const msgObj = new WebIM.message(type, id)
