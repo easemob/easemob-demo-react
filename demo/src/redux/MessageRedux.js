@@ -228,7 +228,8 @@ const { Types, Creators } = createActions({
                 },
                 fail: function () {
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
-                }
+                },
+                ext: {a: 1, b: [1,2,3], c: 1.12, e: {a: 1}}
             })
 
             if (chatType == 'groupchat' || chatType == 'chatroom') {
