@@ -1,7 +1,7 @@
 /* eslint-disable */
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
-import websdk from './webimSDK3.0.7'
+import websdk from './webimSDK3.0.10'
 import webrtc from './EMedia_x1v1'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'

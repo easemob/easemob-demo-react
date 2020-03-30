@@ -29,8 +29,8 @@ function getUrl(){
     return {
         apiUrl: apiUrl,
         xmppUrl: xmppUrl,
-        sandBoxApiUrl: 'https://a1-hsb.easemob.com',
-        sandboxXmppUrl: 'https://im-api-v2-hsb.easemob.com/ws'
+        sandBoxApiUrl: 'https://a1.easemob.com',
+        sandboxXmppUrl: 'https://im-api-v2.easemob.com/ws'
     }
 }
 
@@ -85,7 +85,7 @@ var config = {
      * Whether to console.log in strophe.log()
      * @parameter {Boolean} true or false
      */
-    isDebug: true,
+    isDebug: false,
     /**
      * Whether to show logs in strophe
      * @parameter {Boolean} true or false

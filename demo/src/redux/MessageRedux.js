@@ -216,7 +216,6 @@ const { Types, Creators } = createActions({
             const { type, msg } = body
             const msgObj = new WebIM.message(type, id)
             const chatroom = chatType === 'chatroom'
-            // console.log(pMessage)
             msgObj.set({
                 //TODO: cate type == 'chatrooms'
                 msg,
@@ -229,7 +228,7 @@ const { Types, Creators } = createActions({
                 fail: function () {
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
-                ext: {a: 1, b: [1,2,3], c: 1.12, e: {a: 1}}
+                ext: {}
             })
 
             if (chatType == 'groupchat' || chatType == 'chatroom') {
@@ -238,6 +237,25 @@ const { Types, Creators } = createActions({
 
             WebIM.conn.send(msgObj.body)
             dispatch(Creators.addMessage(pMessage, type))
+
+            //测试发自定义消息
+            // const pMessage = parseFromLocal(chatType, chatId, message, 'custom')
+            // msgObj.set({
+            //     to,
+            //     roomType: chatroom,
+            //     chatType: 'singleChat',
+            //     customEvent: 'customEvent',
+            //     customExts: {qw: 123},
+            //     params: {a: 33},
+            //     success: function () {
+            //         dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
+            //     },
+            //     fail: function () {
+            //         dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
+            //     },
+            //     ext: {a: 1}
+            // })
+
         }
     },
     sendImgMessage: (chatType, chatId, message = {}, source = {}, callback = () => {
