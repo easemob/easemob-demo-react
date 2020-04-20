@@ -2,8 +2,9 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 import websdk from './webimSDK3.0.10'
-import webrtc from './EMedia_x1v1'
-// import emedia from './EMedia_sdk-dev'
+import './EMedia_x1v1'
+// import webrtc from 'easemob-webrtc'
+
 import config from 'WebIMConfig'
 import emoji from './emoji'
 import Api from 'axios'
