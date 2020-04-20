@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/suqin/Desktop/软件开发文档/环信/project/websdk/packages/webrtc";
+/******/ 	__webpack_require__.p = "/Users/zhangdong/code/kefu-fe/websdk/packages/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -38457,7 +38457,7 @@ var _RtcHandler = {
         //onTermC
         if (rtcOptions.op == 107) {
             self._connectedSid = '';
-            _fromSessionID = {};
+            self._fromSessionID = {};
             // "ok"      -> 'HANGUP'     "success" -> 'HANGUP'   "timeout"          -> 'NORESPONSE'
             // *               "decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
             var endreasonCode = {
