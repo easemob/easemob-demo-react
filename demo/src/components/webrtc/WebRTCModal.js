@@ -35,7 +35,7 @@ class WebRTCModal extends React.Component {
         console.log('InitWebRTC end..........')
         var me = this
 
-        WebIM.WebRTC.config({ useDeployMore:true })// 开启多集群配置
+        // WebIM.WebRTC.config({ useDeployMore:true })// 开启多集群配置
         WebIM.call = new WebIM.WebRTC.Call({
             connection: WebIM.conn,
 

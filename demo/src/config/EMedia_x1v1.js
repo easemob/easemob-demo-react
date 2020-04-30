@@ -11201,9 +11201,10 @@ module.exports = _util.prototypeExtend({
                     self.listeners.mgr.catrrs = cattrs; //将处理后的会议属性保存到内存
 
                     // 以下为回调
-                    var onCallBack = self.listeners.mgr.onConfrAttrsUpdated.bind(self.listeners.mgr);
+                    var onCallBack = self.listeners.mgr.onConfrAttrsUpdated;
 
                     if (onCallBack && typeof onCallBack == 'function') {
+                        onCallBack = onCallBack.bind(self.listeners.mgr);
                         onCallBack(cattrs);
                     }
                 };
@@ -11215,8 +11216,9 @@ module.exports = _util.prototypeExtend({
                         return;
                     }
 
-                    var onCallBack = self.listeners.mgr.onConfrStateUpdated.bind(self.listeners.mgr);
+                    var onCallBack = self.listeners.mgr.onConfrStateUpdated;
                     if (onCallBack && typeof onCallBack == 'function') {
+                        onCallBack = onCallBack.bind(self.listeners.mgr);
                         onCallBack(evt.cstate);
                     }
                 };
@@ -23787,7 +23789,8 @@ var errorHandler = (0, _operators.catchError)(function (err, caught) {
 function rxCreateConfr(confrType, password, rec, recMerge) {
     var self = this;
 
-    var region = undefined;
+    var region = undefined,
+        liveCfg = undefined;
     if (arguments.length >= 0 && _typeof(arguments[0]) === 'object') {
         var args = arguments[0];
 
@@ -23829,7 +23832,8 @@ function rxCreateConfr(confrType, password, rec, recMerge) {
 function rxCreateConfrSptMnPrg(confrType, password, rec, recMerge, supportWechatMiniProgram) {
     var self = this;
 
-    var region = undefined;
+    var region = undefined,
+        liveCfg = undefined;
     if (arguments.length >= 0 && _typeof(arguments[0]) === 'object') {
         var args = arguments[0];
 
