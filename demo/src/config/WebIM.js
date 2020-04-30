@@ -87,6 +87,7 @@ api.interceptors.response.use(
 
 WebIM.api = api
 WebIM.emoji = emoji
-WebIM.WebRTC = webrtc
+WebIM.WebRTC = webrtc;
+
 WebIM.EMedia = webrtc.emedia
 export default WebIM
