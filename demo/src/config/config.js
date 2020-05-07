@@ -21,7 +21,8 @@ export default {
         gif: 1,
         bmp: 1,
         jpg: 1,
-        png: 1
+        png: 1,
+        jpeg: 1,
     },
     
     PAGE_NUM: 20
