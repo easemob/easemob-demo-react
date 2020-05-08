@@ -100,7 +100,7 @@ var config = {
      * the interval secons between each atuo reconnectting.
      * works only if autoReconnectMaxNum >= 2.
      */
-    autoReconnectInterval: 2,
+    autoReconnectInterval: 10,
     /**
      * webrtc supports WebKit and https only
      */
