@@ -1,11 +1,12 @@
 import WebIM from '@/config/WebIM'
 import '../common/style/webrtc.less'
 import { I18n } from 'react-redux-i18n'
-
+var createReactClass = require('create-react-class');
 var React = require('react')
 var ReactDOM = require('react-dom')
 var Drag = require('./drag')
-var Channel = React.createClass({
+var Channel = createReactClass({
+// class Channel extends React.Component{
     getInitialState: function () {
         return {
             collapsed: this.props.collapsed,
@@ -316,7 +317,9 @@ var Channel = React.createClass({
     }
 })
 
-export default (dom, collapsed) => {
+export default function(dom, collapsed){
+    console.log('this', this)
+    console.log('dom', dom)
     this.dom = dom
     var me = this
     return {

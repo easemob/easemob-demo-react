@@ -13,7 +13,7 @@ const paths = require("./paths")
 const getClientEnvironment = require("./env")
 const tmpVersion = "local_" + (Math.floor(Math.random() * 1e6)).toString()
 const VERSION = process.env.TAG_NAME || tmpVersion		// webpack 不让传自定义参数
-
+const TerserPlugin = require('terser-webpack-plugin');
 function resolve(dir) {
 	return path.join(__dirname, "..", dir)
 }
@@ -38,7 +38,7 @@ if (env.stringified["process.env"].NODE_ENV !== '"production"') {
 }
 
 // Note: defined here because it will be used more than once.
-const cssFilename = "static/css/[name].[contenthash:8].css"
+const cssFilename = "static/css/[name].[md5:contenthash:hex:8].css" //"static/css/[name].[contenthash:8].css"
 
 // ExtractTextPlugin expects the build output to be flat.
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -112,11 +112,22 @@ module.exports = {
 			// please link the files into your node_modules/ and let module-resolution kick in.
 			// Make sure your source files are compiled, as they will not be processed in any way.
 			new ModuleScopePlugin(paths.appSrc),
-			new webpack.optimize.CommonsChunkPlugin({
-				name: "WebIMConfig",
-				chunks: ["WebIMConfig"]
-			})
-		]
+			// new webpack.optimize.CommonsChunkPlugin({
+			// 	name: "WebIMConfig",
+			// 	chunks: ["WebIMConfig"]
+			// })
+		],
+		// optimization: {
+	 //        splitChunks: {
+	 //            cacheGroups: {
+	 //                commons: {
+	 //                    name: "commons",
+	 //                    chunks: "initial",
+	 //                    minChunks: 2
+	 //                }
+	 //            }
+	 //        }
+	 //    },
 	},
 	module: {
 		strictExportPresence: true,
@@ -208,7 +219,7 @@ module.exports = {
 									loader: require.resolve("css-loader"),
 									options: {
 										importLoaders: 1,
-										minimize: true,
+										// minimize: true,
 										sourceMap: true
 									}
 								},
@@ -287,7 +298,7 @@ module.exports = {
 		// <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
 		// In production, it will be an empty string unless you specify "homepage"
 		// in `package.json`, in which case it will be the pathname of that URL.
-		new InterpolateHtmlPlugin(env.raw),
+		
 		// Generates an `index.html` file with the <script> injected.
 		new HtmlWebpackPlugin({
 			inject: true,
@@ -308,30 +319,31 @@ module.exports = {
 				minifyURLs: true
 			}
 		}),
+		new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
 		// Makes some environment variables available to the JS code, for example:
 		// if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
 		// It is absolutely essential that NODE_ENV was set to production here.
 		// Otherwise React will be compiled in the very slow development mode.
 		new webpack.DefinePlugin(env.stringified),
 		// Minify the code.
-		new webpack.optimize.UglifyJsPlugin({
-            exclude: /WebIMConfig/,
-			compress: {
-				warnings: false,
-				// Disabled because of an issue with Uglify breaking seemingly valid code:
-				// https://github.com/facebookincubator/create-react-app/issues/2376
-				// Pending further investigation:
-				// https://github.com/mishoo/UglifyJS2/issues/2011
-				comparisons: false
-			},
-			output: {
-				comments: false,
-				// Turned on because emoji and regex is not minified properly using default
-				// https://github.com/facebookincubator/create-react-app/issues/2488
-				ascii_only: true
-			},
-			sourceMap: true
-		}),
+		// new webpack.optimize.UglifyJsPlugin({
+  //           exclude: /WebIMConfig/,
+		// 	compress: {
+		// 		warnings: false,
+		// 		// Disabled because of an issue with Uglify breaking seemingly valid code:
+		// 		// https://github.com/facebookincubator/create-react-app/issues/2376
+		// 		// Pending further investigation:
+		// 		// https://github.com/mishoo/UglifyJS2/issues/2011
+		// 		comparisons: false
+		// 	},
+		// 	output: {
+		// 		comments: false,
+		// 		// Turned on because emoji and regex is not minified properly using default
+		// 		// https://github.com/facebookincubator/create-react-app/issues/2488
+		// 		ascii_only: true
+		// 	},
+		// 	sourceMap: true
+		// }),
 		// Note: this won't work without ExtractTextPlugin.extract(..) in `loaders`.
 		new ExtractTextPlugin({
 			filename: cssFilename
@@ -379,6 +391,24 @@ module.exports = {
 		// You can remove this if you don't use Moment.js:
 		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
 	],
+	optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    name: "commons",
+                    chunks: "initial",
+                    minChunks: 2
+                }
+            }
+        },
+        minimizer: [
+            new TerserPlugin({
+                cache: true, // 开启缓存
+                parallel: true, // 支持多进程
+                sourceMap: true, 
+            }),
+        ]
+    },
 	// Some libraries import Node modules but don't use them in the browser.
 	// Tell Webpack to provide empty mocks for them so importing them works.
 	node: {
