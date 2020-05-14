@@ -386,7 +386,7 @@ const { Types, Creators } = createActions({
         return (dispatch) =>{
             let pMessage = null
             let bodyType = 'audio'
-            const { chatId, chatType, file } = obj
+            const { chatId, chatType, file, duration } = obj
             const id = WebIM.conn.getUniqueId()
             const msgObj = new WebIM.message('audio', id)
             let isRoom = chatType === 'chatroom'
@@ -396,7 +396,7 @@ const { Types, Creators } = createActions({
                 to: chatId,
                 type: 'audio',
                 roomType: isRoom,
-
+                length: duration,
                 onFileUploadError: function(error){
                     console.log('语音上传失败', error)
                 },
@@ -431,7 +431,8 @@ const { Types, Creators } = createActions({
                 },
                 onFileDownloadComplete: function (response) {
                     let objectUrl = WebIM.utils.parseDownloadResponse.call(WebIM.conn, response)
-                    message.url = objectUrl
+                    message.audioSrcUrl = message.url
+                    // message.url = objectUrl
                     dispatch(Creators.addMessage(message, bodyType))
                 },
                 onFileDownloadError: function () {
