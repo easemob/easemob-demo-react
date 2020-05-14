@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { WebIM } from '@/config'
 import { history } from '@/utils'
 import GroupActions from '@/redux/GroupRedux'
-
+import { message } from 'antd'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
@@ -96,6 +96,9 @@ const { Types, Creators } = createActions({
                     if (blacklist) dispatch(Creators.setBlacklist(groupId, blacklist))
                 },
                 error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(true))
                     console.log(`an error found while invoking resultful getGroupBlackList: ${e.message}`)
@@ -114,6 +117,9 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.operateGroupMember(groupId, username, 'del'))
                 },
                 error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
                     console.log(`an error found while invoking resultful mute: ${e.message}`)
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(true))
@@ -137,6 +143,9 @@ const { Types, Creators } = createActions({
                 error: e => {
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(true))
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
                     console.log(`an error found while invoking resultful removeGroupBlockAsync: ${e.message}`)
                 }
             })
@@ -156,7 +165,12 @@ const { Types, Creators } = createActions({
                     // }
                     dispatch(Creators.operateAdmin(groupId, response.data.newadmin, 'add'))
                 },
-                error: e => console.log(`an error found while invoking restful setAdmin: ${e}`)
+                error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
+                    console.log(`an error found while invoking restful setAdmin: ${e}`)
+                }
             })
         }
     },
@@ -170,7 +184,12 @@ const { Types, Creators } = createActions({
                 success: response => {
                     dispatch(Creators.operateMuted(groupId, response.data, 'add'))
                 },
-                error: e => console.log(`an error found while invoking resultful mute: ${e}`)
+                error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
+                    console.log(`an error found while invoking resultful mute: ${e}`)
+                }
             })
         }
     },
@@ -180,7 +199,12 @@ const { Types, Creators } = createActions({
                 groupId,
                 username,
                 success: response => dispatch(Creators.operateAdmin(groupId, response.data.oldadmin, 'del')),
-                error: e => console.log(`an error found while invoking resultful removeAdmin: ${e}`)
+                error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
+                    console.log(`an error found while invoking resultful removeAdmin: ${e}`)
+                }
             })
         }
     },
@@ -190,7 +214,12 @@ const { Types, Creators } = createActions({
                 groupId,
                 username,
                 success: response => dispatch(Creators.operateMuted(groupId, response.data, 'del')),
-                error: e => console.log(`an error found while invoking resultful removeMute: ${e}`)
+                error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
+                    console.log(`an error found while invoking resultful removeMute: ${e}`)
+                }
             })
         }
     },
@@ -200,7 +229,12 @@ const { Types, Creators } = createActions({
                 groupId,
                 username,
                 success: response => dispatch(Creators.operateGroupMember(groupId, username, 'del')),
-                error: e => console.log(`an error found while invoking resultful removeSingleGroupMember: ${e}`)
+                error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
+                    console.log(`an error found while invoking resultful removeSingleGroupMember: ${e}`)
+                }
             })
         }
     },
