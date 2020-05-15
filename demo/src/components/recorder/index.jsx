@@ -123,6 +123,7 @@ export default class RecordAudio extends Component {
         this.clearTimer()
         let _endTime = new Date().getTime()
         this.setState({ endTime: _endTime })
+        let duration = (_endTime - this.state.startTime) / 1000
         if (this.state.recorder) {
             this.state.recorder.stop()
             // 重置说话时间
@@ -134,14 +135,16 @@ export default class RecordAudio extends Component {
                 const { selectItem, selectTab } = this.props.match.params
                 let uri = {
                     url: WebIM.utils.parseDownloadResponse.call(WebIM.conn, blob),
-                    filename: 'audio',
+                    filename: 'audio.wav',
                     filetype: 'audio',
-                    data: blob
+                    data: blob,
+                    length: duration
                 }
                 this.props.sendRecorder({
                     chatType: chatType[selectTab],
                     chatId: selectItem,
-                    file: uri
+                    file: uri,
+                    duration: duration
                 })
             }
         }

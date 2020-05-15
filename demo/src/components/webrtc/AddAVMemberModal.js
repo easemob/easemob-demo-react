@@ -82,9 +82,9 @@ class AddAVMemberModal extends React.Component {
                         jids.push(appkey + '_' + elem + '@' + spHost)
                     }
                 }
-                const { confrId, password } = me.props.confr
+                let { confrId, password } = me.props.confr
                 for (let jid of jids) {
-                    WebIM.call.inviteConference(confrId, password, jid, gid)
+                    WebIM.call.inviteConference(confrId, password='', jid, gid)
                 }
             }
         })
