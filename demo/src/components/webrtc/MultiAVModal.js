@@ -17,28 +17,9 @@ class MultiAVModal extends React.Component {
             hour: 0,
             minute: 0,
             second: 0,
-            localAV: {
-                stream: "",
-                localStreamId: "",
-                openVideo: false,
-                openAudio: false,
-            },
-            localVideo: {
-                stream: '',
-                localStreamId: '',
-                openVideo: true,
-                openAudio: true,
-            },
+            
+            
             isShareDesktop:false, //共享桌面状态
-            rv: new Array(5).fill({
-                nickName: '',
-                streamId: '',
-                openVideo: false,
-                video: <div className="default"></div>
-            }),
-            rvCount: 0,
-            toolsColor: [ '', '', '','',''],
-
 
             streams:[], //流列表 stream 和 member
             own_stream: null
@@ -259,8 +240,6 @@ class MultiAVModal extends React.Component {
             // 监听流的变化
             emedia.mgr.onMediaChanaged(video_tag, (constaints, stream) => {
 
-                console.log('流的变化', constaints, stream);
-                
                 // 将流重置
                 let { streams } = _this.state;
 
