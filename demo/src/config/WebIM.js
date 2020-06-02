@@ -5,8 +5,8 @@
 import webrtc from 'easemob-webrtc'
 // import webrtc from './EMedia_x1v1'
 
-// import websdk from './webimSDK3.1.2'
-import websdk from 'easemob-websdk'
+import websdk from './websdk3.1.2'
+// import websdk from 'easemob-websdk'
 
 import config from 'WebIMConfig'
 import emoji from './emoji'
