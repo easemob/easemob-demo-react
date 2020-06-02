@@ -108,29 +108,6 @@ class MultiAVModal extends React.Component {
         return str
     }
 
-    removeVideo(nickName) {
-        let rv = this.state.rv, temp = [], rvCount = this.state.rvCount
-        for (let [ index, elem ] of rv.entries()) {
-            if (elem.nickName === nickName) {
-                // for (let i = index; i < 4; i++) {
-                //     rv[i] = rv[i + 1]
-                // }
-                let ref_ = 'rv_' + index
-                rv[index] = {
-		            nickName: '',
-		            streamId: '',
-		            video: <video autoPlay playsInline className="default" ref={ref_}/>
-		        }
-                break
-            }
-        }
-        this.setState({
-            rvCount: --rvCount,
-            rv: rv
-        })
-        console.log('RemoveRV2: ', rv)
-    }
-
     initEmedia() {
         let me = this
 
@@ -186,7 +163,6 @@ class MultiAVModal extends React.Component {
             me.props.setJoinedMembers(member)
         }
         WebIM.EMService.onMemberExited = function(member, reason){
-            me.removeVideo(member.name)
 
             //用户主动挂断时，不提示退出群聊
             if( reason !== undefined){
@@ -283,6 +259,8 @@ class MultiAVModal extends React.Component {
             // 监听流的变化
             emedia.mgr.onMediaChanaged(video_tag, (constaints, stream) => {
 
+                console.log('流的变化', constaints, stream);
+                
                 // 将流重置
                 let { streams } = _this.state;
 
@@ -361,6 +339,7 @@ class MultiAVModal extends React.Component {
             }
         })[0]
 
+    
         let subSVideo = true;
 
         // 会返回不同的参数 结构
@@ -454,6 +433,7 @@ class MultiAVModal extends React.Component {
         let { streams } = this.state;
         let _this = this;
 
+        
         return (
             <Draggable
                 defaultPosition={{ x: 300, y: 200 }}
@@ -466,12 +446,12 @@ class MultiAVModal extends React.Component {
 
                     <Row gutter={8}>
                         {
-                            streams.map(item => {
+                            streams.map((item, index) => {
 
                                 let { member, stream } = item;
 
                                 return (
-                                    <Col span={8}>
+                                    <Col span={8} key={index}>
                                         <video ref={`video-el-${stream.id}`} muted autoPlay playsInline/>
                                         <div className="user-name">
                                             <span>{member.name}</span>
@@ -481,7 +461,14 @@ class MultiAVModal extends React.Component {
                                 )
                             })
                         }
-
+                        {/* 占位框 */}
+                        {
+                            new Array(6 - streams.length).fill(0).map(
+                                (item, index) => (
+                                    <Col span={8} key={index}> <video className='default'></video></Col>
+                                )
+                            )
+                        }
                     </Row>
 
                     { this.get_own_stream_action_btns() }
