@@ -301,6 +301,7 @@ emedia.config({
 
     rebuildPeerConnectionWhenNetworkChanaged: true,
     useDeployMore: false,
+    useDTX: true, // 开启 DTX
 
     rtcStatsTypeMath: function rtcStatsTypeMath(_stat, name) {
         switch (_stat.type) {
@@ -14166,15 +14167,27 @@ module.exports = _util.prototypeExtend({
                 onCallBack(evt);
             },
 
-            // 发布流失败
-            onPubVideoFailed: function onPubVideoFailed(evt) {
+            // 发布流失败 23 达到最大视频数，24 达到最大共享桌面数
+            onPubFailed: function onPubFailed(evt) {
+                var endReason = evt.endReason;
 
-                var onCallBack = self.listeners.mgr.onPubVideoFailed;
-                if (!onCallBack || typeof onCallBack != 'function') {
-                    return;
+                console.error('onPubFailed', evt);
+
+                if (endReason == 23) {
+                    var onCallBack = self.listeners.mgr.onPubVideoTooMuch;
+                    if (!onCallBack || typeof onCallBack != 'function') {
+                        return;
+                    }
+
+                    onCallBack();
+                } else if (endReason == 24) {
+                    var _onCallBack = self.listeners.mgr.onPubDesktopTooMuch;
+                    if (!_onCallBack || typeof _onCallBack != 'function') {
+                        return;
+                    }
+
+                    _onCallBack();
                 }
-
-                onCallBack(evt);
             },
 
             // 上麦申请的回复
@@ -17592,7 +17605,7 @@ module.exports = _util.prototypeExtend({
         //'onServerError': 'onServerError'
         '402': 'onConfrAttrsUpdated',
         '413': 'onAdminChanged'
-    }, '107', 'onPubVideoFailed'),
+    }, '107', 'onPubFailed'),
 
     __init__: function __init__() {
         var self = this;
@@ -22095,6 +22108,14 @@ var _WebRTC = _util.prototypeExtend({
             }
 
             _logger.debug('setLocalDescription start', self._rtcId, self.__id, self.closed, self.optimalVideoCodecs, self.optimalAudioCodecs);
+            if (emedia.config.useDTX) {
+                // 1. 先删除 带 CN/ 的行
+                desc.sdp = desc.sdp.replace(/a=rtpmap:(.*)CN\/(.*)\r\n/g, '');
+                // 2. 拿到 音频编码的 数字
+                var num = desc.sdp.match(/a=rtpmap:(.*)\sopus/)[1];
+                // 3. 在a=fmtp:${num} 结尾添加 ;usedtx=1
+                desc.sdp = desc.sdp.replace(new RegExp('a=fmtp:' + num + '(.*)\\r\\n'), 'a=fmtp:' + num + '$1;usedtx=1\r\n');
+            }
             self._rtcPeerConnection.setLocalDescription(desc).then(self._onSetLocalSessionDescriptionSuccess.bind(self), self._onSetSessionDescriptionError.bind(self, desc)).then(function () {
                 desc.cctx = self.cctx;
                 (onCreateOfferSuccess || self.onCreateOfferSuccess.bind(self))(desc);
@@ -24827,11 +24848,11 @@ module.exports = _util.prototypeExtend({
             screenOptions = ['screen', 'window'];
         }
 
-        emedia.electron.desktopCapturer.getSources({ types: screenOptions }, function (error, sources) {
-            if (error) {
-                callback(new __event.OpenDesktopMediaAccessDenied({ error: error }));
-                return;
-            }
+        var getSourcesOptions = {
+            types: screenOptions,
+            thumbnailSize: { width: 230, height: 230 }
+        };
+        emedia.electron.desktopCapturer.getSources(getSourcesOptions).then(function (sources) {
 
             if (typeof emedia.chooseElectronDesktopMedia !== 'function') {
                 callback(new __event.OpenDesktopMedia({ desktopStreamId: sources[0].id }));
@@ -24839,7 +24860,7 @@ module.exports = _util.prototypeExtend({
             }
 
             for (var i = 0; i < sources.length; i++) {
-                _logger.debug("desktop capturer. ", sources[i]);
+                // _logger.debug("desktop capturer. ", sources[i]);
                 var source = sources[i];
                 source.hxThumbDataURL = source.thumbnail.toDataURL();
             }
@@ -24854,10 +24875,12 @@ module.exports = _util.prototypeExtend({
 
                 callback(new __event.OpenDesktopMedia({ desktopStreamId: sourceId }));
             }, function accessDenied() {
-                callback(new __event.OpenDesktopMediaAccessDenied({ message: "User denied access" }));
+                callback(new __event.OpenDesktopMediaAccessDenied({ message: function message() {
+                        return "User denied access";
+                    } }));
             });
-
-            return;
+        }).catch(function (error) {
+            return callback(new __event.OpenDesktopMediaAccessDenied({ error: error }));
         });
     }
 });
@@ -26676,8 +26699,6 @@ _outer.getConferenceInfo = function (confrId, password) {
  */
 _outer.createConference = _Manager.single.createConfrSptMnPrg;
 
-// _outer.createConfr = inner.createConfrSptMnPrg
-
 /**
  * 改变角色
  * @method grantRole
@@ -27557,6 +27578,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.single = undefined;
 
+var _extends2 = __webpack_require__(144);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _typeof2 = __webpack_require__(6);
 
 var _typeof3 = _interopRequireDefault(_typeof2);
@@ -27842,36 +27867,39 @@ function rxCreateConfr(confrType, password, rec, recMerge) {
 function rxCreateConfrSptMnPrg(confrType, password, rec, recMerge, supportWechatMiniProgram) {
     var self = this;
 
-    var region = undefined,
-        liveCfg = undefined;
+    var params = {};
     if (arguments.length >= 0 && (0, _typeof3.default)(arguments[0]) === 'object') {
-        var args = arguments[0];
+        //对象参数写法
+        var create_config = arguments[0];
 
-        region = args.region;
-        confrType = args.confrType;
-        password = args.password;
-        rec = args.rec;
-        recMerge = args.recMerge;
-        supportWechatMiniProgram = args.supportWechatMiniProgram, liveCfg = args.liveCfg;
+        params = (0, _extends3.default)({
+            uid: self.identityName,
+            token: self.identityToken,
+            terminal: self._terminalInfo
+
+        }, create_config);
+    } else {
+        // 单个值类型参数
+        params = {
+            uid: self.identityName,
+            token: self.identityToken,
+            terminal: self._terminalInfo,
+
+            confrType: confrType,
+            password: password,
+            rec: rec,
+            recMerge: recMerge,
+            supportWechatMiniProgram: supportWechatMiniProgram
+        };
     }
 
-    if (typeof confrType === 'string') {
-        confrType = parseInt(confrType);
+    if (params.confrType) {
+        // 转为 number 类型
+        params.confrType = parseInt(params.confrType);
     }
 
-    var params = {
-        region: region,
-        uid: self.identityName,
-        token: self.identityToken,
-        confrType: confrType,
-        password: password,
-        terminal: self._terminalInfo,
-        rec: rec,
-        recMerge: recMerge,
-        supportWechatMiniProgram: supportWechatMiniProgram,
-        liveCfg: liveCfg // 推流CDN 参数
-    };
     if (supportWechatMiniProgram) {
+        //支持小程序时，指定编码方式
         params.useVCodes = ['VP8', 'H264'];
     }
 
@@ -28106,16 +28134,6 @@ function rxJoinExistConfrUsePassword(confrId, password, ext) {
 }
 
 function openUserMedia(confrId, openingStream) {
-
-    // 如果 配置的 video audio 都不存在，默认打开一个 audio
-    var aoff = openingStream.aoff,
-        voff = openingStream.voff;
-
-    if (aoff && voff) {
-        openingStream.aoff = 0;
-        openingStream.constaints.audio = true;
-    }
-
     var self = this;
     var service = self._service(confrId);
 
@@ -28283,39 +28301,15 @@ function rxPublishMedia(confrId, constaints, videoTag, ext) {
     var Stream = confr.mixed ? service.AudioMixerPubstream : service.AVPubstream;
     var stream = confr.av = new Stream({
         constaints: constaints,
-        aoff: constaints.audio ? 0 : 1,
-        voff: constaints.video ? 0 : 1,
+        aoff: 0,
+        voff: 0,
         ext: ext
     });
 
     return openUserMedia.call(self, confr.id, stream).pipe((0, _operators.concatMap)(function (userStream) {
-
-        // 根据加入时的 constaints 重置 stream
-        if (self.realConstaints) {
-            var _self$realConstaints = self.realConstaints,
-                audio = _self$realConstaints.audio,
-                video = _self$realConstaints.video;
-
-            userStream.constaints = self.realConstaints;
-            userStream.aoff = audio ? 0 : 1;
-            userStream.voff = video ? 0 : 1;
-        }
-
         videoTag && _Util2.default.targetDOM(videoTag) && attachMediaStream(videoTag, userStream.localStream);
         return rxPublish.call(self, confr.id, userStream, ext);
     }), (0, _operators.map)(function (pushedStream) {
-
-        // 根据加入时的 constaints 重置 stream
-        if (self.realConstaints) {
-            var _self$realConstaints2 = self.realConstaints,
-                audio = _self$realConstaints2.audio,
-                video = _self$realConstaints2.video;
-
-            pushedStream.constaints = self.realConstaints;
-            pushedStream.aoff = audio ? 0 : 1;
-            pushedStream.voff = video ? 0 : 1;
-        }
-
         confr.av = pushedStream;
         videoTag && self.streamBindVideo(confr.av, videoTag);
         confr.type == self.ConfrType.LIVE && self.hungup(0);
@@ -28872,7 +28866,7 @@ var _single = _Util2.default.extend(new Manager(), {
 
         return rxShareDesktop.call(self, options).toPromise();
     },
-    chanageCamera: function chanageCamera(confrId) {
+    changeCamera: function changeCamera(confrId) {
         return rxChanageCamera.call(this, confrId).toPromise();
     },
     switchMobileCamera: function switchMobileCamera(confrId) {
@@ -28891,10 +28885,6 @@ var _single = _Util2.default.extend(new Manager(), {
             video: videoConstaints,
             audio: withAudio
         };
-
-        // 在这里暂存 页面真实的 constaints、推流的时候，必须保证有一个constaints
-        var realConstaints = JSON.parse((0, _stringify2.default)(constaints));
-        self.realConstaints = realConstaints;
 
         return rxPublishMedia.call(self, confrId, constaints, videoTag, ext).toPromise();
     },
