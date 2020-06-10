@@ -48,6 +48,7 @@ var config = {
      * Application AppKey
      */
     appkey: "easemob-demo#chatdemoui",
+    
     /*
      * Application Host
      */

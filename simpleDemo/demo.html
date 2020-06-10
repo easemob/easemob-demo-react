@@ -1,4 +1,4 @@
-<!--本Demo登陆测试帐号：1c1c，密码：111, 测试账号：1v1v，密码：123456-->
+<!--本Demo登陆测试帐号：easemob-demo1，密码：1, 测试账号：easemob-demo2，密码：1-->
 <!DOCTYPE html>
 <html>
 
@@ -8,1403 +8,228 @@
     <title>环信测试demo</title>
 
     <script src="./WebIMConfig.js"></script>
-    <script src="../sdk/webimSDK3.0.4.js"></script>
-    <script src="../sdk/EMedia_x1v1.js"></script>
+    <script src="./sdk/webimSDK3.1.2.js"></script>
+    <script src="./sdk/EMedia_x1v1.js"></script>
+
+    <script src="../sdk/jquery-3.4.1.js"></script>
+    <!-- 引入IM 初始化文件÷-->
+    <script src="./initWeb.js"></script>
+    <script src="./easmeob-im/login.js"></script>
+    <script src="./easmeob-im/message.js"></script>
+    <script src="./easmeob-im/friend.js"></script>
+    <script src="./easmeob-im/group.js"></script>
+    <script src="./easmeob-im/chatroom.js"></script>
+    <script src="./easmeob-im/webrtc.js"></script>
+    <script src="./easmeob-im/confrence.js"></script>
 
 </head>
 
 <body>
     <div>
-        用户名：<input type="text" name="name" id="name"> </br>
-        密 码：<input type="text" name="pwd" id="pwd"></br>
-
-        用户ID: <input type="text" name="toname" id="toname"></br>
-        消息：<input type="text" name="msg" id="msg">
+        用户名：<input type="text" id="name">
+        用户密码：<input type="password" id="pwd"></br>
+        接收方ID：<input type="text" id="toName">
+        消息内容：<input type="text" id="msg"><br>
+        消息ID：<input type="text" id="msgId">
+        群组ID：<input type="text " id="groupId"><br>
+        Cursor：<input type="text" id="gCursor">
+        群文件ID：<input type="text" id="gFileId"><br>
+        群组类型：<input type="text" id="gType">
+        聊天室类型：<input type="text" id="rType"><br>
+        会议ID：<input type="text" id="confrenceId">
+        会议密码：<input type="text" id="confrencePwd">
     </div>
+
+    <h3>Registered login</h3>
     <div>
-        <h3>Registered login</h3>
-        <button id="register">Register</button>
-        <button id="login">Login</button>
-        <button id="logout">Logout</button>
+        <button id="register">注册</button>
+        <button id="login">登陆</button>
+        <button id="logout">退出</button>
     </div>
     <h3>Message</h3>
     <div>
-        <button id="privateText">PrivateText</button>
-        <button id="privateCmd">PrivateCmd</button>
-        <button id="privateLoc">PrivateLoc</button>
-        <button id="recMessage">RecMessage</button>
-    </div>
-    <div>
+        <button id="privateText">发送文本</button>
+        <button id="privateCmd">发送透传</button>
+        <button id="privateLoc">发送位置</button>
+        <button id="privateUrlImg">Url图片消息</button>
+        <button id="recallMsg">撤回消息</button>
+        <button id="getHistory">拉取历史消息</button>
         <br> image:
-        <input type="file" id="image">
-        <button id="privateImg">PrivateImg</button>
-    </div>
-    <div>
+        <input type="file" id="imgMsg">
+        <button id="privateImg">发送图片</button>
         <br> audio:
-        <input type="file" id="audio">
-        <button id="privateAudio">PrivateAudio</button>
-    </div>
-    <div>
+        <input type="file" id="audioMsg">
+        <button id="privateAudio">发送音频</button>
         <br> video:
-        <input type="file" id="chatVideo">
-        <button id="privateVideo">PrivateVideo</button>
-        <br>
-        <video id="getVideo" style="border: 1px solid red" autoplay>
+        <input type="file" id="videoMsg">
+        <button id="privateVideo">发送视频</button>
+        <br>file:
+        <input type="file" id="fileMsg">
+        <button id="privateFile">发送附件</button><br><br>
+        <video id="getVideo" style="border: 1px solid red" autoplay></video>
     </div>
-    <br>
-    <h3>Roasters</h3>
+    <h3>Roster</h3>
     <div>
-        <button id="getRoasters">GetRoasters</button>
-        <button id="addFriends">AddFriends</button>
-        <button id="agreeFriends">AgreeFriends</button>
-        <button id="rejectFriends">RejectFriends</button>
-        <button id="removeRoster">RemoveRoster</button>
-        <button id="addToBlackList">AddToBlackList</button>
-        <button id="getBlackList">GetBlackList</button>
-        <button id="removeFromBlackList">RemoveFromBlackList</button>
+        <button id="getRoasters">获取好友</button>
+        <button id="addRoster">添加好友</button>
+        <button id="removeRoster">删除好友</button>
+        <button id="getBlackList">获取黑名单列表</button>
+        <button id="addBlackList">加入黑名单</button>
+        <button id="removeFromBlackList">移除黑名单</button>
     </div>
     <h3>Group</h3>
     <div>
-        <button id="createGroup">CreateGroupNew</button>
-        <button id="sendCmdExt">SendCmdExt</button>
-        <button id="joinGroup">JoinGroup</button>
-        <button id="getGroup">GetGroup</button>
-        <button id="getGroupMember">GetGroupMember</button>
-        <button id="groupText">GroupText</button>
-        <button id="getGroupInfo">GetGroupInfo</button>
-        <button id="changeGroupInfo">ChangeGroupInfo</button>
-        <button id="addGroupMembers">AddGroupMembers</button>
-        <button id="addMuteUser">AddMuteUser</button>
-        <button id="removeMuteUser">RemoveMuteUser</button>
-        <button id="getMuteList">GetMuteList</button>
-        <button id="setAdminUser">SetAdminUser</button>
-        <button id="removeAdminUser">RemoveAdminUser</button>
-        <button id="getGroupAdmin">GetGroupAdmin</button>
-        <button id="groupBlockSingle">GroupBlockSingle</button>
-        <button id="removeGroupBlockSingle">RemoveGroupBlockSingle</button>
-        <button id="leaveGroup">LeaveGroup</button>
-        <button id="dissolveGroup">DissolveGroup</button>
-        <div>
-            <br> image:
-            <input type="file" id="gimg">
-            <button id="groupImg">sendGroupImg</button>
-        </div>
+        <button id="getGroupList">获取已加入的群组列表</button>
+        <button id="getPubGroupList">分页获取群组</button>
+        <button id="createGroups">创建群组</button>
+        <button id="getGroupInfo">获取群组详情</button>
+        <button id="putGroupInfo">修改群组信息</button>
+        <button id="getGroupMember">获取群组成员</button>
+        <button id="inviteGroupMember">将好友加入群组</button>
+        <button id="removeGroupMember">移除群组成员</button>
+        <button id="quitGroup">退出群组</button>
+        <button id="disGroup">解散群组</button>
+        <button id="getGroupAdmin">获取群组管理员</button>
+        <button id="setGroupAdmin">设置群组管理员</button>
+        <button id="removeGroupAdmin">移除群组管理员</button>
+        <button id="applyJoinGroup">申请加入群组</button>
+        <button id="getMuteGroupList">获取群组禁言列表</button>
+        <button id="setMuteGroupMember">将成员禁言</button>
+        <button id="removeMuteGroupMember">移除禁言</button>
+        <button id="setMuteAll">全员禁言</button>
+        <button id="removeMuteAll">解除全员禁言</button>
+        <button id="getGroupWhite">获取群组白名单</button>
+        <button id="setGroupWhite">将成员加入白名单</button>
+        <button id="removeGroupWhite">将成员移除白名单</button>
+        <button id="getGroupMemberWhite">查询白名单用户</button>
+        <button id="getGroupBlack">获取群组黑名单</button>
+        <button id="setGroupBlack">将成员加入黑名单</button>
+        <button id="removeGroupBlack">将成员移除黑名单</button>
+        <button id="putAnnouncement">修改/上传群公告</button>
+        <button id="getAnnouncement">获取群公告</button>
+        <button id="getGroupFile">查询群文件</button>
+        <button id="setGroupFile">上传群文件</button>
+        <button id="downGroupFile">下载群文件</button>
+        <button id="removeGroupFile">删除群文件</button>
     </div>
-    <h3>Rooms</h3>
+    <h3>Chatrooms</h3>
     <div>
-        <button id="getRoomsList">GetRommsList</button>
-        <button id="joinRoom">JoinRoom</button>
-        <button id="roomText">RoomText</button>
-        <button id="quitRoom">QuitRoom</button>
-        <div>
-            <br> image:
-            <input type="file" id="rimg">
-            <button id="roomImg">sendRoomImg</button>
-        </div>
+        <button id="getRoomsList">获取聊天室列表</button>
+        <button id="joinRoom">加入聊天室</button>
+        <button id="quitRoom">退出聊天室</button>
+        <button id="setRoomAnnouncement">上传聊天室公告</button>
+        <button id="getRoomAnnouncement">获取聊天室公告</button>
+        <button id="setRoomMute">将成员禁言</button>
+        <button id="removeRoomMute">移除禁言</button>
+        <button id="getRoomMuteList">获取禁言列表</button>
+        <button id="setMuteAll">全员禁言</button>
+        <button id="removeMuteAll">解除全员禁言</button>
+        <button id="setRoomWhite">将成员加入白名单</button>
+        <button id="removeRoomWhite">将成员移除白名单</button>
+        <button id="getRoomWhiteList">获取白名单列表</button>
+        <button id="getRoomMemberWhite">查询白名单</button>
+        <button id="getRoomBlack">获取黑名单列表</button>
+        <button id="setRoomBlack">将成员加入黑名单</button>
+        <button id="removeRoomBlack">将成员移除黑名单</button>
     </div>
     <h3>WebRTC</h3>
     <div>
-        <button id="rtCall">Call</button>
-        <button id="rtAcceptCall">AcceptCall</button>
-        <button id="rtEndCall">EndCall</button>
-        <button id="rtAudioCall">AudioCall</button>
-        <div>
-            <video id="video" style="border: 1px solid red" autoplay>
-
-            </video>
-            <video id="localVideo" style="border: 1px solid blue" muted=true autoplay>
-
-            </video>
-        </div>
+        <button id="rtCall">视频呼叫</button>
+        <button id="rtEndCall"> 挂断</button>
+        <button id="rtAudioCall">音频呼叫</button><br><br>
     </div>
     <h3>Confer</h3>
     <div>
-        <button id="createConfer">CreateConfer</button>
-        <button id="pushVideo">PushVideo</button>
-        <button id="inviteUser">InviteUser</button>
-        <button id="txtInviteUser">TxtInviteUser</button>
-        <button id="endConVideo">EndConVideo</button>
-        </video>
+        <button id="createConfr">创建会议</button>
+        <button id="inviteUser">邀请用户</button>
+        <button id="cancelPushSteam">取消发布流</button>
+        <button id="cancelStream">取消订阅流</button>
+        <button id="subscriStream">订阅成员流</button>
+        <button id="pushDeskStream">共享桌面</button>
+        <button id="pauseMeVideo">暂停自己视频</button>
+        <button id="resumeMeVideo">恢复自己视频</button>
+        <button id="pauseMeAudio">暂停自己音频</button>
+        <button id="resumeMeAudio">恢复自己音频</button>
+        <button id="resumeAudio">仅订阅音频</button>
+        <button id="pauseAudio">仅暂停订阅音频</button>
+        <button id="resumeVideo">仅订阅视频</button>
+        <button id="pauseVideo">仅暂停订阅视频</button>
+        <button id="removeUser">移除成员</button>
+        <button id="exitConfr">离开会议</button>
+        <button id="destroyConfr">销毁会议</button>
+        <button id="joinConfrence">根据ID/密码加入会议</button>
+       
     </div>
-
+    <div>
+        <video id="meVideo" style="border: 1px solid red; width: 300px; height: 200px; " muted=true autoplay>
+        </video>
+        <video id="youVideo" style="border: 1px solid blue ;  width: 300px; height: 200px; " autoplay>
+        </video>
+        <video id="deskVideo" style="border: 1px solid black ;  width: 300px; height: 200px; " autoplay></video>
+    </div>
     <script>
-        var conn = {};
-        console.log(WebIM, window.WebIM);
-        WebIM.config = config;
-        conn = WebIM.conn = new WebIM.default.connection({
-            appKey: WebIM.config.appkey,
-            isHttpDNS: WebIM.config.isHttpDNS,
-            isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
-            host: WebIM.config.Host,
-            https: WebIM.config.https,
-            url: WebIM.config.xmppURL,
-            apiUrl: WebIM.config.apiURL,
-            isAutoLogin: false,
-            heartBeatWait: WebIM.config.heartBeatWait,
-            autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
-            autoReconnectInterval: WebIM.config.autoReconnectInterval,
-            isStropheLog: WebIM.config.isStropheLog,
-            delivery: WebIM.config.delivery
-        })
-
-
-        conn.listen({
-            onOpened: function (message) {          //连接成功回调
-                var myDate = new Date().toLocaleString();
-                console.log("%c [opened] 连接已成功建立", "color: green");
-                console.log(myDate);
-                // rek();
-                // alert(myDate + "登陆成功")
-            },
-            onClosed: function (message) {
-                console.log("onclose:" + message);
-                console.log(error);
-            },         //连接关闭回调
-            onTextMessage: function (message) {
-                console.log('onTextMessage: ', message);
-                if (message.ext.conferenceId != undefined) {
-                    var truthBeTold = window.confirm((message.from + "邀请您加入会议"));
-                    if (truthBeTold) {
-                        emedia.mgr.joinConference(message.ext.conferenceId, message.ext.password, "进入会议").then(function () {
-                            console.log("********加入会议成功*******")
-                        }).catch(function (error) {
-                            console.log("加入会议失败")
-                        })
-                    }
-                }
-
-            },    //收到文本消息
-
-            onEmojiMessage: function (message) {
-                console.log('onEmojiMessage: ', message);
-            },   //收到表情消息
-            onPictureMessage: function (message) {
-                console.log('onPicMessage: ', message);
-            }, //收到图片消息
-            onCmdMessage: function (message) {
-                console.log('onCmdMessage: ', message);
-            },     //收到命令消息
-            onAudioMessage: function (message) {
-                console.log('onAudioMessage: ', message);
-            },   //收到音频消息
-            onLocationMessage: function (message) {
-                console.log('onLocMessage: ', message);
-            },//收到位置消息
-            onFileMessage: function (message) {
-                console.log('onFileMessage: ', message);
-            },    //收到文件消息
-            recallMessage: function (message) {
-                console.log('recallMessage', message);
-            }, //消息撤回
-            onVideoMessage: function (message) {
-                console.log('onVideoMessage: ', message);
-                var node = document.getElementById('getVideo');
-                var option = {
-                    url: message.url,
-                    headers: {
-                        'Accept': 'audio/mp4'
-                    },
-                    onFileDownloadComplete: function (response) {
-                        var objectURL = WebIM.utils.parseDownloadResponse.call(conn, response);
-                        node.src = objectURL;
-                    },
-                    onFileDownloadError: function () {
-                        console.log('File down load error.')
-                    }
-                };
-                WebIM.utils.download.call(conn, option);
-            },   //收到视频消息
-            onPresence: function (message) {
-                var myDate = new Date().toLocaleString();
-                console.log('onPresence: ', myDate + JSON.stringify(message));
-                switch (message.type) {
-                    case 'subscribe': // 对方请求添加好友
-                        var truthBeTold = window.confirm((message.from + "申请添加您为好友:"));
-                        if (truthBeTold) {
-                            // 同意对方添加好友
-                            conn.subscribed({
-                                to: message.from,
-                                message: "[resp:true]"
-                            });
-                            console.log("同意添加好友");
-                        } else {
-                            // 拒绝对方添加好友
-                            conn.unsubscribed({
-                                to: message.from,
-                                message: "rejectAddFriend" // 拒绝添加好友回复信息
-                            });
-                            console.log("拒绝添加好友");
-                        }
-                        break;
-                    case 'subscribed': // 对方同意添加好友，已方同意添加好友
-                        break;
-                    case 'unsubscribe': // 对方删除好友
-                        break;
-                    case 'unsubscribed': // 被拒绝添加好友，或被对方删除好友成功
-                        break;
-                    case 'memberJoinPublicGroupSuccess': // 成功加入聊天室
-                        console.log('join chat room success' + myDate);
-                        console.log(new Date().toLocaleString());
-                        break;
-                    case 'joinChatRoomFaild': // 加入聊天室失败
-                        console.log('join chat room faild');
-                        break;
-                    case 'joinPublicGroupSuccess': // 意义待查
-                        console.log('join public group success', message.from);
-                        break;
-                    case 'createGroupACK':
-                        conn.createGroupAsync({
-                            from: message.from,
-                            success: function (option) {
-                                console.log('Create Group Succeed');
-                            }
-                        });
-                        break;
-                }
-            },       //处理“广播”或“发布-订阅”消息，如联系人订阅请求、处理群组、聊天室被踢解散等消息
-            onRoster: function (message) {
-                console.log("onRoster", message);
-            },         //处理好友申请
-            onInviteMessage: function (message) {
-                console.log('Invite');
-            },  //处理群组邀请
-            onOnline: function () {
-                console.log("onOnline");
-            },                  //本机网络连接成功
-            onOffline: function () {
-                console.log('offline');
-            },                 //本机网络掉线
-            onError: function (message) {
-                console.log('onError: ', message);
-
-            },          //失败回调
-            onBlacklistUpdate: function (list) {       //黑名单变动
-                // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息
-                console.log(list);
-            },
-            onReceivedMessage: function (message) {
-                console.log('onReceivedMessage: ', message);
-            },    //收到消息送达服务器回执
-            onDeliveredMessage: function (message) {
-                console.log('onDeliveredMessage：', message);
-            },   //收到消息送达客户端回执
-            onReadMessage: function (message) {
-                console.log('onReadMessage: ', message);
-            },        //收到消息已读回执
-            onCreateGroup: function (message) {
-                console.log('onCreateGroup: ', message);
-            },        //创建群组成功回执（需调用createGroupNew）
-            onMutedMessage: function (message) {
-                console.log('onMutedMessage: ', message);
-            }         //如果用户在A群组被禁言，在A群发消息会走这个回调并且消息不会传递给群其它成员
+        var uname,          //登陆ID
+            upwd,           //登陆密码
+            msgContent,     //消息内容
+            toID,           //接收方ID，好友/群组 相关操作ID
+            mid,            //消息ID
+            cursor,         //分页获取群组的的 cursor
+            gid,            //群组ID
+            gFileId,        //群文件ID
+            gType,          //判断群组类型
+            roomType,       //判断聊天室类型
+            userMember,     //member 成员信息
+            userStream,     //用于接收用户视频流
+            confrenceId,    //会议ID，用于直接加入
+            confrencePwd    //会议密码，用于直接加入
+        //获取 name 值
+        $("#name").bind("input propertychange", function (event) {
+            uname = $("#name").val()
         });
-
-        //初始化单人视频
-        // 初始化WebRTC Call
-        window.rtcCall = null
-        if (WebIM.WebRTC) {
-            rtcCall = new WebIM.WebRTC.Call({
-                connection: conn,
-
-                mediaStreamConstaints: {
-                    audio: true,
-                    video: true
-                },
-
-                listener: {
-                    onAcceptCall: function (from, options) {
-                        console.log('onAcceptCall::', 'from: ', from, 'options: ', options);
-                    },
-                    onGotRemoteStream: function (stream, streamType) {
-                        console.log('onGotRemoteStream::', 'stream: ', stream, 'streamType: ', streamType);
-                        var video = document.getElementById('video');
-                        video.srcObject = stream;
-                    },
-                    onGotLocalStream: function (stream, streamType) {
-                        console.log('onGotLocalStream::', 'stream:', stream, 'streamType: ', streamType);
-                        var video = document.getElementById('localVideo');
-                        video.srcObject = stream;
-                    },
-                    onRinging: function (caller) {
-                        console.log('onRinging::', 'caller:', caller);
-                        alert('onRinging::', 'caller:', caller)
-                    },
-                    onTermCall: function (reason) {
-                        console.log('onTermCall::');
-                        console.log('reason:', reason);
-                    },
-                    onIceConnectionStateChange: function (iceState) {
-                        console.log('onIceConnectionStateChange::', 'iceState:', iceState);
-                    },
-                    onError: function (e) {
-                        console.log(e);
-                    }
-                }
-            });
-        } else {
-            console.warn('不能进行视频通话！您的浏览器不支持webrtc或者协议不是https。')
-        }
-
-
-        //有人加入会议，其他人调用joinXX等方法，如果加入成功，已经在会议中的人将会收到
-        emedia.mgr.onMemberJoined = function (member) {
-            console.log(member.name, "加入会议");
-        };
-        //有人退出会议
-        emedia.mgr.onMemberExited = function (member) {
-            console.log(member.name, "退出会议");
-        };
-        //有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
-        emedia.mgr.onStreamAdded = function (member, stream) {
-            console.log("媒体流加入");
-            var located = stream.located();
-            if (located) {
-
-            } else {
-                emedia.mgr.subscribe(member, stream, true, true, localVideo);
-            }
-        }
-        //有媒体流移除
-        emedia.mgr.onStreamRemoved = function (member, stream) {
-            console.log("媒体流退出");
-        };
-        //角色改变
-        emedia.mgr.onRoleChanged = function (role) {
-            console.log("角色改变成功");
-            //会议退出；自己主动退 或 服务端主动关闭；
-            emedia.mgr.onConferenceExit = function (reason, failed) {
-                reason = (reason || 0);
-                switch (reason) {
-                    case 0:
-                        reason = "正常挂断";
-                        break;
-                    case 1:
-                        reason = "没响应";
-                        break;
-                    case 2:
-                        reason = "服务器拒绝";
-                        break;
-                    case 3:
-                        reason = "对方忙";
-                        break;
-                    case 4:
-                        reason = "失败,可能是网络或服务器拒绝";
-                        if (failed === -9527) {
-                            reason = "失败,网络原因";
-                        }
-                        if (failed === -500) {
-                            reason = "Ticket失效";
-                        }
-                        if (failed === -502) {
-                            reason = "Ticket过期";
-                        }
-                        if (failed === -504) {
-                            reason = "链接已失效";
-                        }
-                        if (failed === -508) {
-                            reason = "会议无效";
-                        }
-                        if (failed === -510) {
-                            reason = "服务端限制";
-                        }
-                        break;
-                    case 5:
-                        reason = "不支持";
-                        break;
-                    case 10:
-                        reason = "其他设备登录";
-                        break;
-                    case 11:
-                        reason = "会议关闭";
-                        break;
-                }
-            };
-        };
-
-    </script>
-    <script>
-        //注册
-        // document.getElementById('register').onclick = function () {
-        //     var uname = document.getElementById("name").value;
-        //     var upwd = document.getElementById("pwd").value;
-        //     var option = {
-        //         username: uname,
-        //         password: upwd,
-        //         appKey: WebIM.config.appkey,
-        //         success: function () {
-        //             console.log('注册成功');
-        //         },
-        //         error: function () {
-        //             console.log('注册失败');
-        //         },
-        //         apiUrl: WebIM.config.apiURL
-        //     };
-        //     conn.signup(option);
-        // };
-
-        //登录
-        document.getElementById('login').onclick = function () {
-            console.log(WebIM, window.WebIM);
-            var uname = document.getElementById("name").value;
-            var upwd = document.getElementById("pwd").value;
-            options = {
-                apiUrl: WebIM.config.apiURL,
-                user: uname,
-                pwd: upwd,
-                appKey: WebIM.config.appkey
-            };
-            conn.open(options);
-            console.log(options)
-        };
-
-        //退出
-        document.getElementById("logout").onclick = function () {
-            conn.close();
-        }
-    </script>
-    <script>
-        /*
-        * Message
-        */
-        //文本消息
-        var conf = WebIM.config
-        //var WebIM = WebIM.default
-        WebIM.config = conf
-        WebIM.message = WebIM.default.message
-        WebIM.utils = WebIM.default.utils
-        WebIM.debug = WebIM.default.debug
-        WebIM.statusCode = WebIM.default.statusCode
-
-        var myDate = new Date().toLocaleString();
-        document.getElementById('privateText').onclick = function () {
-            var uname = document.getElementById("name").value;
-            var tname = document.getElementById("toname").value;
-            var tmsg = document.getElementById("msg").value;
-            var id = conn.getUniqueId();                 // 生成本地消息id
-            var msg = new WebIM.default.message('txt', id);      // 创建文本消息
-            msg.set({
-                msg: tmsg,                  // 消息内容
-                to: tname,
-                ext: {
-                    'time': myDate
-                },                       // 接收消息对象（用户id）
-                success: function (id, serverMsgId) {
-                    console.log('send private text Success');
-                    msgText = msg.body.msg;
-                },
-                fail: function (e) {
-                    console.log("Send private text error");
-                }
-            });
-            msg.body.chatType = 'singleChat';
-            conn.send(msg.body);
-            console.log(msg);
-
-        };
-
-        //位置消息
-        document.getElementById("privateLoc").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var tmsg = document.getElementById("msg").value;
-            var id = conn.getUniqueId();                 // 生成本地消息id
-            var msg = new WebIM.default.message('location', id);      // 创建位置消息
-            msg.set({
-                to: tname,                          // 接收消息对象（用户id）
-                roomType: false,
-                addr: "北京四通桥",
-                lat: "39.9666",
-                lng: "116.322"
-            })
-            msg.body.chatType = 'singleChat';
-            conn.send(msg.body);
-        };
-        //透传消息
-        document.getElementById('privateCmd').onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var tmsg = document.getElementById("msg").value;
-            var id = conn.getUniqueId();            //生成本地消息id
-            var msg = new WebIM.default.message('cmd', id); //创建命令消息
-            msg.set({
-                msg: tmsg,
-                to: tname,                       //接收消息对象
-                action: 'action',                     //用户自定义，cmd消息必填
-                ext: {
-                    'time': myDate,
-                },
-                success: function (id, serverMsgId) {
-                    console.log('send private cmd Success');
-                },
-                fail: function (e) {
-                    console.log("Send private cmd error");
-                }
-            })
-
-            msg.body.chatType = 'singleChat';
-            conn.send(msg.body);
-        };
-
-        //图片消息
-        document.getElementById('privateImg').onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.default.message('img', id);        // 创建图片消息
-            var input = document.getElementById('image');  // 选择图片的input
-            var file = WebIM.default.utils.getFileUrl(input);      // 将图片转化为二进制文件
-            var allowType = {
-                'jpg': true,
-                'gif': true,
-                'png': true,
-                'bmp': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIM.config.apiURL,
-                    file: file,
-                    to: tname,
-                    ext: {
-                        'time': myDate,
-                    },           // 接收消息对象
-                    roomType: false,
-                    chatType: 'singleChat',
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('Success');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                conn.send(msg.body);
-            }
-        };
-
-        //音频消息
-        document.getElementById("privateAudio").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.default.message('audio', id);      // 创建音频消息
-            var input = document.getElementById('audio');  // 选择音频的input
-            var file = WebIM.default.utils.getFileUrl(input);      // 将音频转化为二进制文件
-            var allowType = {
-                'mp3': true,
-                'amr': true,
-                'wmv': true,
-                'm4a': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIM.config.apiURL,
-                    file: file,
-                    to: tname,
-                    ext: {
-                        'time': myDate,
-                    },
-                    roomType: false,
-                    chatType: 'singleChat',
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('Success');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                conn.send(msg.body);
-            }
-        };
-
-        //视频消息
-        document.getElementById("privateVideo").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('video', id);      // 创建视频消息
-            var input = document.getElementById('chatVideo');  // 选择视频的input
-            var file = WebIM.utils.getFileUrl(input);      // 将视频转化为二进制文件
-            var allowType = {
-                'mp4': true,
-                'wmv': true,
-                'avi': true,
-                'rmvb': true,
-                'mkv': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIM.config.apiURL,
-                    file: file,
-                    to: tname,                       // 接收消息对象
-                    roomType: false,
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('Success');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                conn.send(msg.body);
-            }
-        };
-        //消息撤回
-        document.getElementById("recMessage").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            conn.recallMessage({
-                mid: "578586538653255316",
-                to: tname,
-                success: function (id) {
-                    console.log(id) // id为撤回通知的id
-                },
-                fail: function (err) {
-                    console.log(err)
-                }
-            })
-        }
-
-
-    </script>
-    <script>
-        /*
-        * Roasters
-        */
-        //好友列表
-        document.getElementById("getRoasters").onclick = function () {
-            conn.getRoster({
-                success: function (roster) {
-                    console.log(roster);
-                    //获取好友列表，并进行好友列表渲染，roster格式为：
-                    /*
-                 [
-                 {
-                 jid:"easemob#chatdemoui_test1@easemob.com",
-                 name:"test1",
-                 subscription: "both"
-                 // subscription的值的集合是{both, to, from, none},
-                 // both表示互相在对方的好友列表中，
-                 // to 和 from意义待定
-                 // 如果添加对方为好友被拒绝则为none
-                 }
-                 ]
-                 */
-                    for (var i = 0, l = roster.length; i < l; i++) {
-                        var ros = roster[i];
-                        //ros.subscription值为both/to为要显示的联系人，此处与APP需保持一致，才能保证两个客户端登录后的好友列表一致
-                        if (ros.subscription === 'both' || ros.subscription === 'to') {
-
-                        }
-                    }
-                },
-            });
-        };
-
-        //添加好友
-        document.getElementById("addFriends").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            conn.subscribe({
-                to: tname,
-                // Demo里面接收方没有展现出来这个message，在status字段里面
-                message: '加个好友呗!'
-            });
-            console.log("发送申请成功");
-        };
-
-        //删除好友
-        document.getElementById("removeRoster").onclick = function () {
-            conn.removeRoster({
-                to: tname,
-                success: function () {  // 删除成功
-                    conn.unsubscribed({
-                        to: tname
-                    });
-                    console.log("删除成功");
-                },
-                error: function () {    // 删除失败
-                }
-            });
-        };
-
-        //添加黑名单
-        // list的结构为{username_1: {}, username_2: {}...}，拉黑好友需要将拉黑后的黑名单里的好友信息全部传入，
-        // 如黑名单此时已有A，B两位好友，现想将C也拉进黑名单，正确的操作是同时将ABC的信息都传入接口中。
-        /*
-         var list = {
-         username_1:{
-         jid: 'appKey_'+username_1+'@easemob.com',
-         name: username_1,
-         subscription: 'both',
-         order: 2
-         },
-         username_2:{
-         jid: 'appKey_'+username_2+'@easemob.com',
-         name: username_2,
-         subscription: 'both',
-         order: 3,
-         type: 'jid'
-         },
-         username_3:{
-         jid: 'appKey_'+username_3+'@easemob.com',
-         name: username_3,
-         subscription: 'both',
-         order: 4,
-         type: 'jid'
-         }
-         }
-         jid, username, subscription均在获取好友列表时已获取到，用户可根据好友列表动态获取这些参数，
-         order不重复即可
-         */
-        document.getElementById("addToBlackList").onclick = function () {
-            var list = {
-                // user_1
-                asdfghj: {
-                    jid: 'easemob-demo#chatdemoui_asdfghj@easemob.com',
-                    name: 'asdfghj',
-                    subscription: 'both',
-                    order: 2,
-                    type: 'jid'
-                },
-                // user_2
-                wjy6: {
-                    jid: 'easemob-demo#chatdemoui_wjy6@easemob.com',
-                    name: 'wjy6',
-                    subscription: 'both',
-                    order: 3,
-                    type: 'jid'
-                }
-            };
-            conn.addToBlackList({
-                list: list,
-                type: 'jid',
-                success: function () {
-                    console.log('Add friend to black list success');
-                },
-                error: function () {
-                    console.log('Add friend to black list error');
-                }
-            });
-        };
-
-        //获取好友黑名单
-        //调用getBlacklist函数获取好友黑名单列表。调用这个函数时，会回调conn.listen里的onBlacklistUpdate函数，具体细节请参照Web SDK基础功能。
-        document.getElementById("getBlackList").onclick = function () {
-            conn.getBlacklist();
-        };
-
-        //移除好友黑名单
-        document.getElementById("removeFromBlackList").onclick = function () {
-            var list = [
-                {
-                    wjy6: {
-                        jid: 'easemob-demo#chatdemoui_mengyuanyuan01@easemob.com',
-                        name: 'mengyuanyuan01',
-                        order: '2',
-                        type: 'jid'
-                    }
-                },
-                {
-                    mengyuanyuan: {
-                        jid: 'easemob-demo#chatdemoui_wjy6@easemob.com',
-                        name: 'wjy6',
-                        order: '4',
-                        type: 'jid',
-                    }
-                }
-            ];
-            conn.removeFromBlackList({
-                list: list,
-                type: 'jid',
-                success: function () {
-                    console.log('Remove from black list success.');
-                },
-                error: function () {
-                    console.log('Remove from black list error.')
-                }
-            });
-        };
-    </script>
-    <script>
-        /*
-        * Group
-        */
-        //创建群组
-        var result = {}
-        var resultCon = {}
-
-        document.getElementById("createGroup").onclick = function () {
-            var options = {
-                data: {
-                    groupname: 'testGroup111222',
-                    desc: '这是测试创建群组',
-                    members: ['1m1m'],
-                    public: true,
-                    approval: true,
-                    allowinvites: false
-                },
-                success: function (respData) {
-
-                    console.log("创建群组成功");
-                    result = respData;
-                    createConferId();
-                    // setTimeout(() => {
-                    //     sendCmdExt();
-                    // }, 100)
-                },
-                error: function () {
-                    console.log("创建群组失败");
-                }
-            };
-            conn.createGroupNew(options);
-
-        };
-
-        //加入群组
-        document.getElementById("joinGroup").onclick = function () {
-            var options = {
-                groupId: "72262379175937",
-                success: function (resp) {
-                    console.log("Response: ", resp);
-                },
-                error: function (e) {
-                    if (e.type == 17) {
-                        console.log("您已经在这个群组里了");
-                    }
-                }
-            };
-            conn.joinGroup(options);
-        };
-
-        // 列出当前登录用户加入的所有群组
-        document.getElementById("getGroup").onclick = function () {
-            var options = {
-                success: function (resp) {
-                    console.log("Response: ", resp)
-                },
-                error: function (e) { }
-            }
-            conn.getGroup(options);
-        };
-
-        //获取群组成员 通过rest
-        document.getElementById('getGroupMember').onclick = function () {
-            var pageNum = 1,
-                pageSize = 1000;
-            var options = {
-                pageNum: pageNum,
-                pageSize: pageSize,
-                groupId: '77414068715521',
-                success: function (resp) { console.log("Response: ", resp) },
-                error: function (e) { }
-            };
-            conn.listGroupMember(options);
-        }
-
-        //群组文本消息
-        document.getElementById("groupText").onclick = function () {
-            var id = conn.getUniqueId();            // 生成本地消息id
-            var msg = new WebIM.message('txt', id); // 创建文本消息
-            var option = {
-                msg: '测试群组消息',             // 消息内容
-                to: result.data.groupid,                     // 接收消息对象(群组id)
-                roomType: false,
-                chatType: 'chatRoom',
-                success: function () {
-                    console.log('send room text success');
-                },
-                fail: function () {
-                    console.log('failed');
-                }
-            };
-            msg.set(option);
-            msg.setGroup('groupchat');
-            conn.send(msg.body);
-            console.log(msg);
-        };
-
-        //群组图片消息
-        document.getElementById("groupImg").onclick = function () {
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('img', id);        // 创建图片消息
-            var input = document.getElementById('gimg');  // 选择图片的input
-            var file = WebIM.utils.getFileUrl(input);      // 将图片转化为二进制文件
-            var allowType = {
-                'jpg': true,
-                'gif': true,
-                'png': true,
-                'bmp': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIM.config.apiURL,
-                    file: file,
-                    to: '64951207133185',                       // 接收消息对象
-                    roomType: false,
-                    chatType: 'chatroom',
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('发送群组图片消息成功');
-                    },
-                    fail: function () {
-                        console.log('发送失败');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                msg.setGroup('groupchat');
-                conn.send(msg.body);
-            }
-        };
-        //获取群组详情
-        document.getElementById("getGroupInfo").onclick = function () {
-            var options = {
-                groupId: '77414068715521',
-                success: function (resp) {
-                    console.log("Response: ", resp);
-                },
-                error: function () {
-
-                    console.log('获取失败');
-
-                }
-            };
-            conn.getGroupInfo(options);
-
-        };
-
-        //修改群组信息
-        document.getElementById("changeGroupInfo").onclick = function () {
-            var option = {
-                roomId: '64951207133185',
-                subject: 'testGroup1',    // 群组名称
-                description: 'Change group information test',  // 群组简介
-                success: function () {
-                    console.log('修改成功!');
-                },
-                error: function (e) {
-                    console.log('修改失败');
-                }
-            };
-            conn.changeGroupSubject(option);
-        };
-
-        //添加好友进群
-        document.getElementById("addGroupMembers").onclick = function () {
-
-            var option = {
-                list: ['1z1z'],
-                roomId: result.data.groupId
-                // roomId: result.data.groupid
-            };
-            conn.addGroupMembers(option);
-            console.log("邀请好友进群成功");
-        };
-
-        //将群组成员禁言
-        document.getElementById("addMuteUser").onclick = function () {
-            var options = {
-                username: "1v1v",
-                muteDuration: 886400000,
-                groupId: "64951207133185",
-                success: function (resp) {
-                    console.log('禁言成功');
-                },
-                error: function (e) {
-                    console.log('禁言失败');
-                }
-            };
-            conn.mute(options); s
-        };
-
-        //移除群组成员禁言
-        document.getElementById("removeMuteUser").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                username: "1v1v",
-                success: function (resp) {
-                    console.log('移除成功');
-                },
-                error: function (e) {
-                    console.log('移除失败');
-                }
-            };
-            conn.removeMute(options);
-        };
-
-        //获取群组禁言列表
-        document.getElementById("getMuteList").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                success: function (resp) {
-                    console.log('禁言成员:');
-                    resp.data.forEach(function (user) {
-                        console.log(user.user)
-                    })
-                },
-                error: function (e) {
-                    console.log('获取失败');
-                }
-            };
-            conn.getMuted(options);
-        };
-
-        //设置群组管理员
-        document.getElementById("setAdminUser").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                username: "1v1v",
-                success: function (resp) {
-                    console.log('设置管理员成功');
-                },
-                error: function (e) {
-                    console.log('设置管理员失败');
-                }
-            };
-            conn.setAdmin(options);
-        };
-
-        //取消群组管理员
-        document.getElementById("removeAdminUser").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                username: "1v1v",
-                success: function (resp) {
-                    console.log('取消管理员成功');
-                },
-                error: function (e) {
-                    console.log('取消管理员失败');
-                }
-            };
-            conn.removeAdmin(options);
-
-        };
-
-        //获取群组管理员列表
-        document.getElementById("getGroupAdmin").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                success: function (resp) {
-                    console.log('管理员:');
-                    resp.data.forEach(function (user) {
-                        console.log(user)
-                    })
-                },
-                error: function (e) {
-                    console.log('获取失败');
-                }
-            };
-            conn.getGroupAdmin(options);
-        };
-
-        //将群组成员拉入黑名单
-        document.getElementById("groupBlockSingle").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                username: "1v1v",
-                success: function (resp) {
-                    console.log("Response: ", resp);
-                },
-                error: function (e) {
-                    console.log('添加黑名单失败');
-                }
-            };
-            conn.groupBlockSingle(options);
-
-        };
-
-        //将群组成员移除黑名单
-        document.getElementById("removeGroupBlockSingle").onclick = function () {
-            var options = {
-                groupId: "64951207133185",
-                username: "1v1v",
-                success: function (resp) {
-                    console.log("Response: ", resp);
-                },
-                error: function (e) {
-                    console.log('移除失败');
-                }
-            }
-            conn.removeGroupBlockSingle(options);
-
-        };
-
-        //退出群组
-        document.getElementById("leaveGroup").onclick = function () {
-            var options = {
-                to: 'gdpwq123#rests_77412901650433@conference.easemob.com',
-                roomId: '77412901650433',
-                success: function () {
-                    console.log('退出成功');
-                },
-                error: function () {
-                    console.log('退出失败');
-                }
-            };
-            conn.leaveGroupBySelf(options);
-        };
-
-        //// 解散一个群组
-        document.getElementById("dissolveGroup").onclick = function () {
-
-            var option = {
-                groupId: result.data.groupid,
-                success: function () {
-                    console.log('解散成功');
-                },
-                error: function () {
-                    console.log('解散失败');
-                }
-            };
-            conn.dissolveGroup(option);
-
-        }
-
-
-    </script>
-    <script>
-        /*
-        *Rooms
-        */
-        //获取聊天室列表
-        document.getElementById("getRoomsList").onclick = function () {
-            var option = {
-                apiUrl: 'https://a1.easemob.com',
-                pagenum: 1,                                 // 页数
-                pagesize: 20,                               // 每页个数
-                success: function (list) {
-                    console.log(list);
-                },
-                error: function () {
-                    console.log('获取失败');
-                }
-            };
-            conn.getChatRooms(option);
-        };
-
-        //加入聊天室
-        document.getElementById("joinRoom").onclick = function () {
-            // 加入聊天室
-            conn.joinChatRoom({
-                roomId: '66676238385153',// 聊天室id
-                success: function () {
-                    console.log(new Date().toLocaleString());
-                },
-            });
-
-        };
-
-        //退出聊天室
-        document.getElementById("quitRoom").onclick = function () {
-
-            // 退出聊天室
-            conn.quitChatRoom({
-                roomId: '64843481677825' // 聊天室id
-            });
-
-        };
-
-        //聊天室文本消息
-        document.getElementById("roomText").onclick = function () {
-            // 退出聊天室
-            var id = conn.getUniqueId();
-            var msg = new WebIM.message('txt', id);
-            var option = {
-                msg: '测试发送聊天室消息', // 消息内容
-                to: '64843481677825', // 接收消息对象(本例为twy-room1聊天室)
-                roomType: true,
-                chatType: 'chatRoom',
-                success: function () {
-                    console.log('发送聊天室文本消息成功');
-                    //console.log(msg);
-
-                },
-                fail: function () {
-                    console.log('发送失败');
-                }
-            };
-            msg.set(option);
-            msg.setGroup('groupchat');
-            conn.send(msg.body);
-            console.log(msg);
-        };
-
-        //聊天室图片消息
-        document.getElementById("roomImg").onclick = function () {
-            var id = conn.getUniqueId();                   // 生成本地消息id
-            var msg = new WebIM.message('img', id);        // 创建图片消息
-            var input = document.getElementById('rimg');  // 选择图片的input
-            var file = WebIM.utils.getFileUrl(input);      // 将图片转化为二进制文件
-            var allowType = {
-                'jpg': true,
-                'gif': true,
-                'png': true,
-                'bmp': true
-            };
-            if (file.filetype.toLowerCase() in allowType) {
-                var option = {
-                    apiUrl: WebIM.config.apiURL,
-                    file: file,
-                    to: '64843481677825',                       // 接收消息对象
-                    ext: {
-                        "name": "张三",
-                        "age": "18"
-                    },
-                    roomType: true,
-                    chatType: 'chatroom',
-                    onFileUploadError: function () {      // 消息上传失败
-                        console.log('onFileUploadError');
-                    },
-                    onFileUploadComplete: function () {   // 消息上传成功
-                        console.log('onFileUploadComplete');
-                    },
-                    success: function () {                // 消息发送成功
-                        console.log('发送聊天室图片消息成功');
-                    },
-                    fail: function () {
-                        console.log('发送失败');
-                    },
-                    flashUpload: WebIM.flashUpload
-                };
-                msg.set(option);
-                msg.setGroup('groupchat');
-                conn.send(msg.body);
-            }
-        };
-    </script>
-    <script>
-        /*
-         * WebRTC
-         */
-        // 视频呼叫对方
-
-        // function rek() {
-        //     rtcCall.caller = 'test3';
-        //     var tname = document.getElementById("toname").value;
-        //     rtcCall.makeVideoCall(tname);
-        //     console.log("呼叫：" + tname)
-        // }
-
-        document.getElementById("rtCall").onclick = function () {
-            var tname = document.getElementById("toname").value;
-
-            rtcCall.caller = 'zdtest';
-            rtcCall.makeVideoCall(tname);
-            console.log("呼叫：" + tname)
-
-        };
-        // 关掉/拒绝视频
-        document.getElementById("rtEndCall").onclick = function () {
-            rtcCall.endCall();
-        }
-        // 接受对方呼叫
-        document.getElementById("rtAcceptCall").onclick = function () {
-            rtcCall.acceptCall();
-        }
-        // 语音呼叫对方
-        document.getElementById("rtAudioCall").onclick = function () {
-            var tname = document.getElementById("toname").value;
-            console.log('Audio Call');
-            rtcCall.caller = 'wenke123';
-            rtcCall.makeVoiceCall(tname);
-        };
-    </script>
-    <script>
-        var resultCon = {}
-
-        //创建会议
-        document.getElementById("createConfer").onclick = function () {
-            emedia.mgr.createConference(emedia.mgr.ConfrType.COMMUNICATION_MIX).then(function (confr) {
-                console.log("创建会议成功");
-                console.log(confr);
-                resultCon = confr;
-                emedia.mgr.joinConference(resultCon.confrId, resultCon.password, "加入").then(function (confr) {
-                    console.log("加入成功");
-                    var videoCreate = document.getElementById("video");
-                    var constaints = { audio: true, video: true };
-                    emedia.mgr
-                        .publish(constaints, videoCreate, "发布视频流")
-                        .then(function (pushedStream) {
-                            //stream 对象
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-
-                }).catch(function (error) {
-                    console.log("加入失败");
-                })
-            }).catch(function (error) {
-                console.log("创建会议失败");
-            })
-        }
-        //发布视频流
-        document.getElementById("pushVideo").onclick = function () {
-            var videoPush = document.getElementById("video");
-            var constaints = { audio: true, video: true };
-            emedia.mgr
-                .publish(constaints, videoPush, "创建者加入会议")
-                .then(function (pushedStream) {
-                    //stream 对象
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
-        //cmd 扩展邀请
-        document.getElementById("inviteUser").onclick = function () {
-            var uname = document.getElementById("name").value;
-            var tname = document.getElementById("toname").value;
-            var tmsg = document.getElementById("msg").value;
-            var id = conn.getUniqueId();            //生成本地消息id
-            var msg = new WebIM.message('cmd', id); //创建命令消息
-            msg.set({
-                msg: '邀请您加入会议' + result.confrId,
-                to: tname,                       //接收消息对象
-                action: 'action',                     //用户自定义，cmd消息必填
-                ext: {
-                    confrId: result.confrId,
-                    password: result.password,
-                    jid: WebIM.config.appkey + '_' + tname + '@' + WebIM.config.Host
-                },
-                success: function (id, serverMsgId) {
-                    console.log('send private cmd Success');
-                },
-                fail: function (e) {
-                    console.log("Send private cmd error");
-                }
-            })
-
-            msg.body.chatType = 'singleChat';
-            conn.send(msg.body);
-        }
-        //文本邀请
-        document.getElementById("txtInviteUser").onclick = function () {
-            var toname = document.getElementById("toname").value;
-            var jid = WebIM.config.appkey + "_" + toname + "@" + WebIM.config.Host;
-            rtcCall.inviteConference(resultCon.confrId, resultCon.password, jid);
-        },
-
-
-            //挂断视频
-            document.getElementById("endConVideo").onclick = function () {
-                var rtn = confirm("确定退出会议吗？");
-                if (rtn) {
-                    emedia.mgr.exit();
-                }
-            }
+        //获取 pwd 值
+        $("#pwd").bind("input propertychange", function (event) {
+            upwd = $("#pwd").val()
+        });
+        //获取 msgContent 值
+        $("#msg").bind("input propertychange", function (event) {
+            msgContent = $("#msg").val()
+        });
+        //获取 toID 值
+        $("#toName").bind("input propertychange", function (event) {
+            toID = $("#toName").val()
+        });
+        //获取 msgId 值
+        $('#msgId').bind("input propertychange", function (event) {
+            mid = $("#msgId").val()
+        })
+        //获取 groupId 值
+        $('#groupId').bind("input propertychange", function (event) {
+            gid = $("#groupId").val()
+        })
+        //获取 gCursor 值
+        $('#gCursor').bind("input propertychange", function (event) {
+            cursor = $("#gCursor").val()
+        })
+        //获取 gFileId 值
+        $('#gFileId').bind("input propertychange", function (event) {
+            gFileId = $("#gFileId").val()
+        })
+        //获取 gType 值
+        $('#gType').bind("input propertychange", function (event) {
+            gType = $("#gType").val()
+        })
+        //获取 rType 值
+        $('#rType').bind("input propertychange", function (event) {
+            roomType = $("#rType").val()
+        })
+        // 获取 confrenceId 值
+        $('#confrenceId').bind("input propertychange", function (event) {
+            confrenceId = $("#confrenceId").val()
+        })
+        //获取 confrencePwd 值
+        $('#confrencePwd').bind("input propertychange", function (event) {
+            confrencePwd = $("#confrencePwd").val()
+        })
 
     </script>
 
