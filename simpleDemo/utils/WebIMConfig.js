@@ -48,6 +48,9 @@ var config = {
      * Application AppKey
      */
     appkey: "easemob-demo#chatdemoui",
+    // appkey: "1108200309157490#bpttest",
+    
+
     /*
      * Application Host
      */
