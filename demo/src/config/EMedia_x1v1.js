@@ -26905,7 +26905,7 @@ _outer.degradeRole = function (confrId, members, toRole) {
  * @param {Array} members - 会议成员
  */
 _outer.kickMembersById = function (confr, members) {
-    emedia.decodeMemeberName(members);
+    // emedia.decodeMemeberName(members); 暂时注释，在 IM 一起的时候，appkey 会被删掉
     return _Manager.single.kickMember(members, confr.id);
 };
 
