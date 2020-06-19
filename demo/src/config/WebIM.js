@@ -29,19 +29,17 @@ WebIM.conn = new websdk.connection({
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
     https: WebIM.config.https,
-    url: WebIM.config.xmppURL,
+    url: WebIM.config.socketServer,
     isAutoLogin: false,
     heartBeatWait: WebIM.config.heartBeatWait,
     autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
-    autoReconnectInterval: WebIM.config.autoReconnectInterval,
-    isStropheLog: WebIM.config.isStropheLog,
     delivery: WebIM.config.delivery,
     appKey: WebIM.config.appkey
 })
 
 // for downward compatibility
 if (!WebIM.conn.apiUrl) {
-    WebIM.conn.apiUrl = WebIM.config.apiURL
+    WebIM.conn.apiUrl = WebIM.config.restServer
 }
 
 websdk.debug(true)

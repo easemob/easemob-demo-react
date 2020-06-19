@@ -13,43 +13,38 @@
 
 function getUrl(){
     var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
-    var xmppUrl = '//im-api.easemob.com/ws'
+    var socketUrl = '//im-api.easemob.com/ws'
     if(window.location.href.indexOf('webim-h5.easemob.com') !== -1 ){
         apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
-        xmppUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
     }
     else if(window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1){
         apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
-        xmppUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
     }
     else if(window.location.href.indexOf('localhost') !== -1){
         apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
-        xmppUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
+        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
     }
     return {
         apiUrl: apiUrl,
-        xmppUrl: xmppUrl,
+        socketUrl: socketUrl,
         sandBoxApiUrl: 'https://a1-hsb.easemob.com',
-        sandboxXmppUrl: 'https://im-api-v2-hsb.easemob.com/ws'
+        sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
     }
 }
 
 
 var config = {
     /*
-     * XMPP server
+     * websocket server
      */
-    xmppURL: getUrl().xmppUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
-    // xmppURL: "im-api.easemob.com",
-    // xmppURL: '172.17.2.139:5280',
+    socketServer: getUrl().socketUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
      */
-    // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     // ios must be https!!! by lwz
-    // apiURL: "https://a1.easemob.com",
-    apiURL: getUrl().apiUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
-    // apiURL: (location.protocol === 'https:' ? 'https:' : 'http:') + '//172.17.3.155:8080',
+    restServer: getUrl().apiUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
@@ -63,6 +58,7 @@ var config = {
      * @parameter {Boolean} true or false
      */
     https: true,
+
     isHttpDNS: false,
     /*
      * isMultiLoginSessions
@@ -71,36 +67,21 @@ var config = {
      */
     isMultiLoginSessions: true,
     /**
-     * Whether to use window.doQuery()
-     * @parameter {Boolean} true or false
-     */
-    isWindowSDK: false,
-    /**
-     * isSandBox=true:  xmppURL: 'im-api.sandbox.easemob.com',  apiURL: '//a1.sdb.easemob.com',
-     * isSandBox=false: xmppURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
+     * isSandBox=true:  socketURL: 'im-api.sandbox.easemob.com',  apiURL: '//a1.sdb.easemob.com',
+     * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
      * @parameter {Boolean} true or false
      */
     isSandBox: false,
     /**
-     * Whether to console.log in strophe.log()
+     * Whether to console.log
      * @parameter {Boolean} true or false
      */
-    isDebug: false,
+    isDebug: true,
     /**
-     * Whether to show logs in strophe
-     * @parameter {Boolean} true or false
-     */
-    isStropheLog: false,
-    /**
-     * will auto connect the xmpp server autoReconnectNumMax times in background when client is offline.
+     * will auto connect the websocket server autoReconnectNumMax times in background when client is offline.
      * won't auto connect if autoReconnectNumMax=0.
      */
     autoReconnectNumMax: 5,
-    /**
-     * the interval secons between each atuo reconnectting.
-     * works only if autoReconnectMaxNum >= 2.
-     */
-    autoReconnectInterval: 10,
     /**
      * webrtc supports WebKit and https only
      */
@@ -125,18 +106,17 @@ var config = {
      */
     delivery: true,
     /**
-     * Size of message cache for group chating like group, chatroom etc
+     * Size of message cache for group chating like group, chatroom etc. For use in this demo
      */
     groupMessageCacheSize: 200,
     /**
      * 5 actual logging methods, ordered and available:
      * 'TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'
      */
-
     loglevel: 'ERROR',
 
     /**
-     * enable localstorage for history messages
+     * enable localstorage for history messages. For use in this demo
      */
     enableLocalStorage: true
 }
