@@ -155,9 +155,9 @@ class WebRTCModal extends React.Component {
                 },
                 onInvite: function (from, rtcOption) {
                     const { confrId, password, gid } = rtcOption
-                    const { appkey, xmppURL } = WebIM.config
+                    const { appkey, socketServer } = WebIM.config
                     const { avModal, multiAV } = me.props
-                    let host = xmppURL.split('.')
+                    let host = socketServer.split('.')
                     host = '@' + host[1] + '.' + host[2]
                     from = from.replace(appkey + '_', '')
                     from = from.replace(host, '')
