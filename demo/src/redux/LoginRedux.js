@@ -30,7 +30,7 @@ const { Types, Creators } = createActions({
             //     WebIM.conn.close("logout")
             // }
             WebIM.conn.open({
-                apiUrl: WebIM.config.apiURL,
+                apiUrl: WebIM.config.restServer,
                 user: username.trim().toLowerCase(),
                 pwd: password,
                 //  accessToken: password,
