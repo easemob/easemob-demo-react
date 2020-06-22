@@ -22,7 +22,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             let options = {
                 // appKey: WebIM.config.appkey,
-                // apiUrl: WebIM.config.apiURL,
+                // apiUrl: WebIM.config.restServer,
                 username: username.trim().toLowerCase(),
                 password: password,
                 nickname: nickname ? nickname.trim().toLowerCase() : '',

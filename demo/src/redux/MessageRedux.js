@@ -267,7 +267,7 @@ const { Types, Creators } = createActions({
             const to = chatId
             const msgObj = new WebIM.message(type, id)
             msgObj.set({
-                apiUrl: WebIM.config.apiURL,
+                apiUrl: WebIM.config.restServer,
                 ext: {
                     // file_length: source.fileSize,
                     // filename: source.fileName || "",
@@ -301,7 +301,12 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 success: function (id) {
-                }
+                },
+                // body: {
+                //     url: "https://fanyi-cdn.cdn.bcebos.com/static/translation/img/header/logo_40c4f13.svg",
+                //     type: "img",
+                //     filename: '11122.png'
+                // }
             })
 
             // keep the same logic as sendTextMessage
@@ -330,7 +335,7 @@ const { Types, Creators } = createActions({
             const to = chatId
             const msgObj = new WebIM.message(type, id)
             msgObj.set({
-                apiUrl: WebIM.config.apiURL,
+                apiUrl: WebIM.config.restServer,
                 ext: {
                     file_length: source.data.size
                     // filename: source.fileName || "",
@@ -391,7 +396,7 @@ const { Types, Creators } = createActions({
             const msgObj = new WebIM.message('audio', id)
             let isRoom = chatType === 'chatroom'
             msgObj.set({
-                apiUrl: WebIM.config.apiURL,
+                apiUrl: WebIM.config.restServer,
                 file: file,
                 to: chatId,
                 type: 'audio',
@@ -666,7 +671,7 @@ export const updateMessageStatus = (state, { message, status = '' }) => {
     let mids = state.getIn([ 'byMid' ])||{}
     let mid
     for( var i in mids){
-        console.log('ii',i)
+        // console.log('ii',i)
         if(mids[i].id == id){
             mid = i
         }

@@ -34,7 +34,8 @@ WebIM.conn = new websdk.connection({
     heartBeatWait: WebIM.config.heartBeatWait,
     autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
     delivery: WebIM.config.delivery,
-    appKey: WebIM.config.appkey
+    appKey: WebIM.config.appkey,
+    useOwnUploadFun: WebIM.config.useOwnUploadFun
 })
 
 // for downward compatibility
@@ -46,7 +47,7 @@ websdk.debug(true)
 
 const appKeyPair = WebIM.config.appkey.split('#')
 export let api = Api.create({
-    baseURL: `${WebIM.config.apiURL}/${appKeyPair[0]}/${appKeyPair[1]}`,
+    baseURL: `${WebIM.config.restServer}/${appKeyPair[0]}/${appKeyPair[1]}`,
     validateStatus: function (status) {
         return true
     }
