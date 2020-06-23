@@ -86,6 +86,13 @@ var config = {
      * webrtc supports WebKit and https only
      */
     isWebRTC: window.RTCPeerConnection && /^https\:$/.test(window.location.protocol),
+    /*
+     * Upload pictures or file to your own server and send message with url
+     * @parameter {Boolean} true or false
+     * true: Using the API provided by SDK to upload file to huanxin server
+     * false: Using your method to upload file to your own server
+     */
+    useOwnUploadFun: false,
     /**
      *  cn: chinese
      *  us: english
