@@ -14308,7 +14308,14 @@ module.exports = _util.prototypeExtend({
                 };
 
                 // 收到回调判断是否有 某一个 cattrs 或者 cstate
-                if (session.cattrs) {
+                // 会议属性有两种结构
+                // 对象或数组 不是空对象 或 空数组 才可以
+                if (session.cattrs instanceof Array == true && session.cattrs.length > 0) {
+                    // 非空数组
+                    cattrs_updated(session);
+                }
+                if (session.cattrs.constructor == Object && (0, _keys2.default)(session.cattrs).length > 0) {
+                    // 非空对象
                     cattrs_updated(session);
                 }
 
