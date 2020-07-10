@@ -265,16 +265,18 @@ class MultiAVModal extends React.Component {
     }
 
     async shareDesktop() {
-        try {
-            let _this = this; 
 
+        try {
+             
             var options = {
-                stopSharedCallback: () => _this.stopShareDesktop()
+                confrId: this.props.confr.confrId
             }
             await emedia.mgr.shareDesktopWithAudio(options);
             
             this.setState({ isShareDesktop:true });
         } catch (err) {
+            console.error('share desktop error', err);
+            
             if( //用户取消也是 -201 所以两层判断
                 err.error == -201 &&
                 err.errorMessage.indexOf('ShareDesktopExtensionNotFound') > 0
