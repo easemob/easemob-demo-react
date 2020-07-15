@@ -306,7 +306,7 @@ class Chat extends React.Component {
 
     callVideo = () => {
         if (utils.isIOSWebview() || !emedia.isWebRTC) {
-            // 现在微信还不支持webrtc，给出提示
+            // 现在IOS webview还不支持webrtc，给出提示
             message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
             return
         }
@@ -352,7 +352,11 @@ class Chat extends React.Component {
     }
 
     callVoice = () => {
-
+        if (utils.isIOSWebview() || !emedia.isWebRTC) {
+            // 现在IOS webview还不支持webrtc，给出提示
+            message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
+            return
+        }
         const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
         console.log('sendWrapper::callVoice', WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
 
