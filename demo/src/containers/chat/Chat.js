@@ -309,12 +309,18 @@ class Chat extends React.Component {
         const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))
         const recMerge = videoSetting && videoSetting.recMerge || false
         const rec = videoSetting && videoSetting.rec || false
+        const config = {
+            push: true,
+            timeoutTime: 30000,
+            txtMsg: 'I gave you a video call.', //发送给对方的文本消息
+            pushMsg: `${WebIM.conn.context.userId}正在呼叫你...` //发送给对方的推送消息（只有手机端会显示）
+        }
         if (selectTab === 'contact') {
             this.setState({
                 showWebRTC: true
             })
             WebIM.call.caller = WebIM.conn.context.userId
-            WebIM.call.makeVideoCall(selectItem, null, rec, recMerge)
+            WebIM.call.makeVideoCall(selectItem, null, rec, recMerge, config)
             setTimeout(() => {
                 var confrId = WebIM.call.getServerRecordId()
             }, 1000)
@@ -350,8 +356,14 @@ class Chat extends React.Component {
         this.setState({
             showWebRTC: true
         })
+        const config = {
+            push: true,
+            timeoutTime: 30000,
+            txtMsg: 'I gave you a voice call.', //
+            pushMsg: `${WebIM.conn.context.userId}正在呼叫你...`
+        }
         WebIM.call.caller = WebIM.conn.context.userId
-        WebIM.call.makeVoiceCall(selectItem, null, rec, recMerge)
+        WebIM.call.makeVoiceCall(selectItem, null, rec, recMerge, config)
     }
 
     handleScroll = (e) => {
