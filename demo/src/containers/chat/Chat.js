@@ -21,6 +21,7 @@ import BlacklistActions from '@/redux/BlacklistRedux'
 import MultiAVActions from '@/redux/MultiAVRedux'
 import WebIM from '@/config/WebIM'
 import { history } from '@/utils'
+import utils from '@/utils'
 import getTabMessages from '@/selectors/ChatSelector'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import AddAVMemberModal from '@/components/webrtc/AddAVMemberModal'
@@ -304,6 +305,11 @@ class Chat extends React.Component {
     }
 
     callVideo = () => {
+        if (utils.isIOSWebview() || !emedia.isWebRTC) {
+            // 现在微信还不支持webrtc，给出提示
+            message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
+            return
+        }
         const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
         const { confrModal, avModal } = this.props
         const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))

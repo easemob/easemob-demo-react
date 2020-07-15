@@ -64,6 +64,20 @@ export default {
             node = node.parent
         }
         return false
+    },
+    // isWeixi(){
+    //     const ua = navigator.userAgent.toLowerCase();
+    //     if(ua.match(/MicroMessenger/i)=="micromessenger") {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // },
+    isIOSWebview(){
+        const ua = navigator.userAgent
+        const ischrome = ua.match(/Chrome\/([\d.]+)/) || ua.match(/CriOS\/([\d.]+)/)
+        const iswebview = !ischrome && ua.match(/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/)
+        return iswebview
     }
 }
 

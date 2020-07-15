@@ -85,7 +85,6 @@ class App extends Component {
             loginByToken(utils.getUserName(), utils.getToken())
         }
 
-        document.write('是否支持音视频：', emedia.isWebRTC)
     }
 
     componentWillReceiveProps() {}
