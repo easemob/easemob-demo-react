@@ -151,7 +151,7 @@ class DefaultLayout extends Component {
     changeItem(e, opt) {
         var selectTab
         opt = opt || {}
-        if(opt.defaultItem){
+        if(!opt.defaultItem){
             this.setSelectStatus(e,{ defaultItem:true })
         }
         const { history, location, group } = this.props
@@ -291,7 +291,7 @@ class DefaultLayout extends Component {
 	                this.defaultGroupItem = obj[0].split('_#-#_')[1]
 	                info.key = this.defaultGroupItem
 	                info.tab = 'group'
-	                this.changeItem(info,{ defaultItem:true })
+	                //this.changeItem(info,{ defaultItem:true })
 	            }
 	        }else if(selectTab == 'chatroom' && !this.defaultChatroomItem){
 	            var obj = entities.chatroom.names
@@ -299,7 +299,7 @@ class DefaultLayout extends Component {
 	                this.defaultChatroomItem = obj[0].split('_#-#_')[1]
 	                info.key = this.defaultChatroomItem
 	                info.tab = 'chatroom'
-	                this.changeItem(info,{ defaultItem:true })
+	                //this.changeItem(info,{ defaultItem:true })
 	            }
 	        }else if(selectTab == 'stranger' && !this.defaultStrangerItem){
 	            var obj = entities.stranger.names
@@ -348,7 +348,7 @@ class DefaultLayout extends Component {
                 this.multiAVSelectItem = groupId
                 info.key = groupId
 		        info.tab = 'group'
-		        this.changeItem(info,{ defaultItem:true })
+		        // this.changeItem(info,{ defaultItem:true })
             }
         }
 
