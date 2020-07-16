@@ -154,6 +154,7 @@ WebIM.conn.listen({
             message.success(`${msg.from}${I18n.t('join')}${I18n.t('chatroom')}${msg.gid}${I18n.t('successfully')}`)
             break
         case 'leaveChatRoom': // Leave the chat room
+            message.warning(`${msg.from} left the chatroom: ${msg.gid}` )
             break
         case 'addMute':
             message.warning('you was muted')
