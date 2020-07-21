@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/zhangdong/code/kefu-fe/websdk/packages/webrtc";
+/******/ 	__webpack_require__.p = "/Users/suqin/Desktop/软件开发文档/环信/project/websdk/packages/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -302,7 +302,7 @@ emedia.config({
     rebuildPeerConnectionWhenNetworkChanaged: true,
     useDeployMore: false,
     useDTX: true, // 开启 DTX
-
+    liveCfgs: [], // 多路推流数组
     rtcStatsTypeMath: function rtcStatsTypeMath(_stat, name) {
         switch (_stat.type) {
             case "remote-candidate":
@@ -14350,6 +14350,15 @@ module.exports = _util.prototypeExtend({
                 if (callback && typeof callback == 'function') {
                     callback(result);
                 }
+            },
+
+            // 存储 liveCfgs
+            onLivecfgsChanged: function onLivecfgsChanged(evt) {
+                if (evt.liveCfgs) {
+                    emedia.config({
+                        liveCfgs: evt.liveCfgs
+                    });
+                }
             }
 
         });
@@ -17744,7 +17753,8 @@ module.exports = _util.prototypeExtend({
 
         //'onServerError': 'onServerError'
         '402': 'onConfrAttrsUpdated',
-        '413': 'onAdminChanged'
+        '413': 'onAdminChanged',
+        '452': 'onLivecfgsChanged'
     },
 
     __init__: function __init__() {
@@ -18159,10 +18169,10 @@ module.exports = _util.prototypeExtend({
             onFunc(servMessage);
             return;
         }
-        // 存储 liveCfgs
-        if (servMessage.op == 452 && servMessage.liveCfgs) {
-            self.owner.liveCfgs = servMessage.liveCfgs;
-        }
+        // 存储 liveCfgs  因为申请成为主持人的人，也需要 liveCfgs
+        // if(servMessage.op == 452 && servMessage.liveCfgs) {
+        //     self.owner.liveCfgs = servMessage.liveCfgs;
+        // }
         // 上麦申请 和主持人申请的回复
         if (servMessage.op == 1001 && servMessage.arg) {
             var _JSON$parse = JSON.parse(servMessage.arg),
@@ -26840,7 +26850,7 @@ _outer.createConference = _Manager.single.createConfrSptMnPrg;
  * @param {string} role - 角色
  */
 _outer.grantRole = function (confr, members, role) {
-    emedia.decodeMemeberName(members);
+    // emedia.decodeMemeberName(members); 暂时注释，在 IM 一起的时候，appkey 会被删掉
     return _Manager.single.chanageRoles(role, members, confr.id);
 };
 
@@ -27078,7 +27088,7 @@ _outer.onConfrStateUpdated = function (confr_state) {
 */
 _outer.joinRoom = function () {
     var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(options) {
-        var create, _this, get_ticket, roomName, password, role, config, memName, token, create_params, room, confrId, get_ticket_params, ticket_info, ticket, nickName, ext, _confrId, isCreator, user_room;
+        var create, _this, get_ticket, roomName, password, role, config, memName, token, create_params, room, confrId, get_ticket_params, ticket_info, ticket, _ref2, nickName, ext, isCreator, user_room;
 
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -27093,8 +27103,7 @@ _outer.joinRoom = function () {
 
 
                             if (!appkey) {
-                                console.warn('appkey is not defined');
-                                return;
+                                throw new Error('in joinRoom appkey is not defined');
                             }
                             var org_name = appkey.split('#')[0];
                             var app_name = appkey.split('#')[1];
@@ -27165,51 +27174,45 @@ _outer.joinRoom = function () {
                         memName = this.identityName, token = this.identityToken;
 
                         if (roomName) {
-                            _context.next = 8;
+                            _context.next = 7;
                             break;
                         }
 
-                        console.warn('the roomName is required at joinRoom');
-                        return _context.abrupt('return');
+                        throw new Error('the roomName is required at joinRoom');
 
-                    case 8:
+                    case 7:
                         if (password) {
+                            _context.next = 9;
+                            break;
+                        }
+
+                        throw new Error('the password is required at joinRoom');
+
+                    case 9:
+                        if (memName) {
                             _context.next = 11;
                             break;
                         }
 
-                        console.warn('the password is required at joinRoom');
-                        return _context.abrupt('return');
+                        throw new Error('the memName is required at joinRoom');
 
                     case 11:
-                        if (memName) {
-                            _context.next = 14;
-                            break;
-                        }
-
-                        console.warn('the memName is required at joinRoom');
-                        return _context.abrupt('return');
-
-                    case 14:
                         if (token) {
-                            _context.next = 17;
+                            _context.next = 13;
                             break;
                         }
 
-                        console.warn('the token is required at joinRoom');
-                        return _context.abrupt('return');
+                        throw new Error('the token is required at joinRoom');
 
-                    case 17:
+                    case 13:
                         if (role) {
-                            _context.next = 20;
+                            _context.next = 15;
                             break;
                         }
 
-                        console.warn('the role is required at joinRoom');
-                        return _context.abrupt('return');
+                        throw new Error('the role is required at joinRoom');
 
-                    case 20:
-                        _context.prev = 20;
+                    case 15:
                         create_params = (0, _extends3.default)({
                             roomName: roomName,
                             password: password,
@@ -27217,41 +27220,32 @@ _outer.joinRoom = function () {
                             token: token
                         }, config);
 
-
-                        if (config.supportWechatMiniProgram) {
+                        if (config && config.supportWechatMiniProgram) {
                             create_params.useVCodes = ['H264', 'VP8'];
                         }
 
-                        _context.next = 25;
+                        _context.next = 19;
                         return create(create_params);
 
-                    case 25:
+                    case 19:
                         room = _context.sent;
                         // 加入房间
 
                         confrId = room.confrId;
-                        _context.prev = 27;
                         get_ticket_params = {
                             uid: memName,
                             token: token,
                             confrId: confrId,
                             password: password,
                             role: role,
-                            terminal: this._terminalInfo,
-                            rec: config.rec,
-                            recMerge: config.recMerge,
-                            supportWechatMiniProgram: config.supportWechatMiniProgram
+                            terminal: this._terminalInfo
                         };
-
-                        if (config.supportWechatMiniProgram) {
-                            get_ticket_params.useVCodes = ['H264', 'VP8'];
-                        }
-
-                        _context.next = 32;
+                        _context.next = 24;
                         return get_ticket(get_ticket_params);
 
-                    case 32:
+                    case 24:
                         ticket_info = _context.sent;
+                        // 获取ticket
 
 
                         // 给会议添加 参数
@@ -27259,16 +27253,15 @@ _outer.joinRoom = function () {
                         ticket_info.id = ticket_info.serverConfrId = ticket_info.confrId = confrId;
                         this._confrs[confrId] = (0, _assign2.default)(this._confrs[confrId] || {}, ticket_info);
 
-                        _context.prev = 36;
                         ticket = ticket_info.ticket;
-                        nickName = config.nickName, ext = config.ext;
+                        _ref2 = config ? config : {}, nickName = _ref2.nickName, ext = _ref2.ext;
                         // join confrence 通过 ticket 接口
 
-                        _confrId = room.confrId, isCreator = room.isCreator;
-                        _context.next = 42;
-                        return _this.joinConferenceWithTicket(_confrId, ticket, (0, _extends3.default)({ nickName: nickName }, ext));
+                        isCreator = room.isCreator;
+                        _context.next = 33;
+                        return _this.joinConferenceWithTicket(confrId, ticket, (0, _extends3.default)({ nickName: nickName }, ext));
 
-                    case 42:
+                    case 33:
                         user_room = _context.sent;
 
 
@@ -27278,65 +27271,12 @@ _outer.joinRoom = function () {
                         }
                         return _context.abrupt('return', user_room);
 
-                    case 47:
-                        _context.prev = 47;
-                        _context.t0 = _context['catch'](36);
-
-                        if (!/cause: -523|cause:-523/.test(_context.t0.errorMessage)) {
-                            _context.next = 51;
-                            break;
-                        }
-
-                        return _context.abrupt('return', {
-                            error: -523,
-                            message: 'talker count limit'
-                        });
-
-                    case 51:
-                        return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
-
-                    case 52:
-                        _context.next = 59;
-                        break;
-
-                    case 54:
-                        _context.prev = 54;
-                        _context.t1 = _context['catch'](27);
-
-                        if (!_context.t1.response) {
-                            _context.next = 58;
-                            break;
-                        }
-
-                        return _context.abrupt('return', JSON.parse(_context.t1.response));
-
-                    case 58:
-                        return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
-
-                    case 59:
-                        _context.next = 66;
-                        break;
-
-                    case 61:
-                        _context.prev = 61;
-                        _context.t2 = _context['catch'](20);
-
-                        if (!_context.t2.response) {
-                            _context.next = 65;
-                            break;
-                        }
-
-                        return _context.abrupt('return', JSON.parse(_context.t2.response));
-
-                    case 65:
-                        return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
-
-                    case 66:
+                    case 36:
                     case 'end':
                         return _context.stop();
                 }
             }
-        }, _callee, this, [[20, 61], [27, 54], [36, 47]]);
+        }, _callee, this);
     }));
 
     return function (_x) {
@@ -27493,24 +27433,71 @@ _outer.unmuteAll = function (confrId) {
     var muteAll = false;
     return _update_confr_state.call(this, roleToken, muteAll);
 };
-
-// 推流 CDN 更新布局
-_outer.updateLiveLayout = function (confrId, regions) {
+// 多路推流 
+_outer.addLive = function (confrId, liveCfg) {
     if (!confrId) {
-        console.warn('updateLiveLayout confrId is required');
-        return;
+        throw new Error('addLive confrId is required');
     }
-
-    if (!regions) {
-        console.warn('updateLiveLayout regions is required');
-        return;
+    if (!liveCfg) {
+        throw new Error('addLive liveCfg is required');
     }
 
     var current = this._services[confrId].current;
 
     var role = current.role,
-        roleToken = current.roleToken,
-        liveCfgs = current.liveCfgs;
+        roleToken = current.roleToken;
+
+    if (role != 7) {
+        throw new Error('only admin can addLive');
+    }
+    if (!roleToken) {
+        throw new Error('addLive roleToken is required');
+    }
+
+    var url = emedia.config.restPrefix + '/easemob/rtc/livecfg';
+    var params = {
+        confrId: confrId,
+        roleToken: roleToken,
+        liveCfg: liveCfg
+    };
+
+    return new _promise2.default(function (resolve, reject) {
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: (0, _stringify2.default)(params),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function success(data) {
+                if (data.error == 0) {
+                    resolve(data);
+                } else {
+                    reject(data);
+                }
+            },
+            error: function error(_error6) {
+                reject(_error6);
+            }
+        });
+    });
+};
+// 推流 CDN 更新布局
+_outer.updateLiveLayout = function (confrId, liveId, regions) {
+    if (!confrId) {
+        throw new Error('updateLiveLayout confrId is required');
+    }
+    if (!liveId) {
+        throw new Error('updateLiveLayout liveId is required');
+    }
+
+    if (!regions) {
+        throw new Error('updateLiveLayout regions is required');
+    }
+
+    var current = this._services[confrId].current;
+
+    var role = current.role,
+        roleToken = current.roleToken;
 
     if (role != 7) {
         console.warn('only admin can updateLiveLayout');
@@ -27520,14 +27507,6 @@ _outer.updateLiveLayout = function (confrId, regions) {
         console.error('updateLiveLayout roleToken is required');
         return;
     }
-
-    if (!liveCfgs) {
-        console.warn('updateLiveLayout liveCfgs is not have');
-        return;
-    }
-
-    var liveId = liveCfgs[0].id;
-
 
     var url = emedia.config.restPrefix + '/easemob/rtc/live/layout';
 
@@ -27552,30 +27531,26 @@ _outer.updateLiveLayout = function (confrId, regions) {
                     reject(data);
                 }
             },
-            error: function error(_error6) {
-                reject(_error6);
+            error: function error(_error7) {
+                reject(_error7);
             }
         });
     });
 };
 
 // 取消推流 CDN
-_outer.deleteLive = function (confrId) {
+_outer.deleteLive = function (confrId, liveId) {
     if (!confrId) {
-        console.warn('deleteLive confrId is required');
-        return;
+        throw new Error('deleteLive confrId is required');
+    }
+    if (!liveId) {
+        throw new Error('deleteLive liveId is required');
     }
 
     var current = this._services[confrId].current;
-    var liveCfgs = current.liveCfgs,
-        role = current.role,
+    var role = current.role,
         roleToken = current.roleToken;
 
-
-    if (!liveCfgs) {
-        console.warn('this service Live is not');
-        return;
-    }
 
     if (role != 7) {
         console.warn('only admin can deleteLive');
@@ -27585,9 +27560,6 @@ _outer.deleteLive = function (confrId) {
         console.error('updateLiveLayout roleToken is required');
         return;
     }
-
-    var liveId = liveCfgs[0].id;
-
 
     var url = emedia.config.restPrefix + '/easemob/rtc/delete/live';
     var params = { confrId: confrId, liveId: liveId, roleToken: roleToken };
@@ -27606,8 +27578,8 @@ _outer.deleteLive = function (confrId) {
                     reject(data);
                 }
             },
-            error: function error(_error7) {
-                reject(_error7);
+            error: function error(_error8) {
+                reject(_error8);
             }
         });
     });
@@ -27722,6 +27694,14 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.single = undefined;
+
+var _regenerator = __webpack_require__(134);
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = __webpack_require__(137);
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var _extends2 = __webpack_require__(143);
 
@@ -28979,6 +28959,11 @@ var _single = _Util2.default.extend(new Manager(), {
     },
 
     shareDesktopWithAudio: function shareDesktopWithAudio(params) {
+
+        if (navigator.mediaDevices.getDisplayMedia && !emedia.isElectron) {
+            return this.shareDesktopWithAudioNew(params);
+        }
+
         var videoConstaints = params.videoConstaints,
             withAudio = params.withAudio,
             videoTag = params.videoTag,
@@ -29011,6 +28996,66 @@ var _single = _Util2.default.extend(new Manager(), {
 
         return rxShareDesktop.call(self, options).toPromise();
     },
+
+    // use new navigator api don't rely on plugin
+    shareDesktopWithAudioNew: function () {
+        var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(params) {
+            var confrId, withAudio, ext, constaints, desktopMedia, pubS, desktopStream;
+            return _regenerator2.default.wrap(function _callee$(_context) {
+                while (1) {
+                    switch (_context.prev = _context.next) {
+                        case 0:
+                            confrId = params.confrId, withAudio = params.withAudio, ext = params.ext;
+
+                            if (confrId) {
+                                _context.next = 3;
+                                break;
+                            }
+
+                            throw new Error('shareDesktop confrId is required');
+
+                        case 3:
+                            constaints = {
+                                video: true,
+                                audio: withAudio
+                            };
+                            _context.next = 6;
+                            return navigator.mediaDevices.getDisplayMedia(constaints);
+
+                        case 6:
+                            desktopMedia = _context.sent;
+                            // get screen media 
+
+                            pubS = {
+                                localStream: desktopMedia,
+                                type: 1,
+                                aoff: withAudio ? 0 : 1,
+                                voff: 0,
+                                constaints: constaints,
+                                _located: true
+                            };
+                            _context.next = 10;
+                            return rxPublish.call(this, confrId, pubS, ext).toPromise();
+
+                        case 10:
+                            desktopStream = _context.sent;
+                            return _context.abrupt('return', desktopStream);
+
+                        case 12:
+                        case 'end':
+                            return _context.stop();
+                    }
+                }
+            }, _callee, this);
+        }));
+
+        function shareDesktopWithAudioNew(_x) {
+            return _ref.apply(this, arguments);
+        }
+
+        return shareDesktopWithAudioNew;
+    }(),
+
     changeCamera: function changeCamera(confrId) {
         return rxChanageCamera.call(this, confrId).toPromise();
     },
@@ -43729,6 +43774,10 @@ var _RtcHandler = {
         }
         //}
 
+        // not online clear self._connectedSid
+        if (rtcOptions.online == 0) {
+            self._connectedSid = '';
+        }
         //onTermC
         if (rtcOptions.op == 107) {
             self._connectedSid = '';
