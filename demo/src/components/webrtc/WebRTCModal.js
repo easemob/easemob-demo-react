@@ -19,6 +19,7 @@ class WebRTCModal extends React.Component {
             this.initWebRTC(WebRTCModal)
             // this.initEmedia()
             this.channel = new RTCChannel(this.refs.rtcWrapper, this.props.collapsed)
+
         }
     }
 
@@ -34,6 +35,7 @@ class WebRTCModal extends React.Component {
 
         console.log('InitWebRTC end..........')
         var me = this
+
 
         // WebIM.WebRTC.config({ useDeployMore:true })// 开启多集群配置
         WebIM.call = new WebIM.WebRTC.Call({
@@ -145,6 +147,12 @@ class WebRTCModal extends React.Component {
                         case 'TARGET_OFFLINE':
                             e.message = 'Target is offline.'
                             break
+                        case 'callee is not online!':
+                            // 对方不在线
+                            break;
+                        case 'call timeout':
+                            // 呼叫超时
+                            break;
                         }
                         if (close) {
                             var closeButton = document.getElementById('webrtc_close')

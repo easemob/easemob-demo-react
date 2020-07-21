@@ -21,6 +21,7 @@ import BlacklistActions from '@/redux/BlacklistRedux'
 import MultiAVActions from '@/redux/MultiAVRedux'
 import WebIM from '@/config/WebIM'
 import { history } from '@/utils'
+import utils from '@/utils'
 import getTabMessages from '@/selectors/ChatSelector'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import AddAVMemberModal from '@/components/webrtc/AddAVMemberModal'
@@ -304,17 +305,28 @@ class Chat extends React.Component {
     }
 
     callVideo = () => {
+        if (utils.isIOSWebview() || !emedia.isWebRTC) {
+            // 现在IOS webview还不支持webrtc，给出提示
+            message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
+            return
+        }
         const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
         const { confrModal, avModal } = this.props
         const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))
         const recMerge = videoSetting && videoSetting.recMerge || false
         const rec = videoSetting && videoSetting.rec || false
+        const config = {
+            push: true,
+            timeoutTime: 30000,
+            txtMsg: 'I gave you a video call.', //发送给对方的文本消息
+            pushMsg: `${WebIM.conn.context.userId}正在呼叫你...` //发送给对方的推送消息（只有手机端会显示）
+        }
         if (selectTab === 'contact') {
             this.setState({
                 showWebRTC: true
             })
             WebIM.call.caller = WebIM.conn.context.userId
-            WebIM.call.makeVideoCall(selectItem, null, rec, recMerge)
+            WebIM.call.makeVideoCall(selectItem, null, rec, recMerge, config)
             setTimeout(() => {
                 var confrId = WebIM.call.getServerRecordId()
             }, 1000)
@@ -340,7 +352,11 @@ class Chat extends React.Component {
     }
 
     callVoice = () => {
-
+        if (utils.isIOSWebview() || !emedia.isWebRTC) {
+            // 现在IOS webview还不支持webrtc，给出提示
+            message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
+            return
+        }
         const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
         console.log('sendWrapper::callVoice', WebIM.conn.context.userId/*当前登录用户*/, selectItem/*聊天对象*/, selectTab/*当前标签*/)
 
@@ -350,8 +366,14 @@ class Chat extends React.Component {
         this.setState({
             showWebRTC: true
         })
+        const config = {
+            push: true,
+            timeoutTime: 30000,
+            txtMsg: 'I gave you a voice call.', //
+            pushMsg: `${WebIM.conn.context.userId}正在呼叫你...`
+        }
         WebIM.call.caller = WebIM.conn.context.userId
-        WebIM.call.makeVoiceCall(selectItem, null, rec, recMerge)
+        WebIM.call.makeVoiceCall(selectItem, null, rec, recMerge, config)
     }
 
     handleScroll = (e) => {

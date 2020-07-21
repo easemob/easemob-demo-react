@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/Users/suqin/Desktop/软件开发文档/环信/project/websdk/packages/webrtc";
+/******/ 	__webpack_require__.p = "/Users/zhangdong/code/kefu-fe/websdk/packages/webrtc";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
@@ -27074,7 +27074,7 @@ _outer.onConfrStateUpdated = function (confr_state) {
 * @param {string} option.roomName - 房间名称
 * @param {string} option.password - 房间密码
 * @param {string} option.role - 进入房间时的角色
-* @param {Object} option.config - 进入房间时的拓展配置
+* @param {Object} option.config - 进入房间时的拓展配置 rec: 是否录制；recMerge:是否合并；supportWechatMiniProgram：是否支持小程序
 */
 _outer.joinRoom = function () {
     var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(options) {
@@ -27216,15 +27216,21 @@ _outer.joinRoom = function () {
                             memName: memName,
                             token: token
                         }, config);
-                        _context.next = 24;
+
+
+                        if (config.supportWechatMiniProgram) {
+                            create_params.useVCodes = ['H264', 'VP8'];
+                        }
+
+                        _context.next = 25;
                         return create(create_params);
 
-                    case 24:
+                    case 25:
                         room = _context.sent;
                         // 加入房间
 
                         confrId = room.confrId;
-                        _context.prev = 26;
+                        _context.prev = 27;
                         get_ticket_params = {
                             uid: memName,
                             token: token,
@@ -27233,12 +27239,18 @@ _outer.joinRoom = function () {
                             role: role,
                             terminal: this._terminalInfo,
                             rec: config.rec,
-                            recMerge: config.recMerge
+                            recMerge: config.recMerge,
+                            supportWechatMiniProgram: config.supportWechatMiniProgram
                         };
-                        _context.next = 30;
+
+                        if (config.supportWechatMiniProgram) {
+                            get_ticket_params.useVCodes = ['H264', 'VP8'];
+                        }
+
+                        _context.next = 32;
                         return get_ticket(get_ticket_params);
 
-                    case 30:
+                    case 32:
                         ticket_info = _context.sent;
 
 
@@ -27247,16 +27259,16 @@ _outer.joinRoom = function () {
                         ticket_info.id = ticket_info.serverConfrId = ticket_info.confrId = confrId;
                         this._confrs[confrId] = (0, _assign2.default)(this._confrs[confrId] || {}, ticket_info);
 
-                        _context.prev = 34;
+                        _context.prev = 36;
                         ticket = ticket_info.ticket;
                         nickName = config.nickName, ext = config.ext;
                         // join confrence 通过 ticket 接口
 
                         _confrId = room.confrId, isCreator = room.isCreator;
-                        _context.next = 40;
+                        _context.next = 42;
                         return _this.joinConferenceWithTicket(_confrId, ticket, (0, _extends3.default)({ nickName: nickName }, ext));
 
-                    case 40:
+                    case 42:
                         user_room = _context.sent;
 
 
@@ -27266,12 +27278,12 @@ _outer.joinRoom = function () {
                         }
                         return _context.abrupt('return', user_room);
 
-                    case 45:
-                        _context.prev = 45;
-                        _context.t0 = _context['catch'](34);
+                    case 47:
+                        _context.prev = 47;
+                        _context.t0 = _context['catch'](36);
 
                         if (!/cause: -523|cause:-523/.test(_context.t0.errorMessage)) {
-                            _context.next = 49;
+                            _context.next = 51;
                             break;
                         }
 
@@ -27280,51 +27292,51 @@ _outer.joinRoom = function () {
                             message: 'talker count limit'
                         });
 
-                    case 49:
+                    case 51:
                         return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
 
-                    case 50:
-                        _context.next = 57;
+                    case 52:
+                        _context.next = 59;
                         break;
 
-                    case 52:
-                        _context.prev = 52;
-                        _context.t1 = _context['catch'](26);
+                    case 54:
+                        _context.prev = 54;
+                        _context.t1 = _context['catch'](27);
 
                         if (!_context.t1.response) {
-                            _context.next = 56;
+                            _context.next = 58;
                             break;
                         }
 
                         return _context.abrupt('return', JSON.parse(_context.t1.response));
 
-                    case 56:
+                    case 58:
                         return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
 
-                    case 57:
-                        _context.next = 64;
+                    case 59:
+                        _context.next = 66;
                         break;
 
-                    case 59:
-                        _context.prev = 59;
+                    case 61:
+                        _context.prev = 61;
                         _context.t2 = _context['catch'](20);
 
                         if (!_context.t2.response) {
-                            _context.next = 63;
+                            _context.next = 65;
                             break;
                         }
 
                         return _context.abrupt('return', JSON.parse(_context.t2.response));
 
-                    case 63:
+                    case 65:
                         return _context.abrupt('return', { error: -1, message: 'joinRoom error' });
 
-                    case 64:
+                    case 66:
                     case 'end':
                         return _context.stop();
                 }
             }
-        }, _callee, this, [[20, 59], [26, 52], [34, 45]]);
+        }, _callee, this, [[20, 61], [27, 54], [36, 47]]);
     }));
 
     return function (_x) {

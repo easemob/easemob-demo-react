@@ -84,6 +84,7 @@ class App extends Component {
         if (hasToken && !debug) {
             loginByToken(utils.getUserName(), utils.getToken())
         }
+
     }
 
     componentWillReceiveProps() {}

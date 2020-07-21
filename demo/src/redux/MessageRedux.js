@@ -226,6 +226,7 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
                 fail: function () {
+                    console.warn('发送txt失败，确认是否被禁言、拉黑等')
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 ext: {}
@@ -302,6 +303,10 @@ const { Types, Creators } = createActions({
                 },
                 success: function (id) {
                 },
+                fail: function () {
+                    console.warn('发送img失败，确认是否被禁言、拉黑等')
+                    dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
+                },
                 // body: {
                 //     url: "https://fanyi-cdn.cdn.bcebos.com/static/translation/img/header/logo_40c4f13.svg",
                 //     type: "img",
@@ -368,7 +373,11 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 success: function (id) {
-                }
+                },
+                fail: function () {
+                    console.warn('发送file失败，确认是否被禁言、拉黑等')
+                    dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
+                },
             })
 
             // keep the same logic as sendTextMessage
@@ -414,6 +423,10 @@ const { Types, Creators } = createActions({
                 },
                 success: function(data){
                     console.log('语音发送成功', data)
+                },
+                fail: function () {
+                    console.warn('发送audio失败，确认是否被禁言、拉黑等')
+                    dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 flashUpload: WebIM.flashUpload
             })

@@ -12,8 +12,8 @@
 // }
 
 function getUrl(){
-    var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
-    var socketUrl = '//im-api.easemob.com/ws'
+    var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
+    var socketUrl = '//im-api-v2.easemob.com/ws'
     if(window.location.href.indexOf('webim-h5.easemob.com') !== -1 ){
         apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
         socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
