@@ -25,7 +25,7 @@ import { message, Modal } from 'antd'
 const logger = WebIM.loglevel.getLogger('WebIMRedux')
 
 WebIM.conn.listen({
-    // success connect to xmpp
+    // success connect
     onOpened: msg => {
         const username = store.getState().login.username
         const token = utils.getToken()
