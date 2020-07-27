@@ -39,12 +39,12 @@ var config = {
     /*
      * websocket server
      */
-    socketServer: getUrl().socketUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
      */
     // ios must be https!!! by lwz
-    restServer: getUrl().apiUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
