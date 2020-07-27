@@ -43438,7 +43438,7 @@ var _Call = {
      * @param {boolean} rec -是否录制
      * @param {boolean} recMerge -是否合并
     */
-    makeVideoCall: function makeVideoCall(callee, accessSid, rec, recMerge) {
+    makeVideoCall: function makeVideoCall(callee, accessSid, rec, recMerge, config) {
         //accessSid 不知道这个有啥用  调用的时候也没有传呀
         var self = this;
 
@@ -43446,7 +43446,7 @@ var _Call = {
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
         //mediaStreamConstaints.video = true;
 
-        this.call(callee, mediaStreamConstaints, accessSid, rec, recMerge);
+        this.call(callee, mediaStreamConstaints, accessSid, rec, recMerge, config);
     },
 
     /**
@@ -43457,14 +43457,14 @@ var _Call = {
      * @param {boolean} rec -是否录制
      * @param {boolean} recMerge -是否合并
     */
-    makeVoiceCall: function makeVoiceCall(callee, accessSid, rec, recMerge) {
+    makeVoiceCall: function makeVoiceCall(callee, accessSid, rec, recMerge, config) {
         var self = this;
 
         var mediaStreamConstaints = {};
         Util.extend(mediaStreamConstaints, self.mediaStreamConstaints);
         mediaStreamConstaints.video = false;
 
-        self.call(callee, mediaStreamConstaints, accessSid, rec, recMerge);
+        self.call(callee, mediaStreamConstaints, accessSid, rec, recMerge, config);
     },
 
     /**
@@ -43484,10 +43484,22 @@ var _Call = {
         var self = this;
         self.caller = '';
         self.pattern.termCall();
+        self.timer && clearInterval(self.timer);
     },
 
     call: function call(callee, mediaStreamConstaints, accessSid, rec, recMerge) {
+        var config = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : { push: false };
+
         var self = this;
+        self.timer && clearInterval(self.timer);
+        if (config.push) {
+            var isFirstTime = true;
+            var isConnected = false;
+            var timeoutTime = config && typeof config.timeoutTime === 'number' && config.timeoutTime || 60000;
+            var totalTimes = Number((timeoutTime / 2000).toFixed());
+            var currentTime = 0;
+        }
+
         this.callee = this.api.jid(callee);
 
         var rt = new RouteTo({
@@ -43503,21 +43515,46 @@ var _Call = {
             }
         });
 
-        this.api.reqP2P(rt, mediaStreamConstaints.video ? 1 : 0, mediaStreamConstaints.audio ? 1 : 0, this.api.jid(callee), rec, recMerge, function (from, rtcOptions) {
-            if (rtcOptions.online == "0") {
-                self.listener.onError({ message: "callee is not online!" });
-                return;
-            }
-            rtcOptions.streamType = mediaStreamConstaints.audio && mediaStreamConstaints.video ? "VIDEO" : "VOICE";
+        sendReqP2p();
 
-            // 如果开启多集群 做一个turn 替换
-            if (self.deploy_more_config) {
-                rtcOptions.rtcCfg = self.deploy_more_config.replace_trun_url(rtcOptions.rtcCfg);
-            }
+        function sendReqP2p() {
+            self.api.reqP2P(rt, mediaStreamConstaints.video ? 1 : 0, mediaStreamConstaints.audio ? 1 : 0, self.api.jid(callee), rec, recMerge, function (from, rtcOptions) {
+                if (rtcOptions.online == "0") {
+                    console.warn('callee is not online!');
+                    if (!config.push) {
+                        return self.listener.onError({ message: "callee is not online!" });
+                    }
 
-            self._onGotServerP2PConfig(from, rtcOptions);
-            self.pattern.initC(mediaStreamConstaints, accessSid, rec, recMerge);
-        });
+                    if (isFirstTime) {
+                        self.listener.onError({ message: "callee is not online!" });
+                        config.push && self.api.senPushMsg(callee, config.txtMsg, config.pushMsg);
+                    }
+                    isFirstTime = false;
+                    isConnected = false;
+                    self.timer = !isConnected && currentTime <= totalTimes && setTimeout(function () {
+                        currentTime++;
+                        sendReqP2p();
+                    }, 2000);
+
+                    if (currentTime > totalTimes) {
+                        self.listener.onError({ message: "call timeout" });
+                    }
+                } else {
+                    rtcOptions.streamType = mediaStreamConstaints.audio && mediaStreamConstaints.video ? "VIDEO" : "VOICE";
+
+                    // 如果开启多集群 做一个turn 替换
+                    if (self.deploy_more_config) {
+                        rtcOptions.rtcCfg = self.deploy_more_config.replace_trun_url(rtcOptions.rtcCfg);
+                    }
+
+                    self._onGotServerP2PConfig(from, rtcOptions);
+                    self.pattern.initC(mediaStreamConstaints, accessSid, rec, recMerge);
+                    isConnected = true;
+                }
+            });
+
+            return isConnected;
+        }
     },
 
     /**
@@ -43696,7 +43733,6 @@ var _RtcHandler = {
         var thirdMessage = messageBodyMessage.decode(msginfo.payload);
         var id = msginfo.id;
         var from = msginfo.from.name || '';
-
         // remove resource
         from.lastIndexOf("/") >= 0 && (from = from.substring(0, from.lastIndexOf("/")));
 
@@ -44205,6 +44241,30 @@ var _RtcHandler = {
         firstMessage.payload = secondMessage;
         firstMessage = msyncMessage.encode(firstMessage).finish();
         conn.sendMSync(firstMessage);
+    },
+
+    _sendPushMsg: function _sendPushMsg(to) {
+        var msg = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        var pushMsg = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : WebIM.conn.user + '\u6B63\u5728\u547C\u53EB\u4F60...';
+
+        var msgObj = new WebIM.message('txt', WebIM.conn.getUniqueId());
+        msgObj.set({
+            msg: msg,
+            to: to,
+            roomType: false,
+            chatType: 'singleChat',
+            success: function success() {},
+            fail: function fail() {
+                console.warn('Send push error，Please make sure that you are not blocked');
+            },
+            ext: {
+                em_apns_ext: {
+                    em_push_title: pushMsg
+                }
+            }
+        });
+
+        WebIM.conn.send(msgObj.body);
     }
 };
 
@@ -44360,6 +44420,10 @@ var _clazz = {
         rtcOptions.streamType = video && audio ? "VIDEO" : "VOICE";
 
         this.rtcHandler.sendRtcMessage(rt, rtcOptions, callback);
+    },
+
+    senPushMsg: function senPushMsg(to, msg, pushMsg) {
+        return this.rtcHandler._sendPushMsg(to, msg, pushMsg);
     },
 
     /**

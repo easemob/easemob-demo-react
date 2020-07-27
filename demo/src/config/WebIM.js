@@ -3,7 +3,7 @@
 /* eslint-enable */
 import websdk from './websdk3.2.1'
 // import websdk from 'easemob-websdk'
-import webrtc from './EMedia_x1v1'
+import webrtc from './EMedia_x1v1_3.2.1'
 
 // import emedia from './EMedia_sdk-dev'
 // import webrtc from 'easemob-webrtc'
