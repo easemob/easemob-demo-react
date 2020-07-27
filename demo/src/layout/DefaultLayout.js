@@ -151,7 +151,7 @@ class DefaultLayout extends Component {
     changeItem(e, opt) {
         var selectTab
         opt = opt || {}
-        if(!opt.defaultItem){
+        if(opt.defaultItem){
             this.setSelectStatus(e,{ defaultItem:true })
         }
         const { history, location, group } = this.props
@@ -348,7 +348,7 @@ class DefaultLayout extends Component {
                 this.multiAVSelectItem = groupId
                 info.key = groupId
 		        info.tab = 'group'
-		        // this.changeItem(info,{ defaultItem:true })
+		        this.changeItem(info,{ defaultItem:true })
             }
         }
 
