@@ -39,12 +39,12 @@ var config = {
     /*
      * websocket server
      */
-    socketServer: getUrl().socketUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
      */
     // ios must be https!!! by lwz
-    restServer: getUrl().apiUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
@@ -111,7 +111,7 @@ var config = {
      * sender, in order to tell the sender the message has delivered.
      * See call back function onReceivedMessage
      */
-    delivery: true,
+    delivery: false,
     /**
      * Size of message cache for group chating like group, chatroom etc. For use in this demo
      */
