@@ -38,13 +38,17 @@ function getUrl(){
 var config = {
     /*
      * websocket server
+     * im-api-v2.easemob.com/ws 线上环境
+     * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+    socketServer: getUrl().sandboxSocketUrl,//(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
+     * a1.easemob.com 线上环境
+     * a1-hsb.easemob.com 沙箱环境
      */
     // ios must be https!!! by lwz
-    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+    restServer: getUrl().sandBoxApiUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
