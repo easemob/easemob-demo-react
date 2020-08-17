@@ -202,7 +202,11 @@ class WebRTCModal extends React.Component {
                     emedia.mgr.getConferenceTkt(confrId, password).then(function (confr) {
                         callback(confr)
                     })
+                },
+                onNetWorkDisconnect(endType) { // endType: local || remote, 哪一端断网
+                    console.log('1v1 onNetWorkDisconnect', endType);
                 }
+
             },
         })
         WebIM.conn.registerConfrIQHandler && (WebIM.conn.registerConfrIQHandler());
