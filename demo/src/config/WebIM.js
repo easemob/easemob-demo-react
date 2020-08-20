@@ -4,10 +4,10 @@
 
 import websdk from './websdklist'
 // import websdk from 'easemob-websdk'
-// import webrtc from './EMedia_x1v1_3.2.1'
+import webrtc from './EMedia_x1v1_3.2.2'
+// import webrtc from 'easemob-webrtc'
 
 // import emedia from './EMedia_sdk-dev'
-import webrtc from 'easemob-webrtc'
 import config from 'WebIMConfig'
 import emoji from './emoji'
 import Api from 'axios'
