@@ -29541,7 +29541,9 @@ function rxDisbandConfr(confrId, roleToken) {
     return _rxjs.Observable.create(Manager.prototype.disbandConfr.call(self, apiArgs)).pipe((0, _operators.map)(function (response) {
         if (self.upload_stats) {
             // stop upload qoe
-            self.upload_stats.stop();
+            setTimeout(function () {
+                return self.upload_stats.stop();
+            }, 3000); // set timeout wait onEixt upload eixt event
         }
         _Util2.default.removeAttribute(self._confrs, confrId);
         return confr.id;
@@ -29660,10 +29662,6 @@ function rxJoinUseTicket(confrId, ticket, ext) {
             // 开启 stats 上报
             self.upload_stats = new _UploadStats2.default(emedia); // 将 emedia 传入，在里面获取数据
 
-            // test dev
-            emedia.mgr.upload_stats = self.upload_stats;
-            // test dev end
-
             try {
                 self.upload_stats.connect_ws();
             } catch (error) {
@@ -29687,7 +29685,6 @@ function rxJoinUseTicket(confrId, ticket, ext) {
             observer.complete();
         }, function (event) {
 
-            console.log('join err', event);
             if (self.upload_stats) {
                 // 上报一条错误信息
                 self.upload_stats.join_fail();
@@ -29787,7 +29784,34 @@ function rxResumePauseVideo(pubS, videoConstaints, confrId) {
 
     return rxChanageVideoConstraints.call(self, confrId, pubS, videoConstaints);
 }
+// 质量监控上报 开关音视频事件
+function upload_aoff_or_voff_event(event, pubS) {
 
+    if (!this.upload_stats) {
+        return;
+    }
+
+    if (!event || !pubS) {
+        return;
+    }
+
+    var current = this._services[this.__current_confrId].current;
+    if (!current) {
+        return;
+    }
+
+    var _o = {
+        event: event,
+        rtcId: pubS.rtcId,
+        sId: pubS.id,
+        sessionId: current._session._sessionId,
+        streamType: pubS.type,
+        voff: pubS.voff,
+        aoff: pubS.aoff
+
+    };
+    this.upload_stats.upload_event(_o);
+}
 function rxVoff(confrId, pubS, voff) {
     var self = this;
     var service = self._service(confrId);
@@ -29800,8 +29824,13 @@ function rxVoff(confrId, pubS, voff) {
                 errorMessage: evt.message()
             });
         }, function success() {
-            observer.next(service.getStreamById(pubS.id));
+
+            var stream = service.getStreamById(pubS.id);
+            observer.next(stream);
             observer.complete();
+
+            var event = voff == 1 ? 8 : 6;
+            upload_aoff_or_voff_event.bind(self)(event, stream); // 质量监控上报
         });
     }).pipe(errorHandler);
 }
@@ -29868,8 +29897,12 @@ function rxAoff(confrId, pubS, aoff) {
                 errorMessage: evt.message()
             });
         }, function success() {
-            observer.next(service.getStreamById(pubS.id));
+            var stream = service.getStreamById(pubS.id);
+            observer.next(stream);
             observer.complete();
+
+            var event = aoff == 1 ? 7 : 5;
+            upload_aoff_or_voff_event.bind(self)(event, stream); // 质量监控上报
         });
     }).pipe(errorHandler);
 }
@@ -30698,7 +30731,9 @@ var _single = _Util2.default.extend(new Manager(), {
 
         if (self.upload_stats) {
             // stop upload qoe
-            self.upload_stats.stop();
+            setTimeout(function () {
+                return self.upload_stats.stop();
+            }, 3000); // set timeout wait onEixt upload eixt event
         }
     },
 
@@ -31462,7 +31497,7 @@ var UploadStats = function () {
                 joinConfrTime: currentXService.ticket.timestamp, //整型	加入会议成功的时间，result为0时有效
                 sessionId: sessionId, //字符串	会议的sessionID，result为0时有效
                 networkType: 'WIFI', //字符串	网络类型，包括“WIFI”，“LAN”，“4G”
-                sdkOS: 'WebRTC',
+                sdkOS: 'Web',
                 sdkVersion: sdkVersion,
                 deviceInfo: deviceInfo,
                 osVersion: osVersion,
@@ -43893,7 +43928,6 @@ function init() {
             }
         },
         onUpdateStream: function onUpdateStream(stream, update) {
-            console.log('EventsObservable onUpdateStream', stream, update);
             if (stream.id == 0) {
                 return;
             }
