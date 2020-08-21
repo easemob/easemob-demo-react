@@ -149,9 +149,9 @@ export default class ChatMessage extends Component {
                                     </p>
                                 </div>
                                 <div className="ant-col-12">
-                                    <a href={body.url} download={body.filename}>
+                                    {/* <a href={body.url} download={body.filename}>
                                         {I18n.t('download')}
-                                    </a>
+                                    </a> */}
                                 </div>
                             </div>
                         </div>
