@@ -714,6 +714,15 @@ export const clearUnread = (state, { chatType, id }) => {
 }
 
 export const updateMessageMid = (state, { id, mid }) => {
+    const byId = state.getIn([ 'byId', id ])
+    if (!_.isEmpty(byId)) {
+        const { type, chatId } = byId
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: parseInt(id) })
+        let msg = found.setIn([ 'toJid' ], mid)
+        messages.splice(messages.indexOf(found), 1, msg)
+        state = state.setIn([ type, chatId ], messages)
+    }
     AppDB.updateMessageMid(mid, Number(id))
     return state.setIn([ 'byMid', mid ], { id })
 }

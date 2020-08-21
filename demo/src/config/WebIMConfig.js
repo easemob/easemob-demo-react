@@ -29,10 +29,8 @@ function getUrl(){
     return {
         apiUrl: apiUrl,
         socketUrl: socketUrl,
-        // sandBoxApiUrl: 'https://a1-hsb.easemob.com',
-        // sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
-        sandBoxApiUrl: 'https://a1.easemob.com',
-        sandboxSocketUrl: 'https://im-api-v2.easemob.com/ws'
+        sandBoxApiUrl: 'https://a1-hsb.easemob.com',
+        sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
     }
 }
 
