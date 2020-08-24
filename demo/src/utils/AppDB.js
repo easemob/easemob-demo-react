@@ -103,7 +103,6 @@ const AppDB = {
     },
 
     deleteMessage(id){
-        console.log('ddddd', id)
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
             $_TABLE.where('id')

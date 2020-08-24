@@ -66,7 +66,7 @@ export default class ChatMessage extends Component {
         WebIM.conn.recallMessage({
             to: this.props.to,
             mid: toJid,
-            group: this.props.type,
+            type: this.props.type,
             success: () => {
                 this.props.ok(deepGet(this, 'props.id'))
             },
@@ -79,7 +79,10 @@ export default class ChatMessage extends Component {
         const { bySelf, from, time, body, status, toJid, } = this.props
         const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
         const localFormat = renderTime(time)
-
+        let useDropdown = true
+        if (body.msg == '消息已撤回' || !bySelf) {
+            useDropdown = false
+        }
         let content = null
         const menu = (
             <Menu onClick={this.oncontextmenu(toJid)}>
@@ -90,7 +93,7 @@ export default class ChatMessage extends Component {
         )
         switch (body.type) {
         case 'txt':
-            content = bySelf ? (
+            content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <p className="x-message-text" >
                         {this.renderTxt(body.msg || body.url)}
@@ -103,7 +106,7 @@ export default class ChatMessage extends Component {
             )
             break
         case 'img':
-            content = bySelf ? (
+            content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-img">
                         <img
@@ -132,7 +135,7 @@ export default class ChatMessage extends Component {
                     (bytes / Math.pow(1024, Math.floor(e))).toFixed(2) + ' ' + s[e]
                 )
             }
-            content = bySelf ? (
+            content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <Card
                         title={I18n.t('file')}
@@ -183,7 +186,7 @@ export default class ChatMessage extends Component {
             )
             break
         case 'video':
-            content = bySelf ? (
+            content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-video">
                         <video src={body.url} width="100%" controls />
@@ -196,7 +199,7 @@ export default class ChatMessage extends Component {
             )
             break
         case 'audio':
-            content = bySelf ? (
+            content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
                     <div className="x-message-audio" style={bySelf&&{display:'inline-block'}}>
                         <Audio url={body.url} length={body.length} />
