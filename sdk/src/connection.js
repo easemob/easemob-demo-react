@@ -2033,15 +2033,15 @@ connection.prototype.handleMessage = function (msginfo) {
                     if(msgBody.action === 'em_retrieve_dns'){
                         isCmdMsg = true;
                     }
-                    if(msgBody.action.indexOf("em_") !== 0){
+                    // if(msgBody.action.indexOf("em_") !== 0){
                         self.onCmdMessage(msg);
-                    }
-                    else{
-                        var ackMessage = new WebIM.message("read", self.getUniqueId())
-                        ackMessage.set({ id: msg.id, to: msg.from, ext: { logo: "easemob" } })
-                        self.send(ackMessage.body)
-                        self.handelSendQueue();        
-                    }
+                    // }
+                    // else{
+                    //     var ackMessage = new WebIM.message("read", self.getUniqueId())
+                    //     ackMessage.set({ id: msg.id, to: msg.from, ext: { logo: "easemob" } })
+                    //     self.send(ackMessage.body)
+                    //     self.handelSendQueue();        
+                    // }
                     break;
             }
             ;
