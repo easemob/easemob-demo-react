@@ -581,7 +581,7 @@ export default connect(
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
-        deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id)),
+        deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
         sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
         sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),

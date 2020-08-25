@@ -199,7 +199,7 @@ function copy(message, tpl) {
 
 const { Types, Creators } = createActions({
     addMessage: [ 'message', 'bodyType' ],
-    deleteMessage: [ 'id' ],
+    deleteMessage: [ 'id', 'isSelf' ],
     updateMessageStatus: [ 'message', 'status' ],
     updateMessageMid: [ 'id', 'mid' ],
     muteMessage: [ 'mid' ],
@@ -641,6 +641,7 @@ export const deleteMessage = (state,{ id, isSelf }) => {
         let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
         const index = messages.indexOf(found)
+        let bySelf = found.getIn([ 'bySelf' ])
         if(found.getIn([ 'body', 'type' ]) != 'txt'){
             messages.splice(index, 1)
             messages.splice(index,0,{
@@ -656,10 +657,12 @@ export const deleteMessage = (state,{ id, isSelf }) => {
                 time: found.getIn([ 'time' ]),
                 to: found.getIn([ 'to' ]),
                 toJid: '',
-                type: 'chat'
+                type: 'chat',
+                bySelf: bySelf
             })
         }else{
-            let message = found.setIn([ 'body', 'msg' ], found.from+'撤回了一条消息')
+            let nMsg = bySelf ? '消息已撤回' : found.from+'撤回了一条消息'
+            let message = found.setIn([ 'body', 'msg' ], nMsg)
             // message = found.setIn([ "status",], 'read')
             //console.log('删除了这条消息',message)
             messages.splice(messages.indexOf(found), 1, message)
@@ -714,6 +717,15 @@ export const clearUnread = (state, { chatType, id }) => {
 }
 
 export const updateMessageMid = (state, { id, mid }) => {
+    const byId = state.getIn([ 'byId', id ])
+    if (!_.isEmpty(byId)) {
+        const { type, chatId } = byId
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: parseInt(id) })
+        let msg = found.setIn([ 'toJid' ], mid)
+        messages.splice(messages.indexOf(found), 1, msg)
+        state = state.setIn([ type, chatId ], messages)
+    }
     AppDB.updateMessageMid(mid, Number(id))
     return state.setIn([ 'byMid', mid ], { id })
 }
