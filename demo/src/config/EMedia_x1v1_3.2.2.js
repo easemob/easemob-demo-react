@@ -31278,7 +31278,7 @@ var UploadStats = function () {
                 return;
             }
 
-            this.data.push(event_obj);
+            this.data.splice(1, 0, event_obj); // send event frist , but init data must array[0]
         }
         // format event
 
@@ -31569,7 +31569,6 @@ var UploadStats = function () {
                         _o.aB = item.bytesSent; // 临时存储
                     }
                     if (item.kind == 'video') {
-                        _o.vFps = item.framesPerSecond;
                         _o.vW = item.frameWidth;
                         _o.vH = item.frameHeight;
                         _o.vP = item.packetsSent;
@@ -31588,8 +31587,15 @@ var UploadStats = function () {
                     }
                 }
 
-                if (item.type == 'media-source' && item.kind == 'audio') {
-                    _o.audioInputLevel = item.audioLevel * 1000;
+                if (item.type == 'media-source') {
+
+                    if (item.kind == 'audio') {
+                        _o.audioInputLevel = item.audioLevel * 1000;
+                    }
+
+                    if (item.kind == 'video') {
+                        _o.vFps = item.framesPerSecond;
+                    }
                 }
 
                 if (item.type == 'candidate-pair') {
@@ -31617,7 +31623,6 @@ var UploadStats = function () {
                     }
 
                     if (item.kind == 'video') {
-                        _o.vFps = item.framesPerSecond;
                         _o.vP = item.packetsReceived;
                         _o.vPL = item.packetsLost;
 
@@ -31690,6 +31695,9 @@ var UploadStats = function () {
 
                     var interval = (time - prev_time) / 1000; // 单位：s
                     var vFps = (vFR - prev_vFR) / interval;
+                    if (vFps < 0) {
+                        vFps = 0;
+                    };
                     upload_obj.vFps = vFps;
                 }
             }
