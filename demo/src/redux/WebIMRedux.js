@@ -252,6 +252,15 @@ WebIM.conn.listen({
         // msg.msg && message.error(msg.msg)
         store.dispatch(Creators.logoutSuccess())
     },
+    
+    // 好友相关回调
+    onContactInvited: (msg) => {console.log('onContactInvited', msg)},
+    onContactDeleted: (msg) => {console.log('onContactDeleted', msg)},
+    onContactAdded: (msg) => {console.log('onContactAdded', msg)},
+    onContactRefuse: (msg) => {console.log('onContactRefuse', msg)},
+    onContactAgreed: (msg) => {console.log('onContactAgreed', msg)},
+
+    // 消息相关回调
     onBlacklistUpdate: list => {
         store.dispatch(BlacklistActions.updateBlacklist(list))
     },
