@@ -220,7 +220,7 @@ const { Types, Creators } = createActions({
                 //TODO: cate type == 'chatrooms'
                 msg,
                 to,
-                roomType: chatroom,
+                // roomType: chatroom,
                 chatType: 'singleChat',
                 success: function () {
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
@@ -232,9 +232,15 @@ const { Types, Creators } = createActions({
                 ext: {}
             })
 
-            if (chatType == 'groupchat' || chatType == 'chatroom') {
-                msgObj.setGroup('groupchat')
+            // 最新的写法，也兼容老的写法，其他类型消息用的老写法
+            if (chatType == 'groupchat') {
+                msgObj.setChatType('groupChat')
+            } else if(chatType == 'chatroom') {
+                msgObj.setChatType('chatRoom')
             }
+            // if (chatType == 'groupchat' || chatType == 'chatroom') {
+            //     msgObj.setGroup('groupchat')
+            // }
 
             WebIM.conn.send(msgObj.body)
             dispatch(Creators.addMessage(pMessage, type))
