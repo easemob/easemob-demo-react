@@ -49,7 +49,7 @@ class GroupRequestModal extends React.Component {
                 requests.push(
                     <Row key={from}>
                         <Col span={14}>
-                            {`${from}${I18n.t('apply')}${I18n.t('joinGroup')}`}
+                            {`${from}${I18n.t('joinGroup')}`}
                             <p>
                                 {reason}
                             </p>
