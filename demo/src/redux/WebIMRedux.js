@@ -140,6 +140,7 @@ WebIM.conn.listen({
         case 'unsubscribe': // The sender deletes a friend.
         case 'unsubscribed': // The other party has removed you from the friend list.
             store.dispatch(RosterActions.getContacts())
+            store.dispatch(MessageActions.clearUnread('chat', msg.from))
             // Alert.alert(msg.from + " " + I18n.t("unsubscribed"))
             if ('code' in msg) {
                 message.warning(msg.from + ' ' + I18n.t('refuse'))

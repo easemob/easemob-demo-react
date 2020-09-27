@@ -205,7 +205,7 @@ const { Types, Creators } = createActions({
     muteMessage: [ 'mid' ],
     demo: [ 'chatType' ],
     //clearMessage: [ "chatType", "id" ],
-    // clearUnread: [ "chatType", "id" ],
+    clearUnread: [ "chatType", "id" ],
     // ---------------async------------------
     sendTxtMessage: (chatType, chatId, message = {}) => {
         // console.log('sendTxtMessage', chatType, chatId, message)
@@ -437,7 +437,8 @@ const { Types, Creators } = createActions({
                 flashUpload: WebIM.flashUpload
             })
             if(chatType === 'groupchat' || chatType === 'chatroom'){
-                msgObj.setGroup('groupchat')
+                // msgObj.setGroup('groupchat')
+                msgObj.setChatType('groupChat')
             }
             WebIM.conn.send(msgObj.body)
             pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'audio')
