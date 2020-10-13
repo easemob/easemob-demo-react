@@ -2,7 +2,7 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './websdk3.3.0'
+import websdk from './websdk3.3.2'
 // import websdk from 'easemob-websdk'
 // import webrtc from './EMedia_x1v1_3.2.2'
 import webrtc from 'easemob-webrtc'
@@ -37,7 +37,8 @@ WebIM.conn = new websdk.connection({
     autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
     delivery: WebIM.config.delivery,
     appKey: WebIM.config.appkey,
-    useOwnUploadFun: WebIM.config.useOwnUploadFun
+    useOwnUploadFun: WebIM.config.useOwnUploadFun,
+    deviceId: WebIM.config.deviceId
 })
 
 // for downward compatibility
