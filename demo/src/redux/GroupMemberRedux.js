@@ -60,6 +60,9 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.listGroupMemberAsync({ groupId: groupId }))
                 },
                 error: e => {
+                    if (e.type === 17) {
+                        message.error('你没有权限做此操作');
+                    }
                     // dispatch(Creators.setLoading(false))
                     // dispatch(Creators.setLoadingFailed(true))
                 }

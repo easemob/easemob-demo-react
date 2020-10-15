@@ -86,6 +86,7 @@ WebIM.conn.listen({
         case 'deleteGroupChat':
             message.error(`group${msg.gid} was destroyed.`)
             store.dispatch(GroupActions.getGroups())
+            store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
             break
         case 'leaveGroup': // 某人离开群
             message.error(
@@ -98,6 +99,7 @@ WebIM.conn.listen({
                     I18n.t('admin')} .`
             )
             store.dispatch(GroupActions.getGroups())
+            store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
             break
         case 'invite': //手机端邀请入群
             store.dispatch(CommonActions.setShowGroupInviteModal(true))
