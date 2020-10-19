@@ -1,4 +1,15 @@
 # 版本更新说明:
+## v3.3.2 @2020-6-10
+  * [IM SDK] 增加支持设置固定 deviceId
+  * [IM SDK] 修改 getGroup 方法去掉参数
+  * [IM SDK] 修复拉历史消息 bug
+  * [IM SDK] 修复发送附件消息对3.3.0之前 api 的兼容问题
+  * [IM SDK] 修复使用 uniapp 打包的 app，退到后台回来时websocket无法连接的问题
+  * [webim demo] 增加提示注册失败原因：用户名超出64字节
+  * [webim demo] 增加群组非管理员邀请其他用户进群没有权限提示
+  * [webim demo] 修复部分已知bug
+
+
 ## v3.2.5 @2020-6-10
 ### Feature
 * [demo] 1v1视频无法互通
