@@ -17,7 +17,7 @@ const { Types, Creators } = createActions({
             let pagenum = 1
             let pagesize = 10
             WebIM.conn.getChatRooms({
-                apiUrl: WebIM.config.restServer,
+                // apiUrl: WebIM.config.restServer,
                 pagenum: pagenum,
                 pagesize: pagesize,
                 success: function(resp) {

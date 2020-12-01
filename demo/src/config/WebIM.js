@@ -42,9 +42,9 @@ WebIM.conn = new websdk.connection({
 })
 
 // for downward compatibility
-if (!WebIM.conn.apiUrl) {
-    WebIM.conn.apiUrl = WebIM.config.restServer
-}
+// if (!WebIM.conn.apiUrl) {
+//     WebIM.conn.apiUrl = WebIM.config.restServer
+// }
 
 websdk.debug(true)
 

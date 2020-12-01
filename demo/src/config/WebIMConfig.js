@@ -11,28 +11,6 @@
 //     protocol: "https"
 // }
 
-function getUrl(){
-    var apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
-    var socketUrl = '//im-api-v2.easemob.com/ws'
-    if(window.location.href.indexOf('webim-h5.easemob.com') !== -1 ){
-        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
-        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
-    }
-    else if(window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1){
-        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
-        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
-    }
-    else if(window.location.href.indexOf('localhost') !== -1){
-        apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com'
-        socketUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws'
-    }
-    return {
-        apiUrl: apiUrl,
-        socketUrl: socketUrl,
-        sandBoxApiUrl: 'https://a1-hsb.easemob.com',
-        sandboxSocketUrl: 'https://im-api-v2-hsb.easemob.com/ws'
-    }
-}
 
 
 var config = {
@@ -41,13 +19,13 @@ var config = {
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: getUrl().socketUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
+    // socketServer: getUrl().socketUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: getUrl().apiUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
+    // restServer: getUrl().apiUrl, //(window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
@@ -62,7 +40,7 @@ var config = {
      */
     https: true,
 
-    isHttpDNS: false,
+    isHttpDNS: true,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.

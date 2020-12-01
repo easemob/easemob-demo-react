@@ -274,7 +274,7 @@ const { Types, Creators } = createActions({
             const to = chatId
             const msgObj = new WebIM.message(type, id)
             msgObj.set({
-                apiUrl: WebIM.config.restServer,
+                // apiUrl: WebIM.config.restServer,
                 ext: {
                     // file_length: source.fileSize,
                     // filename: source.fileName || "",
@@ -346,7 +346,7 @@ const { Types, Creators } = createActions({
             const to = chatId
             const msgObj = new WebIM.message(type, id)
             msgObj.set({
-                apiUrl: WebIM.config.restServer,
+                // apiUrl: WebIM.config.restServer,
                 ext: {
                     file_length: source.data.size
                     // filename: source.fileName || "",
@@ -411,7 +411,7 @@ const { Types, Creators } = createActions({
             const msgObj = new WebIM.message('audio', id)
             let isRoom = chatType === 'chatroom'
             msgObj.set({
-                apiUrl: WebIM.config.restServer,
+                // apiUrl: WebIM.config.restServer,
                 file: file,
                 to: chatId,
                 type: 'audio',
