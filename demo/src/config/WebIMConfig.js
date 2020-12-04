@@ -40,6 +40,10 @@ var config = {
      */
     https: true,
 
+    /*
+    * 公有云配置默认为 true，
+    * 私有云配置请设置 isHttpDNS = false , 详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
+    */
     isHttpDNS: true,
     /*
      * isMultiLoginSessions

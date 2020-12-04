@@ -27,24 +27,24 @@ WebIM.loglevel = loglevel
 // console.log = loglevel.info
 
 WebIM.conn = new websdk.connection({
-    isHttpDNS: WebIM.config.isHttpDNS,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
     https: WebIM.config.https,
-    url: WebIM.config.socketServer,
     isAutoLogin: false,
     heartBeatWait: WebIM.config.heartBeatWait,
     autoReconnectNumMax: WebIM.config.autoReconnectNumMax,
     delivery: WebIM.config.delivery,
     appKey: WebIM.config.appkey,
     useOwnUploadFun: WebIM.config.useOwnUploadFun,
-    deviceId: WebIM.config.deviceId
-})
+    deviceId: WebIM.config.deviceId,
+    //公有云 isHttpDNS 默认配置为true
+    isHttpDNS: WebIM.config.isHttpDNS,
 
-// for downward compatibility
-// if (!WebIM.conn.apiUrl) {
-//     WebIM.conn.apiUrl = WebIM.config.restServer
-// }
+    // 私有云设置，详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
+    // isHttpDNS: false,
+    // url: 'xxx', // 设置为私有云的websocket server url
+    // apiUrl: 'xxx' // 设置为私有云的rest server url
+})
 
 websdk.debug(true)
 
@@ -84,9 +84,6 @@ api.interceptors.response.use(
     }
 )
 
-// emedia.config({
-//     forceUseVideoCodecs:["VP8", "H264"]
-// });
 
 WebIM.api = api
 WebIM.emoji = emoji
