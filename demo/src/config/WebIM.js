@@ -4,8 +4,8 @@
 
 import websdk from './websdk3.3.2'
 // import websdk from 'easemob-websdk'
-// import webrtc from './EMedia_x1v1_3.2.2'
-import webrtc from 'easemob-webrtc'
+import webrtc from './EMedia_x1v1_3.4.1'
+// import webrtc from 'easemob-webrtc'
 
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
