@@ -163,10 +163,11 @@ class WebRTCModal extends React.Component {
                 },
                 onInvite: function (from, rtcOption) {
                     const { confrId, password, gid } = rtcOption
-                    const { appkey, socketServer } = WebIM.config
+                    const { appkey } = WebIM.config
                     const { avModal, multiAV } = me.props
-                    let host = socketServer.split('.')
-                    host = '@' + host[1] + '.' + host[2]
+                    
+                    let host = WebIM.conn.url && WebIM.conn.url.split('.')
+                    if(host.length && host.length > 2) host = '@' + host[1] + '.' + host[2];
                     from = from.replace(appkey + '_', '')
                     from = from.replace(host, '')
                     let callback = (confr) => {
