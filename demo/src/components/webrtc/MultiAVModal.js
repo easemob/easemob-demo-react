@@ -22,7 +22,9 @@ class MultiAVModal extends React.Component {
             isShareDesktop:false, //共享桌面状态
 
             streams:[], //流列表 stream 和 member
-            own_stream: null
+            own_stream: null,
+            micOpen: true,
+            videoOpen: true
         }
         this.closeModal = this.closeModal.bind(this)
         this.loadTime = this.loadTime.bind(this)
@@ -201,14 +203,25 @@ class MultiAVModal extends React.Component {
     addMember(){
         this.props.showConfrModal()
     }
-
     close_mic() {
-        let { own_stream } = this.state;
+        let { own_stream, micOpen } = this.state;
+        if (!micOpen) {return}
         emedia.mgr.pauseAudio(own_stream)
+        setTimeout(() => {
+            this.setState({
+                micOpen: false
+            })
+        }, 1000)
     }
     open_mic() {
-        let { own_stream } = this.state;
+        let { own_stream, micOpen} = this.state;
+        if (micOpen) {return}
         emedia.mgr.resumeAudio(own_stream)
+        setTimeout(() => {
+            this.setState({
+                micOpen: true
+            })
+        }, 1000)
     }
 
     close_camera() {
