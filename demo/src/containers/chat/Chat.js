@@ -305,6 +305,7 @@ class Chat extends React.Component {
     }
 
     callVideo = () => {
+        if (WebIM.WebRTC.isCalling) {return message.info('通话中...')}
         if (utils.isIOSWebview() || !emedia.isWebRTC) {
             // 现在IOS webview还不支持webrtc，给出提示
             message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
@@ -325,6 +326,7 @@ class Chat extends React.Component {
             this.setState({
                 showWebRTC: true
             })
+            WebIM.WebRTC.isCalling = true;
             WebIM.call.caller = WebIM.conn.context.userId
             WebIM.call.makeVideoCall(selectItem, null, rec, recMerge, config)
             setTimeout(() => {
@@ -352,6 +354,7 @@ class Chat extends React.Component {
     }
 
     callVoice = () => {
+        if (WebIM.WebRTC.isCalling) {return message.info('通话中...')}
         if (utils.isIOSWebview() || !emedia.isWebRTC) {
             // 现在IOS webview还不支持webrtc，给出提示
             message.info('当前环境不支持音视频功能,可以在chrome上尝试使用')
@@ -366,6 +369,7 @@ class Chat extends React.Component {
         this.setState({
             showWebRTC: true
         })
+        WebIM.WebRTC.isCalling = true;
         const config = {
             push: true,
             timeoutTime: 30000,
@@ -595,6 +599,7 @@ export default connect(
         fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),
         updateConfrInfo: (gid, rec, recMerge) => dispatch(MultiAVActions.updateConfrInfoAsync(gid, rec, recMerge)),
         showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
-        closeConfrModal: (gid) => dispatch(MultiAVActions.closeConfrModal())
+        closeConfrModal: (gid) => dispatch(MultiAVActions.closeConfrModal()),
+        showP2pModal: () => dispatch(MultiAVActions.showP2pModal())
     })
 )(Chat)

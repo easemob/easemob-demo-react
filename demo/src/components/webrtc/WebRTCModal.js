@@ -89,6 +89,8 @@ class WebRTCModal extends React.Component {
                     //"decline" -> 'REJECT'     "busy"    -> 'BUSY'     "failed-transport" -> 'FAIL'
                     // TODO reason undefine if reason is busy
                     console.log('onTermCall', reason)
+                    WebIM.WebRTC.isCalling = false;
+
                     if (reason && (reason == 'busy' || reason == 'BUSY')) {
                         message.error('Target is busy. Try it later.')
                     }
