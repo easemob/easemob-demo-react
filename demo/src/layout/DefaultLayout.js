@@ -197,7 +197,9 @@ class DefaultLayout extends Component {
             // moved to changeTab
             //quit previous chatroom
             if (selectItem) {
-                this.props.quitChatRoom(selectItem)
+                if (!(selectItem in group.byId)) {
+                    this.props.quitChatRoom(selectItem)
+                }
             }
             // join chatroom
             this.props.joinChatRoom(e.key)
