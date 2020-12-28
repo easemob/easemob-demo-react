@@ -422,7 +422,8 @@ WebIM.conn.listen({
     },
     onCustomMessage: msg => {
         console.log('onCustomMessage', msg)
-    }
+    },
+    onChannelMessage: msg => console.log('onChannelMessage', msg)
 })
 
 /* ------------- Types and Action Creators ------------- */

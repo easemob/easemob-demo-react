@@ -110,8 +110,8 @@ var config = {
     /**
      * enable localstorage for history messages. For use in this demo
      */
-    enableLocalStorage: true,
+    enableLocalStorage: true
 
-    deviceId: 'newDevice'
+    // deviceId: 'newDevice'
 }
 export default config
