@@ -42,10 +42,10 @@ let options = {
 
 // 内部沙箱测试环境
 if (WebIM.config.isSandBox) {
-    options.url = 'https://im-api-v2-hsb.easemob.com/ws';
-    options.apiUrl = 'https://a1-hsb.easemob.com';
+    options.url =  (window.location.protocol === "https:" ? "https:" : "http:") + '//im-api-v2-hsb.easemob.com/ws';
+    options.apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
     options.isHttpDNS = false;
-    WebIM.config.restServer = 'https://a1-hsb.easemob.com';
+    WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 
 WebIM.conn = new websdk.connection(options)
