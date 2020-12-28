@@ -29,11 +29,10 @@ const { Types, Creators } = createActions({
             // if (WebIM.conn.isOpened()) {
             //     WebIM.conn.close("logout")
             // }
-            WebIM.conn.open({
-                // apiUrl: WebIM.config.restServer,
+            let options = {
                 user: username.trim().toLowerCase(),
                 pwd: password,
-                //  accessToken: password,
+                 // accessToken: password,
                 appKey: WebIM.config.appkey,
                 success(token) {
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
@@ -46,7 +45,13 @@ const { Types, Creators } = createActions({
                 error: e => {
                     dispatch(Creators.stopLoging())
                 }
-            })
+            }
+
+            if (WebIM.config.isSandBox) {
+                options.apiUr = WebIM.config.restServer;
+            }
+
+            WebIM.conn.open(options)
         }
     },
     loginByToken: (username, token) => {

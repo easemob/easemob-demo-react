@@ -2,7 +2,7 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './websdk3.3.2'
+import websdk from './websdk3.4.0'
 // import websdk from 'easemob-websdk'
 import webrtc from './EMedia_x1v1_3.4.1'
 // import webrtc from 'easemob-webrtc'
@@ -23,10 +23,9 @@ let WebIM = window.WebIM || {}
 
 WebIM.config = config
 WebIM.loglevel = loglevel
-// replace all console.log with loglevel.info
-// console.log = loglevel.info
 
-WebIM.conn = new websdk.connection({
+
+let options = {
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
     https: WebIM.config.https,
@@ -39,12 +38,17 @@ WebIM.conn = new websdk.connection({
     deviceId: WebIM.config.deviceId,
     //公有云 isHttpDNS 默认配置为true
     isHttpDNS: WebIM.config.isHttpDNS,
+}
 
-    // 私有云设置，详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
-    // isHttpDNS: false,
-    // url: 'xxx', // 设置为私有云的websocket server url
-    // apiUrl: 'xxx' // 设置为私有云的rest server url
-})
+// 内部沙箱测试环境
+if (WebIM.config.isSandBox) {
+    options.url = 'https://im-api-v2-hsb.easemob.com/ws';
+    options.apiUrl = 'https://a1-hsb.easemob.com';
+    options.isHttpDNS = false;
+    WebIM.config.restServer = 'https://a1-hsb.easemob.com';
+}
+
+WebIM.conn = new websdk.connection(options)
 
 websdk.debug(true)
 
