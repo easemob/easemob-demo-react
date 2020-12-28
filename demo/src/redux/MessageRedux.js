@@ -535,6 +535,19 @@ const { Types, Creators } = createActions({
             msgObj.set({ id: msg.id, to: msg.from, ext: { logo: 'easemob' } })
             WebIM.conn.send(msgObj.body)            
         }
+    },
+
+    sendChannel: msg => {
+        return (dispatch) => {
+            const msgObj = new WebIM.message('channel', WebIM.conn.getUniqueId())
+            let to = msg.to
+            if (msg.type == 'groupchat' || msg.type == 'chatroom') {
+                msgObj.set({ to, chatType: 'groupChat' })
+            }else{
+                msgObj.set({ to })
+            }
+            WebIM.conn.send(msgObj.body)            
+        }
     }
 })
 

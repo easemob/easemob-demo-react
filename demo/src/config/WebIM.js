@@ -2,7 +2,7 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './websdk3.4.0'
+import websdk from './websdk3.4.1'
 // import websdk from 'easemob-websdk'
 import webrtc from './EMedia_x1v1_3.4.1'
 // import webrtc from 'easemob-webrtc'

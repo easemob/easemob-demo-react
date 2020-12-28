@@ -176,6 +176,15 @@ class DefaultLayout extends Component {
             return
         }
 
+
+        if (selectTab === "contact") {
+            this.props.sendChannel({
+                from: WebIM.conn.context.jid.name,
+                to: e.key,
+                type: 'contact'
+            })
+        }
+
         if (selectTab === 'group') {
             const groupId = e.key
             if (groupId) {
@@ -189,7 +198,11 @@ class DefaultLayout extends Component {
                 this.props.getMutedAsync(groupId)
                 this.props.getGroupAdminAsync(groupId)
                 // }
-
+                this.props.sendChannel({
+                    from: WebIM.conn.context.jid.name,
+                    to: e.key,
+                    type: 'groupchat'
+                })
             }
         }
 
@@ -203,6 +216,11 @@ class DefaultLayout extends Component {
             }
             // join chatroom
             this.props.joinChatRoom(e.key)
+            this.props.sendChannel({
+                    from: WebIM.conn.context.jid.name,
+                    to: e.key,
+                    type: 'chatroom'
+                })
         }
 
         history.push(redirectPath + location.search)
@@ -443,7 +461,8 @@ export default withRouter(
             getChatRooms: () => dispatch(ChatRoomActions.getChatRooms()),
             getMutedAsync: groupId => dispatch(GroupMemberActions.getMutedAsync(groupId)),
             getGroupAdminAsync: groupId => dispatch(GroupMemberActions.getGroupAdminAsync(groupId)),
-            fetchMessage: (id, chatType, offset) => dispatch(MessageActions.fetchMessage(id, chatType, offset))
+            fetchMessage: (id, chatType, offset) => dispatch(MessageActions.fetchMessage(id, chatType, offset)),
+            sendChannel: (msg) => dispatch(MessageActions.sendChannel(msg))
         })
     )(DefaultLayout)
 )

@@ -48,7 +48,7 @@ const { Types, Creators } = createActions({
             }
 
             if (WebIM.config.isSandBox) {
-                options.apiUr = WebIM.config.restServer;
+                options.apiUrl = WebIM.config.restServer;
             }
 
             WebIM.conn.open(options)
