@@ -232,6 +232,7 @@ module.exports = {
                         // options: {
                         // 	importLoaders: 1
                         // }
+                        
                     },
                     {
                         loader: require.resolve("postcss-loader"),
@@ -256,6 +257,7 @@ module.exports = {
                     {
                         loader: require.resolve("less-loader"),
                         options: {
+                            javascriptEnabled: true
                             // TODO 通过theme.js定义antd组件样式，并且支持按照依赖导入  https://ant.design/docs/react/customize-theme-cn
                             // TODO custom style by theme.js,  https://ant.design/docs/react/customize-theme-cn
                             // modifyVars: getThemeConfig()

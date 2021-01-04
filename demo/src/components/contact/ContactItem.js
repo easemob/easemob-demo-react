@@ -12,7 +12,7 @@ const ContactItem = ({ chatType, items, collapse, hasLogo, ...rest }) => {
     const tabCls = collapse ? '' : ''
 
     const tabsItem = tabs.map(item =>
-        <Menu.Item key={chatType == 'chatroom' || chatType == 'group' ? item.id : item.name} className={tabCls}>
+        <Menu.Item key={chatType == 'chatroom' || chatType == 'group' ? item.id : item.name} className={tabCls} style={{margin:0}}>
             {hasLogo ? <ContactHead className="fl nav-img" name="test" width={50} /> : ''}
             <div className="nav-text">
                 <div>
