@@ -2,8 +2,8 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './websdk3.4.1'
-// import websdk from 'easemob-websdk'
+// import websdk from './websdk3.4.2'
+import websdk from 'easemob-websdk'
 import webrtc from './EMedia_x1v1_3.4.1'
 // import webrtc from 'easemob-webrtc'
 
@@ -13,6 +13,17 @@ import emoji from './emoji'
 import Api from 'axios'
 import { message } from 'antd'
 import loglevel from '@/utils/loglevel'
+import AgoraRTC from "agora-rtc-sdk-ng"
+
+
+const rtc = {
+    // 用来放置本地客户端。
+    client: null,
+    // 用来放置本地音视频频轨道对象。
+    localAudioTrack: null,
+    localVideoTrack: null,
+};
+rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
 console = console || {}
 console.group = console.group || function () {}
@@ -95,4 +106,6 @@ WebIM.WebRTC = webrtc;
 
 WebIM.EMedia = webrtc.emedia
 webrtc.emedia.config.consoleLogger=false
+WebIM.rtc = rtc;
+WebIM.AgoraRTC = AgoraRTC;
 export default WebIM
