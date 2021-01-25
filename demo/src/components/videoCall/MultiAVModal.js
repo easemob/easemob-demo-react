@@ -86,9 +86,11 @@ class MultiAVModal extends React.Component {
             token: null,
         };
 
+        let confr = this.props.confr
+
         let imUserName = WebIM.conn.context.jid.name
 
-        const uid = await rtc.client.join(options.appId, options.channel, options.token, imUserName);
+        const uid = await rtc.client.join(options.appId, confr.channel, null, imUserName);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
