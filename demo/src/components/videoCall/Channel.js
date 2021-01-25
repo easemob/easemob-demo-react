@@ -36,7 +36,7 @@ class Channel extends React.Component{
 
 	componentWillReceiveProps(props){
     	console.log('this.props.callStatus',props,this.props.callStatus)
-    	if (props.callStatus === 3 || props.callStatus === 5) {
+    	if (props.callStatus === 3 || props.callStatus === 5 || props.callStatus === 7) {
     		// 3 主叫加入； 5 被叫加入
     		this.join()
     	}
@@ -158,12 +158,15 @@ class Channel extends React.Component{
             }
         });
 
-        // 监听远端取消发布
-        rtc.client.on("user-unpublished", (user, mediaType) => {
-        	console.log('取消发布了', mediaType)
-        });
+        rtc.client.on('user-unpublished', () => {
+        	if (this.props.confr.type === 0) {
+        		console.log('对方已离开 ---- ', this.props.confr)
+        		this.props.close()
+        	}
+        })
 
         rtc.client.on("user-left", () => {
+        	console.log('对方已离开 ---- ')
         	this.props.close()
         })
     }
@@ -175,14 +178,18 @@ class Channel extends React.Component{
         var toggle_display = (this.props.confr.type == 2)?'block': 'none';
 
         var accept_display = this.props.callStatus === 4 ? 'block' : 'none'; //被叫alerting
-        var mute_display = this.props.callStatus > 4 ? 'block' : 'none'; // 确认后
+        var mute_display = (this.props.callStatus > 4 && this.props.confr.type !=0) ? 'block' : 'none'; // 确认后
+
+        var myName = WebIM.conn.context.jid.name;
+        var {callerIMName, calleeIMName} = this.props.confr
+        var title = callerIMName == myName? calleeIMName:callerIMName
 		return (
 			<div ref='rtc' className={'webim-rtc-video ' + audioCallClass}>
 
                 <div className={'video '+localClassName} ref='localVideo' id="local-player"></div>
                 <div className={'video '+remoteClassName} ref='remoteVideo' id="remote-player"></div>
 
-                <span>{this.props.title}</span>
+                <span>{title}</span>
                 <i ref='close' id='webrtc_close' className='font small close' style={{
                     left: 'auto',
                     right: this.state.close_right + 'px',

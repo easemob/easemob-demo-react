@@ -424,15 +424,16 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行语音通话'
 
+        const callId = WebIM.conn.getUniqueId().toString();
+        const channelName = Math.uuid(8)
         this.props.sendTxtMessage(chatType[selectTab], selectItem, {
             msg: value,
             ext: {
                 action: 'invite',
-                channelName: 'channel1',
-                token: null,
+                channelName: channelName,
                 type: 0, //0为1v1音频，1为1v1视频，2为多人通话
-                callerDevId: 'webim', // 主叫方设备Id
-                callId: 'zdtest', // 随机uuid，每次呼叫都不同，代表一次呼叫
+                callerDevId: WebIM.conn.deviceId, // 主叫方设备Id
+                callId: callId, // 随机uuid，每次呼叫都不同，代表一次呼叫
                 ts: Date.now(),
                 msgType: 'rtcCallWithAgora',
                 callerIMName: WebIM.conn.context.jid.name
@@ -440,13 +441,15 @@ class Chat extends React.Component {
         })
         this.props.updateConfr({
             ext:{
-                channelName: 'channel1',
-                token: '006783c9572963e447e96ee41685fa6ed9fIAChUdLowB6WNzzRR5cVntXRZj3rOEDRAd+Ce0uv1R3pFwrCxmsAAAAAEABI+NBcOvAIYAEAAQA48Ahg',
+                channelName: channelName,
+                token: null,
                 type: 0,
-                callerDevId: 'webim',
-                callId: 'zdtest'
+                callerDevId: WebIM.conn.deviceId,
+                callId: callId
             },
-            to: selectItem
+            to: selectItem,
+            calleeIMName: selectItem,
+            callerIMName: WebIM.conn.context.jid.name
         })
 
     }
