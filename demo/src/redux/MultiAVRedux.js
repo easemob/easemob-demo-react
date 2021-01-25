@@ -91,6 +91,7 @@ export const updateConfrInfo = (state, { confr }) => {
 }
 
 export const showConfrModal = (state) => {
+    console.log('showConfrModal')
     return state.setIn([ 'confrModal' ], true)
 }
 

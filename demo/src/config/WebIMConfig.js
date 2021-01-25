@@ -29,7 +29,7 @@ var config = {
     /*
      * Application AppKey
      */
-    appkey: 'easemob-demo#wgq',
+    appkey: 'easemob-demo#chatdemoui',
     /*
      * Application Host
      */
@@ -110,8 +110,8 @@ var config = {
     /**
      * enable localstorage for history messages. For use in this demo
      */
-    enableLocalStorage: true
+    enableLocalStorage: true,
 
-    // deviceId: 'newDevice'
+    deviceId: 'webim'
 }
 export default config

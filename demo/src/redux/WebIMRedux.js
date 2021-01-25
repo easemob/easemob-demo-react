@@ -12,6 +12,7 @@ import SubscribeActions from '@/redux/SubscribeRedux'
 import BlacklistActions from '@/redux/BlacklistRedux'
 import MessageActions from '@/redux/MessageRedux'
 import GroupRequestActions from '@/redux/GroupRequestRedux'
+import VideoCallAcctions from '@/redux/VideoCallRedux'
 import { store } from '@/redux'
 import { history } from '@/utils'
 import utils from '@/utils'
@@ -21,7 +22,16 @@ import RTCChannel from '@/components/webrtc/rtcChannel'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
 
 import { message, Modal } from 'antd'
-
+const rtc = WebIM.rtc;
+const confirm = Modal.confirm
+const CALLSTATUS = {
+    idle: 0,
+    inviting: 1,
+    alerting: 2,
+    confirmRing: 3,
+    answerCall: 5,
+    confirmCallee: 7
+}
 const logger = WebIM.loglevel.getLogger('WebIMRedux')
 
 WebIM.conn.listen({
@@ -253,7 +263,7 @@ WebIM.conn.listen({
     onClosed: msg => {
         console.log('onClosed', msg)
         // msg.msg && message.error(msg.msg)
-        store.dispatch(Creators.logoutSuccess())
+        //store.dispatch(Creators.logoutSuccess())
     },
     
     // 好友相关回调
@@ -290,17 +300,19 @@ WebIM.conn.listen({
     },
     onTextMessage: message => {
         console.log("onTextMessage", message)
-        const { from, to } = message 
+        let { from, to } = message 
         let { type } = message       
-        const rootState = store.getState()
-        const username = _.get(rootState, 'login.username', '')
-        const bySelf = from == username
+        let rootState = store.getState()
+        let username = _.get(rootState, 'login.username', '')
+        let bySelf = from == username
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
-        const chatId = bySelf || type !== 'chat' ? to : from
+        let chatId = bySelf || type !== 'chat' ? to : from
         if (type === 'chat' &&(( _.get(rootState,'entities.roster.byName['+chatId+'].subscription')  === 'none') || !(_.get(rootState,'entities.roster.byName['+chatId+'].subscription')))){
             message.type = 'stranger'
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,'txt'))            
         }
+
+
         store.dispatch(MessageActions.addMessage(message, 'txt'))     
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
         switch (type) {
@@ -316,6 +328,45 @@ WebIM.conn.listen({
                     inviter: msgExtension.inviter
                 }
                 WebIM.call.listener.onInvite(from, options)
+            }
+
+            if (message.ext && message.ext.action === 'invite') {
+                console.log('收到邀请消息', store.getState().callVideo)
+
+                let callVideo = store.getState().callVideo;
+                message.calleeIMName = message.to
+                message.callerIMName = message.from
+
+                if (callVideo.callStatus > 0) { // 正忙
+                    if (message.ext.callId == callVideo.callId) { // 多人会议中邀请别人
+                        store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                    }else{
+                        return store.dispatch(VideoCallAcctions.answerCall('busy', {callId: message.ext.callId, callerDevId:message.ext.callerDevId, to: from}))
+                    }
+                }
+                store.dispatch(VideoCallAcctions.updateConfr(message))
+                if (message.ext.type === 2) { // 多人
+                    confirm({
+                        title: from + '邀请您进入多人会议',
+                        okText: '确认',
+                        cancelText: '拒绝',
+                        onOk() {
+                            store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                        },
+                        onCancel() {
+                            console.log('Cancel')
+                            store.dispatch(VideoCallAcctions.answerCall('refuse', message.ext.callId, message.ext.callerDevId, from))
+                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                            let conf = {}
+                            store.dispatch(VideoCallAcctions.updateConfr(conf))
+                        }
+                    })
+                }else{
+                    store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                    store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                }
             }
             break
         case 'groupchat':
@@ -423,7 +474,71 @@ WebIM.conn.listen({
     onCustomMessage: msg => {
         console.log('onCustomMessage', msg)
     },
-    onChannelMessage: msg => console.log('onChannelMessage', msg)
+    onChannelMessage: msg => console.log('onChannelMessage', msg),
+
+    onCmdMessage: msg => {
+        console.log('onCmdMessage', msg)
+        if (msg.action === "rtcCall") {
+            let msgInfo = msg.ext
+            let deviceId = '';
+
+            let callerDevId = ''
+            let callId = '';
+            switch(msgInfo.action){
+                case "alert":
+                    deviceId = msgInfo.calleeDevId
+                    callerDevId = msgInfo.callerDevId
+                    callId = msgInfo.callId
+
+                    console.log('收到回复的alert', msg)
+                    store.dispatch(VideoCallAcctions.confirmRing(msg.from, deviceId, callerDevId, callId))
+                    break;
+                case "confirmRing":
+                    console.log('收到confirmRing', msg)
+                    deviceId = msgInfo.calleeDevId
+                    const receivedConfirmRingStatus = 4
+                    store.dispatch(VideoCallAcctions.setCallStatus(receivedConfirmRingStatus))
+                    // store.dispatch(VideoCallAcctions.answerCall(msg.from, deviceId))
+                    console.log('清除定时器2')
+                    rtc.timer && clearTimeout(rtc.timer)
+                    break;
+                case "answerCall":
+                    console.log('收到回复的answerCall', msg)
+                    console.log('清除定时器1')
+                    rtc.timer && clearTimeout(rtc.timer)
+                    if (msgInfo.result !== 'accept') {
+                        store.dispatch(VideoCallAcctions.hangup())
+                        const idleStatus = 0
+                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                        if (msgInfo.result === 'busy') {
+                            message.error('对方正忙')
+                        }else if(msgInfo.result === 'refuse'){
+                            message.error('对方已拒绝')
+                        }
+                        store.dispatch(VideoCallAcctions.hangup())
+                        return
+                    }
+                    deviceId = msgInfo.calleeDevId
+                    store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId))
+                    break;
+                case "confirmCallee":
+                    console.log('收到confirmCallee', msg)
+                    break;
+                case "cancelCall":
+                    console.log('收到cancelCall', msg)
+                    let callVideo = store.getState().callVideo;
+                    const idleStatus = 0
+                    if (msg.from == callVideo.confr.callerIMName) {
+                        store.dispatch(VideoCallAcctions.hangup())
+                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                    }
+                    break;
+                default:
+                    console.log('unexpected action')
+                    break;
+            }
+        }
+    }
 })
 
 /* ------------- Types and Action Creators ------------- */

@@ -53,8 +53,7 @@ body {
     left: 0;
     z-index: 100;
 }
-
-.multi-webim-rtc {
+.multi-webim-rtc2 {
     position: absolute;
     width: 600px;
     height: 480px;
@@ -65,6 +64,19 @@ body {
     padding: 16px 20px 17px 20px;
     border: 0 solid #ADB9C1;
     box-shadow: 0 0 10px #ADB9C1;
+}
+
+.multi-webim-rtc {
+    position: absolute;
+    /*width: 600px;
+    height: 480px;*/
+    top: 0;
+    left: 0;
+    z-index: 100;
+    background-color: #FFF;
+    /*padding: 16px 20px 17px 20px;*/
+    border: 0 solid #ADB9C1;
+    /*box-shadow: 0 0 10px #ADB9C1;*/
 }
 
 .multi-webim-rtc .groupname {

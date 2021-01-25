@@ -13,14 +13,14 @@ import Contact from '@/containers/contact/Contact'
 import Chat from '@/containers/chat/Chat'
 import HeaderTab from '@/components/header/HeaderTab'
 import HeaderOps from '@/components/header/HeaderOps'
-import MultiAVModal from '@/components/webrtc/MultiAVModal'
+import MultiAVModal from '@/components/videoCall/MultiAVModal'
 import GroupActions from '@/redux/GroupRedux'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
 import MessageActions from '@/redux/MessageRedux'
 import { config } from '@/config'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import getCurrentContacts from '@/selectors/ContactSelector'
-
+import PtopCallModdal from '@/components/videoCall/PtopCallModal'
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
 const { Header, Content, Footer, Sider, RightSider } = Layout
@@ -183,6 +183,7 @@ class DefaultLayout extends Component {
                 to: e.key,
                 type: 'contact'
             })
+            console.log('发送channel ack')
         }
 
         if (selectTab === 'group') {
@@ -354,10 +355,15 @@ class DefaultLayout extends Component {
 
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
-        const { login, rightSiderOffset, multiAV, entities, group } = this.props
+        const { login, rightSiderOffset, multiAV, entities, group, callVideo} = this.props
         const room = _.get(group, `byId.${roomId}`, {})
 
-        let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
+        // let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
+        let { confr, callStatus } = callVideo
+        let showConfr = (confr.type === 2 && [1,3,4,5,6,7].includes(callStatus))? true: false
+
+        // console.log('是否展示多人会议', callVideo)
+        let multiAVModal = showConfr ? <MultiAVModal/> : null
 
         if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
             var info = {}
@@ -402,6 +408,7 @@ class DefaultLayout extends Component {
                             zIndex: '100'
                         }}
                     >
+                        
                         <WebRTCModal collapsed={false} visible={true} />
                     </div>
                     <Content
@@ -429,6 +436,7 @@ class DefaultLayout extends Component {
                         }
                     </div>
                     {multiAVModal}
+                    <PtopCallModdal visible={true}/>
                     {/*<Footer style={{ textAlign: "center" }}>
                      Ant Design ©2016 Created by Ant UED
                      </Footer>*/}
@@ -440,15 +448,15 @@ class DefaultLayout extends Component {
 
 export default withRouter(
     connect(
-        ({ breakpoint, entities, login, common, rightSiderOffset, multiAV }) => ({
+        ({ breakpoint, entities, login, common, rightSiderOffset, multiAV, callVideo }) => ({
             breakpoint,
             group: entities.group,
             login,
             common,
             rightSiderOffset: entities.group.rightSiderOffset,
             multiAV,
-            entities
-
+            entities,
+            callVideo
         }),
         dispatch => ({
             getGroupMember: id => dispatch(GroupMemberActions.getGroupMember(id)),

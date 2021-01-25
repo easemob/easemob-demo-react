@@ -19,15 +19,16 @@ import StrangerActions from '@/redux/StrangerRedux'
 import RosterActions from '@/redux/RosterRedux'
 import BlacklistActions from '@/redux/BlacklistRedux'
 import MultiAVActions from '@/redux/MultiAVRedux'
+import VideoCallActions from '@/redux/VideoCallRedux'
 import WebIM from '@/config/WebIM'
 import { history } from '@/utils'
 import utils from '@/utils'
 import getTabMessages from '@/selectors/ChatSelector'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
-import AddAVMemberModal from '@/components/webrtc/AddAVMemberModal'
+import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
-
+const rtc = WebIM.rtc;
 const { TextArea } = Input
 const FormItem = Form.Item
 const { PAGE_NUM } = config
@@ -304,7 +305,68 @@ class Chat extends React.Component {
         if (this.timer) clearTimeout(this.timer)
     }
 
+    callVideo2(){
+
+        const {
+            match,
+            message
+        } = this.props
+        const { selectItem, selectTab } = match.params
+        if (this.props.callStatus > 0) {
+            // return message.error('正在通话中')
+
+            console.log('正在通话中')
+        }
+        const value = '邀请您进行视频通话'
+        // if (!value) return
+        const callId = WebIM.conn.getUniqueId().toString();
+        const channelName = Math.uuid(8)
+        if (selectTab === 'contact') {
+            this.props.sendTxtMessage(chatType[selectTab], selectItem, {
+                msg: value,
+                ext: {
+                    action: 'invite',
+                    channelName: channelName,
+                    type: 1, //0为1v1音频，1为1v1视频，2为多人通话
+                    callerDevId: WebIM.conn.deviceId, // 主叫方设备Id
+                    callId: callId, // 随机uuid，每次呼叫都不同，代表一次呼叫
+                    ts: Date.now(),
+                    msgType: 'rtcCallWithAgora'
+                }
+            })
+            this.props.updateConfr({
+                ext:{
+                    channelName: channelName,
+                    type: 1,
+                    callerDevId: WebIM.conn.deviceId,
+                    callId: callId
+                },
+                to: selectItem,
+                callerIMName: WebIM.conn.context.jid.name,
+                calleeIMName: selectItem
+            })
+            const inviteStatus = 1
+            this.props.setCallStatus(inviteStatus)
+        }else  if (selectTab === 'group'){
+            this.props.showInviteModal()
+            this.props.setGid(selectItem)
+            this.props.updateConfrInfo(selectItem, false, false)
+        }
+        let to = selectItem
+        rtc.timer = setTimeout(() => {
+            if (selectTab === 'contact') {
+                this.props.cancelCall(to)
+                this.props.hangup()
+                console.log('定时器到期', to)
+            }else{
+                // this.props.cancelCall()
+            }
+        }, 30000)
+        console.log('设置定时器')
+    }
+
     callVideo = () => {
+        return this.callVideo2()
         if (WebIM.WebRTC.isCalling) {return message.info('通话中...')}
         if (utils.isIOSWebview() || !emedia.isWebRTC) {
             // 现在IOS webview还不支持webrtc，给出提示
@@ -312,7 +374,7 @@ class Chat extends React.Component {
             return
         }
         const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
-        const { confrModal, avModal } = this.props
+        const { inviteModal, avModal } = this.props
         const videoSetting = JSON.parse(localStorage.getItem('videoSetting'))
         const recMerge = videoSetting && videoSetting.recMerge || false
         const rec = videoSetting && videoSetting.rec || false
@@ -339,7 +401,7 @@ class Chat extends React.Component {
                 message.info('您正在进行视频通话，不能新建其它视频')
                 return
             }
-            if (confrModal) {
+            if (inviteModal) {
                 message.info('您正在创建视频通话，不能重复创建')
                 return
             }
@@ -351,9 +413,47 @@ class Chat extends React.Component {
 
     handleModalClose = () => {
         this.props.closeConfrModal()
+        this.props.closeInviteModal()
+    }
+
+    callVoice2 = () => {
+        const {
+            match,
+            message
+        } = this.props
+        const { selectItem, selectTab } = match.params
+        const value = '邀请您进行语音通话'
+
+        this.props.sendTxtMessage(chatType[selectTab], selectItem, {
+            msg: value,
+            ext: {
+                action: 'invite',
+                channelName: 'channel1',
+                token: null,
+                type: 0, //0为1v1音频，1为1v1视频，2为多人通话
+                callerDevId: 'webim', // 主叫方设备Id
+                callId: 'zdtest', // 随机uuid，每次呼叫都不同，代表一次呼叫
+                ts: Date.now(),
+                msgType: 'rtcCallWithAgora',
+                callerIMName: WebIM.conn.context.jid.name
+            }
+        })
+        this.props.updateConfr({
+            ext:{
+                channelName: 'channel1',
+                token: '006783c9572963e447e96ee41685fa6ed9fIAChUdLowB6WNzzRR5cVntXRZj3rOEDRAd+Ce0uv1R3pFwrCxmsAAAAAEABI+NBcOvAIYAEAAQA48Ahg',
+                type: 0,
+                callerDevId: 'webim',
+                callId: 'zdtest'
+            },
+            to: selectItem
+        })
+
     }
 
     callVoice = () => {
+        return this.callVoice2()
+
         if (WebIM.WebRTC.isCalling) {return message.info('通话中...')}
         if (utils.isIOSWebview() || !emedia.isWebRTC) {
             // 现在IOS webview还不支持webrtc，给出提示
@@ -419,7 +519,8 @@ class Chat extends React.Component {
             location,
             messageList,
             messageListByMid,
-            confrModal
+            confrModal,
+            inviteModal
         } = this.props
         const { selectItem, selectTab } = match.params
         
@@ -566,7 +667,7 @@ class Chat extends React.Component {
                     width={460}
                     /* title={I18n.t("addAFriend")} */
                     title={'选择成员'}
-                    visible={confrModal === true}
+                    visible={inviteModal === true}
                     component={AddAVMemberModal}
                     onModalClose={this.handleModalClose}
                 />
@@ -580,7 +681,9 @@ export default connect(
         messageList: getTabMessages(state, props).TabMessageArray,
         messageListByMid: state.entities.message.byMid,
         confrModal: state.multiAV.confrModal,
-        avModal: state.multiAV.ifShowMultiAVModal
+        inviteModal: state.callVideo.inviteModal,
+        avModal: state.multiAV.ifShowMultiAVModal,
+        callStatus: state.callVideo.callStatus
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
@@ -599,7 +702,14 @@ export default connect(
         fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),
         updateConfrInfo: (gid, rec, recMerge) => dispatch(MultiAVActions.updateConfrInfoAsync(gid, rec, recMerge)),
         showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
+        showInviteModal: () => dispatch(VideoCallActions.showInviteModal()),
         closeConfrModal: (gid) => dispatch(MultiAVActions.closeConfrModal()),
-        showP2pModal: () => dispatch(MultiAVActions.showP2pModal())
+        closeInviteModal: () => dispatch(VideoCallActions.closeInviteModal()),
+        showP2pModal: () => dispatch(MultiAVActions.showP2pModal()),
+        updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg)),
+        setCallStatus: (status) => dispatch(VideoCallActions.setCallStatus(status)),
+        cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
+        setGid: (gid) => dispatch(VideoCallActions.setGid(gid)),
+        hangup: () => dispatch(VideoCallActions.hangup())
     })
 )(Chat)

@@ -463,6 +463,7 @@ class MultiAVModal extends React.Component {
                                 )
                             )
                         }
+                        
                     </Row>
 
                     { this.get_own_stream_action_btns() }

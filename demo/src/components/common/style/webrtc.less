@@ -33,10 +33,11 @@
     }
 }
 
+
 .webim-rtc-video {
     z-index: 3;
     cursor: pointer;
-    position: fixed;
+    position: relative;
     margin: auto;
     right: 0;
     left: 0;
@@ -45,8 +46,9 @@
     overflow: hidden;
     border-radius: 4px;
     background-color: rgb(204, 204, 204);
-
-    video {
+    width: 360px;
+    height: 360px;
+    .video {
         position: absolute;
 
         &.full {
@@ -58,12 +60,12 @@
 
         &.corner {
             z-index: 2;
-            top: 40px;
+            top: 10px;
             left: auto;
             right: 10px;
             bottom: auto;
-            max-height: 17%;
-            max-width: 17%;
+            height: 25%;
+            width: 25%;
             object-fit: contain;
         }
     }
@@ -109,4 +111,8 @@
             color: #eeeeee;
         }
     }
+}
+
+.audioCall {
+    height: 160px;
 }

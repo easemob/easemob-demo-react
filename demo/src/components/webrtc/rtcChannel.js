@@ -318,8 +318,6 @@ var Channel = createReactClass({
 })
 
 export default function(dom, collapsed){
-    console.log('this', this)
-    console.log('dom', dom)
     this.dom = dom
     var me = this
     return {

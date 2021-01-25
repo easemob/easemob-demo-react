@@ -3,6 +3,8 @@ import { Button, Checkbox, Form } from 'antd'
 import { I18n } from 'react-redux-i18n'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
 import MultiAVActions from '@/redux/MultiAVRedux'
+import MessageActions from '@/redux/MessageRedux'
+import VideoCallActions from '@/redux/VideoCallRedux'
 import { connect } from 'react-redux'
 import WebIM from '@/config/WebIM'
 import _ from 'lodash'
@@ -21,8 +23,10 @@ class AddAVMemberModal extends React.Component {
 
     componentDidMount() {
         const { groupMember, gid, selected } = this.props
-        console.log('this.props', this.props)
-        let gm = groupMember.getIn([ gid, 'byName' ])
+        console.log(groupMember, gid, selected)
+        console.log('roster', this.props.roster)
+        console.log('gm', groupMember.getIn([ gid, 'byName' ]))
+        let gm = groupMember.getIn([ gid, 'byName' ]) || this.props.roster
         let options = []
         let joined = this.props.joined
         const username = store.getState().login.username
@@ -56,17 +60,6 @@ class AddAVMemberModal extends React.Component {
                 /* ------ 2 ------ */
                 this.props.showMultiAVModal()
 
-                /* ------ 3 ------ */
-                setTimeout(() => {
-                    const tkt = this.props.confr.ticket
-                    WebIM.EMService.joined(this.props.confr.confrId) || WebIM.EMService.joinConferenceWithTicket(this.props.confr.confrId, tkt, 'user ext field').then(function () {
-                        WebIM.EMService.publish({ audio: true, video: true }, 'user ext field').catch(function (e) {
-                            console.error(e)
-                        })
-                    }).catch(function (e) {
-                        console.error(e)
-                    })
-                }, 0)
 
                 const { members } = values
 
@@ -76,17 +69,51 @@ class AddAVMemberModal extends React.Component {
                 
                 this.props.setSelected(seleted_members)
                 this.props.setGid(gid)
-                let jids = []
-                const appkey = WebIM.config.appkey, spHost = WebIM.config.Host
-                if (seleted_members) {
-                    for (let elem of seleted_members) {
-                        jids.push(appkey + '_' + elem + '@' + spHost)
+
+                const callId = WebIM.conn.getUniqueId().toString();
+                const channelName = Math.uuid(8)
+                const confr = {
+                        channelName: channelName,
+                        type: 2,
+                        callerDevId:  WebIM.conn.deviceId,
+                        callId: callId
                     }
-                }
-                let { confrId, password } = me.props.confr
-                for (let jid of jids) {
-                    WebIM.call.inviteConference(confrId, password='', jid, gid)
-                }
+                this.props.updateConfr({
+                    ext:confr,
+                    to: gid
+                })
+
+                seleted_members.forEach((item) => {
+                    this.sendInviteMsg(item, confr)
+                })
+
+                // let jids = []
+                // const appkey = WebIM.config.appkey, spHost = WebIM.config.Host
+                // if (seleted_members) {
+                //     for (let elem of seleted_members) {
+                //         jids.push(appkey + '_' + elem + '@' + spHost)
+                //     }
+                // }
+                // let { confrId, password } = me.props.confr
+                // for (let jid of jids) {
+                //     WebIM.call.inviteConference(confrId, password='', jid, gid)
+                // }
+            }
+        })
+    }
+
+    sendInviteMsg = (to, confr) => {
+        const value = '邀请您进行视频通话'
+        this.props.sendTxtMessage('singleChat', to, {
+            msg: value,
+            ext: {
+                action: 'invite',
+                channelName: confr.channelName,
+                type: 2, //0为1v1音频，1为1v1视频，2为多人通话
+                callerDevId: confr.callerDevId, // 主叫方设备Id
+                callId: confr.callId, // 随机uuid，每次呼叫都不同，代表一次呼叫
+                ts: Date.now(),
+                msgType: 'rtcCallWithAgora'
             }
         })
     }
@@ -185,16 +212,19 @@ class AddAVMemberModal extends React.Component {
 }
 
 export default connect(
-    ({ entities, multiAV }) => ({
+    ({ entities, multiAV, callVideo }) => ({
         groupMember: entities.groupMember,
-        gid: multiAV.gid,
+        gid: callVideo.gid,
         confr: multiAV.confr,
         selected: multiAV.selectedMembers,
-        joined: multiAV.joinedMembers
+        joined: multiAV.joinedMembers,
+        roster: entities.roster.byName
     }),
     dispatch => ({
         showMultiAVModal: () => dispatch(MultiAVActions.showModal()),
         setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
         setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),
+        sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
+        updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg))
     })
 )(Form.create()(AddAVMemberModal))

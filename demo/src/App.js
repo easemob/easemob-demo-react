@@ -18,7 +18,6 @@ import LoginActions from '@/redux/LoginRedux'
 import Loading from '@/components/common/LoadingComponent'
 import { store } from '@/redux'
 import utils from '@/utils'
-
 const debug = false
 
 // const AuthorizedComponent = ({ token, Layout, ...rest }) => {

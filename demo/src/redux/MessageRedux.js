@@ -229,7 +229,7 @@ const { Types, Creators } = createActions({
                     console.warn('发送txt失败，确认是否被禁言、拉黑等')
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
-                ext: {}
+                ext: message.ext || ''
             })
 
             // 最新的写法，也兼容老的写法，其他类型消息用的老写法
@@ -542,7 +542,7 @@ const { Types, Creators } = createActions({
             const msgObj = new WebIM.message('channel', WebIM.conn.getUniqueId())
             let to = msg.to
             if (msg.type == 'groupchat' || msg.type == 'chatroom') {
-                msgObj.set({ to, chatType: 'groupChat' })
+                msgObj.set({ to, chatType: 'groupChat', fail: function(err){console.log('err', err)} })
             }else{
                 msgObj.set({ to })
             }
