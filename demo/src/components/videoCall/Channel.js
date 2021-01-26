@@ -53,8 +53,8 @@ class Channel extends React.Component{
             // 如果你的项目开启了 App 证书进行 Token 鉴权，这里填写生成的 Token 值。
             token: null //token,
         };
-
-        const uid = await rtc.client.join(options.appId, options.channel, options.token, null);
+        let imUserName = WebIM.conn.context.jid.name
+        const uid = await rtc.client.join(options.appId, options.channel, options.token, imUserName);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -168,11 +168,6 @@ class Channel extends React.Component{
         	console.log('-- 对方已离开 --')
         	this.props.close()
         })
-
-         // 监听远端取消发布
-        rtc.client.on("user-unpublished", (user, mediaType) => {
-        	console.log('取消发布了', user, mediaType)
-        });
     }
 
 	render(){
