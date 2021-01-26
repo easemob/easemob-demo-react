@@ -34,6 +34,7 @@ class MultiAVModal extends React.Component {
     }
 
     componentDidMount(){
+    	rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 		this.addListener()
 		this.join()
 		this.interval()

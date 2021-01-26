@@ -23,7 +23,6 @@ const rtc = {
     localAudioTrack: null,
     localVideoTrack: null,
 };
-rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 
 console = console || {}
 console.group = console.group || function () {}

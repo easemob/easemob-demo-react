@@ -29,6 +29,7 @@ class Channel extends React.Component{
 	}
 
 	componentDidMount(){
+		rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 		this.addListener()
 	}
 
@@ -167,6 +168,11 @@ class Channel extends React.Component{
         	console.log('-- 对方已离开 --')
         	this.props.close()
         })
+
+         // 监听远端取消发布
+        rtc.client.on("user-unpublished", (user, mediaType) => {
+        	console.log('取消发布了', user, mediaType)
+        });
     }
 
 	render(){
