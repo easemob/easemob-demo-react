@@ -70,8 +70,8 @@ class AddAVMemberModal extends React.Component {
                 this.props.setSelected(seleted_members)
                 this.props.setGid(gid)
 
-                const callId = WebIM.conn.getUniqueId().toString();
-                const channelName = Math.uuid(8)
+                const callId = this.props.confr.callId || WebIM.conn.getUniqueId().toString();
+                const channelName = this.props.confr.channel || Math.uuid(8)
                 const confr = {
                         channelName: channelName,
                         type: 2,
@@ -215,7 +215,7 @@ export default connect(
     ({ entities, multiAV, callVideo }) => ({
         groupMember: entities.groupMember,
         gid: callVideo.gid,
-        confr: multiAV.confr,
+        confr: callVideo.confr,
         selected: multiAV.selectedMembers,
         joined: multiAV.joinedMembers,
         roster: entities.roster.byName
