@@ -170,10 +170,14 @@ class MultiAVModal extends React.Component {
         	console.log('取消发布了')
             if (mediaType === "video") {
                 let { videos } = this.state
-                videos.forEach((item, index) => {
+                let newVideos = videos.map((item, index) => {
 	            	if (item.name === user.uid) {
-	            		item = {}
+	            		return {}
 	            	}
+	            	return item
+	            })
+	            this.setState({
+	            	videos: newVideos
 	            })
             }
         });
@@ -191,31 +195,35 @@ class MultiAVModal extends React.Component {
     }
 
     open_camera(){
-    	rtc.client.publish(rtc.localVideoTrack);
+    	// rtc.client.publish(rtc.localVideoTrack);
     	this.setState({
     		voff: false
     	})
+    	rtc.localVideoTrack.setEnabled(true)
     }
 
     close_camera(){
-    	rtc.client.unpublish(rtc.localVideoTrack);
+    	// rtc.client.unpublish(rtc.localVideoTrack);
     	this.setState({
     		voff: true
     	})
+    	rtc.localVideoTrack.setEnabled(false)
     }
 
     open_mic(){
-    	rtc.client.publish(rtc.localAudioTrack);
+    	// rtc.client.publish(rtc.localAudioTrack);
     	this.setState({
     		aoff: false
     	})
+    	rtc.localAudioTrack.setEnabled(true)
     }
 
     close_mic(){
-    	rtc.client.unpublish(rtc.localAudioTrack);
+    	// rtc.client.unpublish(rtc.localAudioTrack);
     	this.setState({
     		aoff: true
     	})
+    	rtc.localAudioTrack.setEnabled(false)
     }
 
     addMember(){
