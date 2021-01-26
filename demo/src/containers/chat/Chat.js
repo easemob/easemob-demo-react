@@ -451,6 +451,8 @@ class Chat extends React.Component {
             calleeIMName: selectItem,
             callerIMName: WebIM.conn.context.jid.name
         })
+        const inviteStatus = 1
+        this.props.setCallStatus(inviteStatus)
 
     }
 

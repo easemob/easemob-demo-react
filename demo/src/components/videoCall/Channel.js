@@ -44,7 +44,6 @@ class Channel extends React.Component{
 
 	async join(){
 		let {channel, token, type} = this.props.confr
-
 		console.log('加入时的参数', channel, token, type)
     	var options = {
             // 替换成你自己项目的 App ID。
@@ -75,6 +74,8 @@ class Channel extends React.Component{
         	await rtc.client.publish(config);
         	rtc.localVideoTrack.play("local-player");
         	rtc.localAudioTrack.play();
+
+
         }
 
         console.log("publish success! --- ");
@@ -114,18 +115,24 @@ class Channel extends React.Component{
 		})
 	}
 
-	mute(){}
+	mute(){
+		console.log('控制音量')
+		this.refs.mute.isopen?rtc.other.audioTrack.setVolume(100):rtc.other.audioTrack.setVolume(0);
+        this.refs.mute.style.color = this.refs.mute.isopen?'#eeeeee':'#4eb1f4'
+        this.refs.mute.isopen = !this.refs.mute.isopen
+	}
 
 	controlStream(type){
 		console.log(type, this.refs.video.isopen)
         if(type === 'audioControl'){
-        	this.refs.audio.isopen?rtc.client.publish(rtc.localAudioTrack):rtc.client.unpublish(rtc.localAudioTrack);
+        	this.refs.audio.isopen?rtc.localAudioTrack.setEnabled(true):rtc.localAudioTrack.setEnabled(false);
             this.refs.audio.style.color = this.refs.audio.isopen?'#eeeeee':'#4eb1f4'
             this.refs.audio.isopen = !this.refs.audio.isopen
-            rtc.localVideoTrack.play("local-player");
+            rtc.localAudioTrack.play();
         }else{
         	console.log('this.refs.video.isopen', this.refs.video.isopen)
-        	this.refs.video.isopen?rtc.client.publish(rtc.localVideoTrack):rtc.client.unpublish(rtc.localVideoTrack);
+        	// this.refs.video.isopen?rtc.client.publish(rtc.localVideoTrack):rtc.client.unpublish(rtc.localVideoTrack);
+        	this.refs.video.isopen?rtc.localVideoTrack.setEnabled(true):rtc.localVideoTrack.setEnabled(false);
             this.refs.video.style.color = this.refs.video.isopen?'#eeeeee':'#4eb1f4'
             this.refs.video.isopen = !this.refs.video.isopen
             rtc.localVideoTrack.play("local-player");
@@ -133,12 +140,10 @@ class Channel extends React.Component{
 	}
 
 	addListener(){
-		console.log('注册监听 -------- ')
     	rtc.client.on("user-published", async (user, mediaType) => {
-    		console.log('有远端画面 -------- ')
+    		console.log('-- 对方发布流 -- ')
             // 开始订阅远端用户。
             await rtc.client.subscribe(user, mediaType);
-            console.log("subscribe success");
 
             // 表示本次订阅的是视频。
             if (mediaType === "video") {
@@ -153,20 +158,14 @@ class Channel extends React.Component{
             if (mediaType === "audio") {
                 // 订阅完成后，从 `user` 中获取远端音频轨道对象。
                 const remoteAudioTrack = user.audioTrack;
+                rtc.other = user
                 // 播放音频因为不会有画面，不需要提供 DOM 元素的信息。
                 remoteAudioTrack.play();
             }
         });
 
-        rtc.client.on('user-unpublished', () => {
-        	if (this.props.confr.type === 0) {
-        		console.log('对方已离开 ---- ', this.props.confr)
-        		this.props.close()
-        	}
-        })
-
         rtc.client.on("user-left", () => {
-        	console.log('对方已离开 ---- ')
+        	console.log('-- 对方已离开 --')
         	this.props.close()
         })
     }
@@ -178,7 +177,7 @@ class Channel extends React.Component{
         var toggle_display = (this.props.confr.type == 2)?'block': 'none';
 
         var accept_display = this.props.callStatus === 4 ? 'block' : 'none'; //被叫alerting
-        var mute_display = (this.props.callStatus > 4 && this.props.confr.type !=0) ? 'block' : 'none'; // 确认后
+        var mute_display = (this.props.callStatus > 4) ? 'block' : 'none'; // 确认后
 
         var myName = WebIM.conn.context.jid.name;
         var {callerIMName, calleeIMName} = this.props.confr
@@ -211,14 +210,14 @@ class Channel extends React.Component{
                         top: this.state.toggle_top + 'px',
                         bottom: 'auto'
                     }} onClick={()=>{this.toggle()}}>d</i>
-                { /*<i ref='mute' className='font small mute'
+                { <i ref='mute' className='font small mute'
                     style={{
-                        display: 'none',
+                        display: mute_display,
                         left: this.state.toggle_right + 'px',
                         right: 'auto',
                         top: 'auto',
                         bottom: this.state.mute_bottom + 'px'
-                    }} onClick={this.mute}>m</i>*/}
+                    }} onClick={this.mute.bind(this)}>m</i>}
                 <i ref='audio' isopen={'true'} className='font small mute'
                     style={{
                         display: mute_display,
@@ -229,7 +228,7 @@ class Channel extends React.Component{
                     }} onClick={this.controlStream.bind(this, 'audioControl')}>u</i>
                 <i ref='video' isopen={'true'} className='font small mute'
                     style={{
-                        display: mute_display,
+                        display: (mute_display == 'block' && this.props.confr.type == 1)?'block': 'none',
                         left: this.state.toggle_right + 60 + 'px',
                         right: 'auto',
                         top: 'auto',

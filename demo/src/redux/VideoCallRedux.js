@@ -71,7 +71,7 @@ const { Types, Creators } = createActions({
 				console.log('定时器到期')
 				dispatch(Creators.cancelCall(to))
 				dispatch(Creators.setCallStatus(CALLSTATUS.idle))
-			}, 5000)
+			}, 30000)
 			console.log('设置定时器')
         }
 	},
@@ -107,7 +107,9 @@ const { Types, Creators } = createActions({
 					msgType: 'rtcCallWithAgora'
 				}, 
 				success: function ( id,serverMsgId ) {
-					dispatch(Creators.setCallStatus(CALLSTATUS.confirmRing))
+					if (status) {
+						dispatch(Creators.setCallStatus(CALLSTATUS.confirmRing))
+					}
 				},
 				fail: function(e){
 				    console.log("Fail");
@@ -191,7 +193,7 @@ const { Types, Creators } = createActions({
 			let to = to || getState().callVideo.confr.calleeIMName
 			let currentCallId = getState().callVideo.confr.callId
 			if (!to) {
-				console.log('bug ----')
+				console.log('-- to is undefined --')
 				return
 			}
 			msg.set({
