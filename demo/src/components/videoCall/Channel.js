@@ -29,9 +29,7 @@ class Channel extends React.Component{
 	}
 
 	componentDidMount(){
-		console.log('Channel callStatus --- +++ ***:', this.props.callStatus)
 		this.addListener()
-		// this.join()
 	}
 
 	componentWillReceiveProps(props){
@@ -66,16 +64,14 @@ class Channel extends React.Component{
         
         if (type === 0) {
         	await rtc.client.publish(config);
-        	rtc.localAudioTrack.play();
+        	// rtc.localAudioTrack.play();
         }else{
         	// 通过摄像头采集的视频创建本地视频轨道对象。
         	rtc.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
         	config.push(rtc.localVideoTrack)
         	await rtc.client.publish(config);
         	rtc.localVideoTrack.play("local-player");
-        	rtc.localAudioTrack.play();
-
-
+        	// rtc.localAudioTrack.play();
         }
 
         console.log("publish success! --- ");
@@ -117,6 +113,9 @@ class Channel extends React.Component{
 
 	mute(){
 		console.log('控制音量')
+		if (!rtc.other.audioTrack) {
+			return message.error('当前无对方音频轨道');
+		}
 		this.refs.mute.isopen?rtc.other.audioTrack.setVolume(100):rtc.other.audioTrack.setVolume(0);
         this.refs.mute.style.color = this.refs.mute.isopen?'#eeeeee':'#4eb1f4'
         this.refs.mute.isopen = !this.refs.mute.isopen
@@ -128,14 +127,14 @@ class Channel extends React.Component{
         	this.refs.audio.isopen?rtc.localAudioTrack.setEnabled(true):rtc.localAudioTrack.setEnabled(false);
             this.refs.audio.style.color = this.refs.audio.isopen?'#eeeeee':'#4eb1f4'
             this.refs.audio.isopen = !this.refs.audio.isopen
-            rtc.localAudioTrack.play();
+            // rtc.localAudioTrack.play();
         }else{
         	console.log('this.refs.video.isopen', this.refs.video.isopen)
         	// this.refs.video.isopen?rtc.client.publish(rtc.localVideoTrack):rtc.client.unpublish(rtc.localVideoTrack);
         	this.refs.video.isopen?rtc.localVideoTrack.setEnabled(true):rtc.localVideoTrack.setEnabled(false);
             this.refs.video.style.color = this.refs.video.isopen?'#eeeeee':'#4eb1f4'
             this.refs.video.isopen = !this.refs.video.isopen
-            rtc.localVideoTrack.play("local-player");
+            // rtc.localVideoTrack.play("local-player");
         }
 	}
 
