@@ -169,19 +169,21 @@ class MultiAVModal extends React.Component {
         // 监听远端取消发布
         rtc.client.on("user-unpublished", (user, mediaType) => {
         	console.log('取消发布了')
-            if (mediaType === "video") {
-                let { videos } = this.state
-                let newVideos = videos.map((item, index) => {
-	            	if (item.name === user.uid) {
-	            		return {}
-	            	}
-	            	return item
-	            })
-	            this.setState({
-	            	videos: newVideos
-	            })
-            }
         });
+
+        rtc.client.on("user-left", (user) => {
+        	console.log('-- 对方已离开 --', user)
+            let { videos } = this.state
+            let newVideos = videos.map((item, index) => {
+            	if (item.name === user.uid) {
+            		return {}
+            	}
+            	return item
+            })
+            this.setState({
+            	videos: newVideos
+            })
+        })
     }
 
     closeModal(){
