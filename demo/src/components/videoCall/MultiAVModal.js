@@ -158,12 +158,12 @@ class MultiAVModal extends React.Component {
             }
 
             // 表示本次订阅的是音频。
-            // if (mediaType === "audio") {
-            //     // 订阅完成后，从 `user` 中获取远端音频轨道对象。
-            //     const remoteAudioTrack = user.audioTrack;
-            //     // 播放音频因为不会有画面，不需要提供 DOM 元素的信息。
-            //     remoteAudioTrack.play();
-            // }
+            if (mediaType === "audio") {
+                // 订阅完成后，从 `user` 中获取远端音频轨道对象。
+                const remoteAudioTrack = user.audioTrack;
+                // 播放音频因为不会有画面，不需要提供 DOM 元素的信息。
+                remoteAudioTrack.play();
+            }
         });
 
         // 监听远端取消发布
