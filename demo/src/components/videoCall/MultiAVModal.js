@@ -132,7 +132,7 @@ class MultiAVModal extends React.Component {
             })
 
             if (!exist) {
-            	for (let i = 0, len = videos.length; i < len; i++) {
+            	for (let i = 1, len = videos.length; i < len; i++) {
 	            	if (!videos[i].name) {
 	            		videos[i] = {
 	            			name: user.uid,
