@@ -345,13 +345,13 @@ class Chat extends React.Component {
                 callerIMName: WebIM.conn.context.jid.name,
                 calleeIMName: selectItem
             })
-            const inviteStatus = 1
-            this.props.setCallStatus(inviteStatus)
         }else  if (selectTab === 'group'){
             this.props.showInviteModal()
             this.props.setGid(selectItem)
             this.props.updateConfrInfo(selectItem, false, false)
         }
+        const inviteStatus = 1
+        this.props.setCallStatus(inviteStatus)
         let to = selectItem
         rtc.timer = setTimeout(() => {
             if (selectTab === 'contact') {
