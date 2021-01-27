@@ -87,7 +87,7 @@ class Channel extends React.Component{
         await rtc.client.leave();
 
         this.props.callStatus
-        if (this.props.callStatus < 5) { //拒接
+        if (this.props.callStatus == 4) { //拒接
         	this.props.answerCall('refuse')
         }
 
