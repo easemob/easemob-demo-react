@@ -33,7 +33,7 @@ class PtopCallModal extends React.Component {
 
 
 	render() {
-		let hide = ([1,3,4,5,6,7].includes(this.props.callStatus) && this.props.confr.type < 2) ? '' : ' hide'
+		let hide = ([1,3,4,5,6,7].includes(this.props.callStatus) && typeof this.props.confr.type == 'number' &&this.props.confr.type < 2) ? '' : ' hide'
 	return(
 		<Draggable defaultPosition={{ x: 300, y: 200 }} bounds="parent">
 			<div className={"multi-webim-rtc " + hide} ref="rtcWrapper">
