@@ -507,15 +507,18 @@ WebIM.conn.listen({
                     console.log('清除定时器1')
                     rtc.timer && clearTimeout(rtc.timer)
                     if (msgInfo.result !== 'accept') {
-                        store.dispatch(VideoCallAcctions.hangup())
                         const idleStatus = 0
-                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                        
                         if (msgInfo.result === 'busy') {
                             message.error('对方正忙')
                         }else if(msgInfo.result === 'refuse'){
                             message.error('对方已拒绝')
                         }
-                        store.dispatch(VideoCallAcctions.hangup())
+                        let callVideo = store.getState().callVideo;
+                        if (callVideo.confr.type !== 2) { // 单人情况挂断，多人不挂断
+                            store.dispatch(VideoCallAcctions.hangup())
+                            store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                        }
                         return
                     }
                     deviceId = msgInfo.calleeDevId
