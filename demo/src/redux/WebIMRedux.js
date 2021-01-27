@@ -495,6 +495,13 @@ WebIM.conn.listen({
                     break;
                 case "confirmRing":
                     console.log('收到confirmRing', msg)
+                    if (!msgInfo.status) {
+                        message.error('邀请已失效')
+                        const idleStatus = 0
+                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                        store.dispatch(VideoCallAcctions.hangup())
+                        return
+                    }
                     deviceId = msgInfo.calleeDevId
                     const receivedConfirmRingStatus = 4
                     store.dispatch(VideoCallAcctions.setCallStatus(receivedConfirmRingStatus))
