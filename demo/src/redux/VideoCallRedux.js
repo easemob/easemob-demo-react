@@ -148,12 +148,13 @@ const { Types, Creators } = createActions({
 				    console.log("Fail"); //如禁言、拉黑后发送消息会失败
 				}
 			});
+			console.log('发送answerCall', msg )
 			WebIM.conn.send(msg.body);
 		}
 	},
 
 	// caller
-	confirmCallee: (to, calleeDevId)=>{
+	confirmCallee: (to, calleeDevId, result)=>{
 		return (dispatch, getState) => {
 			var id = WebIM.conn.getUniqueId();
 			var msg = new WebIM.message('cmd', id);
@@ -167,7 +168,7 @@ const { Types, Creators } = createActions({
 				action : 'rtcCall', 
 				ext: {
 					action: 'confirmCallee',
-					result: 'accept', // busy/accept/refuse
+					result: result || 'accept', // busy/accept/refuse
 					callerDevId: WebIM.conn.deviceId,
 					calleeDevId: calleeDevId,
 					callId: currentCallId,
@@ -180,7 +181,8 @@ const { Types, Creators } = createActions({
 				fail: function(e){
 				    console.log("Fail")
 				}
-			});   
+			}); 
+			console.log('发送confirmCallee', msg)
 			WebIM.conn.send(msg.body);
 		}
 	},
@@ -212,7 +214,8 @@ const { Types, Creators } = createActions({
 				fail: function(e){
 				    console.log("Fail"); //如禁言、拉黑后发送消息会失败
 				}
-			});   
+			});
+			console.log('发送取消消息',msg)
 			WebIM.conn.send(msg.body);
 		}
 	},

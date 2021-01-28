@@ -513,6 +513,10 @@ WebIM.conn.listen({
                     console.log('收到回复的answerCall', msg)
                     console.log('清除定时器1')
                     rtc.timer && clearTimeout(rtc.timer)
+                    
+                    deviceId = msgInfo.calleeDevId
+                    store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
+
                     if (msgInfo.result !== 'accept') {
                         const idleStatus = 0
                         
@@ -528,8 +532,6 @@ WebIM.conn.listen({
                         }
                         return
                     }
-                    deviceId = msgInfo.calleeDevId
-                    store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId))
                     break;
                 case "confirmCallee":
                     console.log('收到confirmCallee', msg)

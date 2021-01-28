@@ -113,11 +113,13 @@ class MultiAVModal extends React.Component {
     }
 
     addListener(){
-    	rtc.client.on("user-published", async (user, mediaType) => {
+    	rtc.client.on("user-published", (user, mediaType) => {
     		console.log('有远端画面 -------- ')
     		console.log(user, mediaType)
             // 开始订阅远端用户。
-            await rtc.client.subscribe(user, mediaType);
+            
+            rtc.client.subscribe(user, mediaType);
+            
             console.log("subscribe success");
 
             let { videos } = this.state
