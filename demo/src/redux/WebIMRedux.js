@@ -354,11 +354,11 @@ WebIM.conn.listen({
                         onOk() {
                             store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
                             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                            store.dispatch(VideoCallAcctions.answerCall('accept', message.ext.callId, message.ext.callerDevId, from))
+                            store.dispatch(VideoCallAcctions.answerCall('accept', { callId:message.ext.callId, callerDevId: message.ext.callerDevId, to:from}))
                         },
                         onCancel() {
                             console.log('Cancel')
-                            store.dispatch(VideoCallAcctions.answerCall('refuse', message.ext.callId, message.ext.callerDevId, from))
+                            store.dispatch(VideoCallAcctions.answerCall('refuse', { callId:message.ext.callId, callerDevId:message.ext.callerDevId, to:from}))
                             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                             store.dispatch(VideoCallAcctions.updateConfr({}))
                         }
