@@ -328,7 +328,7 @@ class Chat extends React.Component {
                     action: 'invite',
                     channelName: channelName,
                     type: 1, //0为1v1音频，1为1v1视频，2为多人通话
-                    callerDevId: WebIM.conn.deviceId, // 主叫方设备Id
+                    callerDevId: WebIM.conn.context.jid.clientResource, // 主叫方设备Id
                     callId: callId, // 随机uuid，每次呼叫都不同，代表一次呼叫
                     ts: Date.now(),
                     msgType: 'rtcCallWithAgora'
@@ -338,7 +338,7 @@ class Chat extends React.Component {
                 ext:{
                     channelName: channelName,
                     type: 1,
-                    callerDevId: WebIM.conn.deviceId,
+                    callerDevId: WebIM.conn.context.jid.clientResource,
                     callId: callId
                 },
                 to: selectItem,
@@ -432,7 +432,7 @@ class Chat extends React.Component {
                 action: 'invite',
                 channelName: channelName,
                 type: 0, //0为1v1音频，1为1v1视频，2为多人通话
-                callerDevId: WebIM.conn.deviceId, // 主叫方设备Id
+                callerDevId: WebIM.conn.context.jid.clientResource, // 主叫方设备Id
                 callId: callId, // 随机uuid，每次呼叫都不同，代表一次呼叫
                 ts: Date.now(),
                 msgType: 'rtcCallWithAgora',
@@ -444,7 +444,7 @@ class Chat extends React.Component {
                 channelName: channelName,
                 token: null,
                 type: 0,
-                callerDevId: WebIM.conn.deviceId,
+                callerDevId: WebIM.conn.context.jid.clientResource,
                 callId: callId
             },
             to: selectItem,

@@ -35,9 +35,15 @@ class Channel extends React.Component{
 
 	componentWillReceiveProps(props){
     	console.log('this.props.callStatus',props,this.props.callStatus)
-    	if (props.callStatus === 3 || props.callStatus === 5 || props.callStatus === 7) {
+    	if (props.callStatus === 3 || props.callStatus === 5 ) {
     		// 3 主叫加入； 5 被叫加入
     		this.join()
+    	}
+    }
+
+    componentWillUnmount(){
+    	if (this.props.callStatus != 0) {
+    		this.props.close()
     	}
     }
 

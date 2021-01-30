@@ -36,6 +36,7 @@ const { Types, Creators } = createActions({
 	setGid: [ 'gid' ],
 	showInviteModal: null,
     closeInviteModal: null,
+    setMultiConfMembers: ['members'],
 
     /*  async methods */
 
@@ -50,7 +51,7 @@ const { Types, Creators } = createActions({
 				action : 'rtcCall', 
 				ext: {
 					action: 'alert',
-					calleeDevId: WebIM.conn.deviceId,
+					calleeDevId: WebIM.conn.context.jid.clientResource,
 					callerDevId: calleeDevId,
 					callId: callId,
 					ts: Date.now(),
@@ -60,7 +61,7 @@ const { Types, Creators } = createActions({
 					dispatch(Creators.setCallStatus(CALLSTATUS.alerting))
 				},
 				fail: function(e){
-				    console.log("Fail"); //如禁言、拉黑后发送消息会失败
+				    console.log("Fail");
 				}
 			});
 
@@ -85,9 +86,12 @@ const { Types, Creators } = createActions({
 			if (callId !== currentCallId) {
 				console.warn('callId 不相同')
 				status = false
+			}else if (getState().callVideo.confr.calleeDevId && getState().callVideo.confr.calleeDevId != calleeDevId){
+				console.warn('calleeDevId 不相同')
+				status = false
 			}
 
-			if (callerDevId !== WebIM.conn.deviceId) {
+			if (callerDevId !== WebIM.conn.context.jid.clientResource) {
 				console.warn('callerDevId 设备不相同')
 				status = false
 			}
@@ -100,7 +104,7 @@ const { Types, Creators } = createActions({
 				ext: {
 					action: 'confirmRing',
 					status: status, // TRUE为有效，FALSE为无效（miss）
-					callerDevId: WebIM.conn.deviceId,
+					callerDevId: WebIM.conn.context.jid.clientResource,
 					calleeDevId: calleeDevId,
 					callId: callId,
 					ts: Date.now(),
@@ -137,7 +141,7 @@ const { Types, Creators } = createActions({
 					action: 'answerCall',
 					result: result, // busy/accept/refuse
 					callerDevId: callerDevId,
-					calleeDevId: WebIM.conn.deviceId,
+					calleeDevId: WebIM.conn.context.jid.clientResource,
 					callId: currentCallId,
 					ts: Date.now(),
 					msgType: 'rtcCallWithAgora'
@@ -161,15 +165,20 @@ const { Types, Creators } = createActions({
 			let currentCallId = getState().callVideo.confr.callId
 
 			/*增加验证是否是同一个通话*/
+			if (getState().callVideo.confr.calleeDevId) {
+				if (calleeDevId !== getState().callVideo.confr.calleeDevId) {
+					// 多端时另一个设备的返回消息
+					result = 'refuse'
+				}
+			}
 
-			
 			msg.set({
 				to: to,
 				action : 'rtcCall', 
 				ext: {
 					action: 'confirmCallee',
 					result: result || 'accept', // busy/accept/refuse
-					callerDevId: WebIM.conn.deviceId,
+					callerDevId: WebIM.conn.context.jid.clientResource,
 					calleeDevId: calleeDevId,
 					callId: currentCallId,
 					ts: Date.now(),
@@ -192,14 +201,14 @@ const { Types, Creators } = createActions({
 			var id = WebIM.conn.getUniqueId();
 			var msg = new WebIM.message('cmd', id);
 			let callerDevId = getState().callVideo.confr.callerDevId
-			let to = to || getState().callVideo.confr.calleeIMName
+			let user = to || getState().callVideo.confr.calleeIMName
 			let currentCallId = getState().callVideo.confr.callId
-			if (!to) {
+			if (!user) {
 				console.log('-- to is undefined --')
 				return
 			}
 			msg.set({
-				to: to,
+				to: user,
 				action : 'rtcCall', 
 				ext: {
 					action: 'cancelCall',
@@ -212,7 +221,7 @@ const { Types, Creators } = createActions({
 					dispatch(Creators.setCallStatus(CALLSTATUS.idle))
 				},
 				fail: function(e){
-				    console.log("Fail"); //如禁言、拉黑后发送消息会失败
+				    console.log("Fail");
 				}
 			});
 			console.log('发送取消消息',msg)
@@ -223,7 +232,6 @@ const { Types, Creators } = createActions({
 	hangup: () => {
 		rtc.localAudioTrack&&rtc.localAudioTrack.close();
         rtc.localVideoTrack&&rtc.localVideoTrack.close();
-        // 离开频道。
         rtc.client.leave();
 
 		return (dispatch, getState) => {
@@ -253,7 +261,8 @@ export const INITIAL_STATE = Immutable({
     	calleeIMName: ''
     },
     gid: '',
-    inviteModal: false
+    inviteModal: false,
+    multiConfMembers: []
 })
 
 
@@ -265,8 +274,12 @@ export const setCallStatus = (state, {status}) => {
     return state.setIn([ 'callStatus' ], status)
 }
 
-export const updateConfr = (state, {msg}) => {
+export const setMultiConfMembers = (state, { members }) => {
+	console.log('members', members)
+	return state.setIn(['multiConfMembers'], members)
+}
 
+export const updateConfr = (state, {msg}) => {
 	console.log('更新会议信息----', msg)
 	let confrInfo = msg.ext || {}
 	let confr = {
@@ -275,6 +288,7 @@ export const updateConfr = (state, {msg}) => {
 		type: confrInfo.type,
 		callId: confrInfo.callId,
 		callerDevId: confrInfo.callerDevId,
+		calleeDevId: confrInfo.calleeDevId
 	}
 	if (confrInfo.type === 2) {
 		confr.confrName = msg.to
@@ -289,6 +303,7 @@ export const updateConfr = (state, {msg}) => {
 	if (msg.callerIMName) {
 		confr.callerIMName = msg.callerIMName
 	}
+
 	return state.setIn(['confr'], confr)
 }
 
@@ -314,6 +329,7 @@ export const reducer = createReducer(INITIAL_STATE, {
 	[Types.SET_GID]: setGid,
 	[Types.SHOW_INVITE_MODAL]: showInviteModal,
 	[Types.CLOSE_INVITE_MODAL]: closeInviteModal,
+	[Types.SET_MULTI_CONF_MEMBERS]: setMultiConfMembers
 
 })
 

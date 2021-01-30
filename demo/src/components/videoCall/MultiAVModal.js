@@ -51,6 +51,12 @@ class MultiAVModal extends React.Component {
     	}
     }
 
+    componentWillUnmount(){
+    	if (this.props.callStatus != 0) {
+    		this.props.hangup()
+    	}
+    }
+
 	interval(){
 		let interval = setInterval( () => {
             let { hour, minute, second } = this.state
@@ -196,6 +202,17 @@ class MultiAVModal extends React.Component {
      //    // 离开频道。
      //    rtc.client.leave();
 
+     	console.log(this.props.callStatus)
+     	console.log(this.props.members)
+     	console.log(this.props.confr)
+     	let members = [... this.props.members]
+     	if (this.props.callStatus == 1) {
+     		members.forEach((item) => {
+     			debugger
+     			this.props.cancelCall(item)
+     		})
+     	}
+
         this.props.hangup()
     }
 
@@ -331,6 +348,7 @@ export default connect(
         gid: callVideo.gid,
         confr: callVideo.confr,
         callStatus: callVideo.callStatus,
+        members: callVideo.multiConfMembers
     }),
     dispatch => ({
         closeModal: () => dispatch(MultiAVActions.closeModal()),
@@ -341,7 +359,8 @@ export default connect(
         setJoinedMembers: (joined) => dispatch(MultiAVActions.setJoinedMembers(joined)),
         updateJoinedMembers: (removed) => dispatch(MultiAVActions.updateJoinedMembers(removed)),
         hangup: () => dispatch(VideoCallActions.hangup()),
-        showInviteModal: () => dispatch(VideoCallActions.showInviteModal())
+        showInviteModal: () => dispatch(VideoCallActions.showInviteModal()),
+        cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to))
     })
 )(MultiAVModal)
 

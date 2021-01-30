@@ -75,7 +75,7 @@ class AddAVMemberModal extends React.Component {
                 const confr = {
                         channelName: channelName,
                         type: 2,
-                        callerDevId:  WebIM.conn.deviceId,
+                        callerDevId:  WebIM.conn.context.jid.clientResource,
                         callId: callId
                     }
                 this.props.updateConfr({
@@ -86,6 +86,8 @@ class AddAVMemberModal extends React.Component {
                 seleted_members.forEach((item) => {
                     this.sendInviteMsg(item, confr)
                 })
+
+                this.props.setMultiConfMembers(seleted_members)
 
                 // let jids = []
                 // const appkey = WebIM.config.appkey, spHost = WebIM.config.Host
@@ -225,6 +227,7 @@ export default connect(
         setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
         setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
-        updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg))
+        updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg)),
+        setMultiConfMembers: (members) => dispatch(VideoCallActions.setMultiConfMembers(members))
     })
 )(Form.create()(AddAVMemberModal))

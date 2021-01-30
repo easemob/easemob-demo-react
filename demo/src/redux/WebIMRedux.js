@@ -24,12 +24,15 @@ import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import { message, Modal } from 'antd'
 const rtc = WebIM.rtc;
 const confirm = Modal.confirm
+
 const CALLSTATUS = {
     idle: 0,
     inviting: 1,
     alerting: 2,
-    confirmRing: 3,
+    confirmRing: 3, // caller
+    receivedConfirmRing: 4, // callee
     answerCall: 5,
+    receivedAnswerCall: 6,
     confirmCallee: 7
 }
 const logger = WebIM.loglevel.getLogger('WebIMRedux')
@@ -301,7 +304,7 @@ WebIM.conn.listen({
     onTextMessage: message => {
         console.log("onTextMessage", message)
         let { from, to } = message 
-        let { type } = message       
+        let { type } = message
         let rootState = store.getState()
         let username = _.get(rootState, 'login.username', '')
         let bySelf = from == username
@@ -337,7 +340,10 @@ WebIM.conn.listen({
                 message.calleeIMName = message.to
                 message.callerIMName = message.from
 
-                if (callVideo.callStatus > 0) { // 正忙
+                if (message.from == WebIM.conn.context.jid.name) {
+                    return // 自己在另一端发出的邀请
+                }
+                if (callVideo.callStatus > CALLSTATUS.idle) { // 正忙
                     if (message.ext.callId == callVideo.callId) { // 多人会议中邀请别人
                         store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
                         store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
@@ -346,7 +352,11 @@ WebIM.conn.listen({
                     }
                 }
                 store.dispatch(VideoCallAcctions.updateConfr(message))
+
                 if (message.ext.type === 2) { // 多人
+                    if (callVideo.callStatus > CALLSTATUS.idle) {
+                        return
+                    }
                     confirm({
                         title: from + '邀请您进入多人会议',
                         okText: '确认',
@@ -479,11 +489,15 @@ WebIM.conn.listen({
     onCmdMessage: msg => {
         console.log('onCmdMessage', msg)
         if (msg.action === "rtcCall") {
+            if (msg.from === WebIM.conn.context.jid.name) {
+                return // 多端情况， 另一端自己发的消息
+            }
             let msgInfo = msg.ext
             let deviceId = '';
 
             let callerDevId = ''
             let callId = '';
+            let callVideo = store.getState().callVideo;
             switch(msgInfo.action){
                 case "alert":
                     deviceId = msgInfo.calleeDevId
@@ -495,16 +509,19 @@ WebIM.conn.listen({
                     break;
                 case "confirmRing":
                     console.log('收到confirmRing', msg)
-                    if (!msgInfo.status) {
-                        message.error('邀请已失效')
-                        const idleStatus = 0
-                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+
+                    if (msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                        console.log('不是自己设备的confirmRing', msg)
+                        return // 多端情况另一端的消息
+                    }
+                    if (!msgInfo.status && callVideo.callStatus < CALLSTATUS.receivedConfirmRing) {
+                        console.warn('邀请已失效')
+                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                         store.dispatch(VideoCallAcctions.hangup())
                         return
                     }
                     deviceId = msgInfo.calleeDevId
-                    const receivedConfirmRingStatus = 4
-                    store.dispatch(VideoCallAcctions.setCallStatus(receivedConfirmRingStatus))
+                    store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.receivedConfirmRing))
                     // store.dispatch(VideoCallAcctions.answerCall(msg.from, deviceId))
                     console.log('清除定时器2')
                     rtc.timer && clearTimeout(rtc.timer)
@@ -515,34 +532,49 @@ WebIM.conn.listen({
                     rtc.timer && clearTimeout(rtc.timer)
                     
                     deviceId = msgInfo.calleeDevId
+
+                    if (msgInfo.callerDevId != WebIM.conn.context.jid.clientResource) {
+                        console.log('不是自己设备的answerCall', msg)
+                        return // 多端情况另一端的消息
+                    }
+
                     store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
 
                     if (msgInfo.result !== 'accept') {
-                        const idleStatus = 0
-                        
                         if (msgInfo.result === 'busy') {
                             message.error('对方正忙')
                         }else if(msgInfo.result === 'refuse'){
                             message.error('对方已拒绝')
                         }
-                        let callVideo = store.getState().callVideo;
+                        
                         if (callVideo.confr.type !== 2) { // 单人情况挂断，多人不挂断
                             store.dispatch(VideoCallAcctions.hangup())
-                            store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                         }
-                        return
                     }
                     break;
                 case "confirmCallee":
                     console.log('收到confirmCallee', msg)
+                    if (msg.to == WebIM.conn.context.jid.name && msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                        store.dispatch(VideoCallAcctions.hangup())
+                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                        return message.error('已在其他设备处理')
+                    }
+                    if (msg.ext.result != 'accept' && callVideo.callStatus != 7) {
+                        // 不在通话中收到 busy refuse时挂断
+                        store.dispatch(VideoCallAcctions.hangup())
+                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                    }
                     break;
                 case "cancelCall":
                     console.log('收到cancelCall', msg)
-                    let callVideo = store.getState().callVideo;
-                    const idleStatus = 0
+                    if (msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                        console.log('不是自己设备的cancelCall', msg)
+                        return // 多端情况另一端的消息
+                    }
                     if (msg.from == callVideo.confr.callerIMName) {
                         store.dispatch(VideoCallAcctions.hangup())
-                        store.dispatch(VideoCallAcctions.setCallStatus(idleStatus))
+                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                     }
                     break;
                 default:
