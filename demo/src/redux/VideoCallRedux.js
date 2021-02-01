@@ -87,10 +87,10 @@ const { Types, Creators } = createActions({
 				console.warn('callId 不相同')
 				status = false
 			}
-			if (confr.calleeDevId && confr.calleeDevId != calleeDevId){
-				console.warn('calleeDevId 不相同')
-				status = false
-			}
+			// if (confr.calleeDevId && confr.calleeDevId != calleeDevId){
+			// 	console.warn('calleeDevId 不相同')
+			// 	status = false
+			// }
 
 			if (callerDevId !== WebIM.conn.context.jid.clientResource) {
 				console.warn('callerDevId 设备不相同')
