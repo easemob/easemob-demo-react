@@ -97,21 +97,7 @@ const { Types, Creators } = createActions({
 				status = false
 			}
 
-			if (status) {
-				dispatch(Creators.updateConfr({
-					to: confr.confrName,
-					ext: {
-						channelName: confr.channel,
-						token: confr.token,
-						type: confr.type,
-						callerDevId: confr.callerDevId,
-						calleeDevId: calleeDevId,
-		                callId: confr.callId,
-					},
-					calleeIMName: confr.calleeIMName,
-					callerIMName: confr.callerIMName
-				}))
-			}
+			
 
 			var id = WebIM.conn.getUniqueId();            //生成本地消息id
 			var msg = new WebIM.message('cmd', id); //创建命令消息
@@ -180,15 +166,36 @@ const { Types, Creators } = createActions({
 		return (dispatch, getState) => {
 			var id = WebIM.conn.getUniqueId();
 			var msg = new WebIM.message('cmd', id);
-			let currentCallId = getState().callVideo.confr.callId
+
+			let confr = getState().callVideo.confr
+			let currentCallId = confr.callId
+
+			if (!confr.calleeDevId) {
+				dispatch(Creators.updateConfr({
+					to: confr.confrName,
+					ext: {
+						channelName: confr.channel,
+						token: confr.token,
+						type: confr.type,
+						callerDevId: confr.callerDevId,
+						calleeDevId: calleeDevId,
+		                callId: confr.callId,
+					},
+					calleeIMName: confr.calleeIMName,
+					callerIMName: confr.callerIMName
+				}))
+			}else{
+				result = 'refuse'
+			}
+
 
 			/*增加验证是否是同一个通话*/
-			if (getState().callVideo.confr.calleeDevId) {
-				if (calleeDevId !== getState().callVideo.confr.calleeDevId) {
-					// 多端时另一个设备的返回消息
-					result = 'refuse'
-				}
-			}
+			// if (getState().callVideo.confr.calleeDevId) {
+			// 	if (calleeDevId !== getState().callVideo.confr.calleeDevId) {
+			// 		// 多端时另一个设备的返回消息
+			// 		result = 'refuse'
+			// 	}
+			// }
 
 			msg.set({
 				to: to,
