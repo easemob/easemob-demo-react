@@ -568,8 +568,12 @@ WebIM.conn.listen({
                     break;
                 case "cancelCall":
                     console.log('收到cancelCall', msg)
-                    if (msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
-                        console.log('不是自己设备的cancelCall', msg)
+                    // if (msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                    //     console.log('不是自己设备的cancelCall', msg)
+                    //     return // 多端情况另一端的消息
+                    // }
+
+                    if (msg.from == WebIM.conn.context.jid.name) {
                         return // 多端情况另一端的消息
                     }
                     if (msg.from == callVideo.confr.callerIMName) {
