@@ -555,11 +555,15 @@ WebIM.conn.listen({
                     break;
                 case "confirmCallee":
                     console.log('收到confirmCallee', msg)
-                    if (msg.to == WebIM.conn.context.jid.name && msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
-                        store.dispatch(VideoCallAcctions.hangup())
-                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
-                        return message.error('已在其他设备处理')
+                    if ( msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                        if (msg.to == WebIM.conn.context.jid.name) {
+                            store.dispatch(VideoCallAcctions.hangup())
+                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                            return message.error('已在其他设备处理')
+                        }
+                        return
                     }
+                    
                     if (msg.ext.result != 'accept' && callVideo.callStatus != 7) {
                         // 不在通话中收到 busy refuse时挂断
                         store.dispatch(VideoCallAcctions.hangup())
