@@ -86,7 +86,8 @@ const { Types, Creators } = createActions({
 			if (callId !== currentCallId) {
 				console.warn('callId 不相同')
 				status = false
-			}else if (getState().callVideo.confr.calleeDevId && getState().callVideo.confr.calleeDevId != calleeDevId){
+			}
+			if (getState().callVideo.confr.calleeDevId && getState().callVideo.confr.calleeDevId != calleeDevId){
 				console.warn('calleeDevId 不相同')
 				status = false
 			}
