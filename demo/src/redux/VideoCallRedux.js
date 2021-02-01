@@ -80,14 +80,15 @@ const { Types, Creators } = createActions({
 	// caller
 	confirmRing: (to, calleeDevId, callerDevId, callId) => {
 		return (dispatch, getState) => {
-
-			let currentCallId = getState().callVideo.confr.callId
+			let confr = getState().callVideo.confr
+			let currentCallId = confr.callId
 			let status = true
+			console.log('confirmRing confr', confr)
 			if (callId !== currentCallId) {
 				console.warn('callId 不相同')
 				status = false
 			}
-			if (getState().callVideo.confr.calleeDevId && getState().callVideo.confr.calleeDevId != calleeDevId){
+			if (confr.calleeDevId && confr.calleeDevId != calleeDevId){
 				console.warn('calleeDevId 不相同')
 				status = false
 			}
@@ -95,6 +96,22 @@ const { Types, Creators } = createActions({
 			if (callerDevId !== WebIM.conn.context.jid.clientResource) {
 				console.warn('callerDevId 设备不相同')
 				status = false
+			}
+
+			if (status) {
+				dispatch(Creators.updateConfr({
+					to: confr.confrName,
+					ext: {
+						channelName: confr.channel,
+						token: confr.token,
+						type: confr.type,
+						callerDevId: confr.callerDevId,
+						calleeDevId: calleeDevId,
+		                callId: confr.callId,
+					},
+					calleeIMName: confr.calleeIMName,
+					callerIMName: confr.callerIMName
+				}))
 			}
 
 			var id = WebIM.conn.getUniqueId();            //生成本地消息id
@@ -233,7 +250,7 @@ const { Types, Creators } = createActions({
 	hangup: () => {
 		rtc.localAudioTrack&&rtc.localAudioTrack.close();
         rtc.localVideoTrack&&rtc.localVideoTrack.close();
-        rtc.client.leave();
+        rtc.client&&rtc.client.leave();
 
 		return (dispatch, getState) => {
 			dispatch(Creators.setCallStatus(CALLSTATUS.idle))
