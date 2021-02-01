@@ -67,7 +67,6 @@ const { Types, Creators } = createActions({
 
 			console.log('被叫发出的alert: ', msg.body)
 			WebIM.conn.send(msg.body);
-
 			rtc.timer = setTimeout(() => {
 				console.log('定时器到期')
 				dispatch(Creators.cancelCall(to))
@@ -137,6 +136,7 @@ const { Types, Creators } = createActions({
 				    console.log("Fail");
 				}
 			});
+			console.log('发送confirmRing', msg)
 			WebIM.conn.send(msg.body);
 		}
 	},
