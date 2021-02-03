@@ -94,10 +94,10 @@ const { Types, Creators } = createActions({
 
 			if (callerDevId !== WebIM.conn.context.jid.clientResource) {
 				console.warn('callerDevId 设备不相同')
-				status = false
+				// status = false
+				return
 			}
 
-			
 
 			var id = WebIM.conn.getUniqueId();            //生成本地消息id
 			var msg = new WebIM.message('cmd', id); //创建命令消息
