@@ -87,6 +87,9 @@ const { Types, Creators } = createActions({
 				console.warn('callId 不相同')
 				status = false
 			}
+			if (getState().callVideo.callStatus > 4) { //已经在通话中
+				status = false
+			}
 			// if (confr.calleeDevId && confr.calleeDevId != calleeDevId){
 			// 	console.warn('calleeDevId 不相同')
 			// 	status = false
@@ -97,7 +100,6 @@ const { Types, Creators } = createActions({
 				// status = false
 				return
 			}
-
 
 			var id = WebIM.conn.getUniqueId();            //生成本地消息id
 			var msg = new WebIM.message('cmd', id); //创建命令消息
