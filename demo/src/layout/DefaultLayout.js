@@ -21,6 +21,8 @@ import { config } from '@/config'
 import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import getCurrentContacts from '@/selectors/ContactSelector'
 import PtopCallModdal from '@/components/videoCall/PtopCallModal'
+import AlertModal from '@/components/videoCall/AlertModal'
+import MiniModal from '@/components/videoCall/MiniModal'
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
 const { Header, Content, Footer, Sider, RightSider } = Layout
@@ -359,12 +361,14 @@ class DefaultLayout extends Component {
         const room = _.get(group, `byId.${roomId}`, {})
 
         // let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
-        let { confr, callStatus } = callVideo
-        let showConfr = (confr.type === 2 && [1,3,4,5,6,7].includes(callStatus))? true: false
-
+        let { confr, callStatus, minisize } = callVideo
+        let showConfr = (confr.type === 2 && [1,3,5,6,7].includes(callStatus))? true: false
         // console.log('是否展示多人会议', callVideo)
-        let multiAVModal = showConfr ? <MultiAVModal/> : null
 
+        let showAlert = callStatus == 4
+        let multiAVModal = showConfr ? <MultiAVModal/> : null
+        let alertModal = showAlert ? <AlertModal/> : null
+        let miniModal = minisize ? <MiniModal/> : null
         if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
             var info = {}
             var gid = multiAV.gid
@@ -440,6 +444,9 @@ class DefaultLayout extends Component {
                     {/*<Footer style={{ textAlign: "center" }}>
                      Ant Design ©2016 Created by Ant UED
                      </Footer>*/}
+
+                     {alertModal}
+                     {miniModal}
                 </Content>
             </Layout>
         )

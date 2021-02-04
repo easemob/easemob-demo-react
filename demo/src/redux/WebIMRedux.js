@@ -353,30 +353,30 @@ WebIM.conn.listen({
                 }
                 store.dispatch(VideoCallAcctions.updateConfr(message))
 
-                if (message.ext.type === 2) { // 多人
-                    if (callVideo.callStatus > CALLSTATUS.idle) {
-                        return
-                    }
-                    confirm({
-                        title: from + '邀请您进入多人会议',
-                        okText: '确认',
-                        cancelText: '拒绝',
-                        onOk() {
-                            store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
-                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                            store.dispatch(VideoCallAcctions.answerCall('accept', { callId:message.ext.callId, callerDevId: message.ext.callerDevId, to:from}))
-                        },
-                        onCancel() {
-                            console.log('Cancel')
-                            store.dispatch(VideoCallAcctions.answerCall('refuse', { callId:message.ext.callId, callerDevId:message.ext.callerDevId, to:from}))
-                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
-                            store.dispatch(VideoCallAcctions.updateConfr({}))
-                        }
-                    })
-                }else{
+                // if (message.ext.type === 2) { // 多人
+                //     if (callVideo.callStatus > CALLSTATUS.idle) {
+                //         return
+                //     }
+                //     confirm({
+                //         title: from + '邀请您进入多人会议',
+                //         okText: '确认',
+                //         cancelText: '拒绝',
+                //         onOk() {
+                //             store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                //             store.dispatch(VideoCallAcctions.answerCall('accept', { callId:message.ext.callId, callerDevId: message.ext.callerDevId, to:from}))
+                //         },
+                //         onCancel() {
+                //             console.log('Cancel')
+                //             store.dispatch(VideoCallAcctions.answerCall('refuse', { callId:message.ext.callId, callerDevId:message.ext.callerDevId, to:from}))
+                //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                //             store.dispatch(VideoCallAcctions.updateConfr({}))
+                //         }
+                //     })
+                // }else{
                     store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
                     store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                }
+                // }
             }
             break
         case 'groupchat':
@@ -569,6 +569,7 @@ WebIM.conn.listen({
                         store.dispatch(VideoCallAcctions.hangup())
                         store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                     }
+                    store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.confirmCallee))
                     break;
                 case "cancelCall":
                     console.log('收到cancelCall', msg)

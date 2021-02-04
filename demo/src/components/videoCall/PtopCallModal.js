@@ -33,11 +33,14 @@ class PtopCallModal extends React.Component {
 
 
 	render() {
-		let hide = ([1,3,4,5,6,7].includes(this.props.callStatus) && typeof this.props.confr.type == 'number' &&this.props.confr.type < 2) ? '' : ' hide'
+		let { minisize } = this.props
+		let hide = ([1,3,5,6,7].includes(this.props.callStatus) && typeof this.props.confr.type == 'number' &&this.props.confr.type < 2) ? '' : ' hide'
+		let classHide = minisize ? 'hide' : ''
+
+		// hide = false
 	return(
 		<Draggable defaultPosition={{ x: 300, y: 200 }} bounds="parent">
-			<div className={"multi-webim-rtc " + hide} ref="rtcWrapper">
-
+			<div className={"multi-webim-rtc " + classHide} ref="rtcWrapper">
 				{
 					hide?'':<Channel/>
 				}
@@ -50,7 +53,8 @@ class PtopCallModal extends React.Component {
 export default connect(
     (state, props) => ({
     	callStatus: state.callVideo.callStatus,
-    	confr: state.callVideo.confr
+    	confr: state.callVideo.confr,
+    	minisize: state.callVideo.minisize
     }),
     dispatch => ({})
 )(PtopCallModal)

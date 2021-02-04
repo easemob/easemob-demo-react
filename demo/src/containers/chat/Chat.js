@@ -421,6 +421,7 @@ class Chat extends React.Component {
             match,
             message
         } = this.props
+        
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行语音通话'
 

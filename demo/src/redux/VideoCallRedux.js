@@ -32,6 +32,8 @@ const CALLSTATUS = {
 
 const { Types, Creators } = createActions({
 	setCallStatus: [ 'status' ],
+	setCallDuration: ['time'],
+	setMinisize: ['isMini'],
 	updateConfr: ['msg'],
 	setGid: [ 'gid' ],
 	showInviteModal: null,
@@ -263,6 +265,8 @@ const { Types, Creators } = createActions({
 
 		return (dispatch, getState) => {
 			dispatch(Creators.setCallStatus(CALLSTATUS.idle))
+			dispatch(Creators.setCallDuration('00:00'))
+			dispatch(Creators.setMinisize(false))
 			dispatch(Creators.updateConfr({
 				to: '',
 				ext: {}
@@ -276,6 +280,8 @@ const { Types, Creators } = createActions({
 
 export const INITIAL_STATE = Immutable({
     callStatus: CALLSTATUS.idle,
+    callDuration: '00:00',
+    minisize: false,
     confr: {
     	channel: '',
     	token: '',
@@ -299,6 +305,15 @@ export const INITIAL_STATE = Immutable({
 export const setCallStatus = (state, {status}) => {
     console.log('更新会议状态-----', status)
     return state.setIn([ 'callStatus' ], status)
+}
+
+export const setCallDuration = (state, {time}) => {
+	return state.setIn([ 'callDuration' ], time)
+}
+
+export const setMinisize = (state, {isMini}) => {
+	console.log('更新大小-----', isMini)
+	return state.setIn([ 'minisize' ], isMini)
 }
 
 export const setMultiConfMembers = (state, { members }) => {
@@ -356,8 +371,9 @@ export const reducer = createReducer(INITIAL_STATE, {
 	[Types.SET_GID]: setGid,
 	[Types.SHOW_INVITE_MODAL]: showInviteModal,
 	[Types.CLOSE_INVITE_MODAL]: closeInviteModal,
-	[Types.SET_MULTI_CONF_MEMBERS]: setMultiConfMembers
-
+	[Types.SET_MULTI_CONF_MEMBERS]: setMultiConfMembers,
+	[Types.SET_CALL_DURATION]: setCallDuration,
+	[Types.SET_MINISIZE]: setMinisize
 })
 
 export default Creators
