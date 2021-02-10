@@ -176,7 +176,7 @@ const { Types, Creators } = createActions({
 			let confr = getState().callVideo.confr
 			let currentCallId = confr.callId
 
-			if (!confr.calleeDevId) {
+			if (!confr.calleeDevId && confr.type !=2 ) {
 				dispatch(Creators.updateConfr({
 					to: confr.confrName,
 					ext: {
@@ -190,10 +190,9 @@ const { Types, Creators } = createActions({
 					calleeIMName: confr.calleeIMName,
 					callerIMName: confr.callerIMName
 				}))
-			}else{
+			}else if(confr.calleeDevId != calleeDevId && confr.type !=2){
 				result = 'refuse'
 			}
-
 
 			/*增加验证是否是同一个通话*/
 			// if (getState().callVideo.confr.calleeDevId) {
@@ -270,6 +269,7 @@ const { Types, Creators } = createActions({
 			dispatch(Creators.setCallDuration('00:00'))
 			dispatch(Creators.setMinisize(false))
 			dispatch(Creators.resetAll())
+			dispatch(Creators.setJoinedMembers([]))
 			dispatch(Creators.updateConfr({
 				to: '',
 				ext: {}

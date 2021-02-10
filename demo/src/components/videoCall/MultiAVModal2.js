@@ -70,8 +70,7 @@ class MultiAVModal extends React.Component {
             // 如果你的项目开启了 App 证书进行 Token 鉴权，这里填写生成的 Token 值。
             token: null,
         };
-
-        let confr = this.props.confr
+        let {joinedMembers, confr} = this.props;
 
         let imUserName = WebIM.conn.context.jid.name
         console.log('加入时的参数', options.appId, confr.channel, imUserName)
@@ -85,10 +84,10 @@ class MultiAVModal extends React.Component {
         await rtc.client.publish([rtc.localAudioTrack, rtc.localVideoTrack]);
 
         console.log("publish success! --- ");
+        let videoElm = 'video' + joinedMembers.length;
+        this.props.setJoinedMembers({videoElm: videoElm , name: imUserName, type: 'video'})
 
-        this.props.setJoinedMembers({videoElm: 'video0', name: imUserName, type: 'video'})
-
-        rtc.localVideoTrack.play("video0");
+        rtc.localVideoTrack.play(videoElm);
     }
 
     addListener(){
@@ -311,6 +310,7 @@ class MultiAVModal extends React.Component {
         let {joinedMembers, invitedMembers, minisize, callDuration} = this.props;
 
         let videos = joinedMembers.concat(invitedMembers)
+
         let classHide = minisize ? 'hide' : ''
 
     	return (
