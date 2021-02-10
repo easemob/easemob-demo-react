@@ -289,8 +289,6 @@ class MultiAVModal extends React.Component {
                     <div className="time">{time}</div>
 
                     <Row gutter={4}>
-
-                    	{/* 占位框 */}
                         {
                             videos.map(
                                 (item, index) => (

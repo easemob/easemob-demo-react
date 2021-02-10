@@ -421,7 +421,7 @@ class Chat extends React.Component {
             match,
             message
         } = this.props
-        
+
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行语音通话'
 
@@ -670,9 +670,10 @@ class Chat extends React.Component {
                 </div>
                 {/* <WebRTCModal collapsed={collapsed} visible={showWebRTC} /> */}
                 <ModalComponent
+                    closable={false}
                     width={460}
                     /* title={I18n.t("addAFriend")} */
-                    title={'选择成员'}
+                    // title={'选择成员'}
                     visible={inviteModal === true}
                     component={AddAVMemberModal}
                     onModalClose={this.handleModalClose}

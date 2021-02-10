@@ -58,7 +58,7 @@ class Channel extends React.Component{
     	if (this.props.callStatus != 0) {
     		this.props.close()
     	}
-    	this.interval&&clearInterval(this.interval)
+    	this.intervalID&&clearInterval(this.intervalID)
     }
 
 	async join(){
@@ -210,7 +210,7 @@ class Channel extends React.Component{
     }
     interval(){
     	let hour = 0, minute =0, second = 0;
-		this.interval = setInterval( () => {
+		this.intervalID = setInterval( () => {
             second += 1
             if (second === 60) {
                 second = 0

@@ -58,6 +58,8 @@ export default class ModalComponent extends React.Component {
                     visible={this.state.visible}
                     onOk={this.handleOk}
                     onCancel={this.handleCancel}
+
+                    closable={this.props.closable}
                 >
                     {
                         <this.props.component

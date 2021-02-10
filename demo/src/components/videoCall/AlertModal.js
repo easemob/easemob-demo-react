@@ -6,6 +6,7 @@ import avatar from '@/themes/img/avatar@2x.png'
 import accept from '@/themes/img/acceptCall@2x.png'
 import hangup from '@/themes/img/hangupCall@2x.png'
 import VideoCallActions from '@/redux/VideoCallRedux';
+import GroupMemberActions from '@/redux/GroupMemberRedux';
 class AtertModal extends React.Component {
 	constructor(){
 		super()
@@ -16,17 +17,21 @@ class AtertModal extends React.Component {
 		const answerCallStatus = 5
 		this.props.answerCall('accept')
 		this.props.setCallStatus(answerCallStatus)
+
+		console.log('gid -- ', this.props)
+		// this.props.getGroupMember(this.props.gid)
+		this.props.listGroupMemberAsync({ groupId: this.props.gid })
 	}
 
 	refuse(){
 		this.props.answerCall('refuse')
-		if (this.props.callStatus < 4) { //拒接
+		if (this.props.callStatus < 7) { //拒接
         	this.props.close()
         }
 	}
 
 	render(){
-		let { type } = this.props.confr
+		let { type, callerIMName } = this.props.confr
 		let text = type == 0 ? '语音': type == 1 ? '视频': '多人视频'
 		return(
 			<div className="rtc-alert-box">
@@ -34,7 +39,7 @@ class AtertModal extends React.Component {
 					<div className="rtc-alert-avatar">
 						<img src={avatar}/>
 					</div>
-					<div className="rtc-alert-name">name</div>
+					<div className="rtc-alert-name">{callerIMName}</div>
 				</div>
 				<div className="rtc-alert-item">
 					<div className="rtc-alert-text">邀请你{text}通话...</div>
@@ -56,13 +61,16 @@ class AtertModal extends React.Component {
 export default connect(
 	(state, props) => ({
     	callStatus: state.callVideo.callStatus,
-    	confr: state.callVideo.confr
+    	confr: state.callVideo.confr,
+    	gid: state.callVideo.gid
     }),
 	(dispatch) => ({
     	close: () => dispatch(VideoCallActions.hangup()),
     	setCallStatus: (status) => dispatch(VideoCallActions.setCallStatus(status)),
     	answerCall: (result) => dispatch(VideoCallActions.answerCall(result)),
-    	cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to))
+    	cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
+    	getGroupMember: id => dispatch(GroupMemberActions.getGroupMember(id)),
+    	listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
     })
 )(AtertModal);
 

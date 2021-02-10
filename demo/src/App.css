@@ -47,50 +47,103 @@ body {
 
 .webim-rtc {
     position: absolute;
-    width: 480px;
-    height: 600px;
+    /*width: 50%;*/
     top: 0;
     left: 0;
     z-index: 100;
-}
-.multi-webim-rtc2 {
-    position: absolute;
-    width: 600px;
-    height: 480px;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    background-color: #FFF;
-    padding: 16px 20px 17px 20px;
-    border: 0 solid #ADB9C1;
+    background-color: #2A2A2A;
+    /*padding: 16px 20px 17px 20px;*/
+    /*border: 0 solid #ADB9C1;*/
     box-shadow: 0 0 10px #ADB9C1;
+    max-height: 99%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .multi-webim-rtc {
     position: absolute;
-    /*width: 600px;
-    height: 480px;*/
+    width: 50%;
     top: 0;
     left: 0;
     z-index: 100;
-    background-color: #FFF;
+    /*height: 16rem;*/
+    background-color: #2A2A2A;
     /*padding: 16px 20px 17px 20px;*/
-    border: 0 solid #ADB9C1;
-    /*box-shadow: 0 0 10px #ADB9C1;*/
+    /*border: 0 solid #ADB9C1;*/
+    box-shadow: 0 0 10px #ADB9C1;
+    max-height: 99%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .multi-webim-rtc .groupname {
-    font-size: 24px;
-    color: #333;
-    line-height: 33px;
-    font-weight: 400;
-    margin-bottom: 8px;
+    height: 36px;
 }
 
+.multi-webim-rtc .groupname img{
+    width: 24px;
+    height: 20px;
+    margin: 8px 13px;
+}
+
+.multi-webim-rtc .istalking{
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 12px;
+    height: 12px;
+}
+
+.istalking img {
+    display: block;
+    height: 12px;
+    width: 12px;
+}
+
+.multi-webim-rtc .hide{
+    display: none;
+}
+
+.video-box{
+    width: 50%;
+    height: 0;
+    padding-bottom: 50%;
+    background: yellow;
+}
+.video-duration{
+    margin: 0;
+    text-align: center;
+    font-size: 12px;
+    color: #fff;
+}
 .multi-webim-rtc .action-wrap {
+    height: 100px;
     display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
+}
+.action-wrap .tools{
+    margin-top: 12px;
+}
+.action-wrap .tools img{
+    width: 40px;
+    height: 40px;
+}
+.tools p {
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+.action-wrap div:nth-child(1){
+    margin-left: 3%;
+}
+.action-wrap div:nth-child(2){
+    margin-left: 15%;
+}
+.action-wrap div:nth-child(3){
+    margin-left: 10%;
+}
+.action-wrap div:nth-child(4){
+    margin-left: 10%;
 }
 .multi-webim-rtc .time {
     font-size: 14px;
@@ -99,32 +152,49 @@ body {
     margin-bottom: 10px;
 }
 
-.multi-webim-rtc video {
-    height: 139px;
-    width: 100%;
-    background-size:100% 100%;
-    background: #303D4E;
-    border: 1px solid #F2F4F6;
-    border-radius: 2px;
-}
 
 .multi-webim-rtc .default {
-    height: 139px;
+    height: 14rem;
     width: 100%;
     background-size:100% 100%;
-    background: #303D4E;
-    border: 1px solid #F2F4F6;
+    /*background: #303D4E;*/
+    /*border: 1px solid #F2F4F6;*/
     border-radius: 2px;
+    
+}
+.joining{
+    background: url('./themes/img/video-bg2.png') no-repeat;
+    background-size: cover;
+}
+.joining::after {
+    content: '';
+    /*background: url('./themes/img/video-loading@2x.png');*/
+    width: 20%;
+    height: 20%;
+    background-size: cover;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    /*animation: turn 1s linear infinite;*/
+    left: 40%;
+    top: 40%;
+}
+
+@keyframes turn{
+    0%{-webkit-transform:rotate(0deg);}
+    25%{-webkit-transform:rotate(90deg);}
+    50%{-webkit-transform:rotate(180deg);}
+    75%{-webkit-transform:rotate(270deg);}
+    100%{-webkit-transform:rotate(360deg);}
 }
 
 .multi-webim-rtc .user-name {
-    height: 40px;
-    width: 180px;
+    height: 20px;
+    width: 100%;
     background: rgba(35, 42, 45, 0.2);
     border-radius: 2px;
     position: absolute;
     bottom: 5px;
-    padding: 10px;
+    padding-left: 10px;
 }
 
 .multi-webim-rtc .remote-ajust{
@@ -181,13 +251,6 @@ body {
     text-align: center;
 }
 
-.multi-webim-rtc .tools i{
-    font-size: 32px;
-    line-height: 32px;
-    color: rgba(83, 90, 93, 0.6);
-    cursor: pointer;
-
-}
 
 /* .multi-webim-rtc .tools i.i-hover{
     color: rgba(83, 90, 93, 0.4);
@@ -210,3 +273,4 @@ body {
     font-weight: 300;
     cursor: pointer;
 }
+

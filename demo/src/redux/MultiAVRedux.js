@@ -19,8 +19,8 @@ const { Types, Creators } = createActions({
     setGid: [ 'gid' ],
     setRtcOptions: [ 'confr' ],
     setSelectedMembers: [ 'selected' ],
-    setJoinedMembers: [ 'joined' ],
-    updateJoinedMembers: [ 'removed' ],
+    setJoinedMembers2: [ 'joined' ],
+    updateJoinedMembers2: [ 'removed' ],
     resetAll: null,
 
     /* ------async------ */
@@ -72,13 +72,13 @@ export const setSelectedMembers = (state, { selected }) => {
     return state.setIn([ 'selectedMembers' ], selected)
 }
 
-export const setJoinedMembers = (state, { joined }) => {
+export const setJoinedMembers2 = (state, { joined }) => {
     let join = state.getIn([ 'joinedMembers' ])
     let joinCurrent = join.concat([ joined.nickName ])
     return state.setIn([ 'joinedMembers' ],joinCurrent)
 }
 
-export const updateJoinedMembers = (state, { removed }) => {
+export const updateJoinedMembers2 = (state, { removed }) => {
     console.log('updateJoinedMembers')
     let join = state.getIn([ 'joinedMembers' ])
     let joinCurrent = _.difference(join,[ removed.nickName ])
@@ -134,7 +134,7 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.SHOW_CONFR_MODAL]: showConfrModal,
     [Types.CLOSE_CONFR_MODAL]: closeConfrModal,
     [Types.SET_SELECTED_MEMBERS]: setSelectedMembers,
-    [Types.SET_JOINED_MEMBERS]: setJoinedMembers,
-    [Types.UPDATE_JOINED_MEMBERS]: updateJoinedMembers,
+    [Types.SET_JOINED_MEMBERS2]: setJoinedMembers2,
+    [Types.UPDATE_JOINED_MEMBERS2]: updateJoinedMembers2,
     [Types.RESET_ALL]: resetAll
 })

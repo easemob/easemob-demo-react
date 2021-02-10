@@ -38,8 +38,10 @@ const { Types, Creators } = createActions({
 	setGid: [ 'gid' ],
 	showInviteModal: null,
     closeInviteModal: null,
-    setMultiConfMembers: ['members'],
-
+    setJoinedMembers: ['members'],
+    setInvitedMembers: ['members'],
+    updateJoinedMembers: [ 'removed' ],
+    resetAll: null,
     /*  async methods */
 
     // callee
@@ -71,7 +73,7 @@ const { Types, Creators } = createActions({
 			WebIM.conn.send(msg.body);
 			rtc.timer = setTimeout(() => {
 				console.log('定时器到期')
-				dispatch(Creators.cancelCall(to))
+				dispatch(Creators.hangup())
 				dispatch(Creators.setCallStatus(CALLSTATUS.idle))
 			}, 30000)
 			console.log('设置定时器')
@@ -86,10 +88,11 @@ const { Types, Creators } = createActions({
 			let status = true
 			console.log('confirmRing confr', confr)
 			if (callId !== currentCallId) {
-				console.warn('callId 不相同')
+				console.warn('callId 不相同', callId)
 				status = false
 			}
-			if (getState().callVideo.callStatus > 4) { //已经在通话中
+
+			if (getState().callVideo.callStatus > 4 && confr.type != 2) { //已经在通话中
 				status = false
 			}
 			// if (confr.calleeDevId && confr.calleeDevId != calleeDevId){
@@ -99,7 +102,6 @@ const { Types, Creators } = createActions({
 
 			if (callerDevId !== WebIM.conn.context.jid.clientResource) {
 				console.warn('callerDevId 设备不相同')
-				// status = false
 				return
 			}
 
@@ -267,6 +269,7 @@ const { Types, Creators } = createActions({
 			dispatch(Creators.setCallStatus(CALLSTATUS.idle))
 			dispatch(Creators.setCallDuration('00:00'))
 			dispatch(Creators.setMinisize(false))
+			dispatch(Creators.resetAll())
 			dispatch(Creators.updateConfr({
 				to: '',
 				ext: {}
@@ -295,7 +298,8 @@ export const INITIAL_STATE = Immutable({
     },
     gid: '',
     inviteModal: false,
-    multiConfMembers: []
+    joinedMembers: [],
+    invitedMembers: [],
 })
 
 
@@ -316,14 +320,51 @@ export const setMinisize = (state, {isMini}) => {
 	return state.setIn([ 'minisize' ], isMini)
 }
 
-export const setMultiConfMembers = (state, { members }) => {
+export const setJoinedMembers = (state, { members }) => {
 	console.log('members', members)
-	return state.setIn(['multiConfMembers'], members)
+	let join = state.getIn([ 'joinedMembers' ])
+    let joinCurrent = join.concat(members)
+
+    console.log('=========================')
+    console.log('== join ==', join, joinCurrent)
+    console.log('=========================')
+
+    let invitedMem = state.getIn([ 'invitedMembers' ])
+    let newInvitedMem = []
+    if (invitedMem.length) {
+    	newInvitedMem = invitedMem.filter((item) => {
+    		if (item.value != members.name) { return item}
+    	})
+    	console.log('newInvitedMem', newInvitedMem)
+    	console.log('=========================')
+    }
+    return state.setIn([ 'joinedMembers' ],joinCurrent)
+    	   .setIn(['invitedMembers'], newInvitedMem)
+}
+export const updateJoinedMembers = (state, { removed }) => {
+    console.log('updateJoinedMembers')
+    let join = state.getIn([ 'joinedMembers' ])
+
+    let joinCurrent = join.filter((item) => {
+    	if (item.name != removed.name) {
+    		return item
+    	}
+    });
+
+    // let joinCurrent = _.difference(join,[ removed.name ])
+    console.log('joinCurrent',joinCurrent)
+    return state.setIn([ 'joinedMembers' ],joinCurrent)
+}
+export const setInvitedMembers = (state, { members }) => {
+	console.log('members', members)
+	// let invitedMem = members.map( (item) => ({name: item}))
+	return state.setIn(['invitedMembers'], members)
 }
 
 export const updateConfr = (state, {msg}) => {
 	console.log('更新会议信息----', msg)
 	let confrInfo = msg.ext || {}
+	let groupId
 	let confr = {
 		channel: confrInfo.channelName,
 		token: confrInfo.token,
@@ -345,8 +386,11 @@ export const updateConfr = (state, {msg}) => {
 	if (msg.callerIMName) {
 		confr.callerIMName = msg.callerIMName
 	}
-
-	return state.setIn(['confr'], confr)
+	if (confrInfo.ext) {
+		groupId = confrInfo.ext.groupId
+	}
+	
+	return confrInfo.ext ? state.setIn(['confr'], confr).setIn(['gid'], groupId): state.setIn(['confr'], confr)
 }
 
 export const setGid = (state, { gid }) => {
@@ -360,7 +404,12 @@ export const showInviteModal = (state) => {
 }
 
 export const closeInviteModal = (state) => {
-    return state.setIn([ 'inviteModal' ], false)
+    return state.setIn([ 'inviteModal' ], false).setIn(['invitedMembers'], [])
+}
+
+export const resetAll = (state) => {
+    console.log('ResetAll...')
+    return state.setIn([ 'joinedMembers' ], [])
 }
 
 
@@ -371,9 +420,12 @@ export const reducer = createReducer(INITIAL_STATE, {
 	[Types.SET_GID]: setGid,
 	[Types.SHOW_INVITE_MODAL]: showInviteModal,
 	[Types.CLOSE_INVITE_MODAL]: closeInviteModal,
-	[Types.SET_MULTI_CONF_MEMBERS]: setMultiConfMembers,
+	[Types.SET_JOINED_MEMBERS]: setJoinedMembers,
 	[Types.SET_CALL_DURATION]: setCallDuration,
-	[Types.SET_MINISIZE]: setMinisize
+	[Types.SET_MINISIZE]: setMinisize,
+	[Types.SET_INVITED_MEMBERS]: setInvitedMembers,
+	[Types.UPDATE_JOINED_MEMBERS]: updateJoinedMembers,
+	[Types.RESET_ALL]: resetAll
 })
 
 export default Creators

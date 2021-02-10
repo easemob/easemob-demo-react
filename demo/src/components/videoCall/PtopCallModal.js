@@ -40,7 +40,7 @@ class PtopCallModal extends React.Component {
 		// hide = false
 	return(
 		<Draggable defaultPosition={{ x: 300, y: 200 }} bounds="parent">
-			<div className={"multi-webim-rtc " + classHide} ref="rtcWrapper">
+			<div className={"webim-rtc " + classHide} ref="rtcWrapper">
 				{
 					hide?'':<Channel/>
 				}

@@ -13,7 +13,7 @@ import Contact from '@/containers/contact/Contact'
 import Chat from '@/containers/chat/Chat'
 import HeaderTab from '@/components/header/HeaderTab'
 import HeaderOps from '@/components/header/HeaderOps'
-import MultiAVModal from '@/components/videoCall/MultiAVModal'
+import MultiAVModal from '@/components/videoCall/MultiAVModal2'
 import GroupActions from '@/redux/GroupRedux'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
 import MessageActions from '@/redux/MessageRedux'
@@ -362,11 +362,12 @@ class DefaultLayout extends Component {
 
         // let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
         let { confr, callStatus, minisize } = callVideo
-        let showConfr = (confr.type === 2 && [1,3,5,6,7].includes(callStatus))? true: false
+        let showConfr = (confr.type === 2 && [1,3,5,6,7].includes(callStatus)) ? true: false
         // console.log('是否展示多人会议', callVideo)
 
         let showAlert = callStatus == 4
         let multiAVModal = showConfr ? <MultiAVModal/> : null
+        // let multiAVModal = <MultiAVModal/>
         let alertModal = showAlert ? <AlertModal/> : null
         let miniModal = minisize ? <MiniModal/> : null
         if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
