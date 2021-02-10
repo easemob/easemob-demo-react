@@ -25,13 +25,10 @@ class AddAVMemberModal extends React.Component {
 
     componentDidMount() {
         const { groupMember, gid, selected,group } = this.props
-        console.log(groupMember, gid, selected)
-        console.log('gm', groupMember.getIn([ gid, 'byName' ]))
-        console.log('entities',  group.getIn(['byId', gid]).groupName)
         let gm = groupMember.getIn([ gid, 'byName' ])
         let options = []
         let joined = this.props.joined
-        let groupName = group.getIn(['byId', gid]).groupName
+        let groupName = group.getIn(['byId', gid])?group.getIn(['byId', gid]).groupName:gid;
         const username = store.getState().login.username
 
         let joinedName = joined.map(item => item.name)
