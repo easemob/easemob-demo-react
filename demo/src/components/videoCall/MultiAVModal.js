@@ -284,54 +284,6 @@ class MultiAVModal extends React.Component {
                 bounds="parent"
                 >
 
-                <div className="multi-webim-rtc multi-webim-rtc2">
-                    <div className="groupname">{groupName}</div>
-                    <div className="time">{time}</div>
-
-                    <Row gutter={4}>
-                        {
-                            videos.map(
-                                (item, index) => (
-                                    <Col span={8} key={index}> 
-                                    	<div className='default' id={'video' + index}></div>
-                                    	<div className="user-name">
-                                            <span>{item.name || ''}</span>
-                                        </div>
-                                    </Col>
-                                )
-                            )
-                        }
-
-                    </Row>
-
-	                <div className='action-wrap'>
-		                <div className="tools">
-		                    <i className='icon iconfont icon-add'
-		                        onClick={() => this.addMember()}
-		                    ></i>
-		                </div>
-		                <div className="tools">
-		                    {
-		                        aoff ? 
-		                        <i className='icon iconfont icon-mic_off' onClick={() => this.open_mic()}></i> : 
-		                        <i className='icon iconfont icon-mic_on'  onClick={() => this.close_mic()}></i>
-		                    }
-		                </div>
-		                <div className="tools">
-		                    {
-		                        voff ? 
-		                        <i className='icon iconfont icon-video_off' onClick={() => this.open_camera()}></i> :
-		                        <i className='icon iconfont icon-video_on'  onClick={() => this.close_camera()}></i>
-		                    }
-		                </div>
-
-		                <div className="tools">
-		                    <div className="hangup" onClick={() => this.closeModal()}>
-		                        挂断
-		                    </div>
-		                </div>
-	                </div>
-                </div>
             </Draggable>
     	)
 

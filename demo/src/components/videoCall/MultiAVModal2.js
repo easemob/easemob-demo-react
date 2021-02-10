@@ -84,7 +84,7 @@ class MultiAVModal extends React.Component {
         await rtc.client.publish([rtc.localAudioTrack, rtc.localVideoTrack]);
 
         console.log("publish success! --- ");
-        let videoElm = 'video' + joinedMembers.length;
+        let videoElm = 'video' + WebIM.conn.context.jid.name;
         this.props.setJoinedMembers({videoElm: videoElm , name: imUserName, type: 'video'})
 
         rtc.localVideoTrack.play(videoElm);
@@ -126,11 +126,11 @@ class MultiAVModal extends React.Component {
             if (!exist) {
                 joined = {
                     name: user.uid,
-                    videoElm: 'video' + joinedMembers.length,
+                    videoElm: 'video' + user.uid,
                     type: mediaType,
-                    valeu: user.uid
+                    value: user.uid,
                 }
-                videoElm = 'video' + joinedMembers.length;
+                videoElm = 'video' + user.uid;
                 this.props.setJoinedMembers(joined)
             }
 
@@ -180,14 +180,14 @@ class MultiAVModal extends React.Component {
                     span: 12
                 })
             }
+
         })
 
         rtc.client.enableAudioVolumeIndicator();
         rtc.client.on("volume-indicator", (result) => {
-            console.log('1111111')
             let isTalting = [...this.state.isTalting]
             result.forEach((volume, index) => {
-                console.log(`**** ${index} UID ${volume.uid} Level ${volume.level} ***`);
+                //console.log(`**** ${index} UID ${volume.uid} Level ${volume.level} ***`);
                 if (volume.level > 5 && !isTalting.includes(volume.uid)) {
                     isTalting.push(volume.uid)
                 }else{
@@ -198,8 +198,6 @@ class MultiAVModal extends React.Component {
                 }
             });
             this.setState({isTalting})
-
-            console.log('isTalting', isTalting)
         });
     }
 
@@ -331,8 +329,8 @@ class MultiAVModal extends React.Component {
                                     let joining = item.videoElm?'':'joining'
                                     let talking = isTalting.includes(item.name)? 'istalking' : 'hide'
                                     return(
-                                    <Col span={span} key={index}> 
-                                    	<div className={'default '+joining} id={'video' + index}>
+                                    <Col span={span} key={item.name}> 
+                                    	<div className={'default '+joining} id={'video' + item.name}>
 
                                         </div>
                                     	<div className="user-name">
