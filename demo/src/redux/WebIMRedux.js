@@ -568,6 +568,7 @@ WebIM.conn.listen({
                         // 不在通话中收到 busy refuse时挂断
                         store.dispatch(VideoCallAcctions.hangup())
                         store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                        return
                     }
                     store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.confirmCallee))
                     break;
