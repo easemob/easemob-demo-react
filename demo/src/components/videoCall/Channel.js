@@ -175,6 +175,10 @@ class Channel extends React.Component{
 
                 // 也可以只传入该 DIV 节点的 ID。
                 remoteVideoTrack.play('remote-player');
+
+                this.setState({
+                	localFullRemoteCorner: false
+                })
             }
 
             // 表示本次订阅的是音频。
