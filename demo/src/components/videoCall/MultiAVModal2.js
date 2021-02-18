@@ -188,15 +188,16 @@ class MultiAVModal extends React.Component {
             let isTalting = [...this.state.isTalting]
             result.forEach((volume, index) => {
                 //console.log(`**** ${index} UID ${volume.uid} Level ${volume.level} ***`);
-                if (volume.level > 5 && !isTalting.includes(volume.uid)) {
+                if (volume.level > 1 && !isTalting.includes(volume.uid)) {
                     isTalting.push(volume.uid)
                 }else{
-                    if (volume.level < 5 && isTalting.includes(volume.uid)) {
+                    if (volume.level < 1 && isTalting.includes(volume.uid)) {
                         let i = isTalting.indexOf(volume.uid)
                         isTalting.splice(i, 1)
                     }
                 }
             });
+            console.log('result -------- ', result, isTalting)
             this.setState({isTalting})
         });
     }
@@ -248,8 +249,15 @@ class MultiAVModal extends React.Component {
     }
 
     close_mic(){
+        let isTalting = this.state.isTalting
+        let imUserName = WebIM.conn.context.jid.name
+        let i = isTalting.indexOf(imUserName)
+        if (i > -1) {
+            isTalting.splice(i, 1)
+        }
     	this.setState({
-    		aoff: true
+    		aoff: true,
+            isTalting
     	})
     	rtc.localAudioTrack.setEnabled(false)
     }
