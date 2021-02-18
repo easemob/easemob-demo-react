@@ -47,7 +47,6 @@ const { Types, Creators } = createActions({
     // callee
 	sendAlerting: (to, calleeDevId, callId) => {
 		return (dispatch, getState) => {
-			console.log('我拿到state', getState())
             var id = WebIM.conn.getUniqueId();            //生成本地消息id
 			var msg = new WebIM.message('cmd', id); //创建命令消息
 			msg.set({
@@ -270,6 +269,7 @@ const { Types, Creators } = createActions({
 			dispatch(Creators.setMinisize(false))
 			dispatch(Creators.resetAll())
 			dispatch(Creators.setJoinedMembers([]))
+			dispatch(Creators.setInvitedMembers([]))
 			dispatch(Creators.updateConfr({
 				to: '',
 				ext: {}

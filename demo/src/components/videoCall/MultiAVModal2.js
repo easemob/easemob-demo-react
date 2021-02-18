@@ -215,7 +215,7 @@ class MultiAVModal extends React.Component {
      	let members = [... this.props.invitedMembers]
      	if ( [1,3].includes(this.props.callStatus)) {
      		members.forEach((item) => {
-     			this.props.cancelCall(item.name)
+     			this.props.cancelCall(item.value)
      		})
      	}
 
