@@ -62,19 +62,16 @@ class MultiAVModal extends React.Component {
 
 
 	async join(){
-    	var options = {
-            // 替换成你自己项目的 App ID。
-            appId: "15cb0d28b87b425ea613fc46f7c9f974",
-            // 传入目标频道名。
-            channel: "",
-            // 如果你的项目开启了 App 证书进行 Token 鉴权，这里填写生成的 Token 值。
-            token: null,
-        };
+        const appId = "15cb0d28b87b425ea613fc46f7c9f974";
         let {joinedMembers, confr} = this.props;
-
         let imUserName = WebIM.conn.context.jid.name
-        console.log('加入时的参数', options.appId, confr.channel, imUserName)
-        const uid = await rtc.client.join(options.appId, confr.channel, null, imUserName);
+        let params = {
+            username: imUserName,
+            channelName: confr.channel,
+            appkey: WebIM.conn.appKey
+        }
+        const {accessToken} = await this.props.getRtctoken(params)
+        const uid = await rtc.client.join(appId, confr.channel, accessToken, imUserName);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -95,7 +92,6 @@ class MultiAVModal extends React.Component {
     		console.log('有远端画面 -------- ')
     		console.log(user, mediaType)
             // 开始订阅远端用户。
-            
             await rtc.client.subscribe(user, mediaType);
             
             console.log("subscribe success");
@@ -204,15 +200,6 @@ class MultiAVModal extends React.Component {
 
     closeModal(){
     	console.log('挂断')
-    	// rtc.localAudioTrack&&rtc.localAudioTrack.close();
-     //    rtc.localVideoTrack&&rtc.localVideoTrack.close();
-
-     //    // 离开频道。
-     //    rtc.client.leave();
-
-     	console.log(this.props.callStatus)
-     	console.log(this.props.invitedMembers)
-     	console.log(this.props.confr)
      	let members = [... this.props.invitedMembers]
      	if ( [1,3].includes(this.props.callStatus)) {
      		members.forEach((item) => {
@@ -413,7 +400,8 @@ export default connect(
         showInviteModal: () => dispatch(VideoCallActions.showInviteModal()),
         cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
         setMinisize: (isMini) => dispatch(VideoCallActions.setMinisize(isMini)),
-        setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time))
+        setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time)),
+        getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf))
     })
 )(MultiAVModal)
 

@@ -63,19 +63,16 @@ class Channel extends React.Component{
 
 	async join(){
 		let {channel, token, type} = this.props.confr
-		
-    	var options = {
-            // 替换成你自己项目的 App ID。
-            // appId: "783c9572963e447e96ee41685fa6ed9f",
-            appId: '15cb0d28b87b425ea613fc46f7c9f974',
-            // 传入目标频道名。
-            channel: channel,
-            // 如果你的项目开启了 App 证书进行 Token 鉴权，这里填写生成的 Token 值。
-            token: null //token,
-        };
+        const appId = '15cb0d28b87b425ea613fc46f7c9f974';
         let imUserName = WebIM.conn.context.jid.name
-        console.log('加入时的参数', options.channel)
-        const uid = await rtc.client.join(options.appId, options.channel, options.token, imUserName);
+
+        let params = {
+        	username: imUserName,
+		    channelName: channel,
+		    appkey: WebIM.conn.appKey
+        }
+        const {accessToken} = await this.props.getRtctoken(params)
+        const uid = await rtc.client.join(appId, channel, accessToken, imUserName);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -349,7 +346,7 @@ export default connect(
     (state, props) => ({
     	callStatus: state.callVideo.callStatus,
     	confr: state.callVideo.confr,
-    	callDuration: state.callVideo.callDuration
+    	callDuration: state.callVideo.callDuration,
     }),
     (dispatch) => ({
     	close: () => dispatch(VideoCallActions.hangup()),
@@ -357,7 +354,8 @@ export default connect(
     	answerCall: (result) => dispatch(VideoCallActions.answerCall(result)),
     	cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
     	setMinisize: (isMini) => dispatch(VideoCallActions.setMinisize(isMini)),
-    	setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time))
+    	setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time)),
+    	getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf))
     })
 )(Channel)
 

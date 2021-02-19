@@ -7,7 +7,7 @@ import CommonActions from '@/redux/CommonRedux'
 import _ from 'lodash'
 import { config } from '@/config'
 import { store } from '@/redux'
-
+import axios from 'axios'
 const rtc = WebIM.rtc;
 const AgoraRTC = WebIM.AgoraRTC;
 /** 
@@ -275,6 +275,24 @@ const { Types, Creators } = createActions({
 				ext: {}
 			}))
 		}
+	},
+
+	getRtctoken: (params)=>{
+		return (dispatch, getState) => {
+			dispatch(CommonActions.fetching())
+			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
+			let {username, channelName, appkey} = params
+			return axios.get(`//a1-hsb.easemob.com/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${appkey}`)
+			.then(function (response) {
+			    dispatch(CommonActions.fetched())
+			    return response.data
+			})
+			.catch(function (error) {
+				dispatch(CommonActions.fetched())
+			    console.log(error);
+			});
+		}
+		
 	}
 
 })
