@@ -39,14 +39,12 @@ class Channel extends React.Component{
 		rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 		this.addListener()
 
-		console.log('this.props.callStatus ----- ', this.props.callStatus)
 		if (this.props.callStatus == 5) { //5 被叫加入
 			this.join()
 		}
 	}
 
 	componentWillReceiveProps(props){
-    	// console.log('this.props.callStatus',props, this.props.callStatus)
     	if (props.callStatus == this.props.callStatus) {return}
     	if (props.callStatus === 3) {
     		// 3 主叫加入； 
@@ -97,13 +95,10 @@ class Channel extends React.Component{
         this.interval()
     }
 	async close(){
-
 		console.log('click hangup')
 		// 销毁本地音视频轨道。
         rtc.localAudioTrack&&rtc.localAudioTrack.close();
         rtc.localVideoTrack&&rtc.localVideoTrack.close();
-
-        
 
         if (this.props.confr.callerIMName == WebIM.conn.context.jid.name) {
         	this.props.cancelCall()
@@ -130,7 +125,6 @@ class Channel extends React.Component{
 	}
 
 	mute(){
-		console.log('控制音量')
 		if (!rtc.other.audioTrack) {
 			return message.error('当前无对方音频轨道');
 		}
@@ -140,7 +134,6 @@ class Channel extends React.Component{
 	}
 
 	controlStream(type){
-		console.log(type, this.refs.audio.isopen)
         if(type === 'audioControl'){
         	this.refs.audio.isopen?rtc.localAudioTrack.setEnabled(true):rtc.localAudioTrack.setEnabled(false);
             // this.refs.audio.style.color = this.refs.audio.isopen?'#eeeeee':'#4eb1f4'
@@ -150,7 +143,6 @@ class Channel extends React.Component{
             this.refs.audio.isopen = !this.refs.audio.isopen
             // rtc.localAudioTrack.play();
         }else{
-        	console.log('this.refs.video.isopen', this.refs.video.isopen)
         	// this.refs.video.isopen?rtc.client.publish(rtc.localVideoTrack):rtc.client.unpublish(rtc.localVideoTrack);
         	this.refs.video.isopen?rtc.localVideoTrack.setEnabled(true):rtc.localVideoTrack.setEnabled(false);
             this.refs.video.style.color = this.refs.video.isopen?'#eeeeee':'#4eb1f4'
@@ -282,60 +274,6 @@ class Channel extends React.Component{
 				</div>
                 <div className={'video '+localClassName} style={{display: video_display}} ref='localVideo' id="local-player"></div>
                 <div className={'video '+remoteClassName} style={{display: video_display}} ref='remoteVideo' id="remote-player"></div>
-
-                {
-                 // <i ref='close' id='webrtc_close' className='font small close' style={{
-                 //    left: 'auto',
-                 //    right: this.state.close_right + 'px',
-                 //    top: 'auto',
-                 //    bottom: this.state.close_bottom + 'px'
-                	// }} onClick={() => {this.close()}}>Q</i>
-            	}
-                { 
-	                // <i ref='accept' className='font small accept' style={{
-	                //     display: accept_display,
-	                //     left: this.state.accept_left + 'px',
-	                //     right: 'auto',
-	                //     top: 'auto',
-	                //     bottom: this.state.accept_bottom + 'px'
-	                // }} onClick={() => this.accept()}>z</i>
-	                // <i ref='toggle' className='font small toggle'
-                 //    style={{
-                 //        display: toggle_display,
-                 //        left: 'auto',
-                 //        right: this.state.toggle_right + 'px',
-                 //        top: this.state.toggle_top + 'px',
-                 //        bottom: 'auto'
-                 //    }} onClick={()=>{this.toggle()}}>d</i>
-                
-                	// <i ref='mute' className='font small mute'
-                 //    style={{
-                 //        display: mute_display,
-                 //        left: this.state.toggle_right + 'px',
-                 //        right: 'auto',
-                 //        top: 'auto',
-                 //        bottom: this.state.mute_bottom + 'px'
-                 //    }} onClick={this.mute.bind(this)}>m</i>
-                
-                	// <i ref='audio' isopen={'true'} className='font small mute'
-                 //    style={{
-                 //        display: mute_display,
-                 //        left: this.state.toggle_right + 30 + 'px',
-                 //        right: 'auto',
-                 //        top: 'auto',
-                 //        bottom: this.state.mute_bottom + 'px'
-                 //    }} onClick={this.controlStream.bind(this, 'audioControl')}>u</i>
-                
-                	// <i ref='video' isopen={'true'} className='font small mute'
-                 //    style={{
-                 //        display: (mute_display == 'block' && this.props.confr.type == 1)?'block': 'none',
-                 //        left: this.state.toggle_right + 60 + 'px',
-                 //        right: 'auto',
-                 //        top: 'auto',
-                 //        bottom: this.state.mute_bottom + 'px'
-                 //    }} onClick={this.controlStream.bind(this,'videoControl')}>v</i>
-
-                }
             </div>
 		)
 	}

@@ -7,6 +7,16 @@ import MultiAVActions from '@/redux/MultiAVRedux'
 import VideoCallActions from '@/redux/VideoCallRedux'
 import Immutable from 'seamless-immutable'
 import { store } from '@/redux'
+import narrow from '@/themes/img/narrow@2x.png'
+import microphone from '@/themes/img/microphone@2x.png'
+import microphoneMute from '@/themes/img/microphone-mute@2x.png'
+import inviteMember from '@/themes/img/invite_member@2x.png'
+import hangup from '@/themes/img/hangupCall@2x.png'
+import camera from '@/themes/img/camera@2x.png'
+import cameraClose from '@/themes/img/camera-close@2x.png'
+import videobg from '@/themes/img/video-bg@2x.png'
+import videold from '@/themes/img/video-loading@2x.png'
+import talkingicon from '@/themes/img/talking@2x.png'
 const confirm = Modal.confirm
 const rtc = WebIM.rtc;
 const AgoraRTC = WebIM.AgoraRTC;
@@ -16,19 +26,13 @@ class MultiAVModal extends React.Component {
         super()
 
         this.state = {
-        	videos: [
-        		{},
-        		{},
-        		{},
-        		{},
-        		{},
-        		{}
-        	],
         	aoff: false,
 			voff: false,
 			hour: 0,
             minute: 0,
             second: 0,
+            span: 12,
+            isTalting: []
         }
         this.loadTime = this.loadTime.bind(this)
     }
@@ -36,68 +40,50 @@ class MultiAVModal extends React.Component {
     componentDidMount(){
     	rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
 		this.addListener()
-		this.join()
 		this.interval()
 
-		console.log('多人会议页面参数更新：', this.props.callStatus)
+        let {joinedMembers, invitedMembers} = this.props;
+        let videos = joinedMembers.concat(invitedMembers)
+        if (videos.length > 4) {
+            this.setState({
+                span: 6
+            })
+        }else{
+            this.setState({
+                span: 12
+            })
+        }
 	}
 
 
 	componentWillReceiveProps(props){
-    	console.log('----多人会议页面参数更新： ----- ',props)
-    	if (props.callStatus === 3 || props.callStatus === 5) {
+        if (props.callStatus == this.props.callStatus) {return}
+    	if (props.callStatus === 3 && !props.confr.calleeDevId || props.callStatus === 7) {
     		// 3 主叫加入； 5 被叫加入
-    		// this.join()
+            console.log('callStatus', props.callStatus, props)
+    		this.join()
     	}
     }
 
     componentWillUnmount(){
     	if (this.props.callStatus != 0) {
-    		this.props.hangup()
+    		//this.props.hangup()
     	}
+        this.intervalID&&clearInterval(this.intervalID)
     }
 
-	interval(){
-		let interval = setInterval( () => {
-            let { hour, minute, second } = this.state
-            second += 1
-            if (second === 60) {
-                second = 0
-                minute += 1
-                if (minute === 60) {
-                    minute = 0
-                    hour += 1
-                    if (hour == 24) {
-                        hour = 0
-                    }
-                }
-            }
-            this.setState({
-                hour: hour,
-                minute: minute,
-                second: second
-            })
-        }, 1000)
-        this.setState({
-            interval: interval
-        })
-	}
 
 	async join(){
-    	var options = {
-            // 替换成你自己项目的 App ID。
-            appId: "15cb0d28b87b425ea613fc46f7c9f974",
-            // 传入目标频道名。
-            channel: "channel1",
-            // 如果你的项目开启了 App 证书进行 Token 鉴权，这里填写生成的 Token 值。
-            token: null,
-        };
-
-        let confr = this.props.confr
-
+        const appId = "15cb0d28b87b425ea613fc46f7c9f974";
+        let {joinedMembers, confr} = this.props;
         let imUserName = WebIM.conn.context.jid.name
-
-        const uid = await rtc.client.join(options.appId, confr.channel, null, imUserName);
+        let params = {
+            username: imUserName,
+            channelName: confr.channel,
+            appkey: WebIM.conn.appKey
+        }
+        const {accessToken} = await this.props.getRtctoken(params)
+        const uid = await rtc.client.join(appId, confr.channel, accessToken, imUserName);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -107,62 +93,65 @@ class MultiAVModal extends React.Component {
         await rtc.client.publish([rtc.localAudioTrack, rtc.localVideoTrack]);
 
         console.log("publish success! --- ");
+        let videoElm = 'video' + WebIM.conn.context.jid.name;
+        this.props.setJoinedMembers({videoElm: videoElm , name: imUserName, type: 'video'})
 
-        rtc.localVideoTrack.play("video0");
-
-        let { videos } = this.state
-        videos[0] = {videoElm: 'video0', name: imUserName, type: 'video'}
-
-        this.setState({
-        	videos
-        })
+        rtc.localVideoTrack.play(videoElm);
     }
+
 
     addListener(){
     	rtc.client.on("user-published", async(user, mediaType) => {
     		console.log('有远端画面 -------- ')
     		console.log(user, mediaType)
             // 开始订阅远端用户。
-            
             await rtc.client.subscribe(user, mediaType);
             
             console.log("subscribe success");
 
-            let { videos } = this.state
+            let {joinedMembers, invitedMembers} = this.props;
             let videoElm = ''
             let exist = false;
-            videos.forEach((item, index) => {
+
+            if (joinedMembers.length > 4) {
+                this.setState({
+                    span: 6
+                })
+            }else{
+                this.setState({
+                    span: 12
+                })
+            }
+
+            joinedMembers.forEach((item, index) => {
             	if (item.name === user.uid) {
             		exist = true
-            		item.type = mediaType
-            		videoElm = 'video' + index;
+            		// item.type = mediaType
+            		// videoElm = 'video' + index;
             	}
             })
 
+            let joined = {}
             if (!exist) {
-            	for (let i = 1, len = videos.length; i < len; i++) {
-	            	if (!videos[i].name) {
-	            		videos[i] = {
-	            			name: user.uid,
-	            			videoElm: 'video' + i,
-	            			type: mediaType
-	            		}
-	            		videoElm = 'video' + i;
-	            		break;
-	            	}
-	            }
+                joined = {
+                    name: user.uid,
+                    videoElm: 'video' + user.uid,
+                    type: mediaType,
+                    value: user.uid,
+                }
+                videoElm = 'video' + user.uid;
+                this.props.setJoinedMembers(joined)
             }
-            
-            this.setState({
-            	videos
-            })
 
             // 表示本次订阅的是视频。
             if (mediaType === "video") {
                 // 订阅完成后，从 `user` 中获取远端视频轨道对象。
                 const remoteVideoTrack = user.videoTrack;
                 // 也可以只传入该 DIV 节点的 ID。
-                remoteVideoTrack.play(videoElm);
+                let videoBox = videoElm?videoElm:joinedMembers.filter((item)=>(item.name == user.uid))[0].videoElm
+                setTimeout(() => {
+                    remoteVideoTrack.play(videoBox);
+                }, 100)
             }
 
             // 表示本次订阅的是音频。
@@ -180,44 +169,63 @@ class MultiAVModal extends React.Component {
         });
 
         rtc.client.on("user-left", (user) => {
-        	console.log('-- 对方已离开 --', user)
-            let { videos } = this.state
-            let newVideos = videos.map((item, index) => {
-            	if (item.name === user.uid) {
-            		return {}
-            	}
-            	return item
-            })
-            this.setState({
-            	videos: newVideos
-            })
+        	console.log('-- 对方已离开 ---', user)
+            
+            this.props.updateJoinedMembers({name: user.uid})
+            
+            let {joinedMembers} = this.props
+
+            if (joinedMembers.length<2) {
+                this.props.hangup()
+            }
+
+            if (joinedMembers.length > 4) {
+                this.setState({
+                    span: 6
+                })
+            }else{
+                this.setState({
+                    span: 12
+                })
+            }
+
         })
+
+        rtc.client.enableAudioVolumeIndicator();
+        rtc.client.on("volume-indicator", (result) => {
+            let isTalting = [...this.state.isTalting]
+            result.forEach((volume, index) => {
+                //console.log(`**** ${index} UID ${volume.uid} Level ${volume.level} ***`);
+                if (volume.level > 1 && !isTalting.includes(volume.uid)) {
+                    isTalting.push(volume.uid)
+                }else{
+                    if (volume.level < 1 && isTalting.includes(volume.uid)) {
+                        let i = isTalting.indexOf(volume.uid)
+                        isTalting.splice(i, 1)
+                    }
+                }
+            });
+            this.setState({isTalting})
+        });
     }
 
     closeModal(){
     	console.log('挂断')
-    	// rtc.localAudioTrack&&rtc.localAudioTrack.close();
-     //    rtc.localVideoTrack&&rtc.localVideoTrack.close();
-
-     //    // 离开频道。
-     //    rtc.client.leave();
-
-     	console.log(this.props.callStatus)
-     	console.log(this.props.members)
-     	console.log(this.props.confr)
-     	let members = [... this.props.members]
+     	let members = [... this.props.invitedMembers]
      	if ( [1,3].includes(this.props.callStatus)) {
      		members.forEach((item) => {
-     			debugger
-     			this.props.cancelCall(item)
+     			this.props.cancelCall(item.value)
      		})
      	}
 
         this.props.hangup()
     }
 
+    minisize(){
+        this.props.setMinisize(true)
+    }
+
     open_camera(){
-    	// rtc.client.publish(rtc.localVideoTrack);
     	this.setState({
     		voff: false
     	})
@@ -225,7 +233,6 @@ class MultiAVModal extends React.Component {
     }
 
     close_camera(){
-    	// rtc.client.unpublish(rtc.localVideoTrack);
     	this.setState({
     		voff: true
     	})
@@ -233,7 +240,6 @@ class MultiAVModal extends React.Component {
     }
 
     open_mic(){
-    	// rtc.client.publish(rtc.localAudioTrack);
     	this.setState({
     		aoff: false
     	})
@@ -241,9 +247,15 @@ class MultiAVModal extends React.Component {
     }
 
     close_mic(){
-    	// rtc.client.unpublish(rtc.localAudioTrack);
+        let isTalting = this.state.isTalting
+        let imUserName = WebIM.conn.context.jid.name
+        let i = isTalting.indexOf(imUserName)
+        if (i > -1) {
+            isTalting.splice(i, 1)
+        }
     	this.setState({
-    		aoff: true
+    		aoff: true,
+            isTalting
     	})
     	rtc.localAudioTrack.setEnabled(false)
     }
@@ -253,8 +265,7 @@ class MultiAVModal extends React.Component {
     	this.props.showInviteModal()
     }
 
-    loadTime() {
-        const { hour, minute, second } = this.state
+    loadTime(hour, minute, second) {
         const n2s = (n) => {
             let s = ''
             if (n >= 0 && n < 10) {
@@ -266,27 +277,111 @@ class MultiAVModal extends React.Component {
         }
         let str = ''
         let hs = n2s(hour), ms = n2s(minute), ss = n2s(second)
-        str = hs + ':' + ms + ':' + ss
+        str = hs == '00' ? ms + ':' + ss : hs + ':' + ms + ':' + ss
         return str
+    }
+    interval(){
+        let hour = 0, minute =0, second = 0;
+        this.intervalID = setInterval( () => {
+            second += 1
+            if (second === 60) {
+                second = 0
+                minute += 1
+                if (minute === 60) {
+                    minute = 0
+                    hour += 1
+                    if (hour == 24) {
+                        hour = 0
+                    }
+                }
+            }
+            let time = this.loadTime(hour, minute, second)
+            this.props.setCallDuration(time)
+        }, 1000)
+    }
+
+    minisize(){
+        this.props.setMinisize(true)
     }
 
     render() {
-    	const time = this.loadTime()
     	let groupName = '多人会议'
-    	let { voff, aoff } = this.state
+    	let { voff, aoff, isTalting } = this.state
     	let streams = []
 
-    	let videos = this.state.videos
+        let span = this.state.span
+
+        let {joinedMembers, invitedMembers, minisize, callDuration} = this.props;
+
+        let videos = joinedMembers.concat(invitedMembers)
+
+        let classHide = minisize ? 'hide' : ''
 
     	return (
     		<Draggable
-                defaultPosition={{ x: 300, y: 200 }}
+                defaultPosition={{ x: 300, y: 100 }}
                 bounds="parent"
                 >
+                <div className={"multi-webim-rtc "+ classHide}>
+                    <div className="groupname">
+                        <img className="narrow" src={narrow} alt="" onClick={()=>{this.minisize()}}/>
+                    </div>
 
+                    <Row gutter={2}>
+                        {
+                            videos.map(
+                                (item, index) => {
+                                    let joining = item.videoElm?'':'joining'
+                                    let talking = isTalting.includes(item.name)? 'istalking' : 'hide'
+                                    return(
+                                    <Col span={span} key={item.name || item.value}> 
+                                    	<div className={'default '+joining} id={'video' + item.name}>
+
+                                        </div>
+                                    	<div className="user-name">
+                                            <span>{item.name || ''}</span>
+                                        </div>
+                                        <div className={talking}>
+                                            <img src={talkingicon} alt=""/>
+                                        </div>
+                                    </Col>
+                                    )
+                                }
+                            )
+                        }
+
+                    </Row>
+                    <p className="video-duration">{callDuration}</p>
+	                <div className='action-wrap'>
+		                <div className="tools">
+		                    <img src={inviteMember} alt="" onClick={()=>{this.addMember()}}/>
+                            <p>添加成员</p>
+		                </div>
+
+                        <div className="tools">
+                            {
+                                aoff ? 
+                                <img src={microphoneMute} alt="" onClick={()=>{this.open_mic()}}/> :
+                                <img src={microphone} alt="" onClick={()=>{this.close_mic()}}/>
+                            }
+                            <p>语音</p>
+                        </div>
+                        <div className="tools">
+                            <img src={hangup} alt="" onClick={()=>{this.closeModal()}}/>
+                            <p>挂断</p>
+                        </div>
+                        <div className="tools">
+                            {
+                                voff?
+                                <img src={cameraClose} alt="" onClick={()=>{this.open_camera()}}/>:
+                                <img src={camera} alt="" onClick={()=>{this.close_camera()}}/>
+                            }
+                            <p>视频</p>
+                        </div>
+	                </div>
+                </div>
             </Draggable>
     	)
-
     }
 
 }
@@ -298,19 +393,20 @@ export default connect(
         gid: callVideo.gid,
         confr: callVideo.confr,
         callStatus: callVideo.callStatus,
-        members: callVideo.multiConfMembers
+        joinedMembers: callVideo.joinedMembers,
+        invitedMembers: callVideo.invitedMembers,
+        callDuration: callVideo.callDuration,
+        minisize: callVideo.minisize,
     }),
     dispatch => ({
-        closeModal: () => dispatch(MultiAVActions.closeModal()),
-        setLocalStream: (stream) => dispatch(MultiAVActions.setLocalStream(stream)),
-        resetConfr: () => dispatch(MultiAVActions.resetAll()),
-        updateConfrInfo: (gid) => dispatch(MultiAVActions.updateConfrInfoAsync(gid)),
-        showConfrModal: () => dispatch(MultiAVActions.showConfrModal()),
-        setJoinedMembers: (joined) => dispatch(MultiAVActions.setJoinedMembers(joined)),
-        updateJoinedMembers: (removed) => dispatch(MultiAVActions.updateJoinedMembers(removed)),
+        setJoinedMembers: (joined) => dispatch(VideoCallActions.setJoinedMembers(joined)),
+        updateJoinedMembers: (removed) => dispatch(VideoCallActions.updateJoinedMembers(removed)),
         hangup: () => dispatch(VideoCallActions.hangup()),
         showInviteModal: () => dispatch(VideoCallActions.showInviteModal()),
-        cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to))
+        cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
+        setMinisize: (isMini) => dispatch(VideoCallActions.setMinisize(isMini)),
+        setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time)),
+        getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf))
     })
 )(MultiAVModal)
 

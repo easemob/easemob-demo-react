@@ -7,12 +7,27 @@ const lo = window.location
 
 export { default as history } from './history'
 
-const { username } = qs.parse(lo.hash.split('?')[1])
+const { username } = qs.parse(lo.hash.split('?')[1]);
 
-
+(function(doc, win) {
+    var docEl = doc.documentElement,
+        resizeEvt = "orientationchange" in window ? "orientationchange" : "resize",
+        recalc = function() {
+            if (docEl.clientWidth > 750) {
+                docEl.style.fontSize = "100px";
+            } else {
+                var width = docEl.clientWidth / 7.5;
+                docEl.style.fontSize = width + "px";
+            }
+        };
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener("DOMContentLoaded", recalc, false);
+})(document, window);
 
 Math.uuid = function (len, radix) {
-    var chars = CHARS, uuid = [], i;
+    var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    var chars = CHARS, uuid = [], i; 
     radix = radix || chars.length;
 
     if (len) {

@@ -13,12 +13,11 @@ import Contact from '@/containers/contact/Contact'
 import Chat from '@/containers/chat/Chat'
 import HeaderTab from '@/components/header/HeaderTab'
 import HeaderOps from '@/components/header/HeaderOps'
-import MultiAVModal from '@/components/videoCall/MultiAVModal2'
+import MultiAVModal from '@/components/videoCall/MultiAVModal'
 import GroupActions from '@/redux/GroupRedux'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
 import MessageActions from '@/redux/MessageRedux'
 import { config } from '@/config'
-import WebRTCModal from '@/components/webrtc/WebRTCModal'
 import getCurrentContacts from '@/selectors/ContactSelector'
 import PtopCallModdal from '@/components/videoCall/PtopCallModal'
 import AlertModal from '@/components/videoCall/AlertModal'
@@ -33,9 +32,6 @@ class DefaultLayout extends Component {
     constructor({ breakpoint, match , entities }) {
         super()
         const { selectTab, selectItem = '' } = match.params
-
-
-        // console.log(selectTab, selectItem, "-----")
 
         this.state = {
             collapsed: breakpoint[SIDER_COL_BREAK],
@@ -72,15 +68,9 @@ class DefaultLayout extends Component {
         this.changeItem = this.changeItem.bind(this)
         this.changeTab = this.changeTab.bind(this)
         this.handleCloseRightSiderClick = this.handleCloseRightSiderClick.bind(this)
-
-        // throw new Error("1")
-        // throw new Error("crap")
-        // this.props.c = 1
-        // console.log(messageList, "---")
     }
 
     toggle = collapsed => {
-        // console.log("collapsed", collapsed)
         this.setState({
             collapsed
         })
@@ -122,7 +112,7 @@ class DefaultLayout extends Component {
                 info.tab = 'contact'
                 this.changeItem(info,{ defaultItem:true })
             }
-        }else if(!opt.multiAV && e.key == 'group'){
+        }else if(e.key == 'group'){
             var obj = entities.group.names
             if(obj && obj[0]){
                 this.defaultGroupItem = obj[0].split('_#-#_')[1]
@@ -231,9 +221,7 @@ class DefaultLayout extends Component {
 
     setSelectStatus(defaultItem,opt) {
         const { history, location, match } = this.props
-        // console.log(location.patchname, match)
         const { selectTab, selectItem = '' } = match.params
-        // console.log(match)
         opt = opt || {}
         if(!opt.defaultItem){
 	        this.setState({
@@ -276,19 +264,13 @@ class DefaultLayout extends Component {
 
     componentWillReceiveProps(nextProps) {
         var info = {}
-        // console.log("componentWillReceiveProps", this.props.location.pathname, nextProps.location.pathname)
         const { breakpoint, location , entities ,match } = this.props
         const nextBeakpoint = nextProps.breakpoint
 
-        // if (breakpoint[SIDER_COL_BREAK] != nextBeakpoint[SIDER_COL_BREAK]) {
-        // console.log(breakpoint, "---1")
-
         this.toggle(nextBeakpoint[SIDER_COL_BREAK])
-        // }
 
         if (location.pathname != nextProps.location.pathname) {
             this.props = nextProps
-            // console.log("componentWillReceiveProps", location)
             this.setSelectStatus()
         }
         // 刷新时，默认打开第一个item
@@ -336,52 +318,64 @@ class DefaultLayout extends Component {
         }
 
         // 多人视频打开时
-        if(this.props.multiAV.ifShowMultiAVModal){
-            const { match } = this.props
-            var gid = this.props.multiAV.gid
-            var byId = entities.group.byId
-            var groupId = byId[gid] && byId[gid].groupId
-            if(groupId && !this.multiGroupSelectItem){
-                this.multiGroupSelectItem = groupId
-                info.tab = 'group'
-	            info.key = groupId
-	            this.changeItem(info,{ defaultItem:true })
-            }
-            if(!groupId && match.params.selectTab != 'group'){
-                info.key = 'group'
-                this.changeTab(info,{ multiAV:true })
-            }
-        }
+        // if(this.props.multiAV.ifShowMultiAVModal){
+        //     const { match } = this.props
+        //     var gid = this.props.multiAV.gid
+        //     var byId = entities.group.byId
+        //     var groupId = byId[gid] && byId[gid].groupId
+        //     if(groupId && !this.multiGroupSelectItem){
+        //         this.multiGroupSelectItem = groupId
+        //         info.tab = 'group'
+	       //      info.key = groupId
+	       //      this.changeItem(info,{ defaultItem:true })
+        //     }
+        //     if(!groupId && match.params.selectTab != 'group'){
+        //         info.key = 'group'
+        //         this.changeTab(info,{ multiAV:true })
+        //     }
+        // }
 
     }
 
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
-        const { login, rightSiderOffset, multiAV, entities, group, callVideo} = this.props
+        const { login, rightSiderOffset, entities, group, callVideo} = this.props
         const room = _.get(group, `byId.${roomId}`, {})
 
-        // let multiAVModal = multiAV.ifShowMultiAVModal ? <MultiAVModal /> : null
         let { confr, callStatus, minisize } = callVideo
-        let showConfr = (confr.type === 2 && [1,3,5,6,7].includes(callStatus)) ? true: false
-        // console.log('是否展示多人会议', callVideo)
+        // idle: 0,
+        // inviting: 1,
+        // alerting: 2,
+        // confirmRing: 3, // caller
+        // receivedConfirmRing: 4, // callee
+        // answerCall: 5,
+        // receivedAnswerCall: 6,
+        // confirmCallee: 7
+        const status = {
+            idle: 0,
+            confirmRing: 3,
+            answerCall: 5,
+            receivedAnswerCall: 6,
+            confirmCallee: 7
+        }
+        let showConfr = (confr.type === 2 && [status.idle,status.confirmRing,status.answerCall,status.receivedAnswerCall,status.confirmCallee].includes(callStatus)) ? true: false
 
         let showAlert = callStatus == 4
         let multiAVModal = showConfr ? <MultiAVModal/> : null
-        // let multiAVModal = <MultiAVModal/>
         let alertModal = showAlert ? <AlertModal/> : null
         let miniModal = minisize ? <MiniModal/> : null
-        if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
-            var info = {}
-            var gid = multiAV.gid
-	        var byId = entities.group.byId
-	        var groupId = byId[gid] && byId[gid].groupId
-            if(groupId){
-                this.multiAVSelectItem = groupId
-                info.key = groupId
-		        info.tab = 'group'
-		        this.changeItem(info,{ defaultItem:true })
-            }
-        }
+        // if(this.props.multiAV.ifShowMultiAVModal && !this.multiAVSelectItem){
+        //     var info = {}
+        //     var gid = multiAV.gid
+	       //  var byId = entities.group.byId
+	       //  var groupId = byId[gid] && byId[gid].groupId
+        //     if(groupId){
+        //         this.multiAVSelectItem = groupId
+        //         info.key = groupId
+		      //   info.tab = 'group'
+		      //   this.changeItem(info,{ defaultItem:true })
+        //     }
+        // }
 
         return (
             <Layout>
@@ -414,7 +408,6 @@ class DefaultLayout extends Component {
                         }}
                     >
                         
-                        <WebRTCModal collapsed={false} visible={true} />
                     </div>
                     <Content
                         className="x-layout-chat"
@@ -456,13 +449,12 @@ class DefaultLayout extends Component {
 
 export default withRouter(
     connect(
-        ({ breakpoint, entities, login, common, rightSiderOffset, multiAV, callVideo }) => ({
+        ({ breakpoint, entities, login, common, rightSiderOffset, callVideo }) => ({
             breakpoint,
             group: entities.group,
             login,
             common,
             rightSiderOffset: entities.group.rightSiderOffset,
-            multiAV,
             entities,
             callVideo
         }),

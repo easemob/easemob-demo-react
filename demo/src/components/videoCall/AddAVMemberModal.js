@@ -63,9 +63,7 @@ class AddAVMemberModal extends React.Component {
             return
         }
         this.props.onCancel()
-        this.props.setGid(gid)
-
-        this.props.showMultiAVModal()
+        // this.props.setGid(gid)
 
         const callId = this.props.confr.callId || WebIM.conn.getUniqueId().toString();
         const channelName = this.props.confr.channel || Math.uuid(8)
@@ -114,7 +112,6 @@ class AddAVMemberModal extends React.Component {
     onChange = checkedValues => {
         const len = checkedValues.length
         let options = _.cloneDeep(this.state.options)
-        console.log('options',options)
         if (len >= this.state.maxUsers) {
             this.setState({
                 disabled: true
@@ -144,11 +141,9 @@ class AddAVMemberModal extends React.Component {
     handleChange(e){
         let item = e.target
         let options = _.cloneDeep(this.state.options)
-        console.log('options', options)
         let seleted_members =  _.cloneDeep(this.props.selected)
         // let seleted_members = _.difference(members,joined)
         //this.props.setSelected(seleted_members)
-        console.log('item', item)
         if (item.checked) {
             seleted_members.push({label: item.name, value: item.name})
         }else{
@@ -159,9 +154,8 @@ class AddAVMemberModal extends React.Component {
             })
         }
 
-        console.log('seleted_members', seleted_members)
         this.props.setInvitedMembers(seleted_members)
-        if (seleted_members.length >=3) {
+        if (seleted_members.length >=15) {
 
             let stringArr = seleted_members.map( item => JSON.stringify(item))
             let members = options.map((item) => {
@@ -222,7 +216,6 @@ class AddAVMemberModal extends React.Component {
         })
     }
     onClear(e){
-        console.log(e.target)
         let value = e.target.value
         if (value == '') {
             const { groupMember, gid, selected } = this.props
@@ -278,7 +271,6 @@ class AddAVMemberModal extends React.Component {
                 {this.state.groupName}
             </div>
 
-            
             <ul className="a-add-members">
                 {
                     options.map((item) => {
@@ -295,45 +287,6 @@ class AddAVMemberModal extends React.Component {
                 }
                
             </ul>
-
-            {
-                // <Form onSubmit={this.handleSubmit} className="x-add-group">
-
-                // <div className="x-add-group-members">
-                //     <FormItem>
-                //         {getFieldDecorator('members', { initialValue: joined })(
-                //             <div>
-                //             <CheckboxGroup
-                //                 style={{ display: 'block' }}
-                //                 options={options}
-                //                 onChange={this.onChange}
-                //             >
-                //             <div>123</div>
-                //             </CheckboxGroup>
-                //             <div>45</div>
-                //             </div>
-                //         )}
-                //     </FormItem>
-                // </div>
-
-                // <div></div>
-                // <div style={{ overflow: 'hidden' }}>
-                //     <Button
-                //         style={{
-                //             width: 100,
-                //             height: 32
-                //         }}
-                //         className="fr"
-                //         type="primary"
-                //         htmlType="submit"
-                //     >
-                //         开始
-                //     </Button>
-                // </div>
-
-                // </Form>
-
-            }
             </div>
 
 
@@ -377,9 +330,7 @@ export default connect(
         group: entities.group
     }),
     dispatch => ({
-        showMultiAVModal: () => dispatch(MultiAVActions.showModal()),
         setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
-        setGid: (gid) => dispatch(MultiAVActions.setGid(gid)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg)),
         setInvitedMembers: (members) => dispatch(VideoCallActions.setInvitedMembers(members))

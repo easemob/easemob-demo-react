@@ -10,7 +10,6 @@ class MiniModal extends  React.Component{
 	}
 
 	handleClick(e){
-		console.log('点击',e)
 		this.props.setMinisize(false)
 	}
 

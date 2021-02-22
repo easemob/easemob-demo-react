@@ -17,8 +17,9 @@ const AgoraRTC = WebIM.AgoraRTC;
 										<-------------alerting-------
 			----------confirmRing------------>
 										<-------------answerCall-----
-
+			----------confirmCallee---------->
 */
+
 const CALLSTATUS = {
 	idle: 0,
 	inviting: 1,
@@ -193,14 +194,6 @@ const { Types, Creators } = createActions({
 				result = 'refuse'
 			}
 
-			/*增加验证是否是同一个通话*/
-			// if (getState().callVideo.confr.calleeDevId) {
-			// 	if (calleeDevId !== getState().callVideo.confr.calleeDevId) {
-			// 		// 多端时另一个设备的返回消息
-			// 		result = 'refuse'
-			// 	}
-			// }
-
 			msg.set({
 				to: to,
 				action : 'rtcCall', 
@@ -334,53 +327,39 @@ export const setCallDuration = (state, {time}) => {
 }
 
 export const setMinisize = (state, {isMini}) => {
-	console.log('更新大小-----', isMini)
 	return state.setIn([ 'minisize' ], isMini)
 }
 
 export const setJoinedMembers = (state, { members }) => {
-	console.log('members', members)
 	let join = state.getIn([ 'joinedMembers' ])
     let joinCurrent = join.concat(members)
-
-    console.log('=========================')
-    console.log('== join ==', join, joinCurrent)
-    console.log('=========================')
-
     let invitedMem = state.getIn([ 'invitedMembers' ])
     let newInvitedMem = []
     if (invitedMem.length) {
     	newInvitedMem = invitedMem.filter((item) => {
     		if (item.value != members.name) { return item}
     	})
-    	console.log('newInvitedMem', newInvitedMem)
-    	console.log('=========================')
     }
     return state.setIn([ 'joinedMembers' ],joinCurrent)
     	   .setIn(['invitedMembers'], newInvitedMem)
 }
 export const updateJoinedMembers = (state, { removed }) => {
-    console.log('updateJoinedMembers')
     let join = state.getIn([ 'joinedMembers' ])
-
     let joinCurrent = join.filter((item) => {
     	if (item.name != removed.name) {
     		return item
     	}
     });
-
     // let joinCurrent = _.difference(join,[ removed.name ])
     console.log('joinCurrent',joinCurrent)
     return state.setIn([ 'joinedMembers' ],joinCurrent)
 }
 export const setInvitedMembers = (state, { members }) => {
-	console.log('members', members)
 	// let invitedMem = members.map( (item) => ({name: item}))
 	return state.setIn(['invitedMembers'], members)
 }
 
 export const updateConfr = (state, {msg}) => {
-	console.log('更新会议信息----', msg)
 	let confrInfo = msg.ext || {}
 	let groupId
 	let confr = {
@@ -412,12 +391,10 @@ export const updateConfr = (state, {msg}) => {
 }
 
 export const setGid = (state, { gid }) => {
-	console.log('gid', gid)
     return state.setIn([ 'gid' ], gid)
 }
 
 export const showInviteModal = (state) => {
-    console.log('showConfrModal')
     return state.setIn([ 'inviteModal' ], true)
 }
 
@@ -426,7 +403,6 @@ export const closeInviteModal = (state) => {
 }
 
 export const resetAll = (state) => {
-    console.log('ResetAll...')
     return state.setIn([ 'joinedMembers' ], [])
 }
 

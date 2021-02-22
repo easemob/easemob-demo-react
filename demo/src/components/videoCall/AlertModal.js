@@ -17,8 +17,6 @@ class AtertModal extends React.Component {
 		const answerCallStatus = 5
 		this.props.answerCall('accept')
 		this.props.setCallStatus(answerCallStatus)
-
-		console.log('gid -- ', this.props)
 		// this.props.getGroupMember(this.props.gid)
 		this.props.listGroupMemberAsync({ groupId: this.props.gid })
 	}

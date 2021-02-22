@@ -62,7 +62,7 @@ body {
 
 .multi-webim-rtc {
     position: absolute;
-    width: 50%;
+    width: 7rem;
     top: 0;
     left: 0;
     z-index: 100;
@@ -137,7 +137,7 @@ body {
     margin-left: 3%;
 }
 .action-wrap div:nth-child(2){
-    margin-left: 15%;
+    margin-left: 22%;
 }
 .action-wrap div:nth-child(3){
     margin-left: 10%;
@@ -154,7 +154,7 @@ body {
 
 
 .multi-webim-rtc .default {
-    height: 14rem;
+    height: 2.5rem;
     width: 100%;
     background-size:100% 100%;
     /*background: #303D4E;*/

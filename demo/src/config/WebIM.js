@@ -4,9 +4,7 @@
 
 // import websdk from './websdk3.4.2'
 import websdk from 'easemob-websdk'
-import webrtc from './EMedia_x1v1_3.4.1'
 // import webrtc from 'easemob-webrtc'
-
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
 import emoji from './emoji'
@@ -101,10 +99,7 @@ api.interceptors.response.use(
 
 WebIM.api = api
 WebIM.emoji = emoji
-WebIM.WebRTC = webrtc;
 
-WebIM.EMedia = webrtc.emedia
-webrtc.emedia.config.consoleLogger=false
 WebIM.rtc = rtc;
 WebIM.AgoraRTC = AgoraRTC;
 export default WebIM
