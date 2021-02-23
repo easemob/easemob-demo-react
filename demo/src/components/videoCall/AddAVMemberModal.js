@@ -2,7 +2,6 @@ import React from 'react'
 import { Button, Checkbox, Form, Input, message } from 'antd'
 import { I18n } from 'react-redux-i18n'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
-import MultiAVActions from '@/redux/MultiAVRedux'
 import MessageActions from '@/redux/MessageRedux'
 import VideoCallActions from '@/redux/VideoCallRedux'
 import { connect } from 'react-redux'
@@ -330,7 +329,6 @@ export default connect(
         group: entities.group
     }),
     dispatch => ({
-        setSelected: (selected) => dispatch(MultiAVActions.setSelectedMembers(selected)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg)),
         setInvitedMembers: (members) => dispatch(VideoCallActions.setInvitedMembers(members))

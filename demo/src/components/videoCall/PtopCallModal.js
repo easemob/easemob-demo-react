@@ -4,7 +4,7 @@ import Draggable from 'react-draggable';
 import { message, Modal } from 'antd';
 // import VideoCallRedux from 'VideoCallRedux';
 import Channel from './Channel';
-
+import '../common/style/webrtc.less'
 const rtc = WebIM.rtc;
 const AgoraRTC = WebIM.AgoraRTC;
 class PtopCallModal extends React.Component {

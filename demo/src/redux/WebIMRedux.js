@@ -18,8 +18,6 @@ import { history } from '@/utils'
 import utils from '@/utils'
 import AppDB from '@/utils/AppDB'
 import { I18n } from 'react-redux-i18n'
-import RTCChannel from '@/components/webrtc/rtcChannel'
-import WebRTCModal from '@/components/webrtc/WebRTCModal'
 
 import { message, Modal } from 'antd'
 const rtc = WebIM.rtc;

@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import WebIM from '@/config/WebIM'
 import Draggable from 'react-draggable'
 import { message, Row, Col, Modal } from 'antd'
-import MultiAVActions from '@/redux/MultiAVRedux'
 import VideoCallActions from '@/redux/VideoCallRedux'
 import Immutable from 'seamless-immutable'
 import { store } from '@/redux'
@@ -319,7 +318,7 @@ class MultiAVModal extends React.Component {
 
     	return (
     		<Draggable
-                defaultPosition={{ x: 300, y: 100 }}
+                defaultPosition={{ x: 300, y: 200 }}
                 bounds="parent"
                 >
                 <div className={"multi-webim-rtc "+ classHide}>
