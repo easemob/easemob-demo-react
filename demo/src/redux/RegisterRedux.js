@@ -36,6 +36,8 @@ const { Types, Creators } = createActions({
                     } else if (JSON.parse(err.data).error === 'illegal_argument') {
                         if (JSON.parse(err.data).error_description === 'USERNAME_TOO_LONG') {
                             return message.error('用户名超过64个字节！')
+                        }else if(JSON.parse(err.data).error_description === 'password or pin must provided'){
+                            return  message.error('密码不合法！')
                         }
                         message.error('用户名不合法！')
                     } else if (JSON.parse(err.data).error === 'unauthorized') {
