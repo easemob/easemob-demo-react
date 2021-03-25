@@ -275,7 +275,7 @@ const { Types, Creators } = createActions({
 			dispatch(CommonActions.fetching())
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
 			let {username, channelName, appkey} = params
-			return axios.get(`//a1-hsb.easemob.com/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
+			return axios.get(`//a1.easemob.com/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
 			.then(function (response) {
 			    dispatch(CommonActions.fetched())
 			    return response.data
