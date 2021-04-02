@@ -58,7 +58,7 @@ class GroupMembers extends React.Component {
             }
             const isAdmin = _.includes(admins, key)
             const isMuted = _.includes(muted, key)
-            return { name: info.nickName, key, affiliation, isAdmin, isMuted }
+            return { name: info.nickname, key, affiliation, isAdmin, isMuted }
         })
         const columns = [
             {
