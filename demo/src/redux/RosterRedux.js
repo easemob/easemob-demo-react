@@ -19,8 +19,16 @@ const { Types, Creators } = createActions({
             dispatch(CommonActions.fetching())
             WebIM.conn.getRoster({
                 success: roster => {
-                    dispatch(Creators.updateRoster(roster))
-                    dispatch(CommonActions.fetched())
+                    console.log('roster', roster)
+                    let rosterNames = roster.map(item => item.name)
+                    WebIM.conn.fetchUserInfoById(rosterNames).then((res) => {
+                        let infos = res.data
+                        roster.forEach((item) => {
+                            item.info = infos[item.name]
+                        })
+                        dispatch(Creators.updateRoster(roster))
+                        dispatch(CommonActions.fetched())
+                    })
                 },
                 error: error => {
                     //TODO ERROR
@@ -60,6 +68,28 @@ const { Types, Creators } = createActions({
                 to: id,
                 message: u + I18n.t('request')
             })
+        }
+    },
+
+    getUserInfo: id => {
+        return (dispatch, getState) => {
+            return WebIM.conn.fetchUserInfoById(id).then((res)=>{
+                return res
+            })
+        }
+    },
+
+    updateUserInfo: (key, value) => {
+        return (dispatch, getState) => {
+            return WebIM.conn.updateOwnUserInfo(key, value).then((res)=>{
+                return res
+            })
+        }
+    },
+
+    getAvatarList: () => {
+        return (dispatch, getState) => {
+            return WebIM.api.get('//download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/headImage.conf')
         }
     }
 })

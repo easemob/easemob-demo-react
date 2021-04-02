@@ -63,6 +63,7 @@ export default class ModalComponent extends React.Component {
                 >
                     {
                         <this.props.component
+                            {...this.props}
                             onChangeTitle={this.onChangeTitle}
                             onOk={this.handleOk}
                             onCancel={this.handleCancel}

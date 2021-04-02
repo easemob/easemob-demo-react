@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Menu, Icon, Badge } from 'antd'
+import { Menu, Icon, Badge, Avatar } from 'antd'
 import ContactHead from './ContactHead'
 
 const SubMenu = Menu.SubMenu
@@ -16,8 +16,11 @@ const ContactItem = ({ chatType, items, collapse, hasLogo, ...rest }) => {
             {hasLogo ? <ContactHead className="fl nav-img" name="test" width={50} /> : ''}
             <div className="nav-text">
                 <div>
-                    {item.name}
-
+                    {chatType == 'contact' ? 
+                    item.info.avatarurl?
+                    <Avatar src={item.info.avatarurl} onClick={rest.onClickAvatar}/>: 
+                    <Avatar onClick={rest.onClickAvatar}>{item.info.nickname||item.name}</Avatar> : null}
+                    <span style={{marginLeft: '5px'}}>{item?.info?.nickname || item.name}</span>
                     {/*
                         <Badge
                         count={109}

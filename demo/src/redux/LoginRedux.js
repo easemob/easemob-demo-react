@@ -19,7 +19,7 @@ const { Types, Creators } = createActions({
     loginFailure: [ 'error' ],
     jumpRegister: null,
     logout: null,
-
+    setOwnInfo: ['info'],
     // ------------- async -----------------
 
     login: (username, password) => {
@@ -52,6 +52,11 @@ const { Types, Creators } = createActions({
             }
 
             WebIM.conn.open(options)
+
+            WebIM.conn.fetchUserInfoById(username).then((res) => {
+                let info = res.data[username]
+                dispatch(Creators.setOwnInfo(info))
+            })
         }
     },
     loginByToken: (username, token) => {
@@ -71,6 +76,10 @@ const { Types, Creators } = createActions({
                 // success(token) {
                 // }
             })
+            WebIM.conn.fetchUserInfoById(username).then((res) => {
+                let info = res.data[username]
+                dispatch(Creators.setOwnInfo(info))
+            })
         }
     }
 })
@@ -89,7 +98,8 @@ export const INITIAL_STATE = Immutable({
     isLoadingToken: false,
     //
     hasToken: false,
-    isLogin: false
+    isLogin: false,
+    info: {}
 })
 
 /* ------------- Reducers ------------- */
@@ -98,6 +108,13 @@ export const setLoginToken = (state = INITIAL_STATE, { username, token }) => {
     return Immutable.merge(state, {
         username: username,
         token
+    })
+}
+
+export const setOwnInfo = (state = INITIAL_STATE, { info }) => {
+    console.log('login info', info)
+    return Immutable.merge(state, {
+        info: info
     })
 }
 
@@ -151,6 +168,7 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.LOGIN_FAILURE]: failure,
     [Types.LOGOUT]: logout,
     [Types.JUMP_REGISTER]: jumpRegister,
+    [Types.SET_OWN_INFO]: setOwnInfo
 })
 
 /* ------------- Selectors ------------- */

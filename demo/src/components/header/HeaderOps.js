@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Menu, Dropdown, Icon } from 'antd'
+import { Menu, Dropdown, Icon, Avatar, Image } from 'antd'
 import { I18n } from 'react-redux-i18n'
 import ListItem from '@/components/list/ListItem'
 import History from '@/utils/history'
 import WebIM from '@/config/WebIM'
 import WebIMActions from '@/redux/WebIMRedux'
 import CommonActions from '@/redux/CommonRedux'
+import RosterActions from '@/redux/RosterRedux'
 import './style/HeaderOps.less'
 import _ from 'lodash'
 
@@ -20,6 +21,7 @@ import JoinGroupModal from '@/components/group/JoinGroupModal'
 import GroupRequestModal from '@/components/group/GroupRequestModal'
 import GroupInviteModal from '@/components/group/GroupInviteModal'
 import VideoSetting from '@/components/videoSetting/videoSettingModal'
+import UserInfoModal from '@/components/contact/UserInfoModal'
 
 class HeaderOps extends Component {
     constructor(props) {
@@ -33,6 +35,7 @@ class HeaderOps extends Component {
         // showBlacklistModal: false,
         // showAddGroupModal: false,
         // showJoinGroupModal: false
+        this.userInfo = {}
         this.onMenuSettingsClick = this.onMenuSettingsClick.bind(this)
         this.onMenuRightClick = this.onMenuRightClick.bind(this)
         this.handleLogout = this.handleLogout.bind(this)
@@ -40,7 +43,6 @@ class HeaderOps extends Component {
     }
 
     handleLogout() {
-
         this.props.doLogout()
     }
 
@@ -81,6 +83,15 @@ class HeaderOps extends Component {
         default:
             break
         }
+    }
+
+    showUserInfo = async () =>{
+        let info = await this.props.getUserInfo(WebIM.conn.context.userId)
+        this.userInfo = info.data[WebIM.conn.context.userId]
+        this.userInfo.userId = WebIM.conn.context.userId
+        this.setState({
+            modal: 'showUserInfo'
+        })
     }
 
     handleModalClose(e) {
@@ -132,7 +143,6 @@ class HeaderOps extends Component {
                 {tabsRightItem}
             </Menu>
         )
-        // console.log("subscribes", _.isEmpty, subscribes)
 
         return (
             <div id="x-header-ops" className="x-list-item headerBg">
@@ -150,8 +160,11 @@ class HeaderOps extends Component {
                         <Icon type="setting" />
                     </Dropdown>
                 </div>
-                <div className="fl" style={{ lineHeight: '50px', color: '#fff' }}>
-                    {title}
+                <div className="fl" style={{ lineHeight: '50px', color: '#fff', display: 'flex' }}>
+                    <div onClick={this.showUserInfo} style={{marginRight: '5px'}}>
+                        <Avatar style={{cursor: 'pointer'}} src={this.props.ownInfo.avatarurl}></Avatar>
+                    </div>
+                    {this.props.ownInfo.nickname||title}
                 </div>
                 <div
                     className="fr"
@@ -238,6 +251,18 @@ class HeaderOps extends Component {
                         onModalClose={this.handleModalClose}
                     />
                 }
+                {
+                    <ModalComponent
+                        width={360}
+                        title="个人名片"
+                        userInfos={this.userInfo}
+                        showEdit={true}
+                        visible={modal === 'showUserInfo'}
+                        component={UserInfoModal}
+                        onModalClose={this.handleModalClose}
+                    />
+                    
+                }
             </div>
         )
     }
@@ -253,11 +278,13 @@ export default connect(
         subscribes: state.entities.subscribe.byFrom,
         groupRequests: state.entities.groupRequest.byGid,
         showGroupRequestModal: state.common.showGroupRequestModal,
-        showGroupInviteModal: state.common.showGroupInviteModal
+        showGroupInviteModal: state.common.showGroupInviteModal,
+        ownInfo: state.login.info
     }),
     dispatch => ({
         doLogout: () => dispatch(WebIMActions.logout()),
         setShowGroupRequestModal: (status) => dispatch(CommonActions.setShowGroupRequestModal(status)),
-        setShowGroupInviteModal: (status) => dispatch(CommonActions.setShowGroupInviteModal(status))
+        setShowGroupInviteModal: (status) => dispatch(CommonActions.setShowGroupInviteModal(status)),
+        getUserInfo: id => dispatch(RosterActions.getUserInfo(id))
     })
 )(HeaderOps)

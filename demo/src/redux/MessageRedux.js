@@ -548,7 +548,43 @@ const { Types, Creators } = createActions({
             }
             WebIM.conn.send(msgObj.body)            
         }
+    },
+
+    sendCustomMsg: (chatType, chatId, msg) => {
+        return (dispatch) => {
+            const msgObj = new WebIM.message('custom', WebIM.conn.getUniqueId())
+
+            var customEvent = "userCard";  // 创建自定义事件
+            var customExts = {
+                uid: msg.userId,
+                nickname: msg.nick,
+                avatar: msg.avatar
+            };   // 消息内容，key/value 需要 string 类型
+            msgObj.set({
+                to: chatId,  // 接收消息对象（用户id）
+                customEvent,
+                customExts,
+                ext:{}, 
+                chatType: chatType,
+                success: function (id, serverMsgId) {
+                    console.log('发送成功')
+                },
+                fail: function(e){
+                    console.log('发送失败')
+                }
+            });
+            WebIM.conn.send(msgObj.body);
+            msgObj.body.type = 'chat'
+            var pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'custom')
+            pMessage = {
+                ...pMessage.body,
+                ...pMessage
+            }
+            console.log('发送的自定义消息', pMessage)
+            dispatch(Creators.addMessage(msgObj.body, 'custom'))
+        }
     }
+
 })
 
 export const MessageTypes = Types
@@ -585,6 +621,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     const username = _.get(rootState, 'login.username', '')
     const { id, to, status } = message
     let { type } = message
+    if (type == 'singleChat') {type == 'chat'}
     // where the message comes from, when from current user, it is null
     const from = message.from || username
     // bySelf is true when sent by current user, otherwise is false
@@ -595,13 +632,11 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     if(type === 'stranger'){
         chatId = from
     }
-
     // change type as stranger
     // if (type === "chat" && !rootState.entities.roster.byName[chatId]) {
     //     type = "stranger";
     //     message.type = "stranger";
     // }
-
     // update message array
     const chatData = state.getIn([ type, chatId ], Immutable([])).asMutable()
     const _message = {
@@ -618,7 +653,6 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
             _message.id = oid
         }
     }
-
     let isPushed = false
     chatData.forEach(m => {
         if (m.id === _message.id) {

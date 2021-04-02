@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { I18n } from 'react-redux-i18n'
 import _ from 'lodash'
-import { Button, Row, Form, Input, Icon, Dropdown, Menu, message } from 'antd'
+import { Button, Row, Form, Input, Icon, Dropdown, Menu, message, Popover, Radio } from 'antd'
 import { config } from '@/config'
 import ListItem from '@/components/list/ListItem'
 import ChatMessage from '@/components/chat/ChatMessage'
@@ -26,6 +26,7 @@ import getTabMessages from '@/selectors/ChatSelector'
 import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
+import UserInfoModal from '@/components/contact/UserInfoModal'
 const rtc = WebIM.rtc;
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -51,8 +52,13 @@ class Chat extends React.Component {
             selectTab,
             selectItem,
             value: '',
-            isLoaded: false
+            isLoaded: false,
+            visible: false,
+            checkedValue: '',
+            showUserInfoMoadl: false,
         }
+        this.userInfo = {}
+        this.showEdit = false
         this.handleSend = this.handleSend.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.pictureChange = this.pictureChange.bind(this)
@@ -430,6 +436,49 @@ class Chat extends React.Component {
     ok = (id) => {
         this.props.deleteMessage(id, true)
     }
+
+    handleHoverChange = (visible)=>{
+        this.setState({
+            visible
+        })
+    }
+
+    onChange = e => {
+        this.setState({
+          checkedValue: e.target.value,
+        });
+    };
+
+    sendIdCardMsg = async ()=>{
+        let userId = this.state.checkedValue
+        const { selectItem, selectTab } = this.props.match.params
+        let info = await this.props.getUserInfo(userId)
+        info = info.data[userId]
+        let msg = {
+            userId: userId,
+            nick: info.nickname || '',
+            avatar: info.avatarurl || ''
+        }
+        this.props.sendCustomMsg('singleChat', selectItem, msg)
+         this.setState({
+            visible: false
+        })
+    }
+    onClickIdCard = async (data) =>{
+        let res  = await this.props.getUserInfo(data.uid)
+        let info = res.data[data.uid]
+        this.userInfo = info
+        this.userInfo.userId = data.uid
+        // this.showEdit = data.uid == WebIM.conn.context.userId
+        this.setState({
+            showUserInfoMoadl: true
+        })
+    }
+    handleInfoModalClose = () => {
+        this.setState({
+            showUserInfoMoadl: false
+        })
+    }
     render() {
         this.logger.info('chat component render')
         let {
@@ -452,6 +501,14 @@ class Chat extends React.Component {
 
         let name = selectItem
         let webrtcButtons = []
+        let userinfos = {}
+        if (selectTab === 'contact') {
+            let withInfoUsers = this.props.entities.roster.byName
+            userinfos = name = withInfoUsers ? withInfoUsers[selectItem].info.nickname: name
+        }
+        if (selectTab === 'group') {
+            userinfos = this.props.entities.groupMember[selectItem]?.byName || {}
+        }
 
         if (WebIM.config.isWebRTC) {
             if (selectTab === 'contact') {
@@ -477,6 +534,41 @@ class Chat extends React.Component {
 
         const { showWebRTC } = this.state
 
+        const content = ()=>{
+            const radioStyle = {
+                display: 'block',
+                height: '30px',
+                lineHeight: '30px',
+            };
+
+            const container = {
+                height: '150px',
+                overflowY: 'scroll'
+            }
+            let users = []
+            let list = []
+            let withInfoUsers = {}
+            users = this.props.entities.roster.names || []
+            withInfoUsers = this.props.entities.roster.byName
+            users.forEach((item, index) => {
+                list.push(
+                    <Radio style={radioStyle} value={item} key={item}>
+                      {withInfoUsers[item].info.nickname || item}
+                    </Radio>
+                )
+            })
+
+            return (
+                <div>
+                    <div style={container}>
+                        <Radio.Group onChange={this.onChange} value={this.state.checkedValue}>
+                            {list}
+                        </Radio.Group>
+                    </div>
+                    <Button onClick={this.sendIdCardMsg}>发送</Button>
+                </div>
+            )
+        }
         return (
             <div className="x-chat">
                 <div className="x-list-item x-chat-header">
@@ -515,10 +607,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage key={i} ok={this.ok}{...message} />
+                                return <ChatMessage key={i} fromNick={selectTab=='contact'?userinfos:userinfos[message.from]?.info.nickname} onClickIdCard={this.onClickIdCard} ok={this.ok}{...message} />
                             }
                         } else {
-                            return <ChatMessage key={i} ok={this.ok} {...message} />
+                            return <ChatMessage key={i} fromNick={selectTab=='contact'?userinfos:userinfos[message.from]?.info.nickname} onClickIdCard={this.onClickIdCard} ok={this.ok} {...message} />
                         }
                     })}
                 </div>
@@ -563,6 +655,17 @@ class Chat extends React.Component {
                         <label htmlFor="clearMessage" className="x-chat-ops-icon ib" onClick={this.onClearMessage}>
                             <i className="icon iconfont icon-trash"></i>
                         </label>
+
+                        
+                        <Popover 
+                            content={content()} 
+                            title="" 
+                            trigger="click"
+                            visible={this.state.visible}
+                            onVisibleChange={this.handleHoverChange}
+                        >
+                            <Icon type="idcard" style={{padding:'0 15px'}} className="icon iconfont icon-trash"/>
+                        </Popover>
                     </div>
                     <div className="x-list-item x-chat-send">
                         <Input
@@ -592,6 +695,16 @@ class Chat extends React.Component {
                     component={AddAVMemberModal}
                     onModalClose={this.handleModalClose}
                 />
+
+                <ModalComponent
+                    width={360}
+                    title="个人名片"
+                    visible={this.state.showUserInfoMoadl}
+                    userInfos={this.userInfo}
+                    showEdit={this.showEdit}
+                    component={UserInfoModal}
+                    onModalClose={this.handleInfoModalClose}
+                />
             </div>
         )
     }
@@ -602,7 +715,9 @@ export default connect(
         messageList: getTabMessages(state, props).TabMessageArray,
         messageListByMid: state.entities.message.byMid,
         inviteModal: state.callVideo.inviteModal,
-        callStatus: state.callVideo.callStatus
+        callStatus: state.callVideo.callStatus,
+        entities: state.entities,
+        state: state
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
@@ -610,12 +725,14 @@ export default connect(
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
         sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
         sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),
+        sendCustomMsg: (chatType, id, message) => dispatch(MessageActions.sendCustomMsg(chatType, id, message)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),
         listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
         getMutedAsync: groupId => dispatch(GroupMemberActions.getMutedAsync(groupId)),
         getGroupAdminAsync: groupId => dispatch(GroupMemberActions.getGroupAdminAsync(groupId)),
         removeContact: id => dispatch(RosterActions.removeContact(id)),
         addContact: id => dispatch(RosterActions.addContact(id)),
+        getUserInfo: id => dispatch(RosterActions.getUserInfo(id)),
         deleteStranger: id => dispatch(StrangerActions.deleteStranger(id)),
         doAddBlacklist: id => dispatch(BlacklistActions.doAddBlacklist(id)),
         fetchMessage: (id, chatType, offset, cb) => dispatch(MessageActions.fetchMessage(id, chatType, offset, cb)),

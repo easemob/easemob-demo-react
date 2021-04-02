@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { I18n } from 'react-redux-i18n'
-import { Menu, Dropdown, Card, Tag, message, Modal } from 'antd'
+import { Menu, Dropdown, Card, Tag, message, Modal, Avatar } from 'antd'
 import { renderTime, deepGet } from '@/utils'
 import emoji from '@/config/emoji'
 import Audio from '@/components/chat/Audio'
@@ -75,8 +75,14 @@ export default class ChatMessage extends Component {
             }
         })
     }
+
+    handleIdCardClick = (data) => {
+        let userId = data.uid
+        this.props.onClickIdCard(data)
+    }
+
     render() {
-        const { bySelf, from, time, body, status, toJid, } = this.props
+        const { bySelf, from, time, body, status, toJid, fromNick} = this.props
         const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
         const localFormat = renderTime(time)
         let useDropdown = true
@@ -211,6 +217,22 @@ export default class ChatMessage extends Component {
                 </div>
             )
             break
+        case 'custom':
+            content = useDropdown ? (
+                <div className={classNames("x-message-idCard", bySelf ? 'x-message-idCard-right' : '')} data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
+                    <div>
+                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar}></Avatar>
+                    </div>
+                    <div>{body.customExts.nickname}</div>
+                </div>
+            ):(
+                <div className="x-message-idCard" data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
+                    <div>
+                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar}></Avatar>
+                    </div>
+                    <div>{body.customExts.nickname}</div>
+                </div>
+            )
         default:
             break
         }
@@ -233,7 +255,7 @@ export default class ChatMessage extends Component {
 
         return <div className={cls}>
             <div className="x-message-user">
-                {from}
+                {fromNick}
             </div>
             <div className="x-message-content">
                 {/* 已读、未读Tag */}

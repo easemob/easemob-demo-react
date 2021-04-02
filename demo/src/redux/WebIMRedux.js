@@ -481,6 +481,24 @@ WebIM.conn.listen({
     },
     onCustomMessage: msg => {
         console.log('onCustomMessage', msg)
+        let {customEvent, type, from, to} = msg
+        if (msg.customEvent == "userCard" && typeof msg.customExts == 'string') {
+            msg.customExts = JSON.parse(msg.customExts)
+        }
+        store.dispatch(MessageActions.addMessage(msg, 'custom'))
+        switch (type) {
+        case 'chat':
+            store.dispatch(RosterActions.topRoster(from))
+            break
+        case 'groupchat':
+            store.dispatch(GroupActions.topGroup(to))
+            break
+        case 'chatroom':
+            store.dispatch(ChatRoomActions.topChatroom(to))
+            break
+        default:
+            break
+        }
     },
     onChannelMessage: msg => console.log('onChannelMessage', msg),
 

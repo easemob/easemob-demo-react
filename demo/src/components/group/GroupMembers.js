@@ -49,7 +49,7 @@ class GroupMembers extends React.Component {
         const muted = _.get(groupMember, `${roomId}.muted`, [])
 
         const data = _.map(members, (val, key) => {
-            const { affiliation } = val
+            const { affiliation, info } = val
             if (affiliation.toLowerCase() === 'owner') {
                 owner = key.toLowerCase()
                 if (key === currentUser.toLowerCase()) {
@@ -58,7 +58,7 @@ class GroupMembers extends React.Component {
             }
             const isAdmin = _.includes(admins, key)
             const isMuted = _.includes(muted, key)
-            return { name: key, key, affiliation, isAdmin, isMuted }
+            return { name: info.nickName, key, affiliation, isAdmin, isMuted }
         })
         const columns = [
             {
@@ -146,7 +146,7 @@ class GroupMembers extends React.Component {
         return (
             <Card title={I18n.t('members')} bordered={false} noHovering={true} className="group-member-wrapper">
                 {/* <Menu className="group-member-list">
-                    {members.map((val, idx) => <Menu.Item key={idx} className="group-member-item"><span>{val}</span></Menu.Item>)}
+                    {members.map((val, idx) => <Menu.Item key={idx} className="group-member-item"><span>{val+'sss'}</span></Menu.Item>)}
                 </Menu> */}
                 <Table
                     columns={columns}

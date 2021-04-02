@@ -80,7 +80,16 @@ const { Types, Creators } = createActions({
                 pageSize,
                 success: response => {
                     const members = response.data
-                    dispatch(Creators.setGroupMember(groupId, members))
+                    let memberNames = members.map((item)=>{
+                        return item.member || item.owner
+                    })
+                    WebIM.conn.fetchUserInfoById(memberNames).then((res)=>{
+                        let infos = res.data
+                        members.forEach((item) => {
+                            item.info = infos[item.member || item.owner]
+                        })
+                        dispatch(Creators.setGroupMember(groupId, members))
+                    })
                 },
                 error: e => console.log(e.message)
             })
@@ -387,10 +396,10 @@ export const setGroupMember = (state, { groupId, members }) => {
     const byName = _.reduce(
         members,
         (acc, val) => {
-            const { member, owner } = val
+            const { member, owner, info } = val
             const name = member || owner
             const affiliation = owner ? 'owner' : 'member'
-            acc[name] = { name, affiliation }
+            acc[name] = { name, affiliation, info}
             return acc
         },
         {}

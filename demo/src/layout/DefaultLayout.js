@@ -22,6 +22,8 @@ import getCurrentContacts from '@/selectors/ContactSelector'
 import PtopCallModdal from '@/components/videoCall/PtopCallModal'
 import AlertModal from '@/components/videoCall/AlertModal'
 import MiniModal from '@/components/videoCall/MiniModal'
+import ModalComponent from '@/components/common/ModalComponent'
+import UserInfoModal from '@/components/contact/UserInfoModal'
 
 const { SIDER_COL_BREAK, SIDER_COL_WIDTH, SIDER_WIDTH, RIGHT_SIDER_WIDTH } = config
 const { Header, Content, Footer, Sider, RightSider } = Layout
@@ -62,9 +64,10 @@ class DefaultLayout extends Component {
             ],
             rightSiderOffset: -1 * RIGHT_SIDER_WIDTH,
             roomId: NaN,
-            contactItems: []
+            contactItems: [],
+            showUserInfoMoadl: false
         }
-
+        this.userInfo = {}
         this.changeItem = this.changeItem.bind(this)
         this.changeTab = this.changeTab.bind(this)
         this.handleCloseRightSiderClick = this.handleCloseRightSiderClick.bind(this)
@@ -218,7 +221,14 @@ class DefaultLayout extends Component {
 
         history.push(redirectPath + location.search)
     }
-
+    onClickAvatar(userId){
+        let userInfos = this.props.entities.roster.byName || {}
+        this.userInfo = JSON.parse(JSON.stringify(userInfos[userId].info))
+        this.userInfo.userId = userId
+        this.setState({
+            showUserInfoMoadl: true
+        })
+    }
     setSelectStatus(defaultItem,opt) {
         const { history, location, match } = this.props
         const { selectTab, selectItem = '' } = match.params
@@ -337,6 +347,13 @@ class DefaultLayout extends Component {
 
     }
 
+
+    handleInfoModalClose = ()=>{
+        this.setState({
+            showUserInfoMoadl: false
+        })
+    }
+
     render() {
         const { collapsed, selectTab, selectItem, headerTabs, roomId } = this.state
         const { login, rightSiderOffset, entities, group, callVideo} = this.props
@@ -398,7 +415,7 @@ class DefaultLayout extends Component {
                             left: selectItem && collapsed ? '-100%' : 0
                         }}
                     >
-                        <Contact collapsed={false} onClick={this.changeItem} selectedKeys={[ selectItem ]}
+                        <Contact collapsed={false} onClickAvatar={this.onClickAvatar.bind(this, selectItem)} onClick={this.changeItem} selectedKeys={[ selectItem ]}
                         />
                     </div>
                     <div className="x-layout-video"
@@ -441,6 +458,15 @@ class DefaultLayout extends Component {
 
                      {alertModal}
                      {miniModal}
+                     <ModalComponent
+                        width={360}
+                        title="个人名片"
+                        visible={this.state.showUserInfoMoadl}
+                        userInfos={this.userInfo}
+                        showEdit={false}
+                        component={UserInfoModal}
+                        onModalClose={this.handleInfoModalClose}
+                    />
                 </Content>
             </Layout>
         )
