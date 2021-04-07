@@ -26,7 +26,7 @@ export default class EditInput extends React.Component{
 				verifyResult = reg.test(this.state.inputValue)
 				break;
 			case 'gender':
-				reg = /男|女|未知/
+				reg = /^(男|女|未知)$/
 				verifyResult = reg.test(this.state.inputValue)
 				break;
 			case 'phone':
