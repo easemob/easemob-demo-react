@@ -25,7 +25,7 @@ const Register = ({
             if (errors) {
                 return
             }
-            doRegister(values.username, values.password, values.nickname)
+            doRegister(values.username, values.password, values.username)
         })
     }
 
@@ -70,7 +70,7 @@ const Register = ({
                         />
                     )}
                 </FormItem>
-                <FormItem hasFeedback>
+                {/*<FormItem hasFeedback>
                     {getFieldDecorator("nickname")(
                         <Input
                             size="large"
@@ -79,6 +79,7 @@ const Register = ({
                         />
                     )}
                 </FormItem>
+                */}
                 <Row>
                     <Button
                         type="primary"

@@ -22,7 +22,7 @@ import GroupRequestModal from '@/components/group/GroupRequestModal'
 import GroupInviteModal from '@/components/group/GroupInviteModal'
 import VideoSetting from '@/components/videoSetting/videoSettingModal'
 import UserInfoModal from '@/components/contact/UserInfoModal'
-
+import LoginActions from '@/redux/LoginRedux'
 class HeaderOps extends Component {
     constructor(props) {
         super()
@@ -40,6 +40,8 @@ class HeaderOps extends Component {
         this.onMenuRightClick = this.onMenuRightClick.bind(this)
         this.handleLogout = this.handleLogout.bind(this)
         this.handleModalClose = this.handleModalClose.bind(this)
+        this.baseAvatarUrl = 'https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/'
+        this.defaultAvatar = `${this.baseAvatarUrl}Image${1}.png`
     }
 
     handleLogout() {
@@ -88,6 +90,7 @@ class HeaderOps extends Component {
     showUserInfo = async () =>{
         let info = await this.props.getUserInfo(WebIM.conn.context.userId)
         this.userInfo = info.data[WebIM.conn.context.userId]
+        this.props.setOwnInfo(this.userInfo)
         this.userInfo.userId = WebIM.conn.context.userId
         this.setState({
             modal: 'showUserInfo'
@@ -162,9 +165,9 @@ class HeaderOps extends Component {
                 </div>
                 <div className="fl" style={{ lineHeight: '50px', color: '#fff', display: 'flex' }}>
                     <div onClick={this.showUserInfo} style={{marginRight: '5px'}}>
-                        <Avatar style={{cursor: 'pointer'}} src={this.props.ownInfo.avatarurl}></Avatar>
+                        <Avatar style={{cursor: 'pointer'}} src={this.props?.ownInfo?.avatarurl||this.defaultAvatar}></Avatar>
                     </div>
-                    {this.props.ownInfo.nickname||title}
+                    {this.props?.ownInfo?.nickname||title}
                 </div>
                 <div
                     className="fr"
@@ -285,6 +288,7 @@ export default connect(
         doLogout: () => dispatch(WebIMActions.logout()),
         setShowGroupRequestModal: (status) => dispatch(CommonActions.setShowGroupRequestModal(status)),
         setShowGroupInviteModal: (status) => dispatch(CommonActions.setShowGroupInviteModal(status)),
-        getUserInfo: id => dispatch(RosterActions.getUserInfo(id))
+        getUserInfo: id => dispatch(RosterActions.getUserInfo(id)),
+        setOwnInfo: (info) => dispatch(LoginActions.setOwnInfo(info))
     })
 )(HeaderOps)

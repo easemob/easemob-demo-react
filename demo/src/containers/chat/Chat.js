@@ -504,7 +504,7 @@ class Chat extends React.Component {
         let userinfos = {}
         if (selectTab === 'contact') {
             let withInfoUsers = this.props.entities.roster.byName
-            userinfos = name = withInfoUsers ? withInfoUsers[selectItem].info.nickname: name
+            userinfos = name = withInfoUsers ? withInfoUsers[selectItem]?.info.nickname: name
         }
         if (selectTab === 'group') {
             userinfos = this.props.entities.groupMember[selectItem]?.byName || {}

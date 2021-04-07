@@ -91,6 +91,14 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             return WebIM.api.get('//download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/headImage.conf')
         }
+    },
+
+    updateUserNick: nick => {
+        return (dispatch, getState) => {
+            return WebIM.conn.updateCurrentUserNick(nick).then((res)=>{
+                return res
+            })
+        }
     }
 })
 

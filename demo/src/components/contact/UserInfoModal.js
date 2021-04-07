@@ -38,6 +38,9 @@ class UserInfoModal extends React.Component{
         let infos = JSON.parse(JSON.stringify(this.props.userInfos))
         infos[type] = value
         this.props.setOwnInfo(infos)
+        if (type == 'nickname') {
+            this.props.updateUserNick(value)
+        }
     }
 
     callback(){
@@ -86,7 +89,7 @@ class UserInfoModal extends React.Component{
     				<EditInput label="生日" type="birth" placeholder="2000-1-1" value={userInfos.birth||''} isSelf={showEdit} maxLength={10} onCommit={this.handleCommit.bind(this, 'birth')}/>
     			</div>
     			<div>
-    				<EditInput label="性别" type="gender" placeholder="男、女、未知" value={gender} isSelf={showEdit} maxLength={1} onCommit={this.handleCommit.bind(this, 'gender')}/>
+    				<EditInput label="性别" type="gender" placeholder="男、女、未知" value={gender} isSelf={showEdit} maxLength={2} onCommit={this.handleCommit.bind(this, 'gender')}/>
     			</div>
     			<div>
     				<EditInput label="电话" type="phone" placeholder="手机号" value={userInfos.phone||''} isSelf={showEdit} maxLength={11} onCommit={this.handleCommit.bind(this, 'phone')}/>
@@ -110,7 +113,8 @@ export default connect(
         addContact: id => dispatch(RosterActions.addContact(id)),
         updateUserInfo: (key, value) => dispatch(RosterActions.updateUserInfo(key, value)),
         getAvatarList: () => dispatch(RosterActions.getAvatarList()),
-        setOwnInfo: (info) => dispatch(LoginActions.setOwnInfo(info))
+        setOwnInfo: (info) => dispatch(LoginActions.setOwnInfo(info)),
+        updateUserNick: nick => dispatch(RosterActions.updateUserNick(nick))
     })
 )(UserInfoModal)
 
