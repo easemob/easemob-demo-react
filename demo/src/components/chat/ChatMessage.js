@@ -24,6 +24,7 @@ export default class ChatMessage extends Component {
     state = { showImgModal: false }
 
     renderTxt = txt => {
+        if (txt == undefined) {return []}
         let rnTxt = []
         let match = null
         const regex = /(\[.*?\])/g
