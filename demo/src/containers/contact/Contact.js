@@ -37,7 +37,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
             const count = message.getIn([ "unread", "chat", name ], 0)
             items[index] = {
                 name,
-                info: userInfos[name].info,
+                info: userInfos[name]?.info || {},
                 unread: count,
                 ...info
             }
