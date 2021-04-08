@@ -450,8 +450,19 @@ class Chat extends React.Component {
     };
 
     sendIdCardMsg = async ()=>{
-        let userId = this.state.checkedValue
         const { selectItem, selectTab } = this.props.match.params
+        let chatType
+        if (selectTab === 'contact') {
+            chatType = 'singleChat'
+        } else if(selectTab === 'group'){
+            chatType = 'groupchat'
+        } else {
+            chatType = 'chatroom'
+        }
+
+
+        let userId = this.state.checkedValue
+        
         let info = await this.props.getUserInfo(userId)
         info = info.data[userId]
         let msg = {
@@ -459,7 +470,7 @@ class Chat extends React.Component {
             nick: info.nickname || '',
             avatar: info.avatarurl || ''
         }
-        this.props.sendCustomMsg('singleChat', selectItem, msg)
+        this.props.sendCustomMsg(chatType, selectItem, msg)
          this.setState({
             visible: false
         })

@@ -573,8 +573,18 @@ const { Types, Creators } = createActions({
                     console.log('发送失败')
                 }
             });
+
+            chatType = chatType.toLowerCase()
+            if(chatType === 'groupchat'){
+                msgObj.setChatType('groupChat')
+                msgObj.body.type = 'groupchat'
+            }else if( chatType === 'chatroom'){
+                msgObj.setChatType('groupChat')
+                msgObj.body.type = 'chatroom'
+            } else{
+                msgObj.body.type = 'chat'
+            }
             WebIM.conn.send(msgObj.body);
-            msgObj.body.type = 'chat'
             var pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'custom')
             pMessage = {
                 ...pMessage.body,
@@ -621,6 +631,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     const username = _.get(rootState, 'login.username', '')
     const { id, to, status } = message
     let { type } = message
+    type = type.toLowerCase()
     if (type == 'singleChat') {type == 'chat'}
     // where the message comes from, when from current user, it is null
     const from = message.from || username

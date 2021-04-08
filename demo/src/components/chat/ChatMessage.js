@@ -7,7 +7,7 @@ import { renderTime, deepGet } from '@/utils'
 import emoji from '@/config/emoji'
 import Audio from '@/components/chat/Audio'
 import WebIM from '@/config/WebIM'
-
+const defaultAvatar = 'https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/Image1.png'
 export default class ChatMessage extends Component {
     static propTypes = {
         bySelf: PropTypes.any,
@@ -221,16 +221,16 @@ export default class ChatMessage extends Component {
             content = useDropdown ? (
                 <div className={classNames("x-message-idCard", bySelf ? 'x-message-idCard-right' : '')} data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
                     <div>
-                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar}></Avatar>
+                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar||defaultAvatar}></Avatar>
                     </div>
-                    <div>{body.customExts.nickname}</div>
+                    <div>{body.customExts.nickname||body.customExts.uid}</div>
                 </div>
             ):(
                 <div className="x-message-idCard" data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
                     <div>
-                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar}></Avatar>
+                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar||defaultAvatar}></Avatar>
                     </div>
-                    <div>{body.customExts.nickname}</div>
+                    <div>{body.customExts.nickname||body.customExts.uid}</div>
                 </div>
             )
         default:

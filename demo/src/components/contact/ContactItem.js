@@ -5,7 +5,7 @@ import ContactHead from './ContactHead'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
-
+const defaultAvatar = 'https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/Image1.png'
 const ContactItem = ({ chatType, items, collapse, hasLogo, ...rest }) => {
     const tabs = items //["Contacts", "Chat", "Public"]
     const tabsLen = tabs.length
@@ -17,9 +17,7 @@ const ContactItem = ({ chatType, items, collapse, hasLogo, ...rest }) => {
             <div className="nav-text">
                 <div>
                     {chatType == 'contact' ? 
-                    item.info.avatarurl?
-                    <Avatar src={item.info.avatarurl} onClick={rest.onClickAvatar}/>: 
-                    <Avatar onClick={rest.onClickAvatar}>{item.info.nickname||item.name}</Avatar> : null}
+                    <Avatar src={item.info.avatarurl||defaultAvatar} onClick={rest.onClickAvatar}/>:null}
                     <span style={{marginLeft: '5px'}}>{item?.info?.nickname || item.name}</span>
                     {/*
                         <Badge
