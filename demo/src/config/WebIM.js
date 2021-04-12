@@ -2,8 +2,8 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './websdk3.5.2'
-// import websdk from 'easemob-websdk'
+// import websdk from './websdk3.5.2'
+import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
@@ -49,6 +49,9 @@ let options = {
 }
 
 // 内部沙箱测试环境
+if (window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1) {
+    WebIM.config.isSandBox = true
+}
 if (WebIM.config.isSandBox) {
     options.url =  (window.location.protocol === "https:" ? "https:" : "http:") + '//im-api-v2-hsb.easemob.com/ws';
     options.apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';

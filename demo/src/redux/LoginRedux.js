@@ -112,7 +112,6 @@ export const setLoginToken = (state = INITIAL_STATE, { username, token }) => {
 }
 
 export const setOwnInfo = (state = INITIAL_STATE, { info }) => {
-    console.log('login info', info)
     return Immutable.merge(state, {
         info: info
     })
