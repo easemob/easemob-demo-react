@@ -30,7 +30,7 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
     switch (chatType) {
     case "contact":
         const { byId, chat } = message
-        let userInfos = _.get(contacts, "byName", [])
+        let userInfos = _.get(contacts, "byName", {})
         _.forEach(_.get(contacts, "friends", []), (name, index) => {
             if (_.includes(blacklist.names, name)) return
             const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], name ], []))
