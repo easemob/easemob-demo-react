@@ -50,7 +50,7 @@ let options = {
 
 // 内部沙箱测试环境
 if (window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1) {
-    WebIM.config.isSandBox = true
+    // WebIM.config.isSandBox = true
 }
 if (WebIM.config.isSandBox) {
     options.url =  (window.location.protocol === "https:" ? "https:" : "http:") + '//im-api-v2-hsb.easemob.com/ws';
