@@ -315,7 +315,7 @@ WebIM.conn.listen({
 
 
         store.dispatch(MessageActions.addMessage(message, 'txt'))     
-        type === 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
+        //type === 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))

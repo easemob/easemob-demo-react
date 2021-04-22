@@ -36,7 +36,8 @@ class Channel extends React.Component{
 	}
 
 	componentDidMount(){
-		rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+		rtc.client = AgoraRTC.createClient({ mode: "live", codec: "h264" });
+		rtc.client.setClientRole('host')
 		this.addListener()
 
 		if (this.props.callStatus == 5) { //5 被叫加入
@@ -63,14 +64,17 @@ class Channel extends React.Component{
 		let {channel, token, type} = this.props.confr
         const appId = '15cb0d28b87b425ea613fc46f7c9f974';
         let imUserName = WebIM.conn.context.jid.name
-
         let params = {
         	username: imUserName,
 		    channelName: channel,
 		    appkey: WebIM.conn.appKey
         }
-        const {accessToken} = await this.props.getRtctoken(params)
-        const uid = await rtc.client.join(appId, channel, accessToken, imUserName);
+        const {accessToken, agoraUserId} = await this.props.getRtctoken(params)
+
+
+       	// let res = this.props.getConfDetail(params)
+       	console.log('会议详情', accessToken, agoraUserId)
+        const uid = await rtc.client.join(appId, channel, accessToken, agoraUserId);
 
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
@@ -78,7 +82,6 @@ class Channel extends React.Component{
         // 将这些音视频轨道对象发布到频道中。
 
         let config = [rtc.localAudioTrack]
-        
         if (type === 0) {
         	await rtc.client.publish(config);
         	// rtc.localAudioTrack.play();
@@ -293,7 +296,8 @@ export default connect(
     	cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
     	setMinisize: (isMini) => dispatch(VideoCallActions.setMinisize(isMini)),
     	setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time)),
-    	getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf))
+    	getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf)),
+    	getConfDetail: (conf) => dispatch(VideoCallActions.getConfDetail(conf))
     })
 )(Channel)
 

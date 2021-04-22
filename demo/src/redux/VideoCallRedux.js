@@ -43,6 +43,7 @@ const { Types, Creators } = createActions({
     setInvitedMembers: ['members'],
     updateJoinedMembers: [ 'removed' ],
     resetAll: null,
+    setUidToUserId: ['members'],
     /*  async methods */
 
     // callee
@@ -275,7 +276,8 @@ const { Types, Creators } = createActions({
 			dispatch(CommonActions.fetching())
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
 			let {username, channelName, appkey} = params
-			return axios.get(`${WebIM.conn.apiUrl}/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
+			//${WebIM.conn.apiUrl} &agoraUserId=12345
+			return axios.get(`https://a1-hsb.easemob.com/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
 			.then(function (response) {
 			    dispatch(CommonActions.fetched())
 			    return response.data
@@ -286,7 +288,28 @@ const { Types, Creators } = createActions({
 			});
 		}
 		
+	},
+
+	getConfDetail: function(params){
+		return (dispatch, getState) => {
+			dispatch(CommonActions.fetching())
+			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
+			let {username, channelName, appkey} = params
+			return axios.get(`https://a1-hsb.easemob.com/channel/mapper?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
+			.then(function (response) {
+			    dispatch(CommonActions.fetched())
+			    let members = response.data.result
+			    dispatch(Creators.setUidToUserId(members))
+			    return members
+			})
+			.catch(function (error) {
+				dispatch(CommonActions.fetched())
+			    console.log(error);
+			});
+		}
+		
 	}
+
 
 })
 
@@ -311,6 +334,7 @@ export const INITIAL_STATE = Immutable({
     inviteModal: false,
     joinedMembers: [],
     invitedMembers: [],
+    uid2userId: {}
 })
 
 
@@ -357,6 +381,11 @@ export const updateJoinedMembers = (state, { removed }) => {
 export const setInvitedMembers = (state, { members }) => {
 	// let invitedMem = members.map( (item) => ({name: item}))
 	return state.setIn(['invitedMembers'], members)
+}
+
+export const setUidToUserId = (state, { members }) => {
+	// let uid2userId = state.getIn([ 'uid2userId' ])
+	return state.setIn(['uid2userId'], members)
 }
 
 export const updateConfr = (state, {msg}) => {
@@ -419,7 +448,8 @@ export const reducer = createReducer(INITIAL_STATE, {
 	[Types.SET_MINISIZE]: setMinisize,
 	[Types.SET_INVITED_MEMBERS]: setInvitedMembers,
 	[Types.UPDATE_JOINED_MEMBERS]: updateJoinedMembers,
-	[Types.RESET_ALL]: resetAll
+	[Types.RESET_ALL]: resetAll,
+	[Types.SET_UID_TO_USER_ID]: setUidToUserId
 })
 
 export default Creators

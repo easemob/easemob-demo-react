@@ -34,10 +34,11 @@ class MultiAVModal extends React.Component {
             isTalting: []
         }
         this.loadTime = this.loadTime.bind(this)
+        this.uid2userids = {}
     }
 
     componentDidMount(){
-    	rtc.client = AgoraRTC.createClient({ mode: "rtc", codec: "h264" });
+    	rtc.client = AgoraRTC.createClient({ mode: "live", codec: "h264" });
         rtc.client.setClientRole('host')
 		this.addListener()
 		this.interval()
@@ -82,9 +83,10 @@ class MultiAVModal extends React.Component {
             channelName: confr.channel,
             appkey: WebIM.conn.appKey
         }
-        const {accessToken} = await this.props.getRtctoken(params)
-        const uid = await rtc.client.join(appId, confr.channel, accessToken, imUserName);
-
+        const {accessToken, agoraUserId} = await this.props.getRtctoken(params)
+        this.uid2userids = await this.props.getConfDetail(params)
+        const uid = await rtc.client.join(appId, confr.channel, accessToken, agoraUserId);
+        console.log('会议详情 ---', this.uid2userids)
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
         // 通过摄像头采集的视频创建本地视频轨道对象。
@@ -105,6 +107,19 @@ class MultiAVModal extends React.Component {
     		console.log('有远端画面 -------- ')
     		console.log(user, mediaType)
             // 开始订阅远端用户。
+            if (this.uid2userids[user.uid]) {
+                user.uid2userid = this.uid2userids[user.uid]
+            }else{
+                let {joinedMembers, confr} = this.props;
+                let imUserName = WebIM.conn.context.jid.name
+                let params = {
+                    username: imUserName,
+                    channelName: confr.channel,
+                    appkey: WebIM.conn.appKey
+                }
+                this.uid2userids = await this.props.getConfDetail(params)
+                user.uid2userid = this.uid2userids[user.uid]
+            }
             await rtc.client.subscribe(user, mediaType);
             
             console.log("subscribe success");
@@ -124,7 +139,7 @@ class MultiAVModal extends React.Component {
             }
 
             joinedMembers.forEach((item, index) => {
-            	if (item.name === user.uid) {
+            	if (item.name === user.uid2userid) {
             		exist = true
             		// item.type = mediaType
             		// videoElm = 'video' + index;
@@ -134,12 +149,12 @@ class MultiAVModal extends React.Component {
             let joined = {}
             if (!exist) {
                 joined = {
-                    name: user.uid,
-                    videoElm: 'video' + user.uid,
+                    name: user.uid2userid,
+                    videoElm: 'video' + user.uid2userid,
                     type: mediaType,
-                    value: user.uid,
+                    value: user.uid2userid,
                 }
-                videoElm = 'video' + user.uid;
+                videoElm = 'video' + user.uid2userid;
                 this.props.setJoinedMembers(joined)
             }
 
@@ -148,7 +163,7 @@ class MultiAVModal extends React.Component {
                 // 订阅完成后，从 `user` 中获取远端视频轨道对象。
                 const remoteVideoTrack = user.videoTrack;
                 // 也可以只传入该 DIV 节点的 ID。
-                let videoBox = videoElm?videoElm:joinedMembers.filter((item)=>(item.name == user.uid))[0].videoElm
+                let videoBox = videoElm?videoElm:joinedMembers.filter((item)=>(item.name == user.uid2userid))[0].videoElm
                 setTimeout(() => {
                     remoteVideoTrack.play(videoBox);
                 }, 100)
@@ -171,7 +186,7 @@ class MultiAVModal extends React.Component {
         rtc.client.on("user-left", (user) => {
         	console.log('-- 对方已离开 ---', user)
             
-            this.props.updateJoinedMembers({name: user.uid})
+            this.props.updateJoinedMembers({name: user.uid2userid})
             
             let {joinedMembers} = this.props
 
@@ -196,11 +211,12 @@ class MultiAVModal extends React.Component {
             let isTalting = [...this.state.isTalting]
             result.forEach((volume, index) => {
                 //console.log(`**** ${index} UID ${volume.uid} Level ${volume.level} ***`);
-                if (volume.level > 1 && !isTalting.includes(volume.uid)) {
-                    isTalting.push(volume.uid)
+                let userId = this.uid2userids[volume.uid]
+                if (volume.level > 1 && !isTalting.includes(userId)) {
+                    isTalting.push(userId)
                 }else{
-                    if (volume.level < 1 && isTalting.includes(volume.uid)) {
-                        let i = isTalting.indexOf(volume.uid)
+                    if (volume.level < 1 && isTalting.includes(userId)) {
+                        let i = isTalting.indexOf(userId)
                         isTalting.splice(i, 1)
                     }
                 }
@@ -406,7 +422,9 @@ export default connect(
         cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
         setMinisize: (isMini) => dispatch(VideoCallActions.setMinisize(isMini)),
         setCallDuration: (time) => dispatch(VideoCallActions.setCallDuration(time)),
-        getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf))
+        getRtctoken: (conf) => dispatch(VideoCallActions.getRtctoken(conf)),
+        setUidToUserId: (member) => dispatch(VideoCallActions.setUidToUserId(member)),
+        getConfDetail: (conf) => dispatch(VideoCallActions.getConfDetail(conf))
     })
 )(MultiAVModal)
 
