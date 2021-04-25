@@ -31,7 +31,7 @@ const rtc = WebIM.rtc;
 const { TextArea } = Input
 const FormItem = Form.Item
 const { PAGE_NUM } = config
-
+const Message = message
 const chatType = {
     contact: 'chat',
     group: 'groupchat',
@@ -307,15 +307,16 @@ class Chat extends React.Component {
     }
 
     callVideo = () =>{
+        if (this.props.callStatus > 0) {
+            console.log(this.props.callStatus)
+            return Message.error('正在通话中')
+            console.log('正在通话中')
+        }
         const {
             match,
             message
         } = this.props
         const { selectItem, selectTab } = match.params
-        if (this.props.callStatus > 0) {
-            // return message.error('正在通话中')
-            console.log('正在通话中')
-        }
         const value = '邀请您进行视频通话'
         const callId = WebIM.conn.getUniqueId().toString();
         const channelName = Math.uuid(8)
@@ -703,6 +704,7 @@ class Chat extends React.Component {
                     /* title={I18n.t("addAFriend")} */
                     // title={'选择成员'}
                     visible={inviteModal === true}
+                    maskClosable={false}
                     component={AddAVMemberModal}
                     onModalClose={this.handleModalClose}
                 />

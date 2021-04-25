@@ -106,6 +106,7 @@ class AddAVMemberModal extends React.Component {
                 }
             }
         })
+        this.props.setCallStatus(3)
     }
 
     onChange = checkedValues => {
@@ -201,6 +202,10 @@ class AddAVMemberModal extends React.Component {
     }
 
     oncancel(){
+        console.log('this.props.callStatus', this.props.callStatus)
+        if (this.props.callStatus < 7) {
+            this.props.setCallStatus(0)
+        }
         this.props.onCancel()
     }
 
@@ -326,12 +331,14 @@ export default connect(
         selected: callVideo.invitedMembers,
         joined: callVideo.joinedMembers,
         roster: entities.roster.byName,
-        group: entities.group
+        group: entities.group,
+        callStatus: callVideo.callStatus,
     }),
     dispatch => ({
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         updateConfr: (msg) => dispatch(VideoCallActions.updateConfr(msg)),
-        setInvitedMembers: (members) => dispatch(VideoCallActions.setInvitedMembers(members))
+        setInvitedMembers: (members) => dispatch(VideoCallActions.setInvitedMembers(members)),
+        setCallStatus: (status) => dispatch(VideoCallActions.setCallStatus(status)),
     })
 )(Form.create()(AddAVMemberModal))
 

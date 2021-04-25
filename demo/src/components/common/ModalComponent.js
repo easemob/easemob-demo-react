@@ -53,6 +53,7 @@ export default class ModalComponent extends React.Component {
             <div>
                 <Modal
                     width={this.props.width}
+                    maskClosable={this.props.maskClosable}
                     className="x-modal x-modal__nofooter"
                     title={this.state.title}
                     visible={this.state.visible}

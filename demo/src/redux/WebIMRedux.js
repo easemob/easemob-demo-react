@@ -12,6 +12,7 @@ import SubscribeActions from '@/redux/SubscribeRedux'
 import BlacklistActions from '@/redux/BlacklistRedux'
 import MessageActions from '@/redux/MessageRedux'
 import GroupRequestActions from '@/redux/GroupRequestRedux'
+import GroupMemberActions from '@/redux/GroupMemberRedux'
 import VideoCallAcctions from '@/redux/VideoCallRedux'
 import { store } from '@/redux'
 import { history } from '@/utils'
@@ -163,6 +164,7 @@ WebIM.conn.listen({
             break
         case 'memberJoinPublicGroupSuccess':
             message.success(`${msg.from}${I18n.t('join')}${I18n.t('group')}${msg.gid}${I18n.t('successfully')}`)
+            store.dispatch(GroupMemberActions.listGroupMemberAsync({groupId: msg.gid}))
             break
         case 'memberJoinChatRoomSuccess':
             message.success(`${msg.from}${I18n.t('join')}${I18n.t('chatroom')}${msg.gid}${I18n.t('successfully')}`)

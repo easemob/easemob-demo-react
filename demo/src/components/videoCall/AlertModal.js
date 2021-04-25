@@ -12,13 +12,18 @@ class AtertModal extends React.Component {
 		super()
 	}
 
-
+	componentDidMount(){
+		this.timer = setTimeout(()=>{
+			this.refuse()
+		}, 30000)
+	}
 	accept(){
 		const answerCallStatus = 5
 		this.props.answerCall('accept')
 		this.props.setCallStatus(answerCallStatus)
 		// this.props.getGroupMember(this.props.gid)
 		this.props.listGroupMemberAsync({ groupId: this.props.gid })
+		clearTimeout(this.timer)
 	}
 
 	refuse(){
@@ -26,6 +31,7 @@ class AtertModal extends React.Component {
 		if (this.props.callStatus < 7) { //拒接
         	this.props.close()
         }
+        clearTimeout(this.timer)
 	}
 
 	render(){

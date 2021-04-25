@@ -47,7 +47,6 @@ class GroupMembers extends React.Component {
         const members = _.get(groupMember, `${roomId}.byName`, [])
         const admins = _.get(groupMember, `${roomId}.admins`, [])
         const muted = _.get(groupMember, `${roomId}.muted`, [])
-
         const data = _.map(members, (val, key) => {
             const { affiliation, info } = val
             if (affiliation.toLowerCase() === 'owner') {
@@ -58,7 +57,7 @@ class GroupMembers extends React.Component {
             }
             const isAdmin = _.includes(admins, key)
             const isMuted = _.includes(muted, key)
-            return { name: info.nickname, key, affiliation, isAdmin, isMuted }
+            return { name: info.nickname || val.name, key, affiliation, isAdmin, isMuted }
         })
         const columns = [
             {
