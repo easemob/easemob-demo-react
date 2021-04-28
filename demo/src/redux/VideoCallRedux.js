@@ -277,7 +277,7 @@ const { Types, Creators } = createActions({
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
 			let {username, channelName, appkey} = params
 			//${WebIM.conn.apiUrl} &agoraUserId=12345
-			return axios.get(`https://a1-hsb.easemob.com/token/rtcToken?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
+			return axios.get(`${WebIM.conn.apiUrl}/token/rtcToken/v1?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
 			.then(function (response) {
 			    dispatch(CommonActions.fetched())
 			    return response.data
@@ -295,7 +295,7 @@ const { Types, Creators } = createActions({
 			dispatch(CommonActions.fetching())
 			axios.defaults.headers.common['Authorization'] = 'Bearer ' + WebIM.conn.context.accessToken;
 			let {username, channelName, appkey} = params
-			return axios.get(`https://a1-hsb.easemob.com/channel/mapper?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
+			return axios.get(`${WebIM.conn.apiUrl}/channel/mapper?userAccount=${username}&channelName=${channelName}&appkey=${encodeURIComponent(appkey)}`)
 			.then(function (response) {
 			    dispatch(CommonActions.fetched())
 			    let members = response.data.result
