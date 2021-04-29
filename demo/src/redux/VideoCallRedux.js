@@ -208,7 +208,9 @@ const { Types, Creators } = createActions({
 					msgType: 'rtcCallWithAgora'
 				}, 
 				success: function ( id,serverMsgId ) {
-					dispatch(Creators.setCallStatus(CALLSTATUS.confirmCallee))
+					if (result == 'accept') {
+						dispatch(Creators.setCallStatus(CALLSTATUS.confirmCallee))
+					}
 				},
 				fail: function(e){
 				    console.log("Fail")

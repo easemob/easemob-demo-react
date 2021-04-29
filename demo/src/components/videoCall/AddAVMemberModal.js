@@ -145,7 +145,13 @@ class AddAVMemberModal extends React.Component {
         // let seleted_members = _.difference(members,joined)
         //this.props.setSelected(seleted_members)
         if (item.checked) {
-            seleted_members.push({label: item.name, value: item.name})
+            let seleted = false
+            seleted_members.forEach((user, index) => {
+                if (user.value == item.name) {
+                    seleted = true
+                }
+            })
+            !seleted && seleted_members.push({label: item.name, value: item.name})
         }else{
             seleted_members.forEach((user, index) => {
                 if (user.value == item.name) {

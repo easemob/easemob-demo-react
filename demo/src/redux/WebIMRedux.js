@@ -555,9 +555,6 @@ WebIM.conn.listen({
                         console.log('不是自己设备的answerCall', msg)
                         return // 多端情况另一端的消息
                     }
-
-                    store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
-
                     if (msgInfo.result !== 'accept') {
                         if (msgInfo.result === 'busy') {
                             message.error('对方正忙')
@@ -566,9 +563,12 @@ WebIM.conn.listen({
                         }
                         
                         if (callVideo.confr.type !== 2) { // 单人情况挂断，多人不挂断
+                            store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
                             store.dispatch(VideoCallAcctions.hangup())
                             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                         }
+                    }else{
+                        store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
                     }
                     break;
                 case "confirmCallee":

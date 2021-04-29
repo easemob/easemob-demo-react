@@ -310,7 +310,6 @@ class Chat extends React.Component {
         if (this.props.callStatus > 0) {
             console.log(this.props.callStatus)
             return Message.error('正在通话中')
-            console.log('正在通话中')
         }
         const {
             match,
@@ -371,7 +370,10 @@ class Chat extends React.Component {
             match,
             message
         } = this.props
-
+        if (this.props.callStatus > 0) {
+            console.log(this.props.callStatus)
+            return Message.error('正在通话中')
+        }
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行语音通话'
 
