@@ -304,7 +304,7 @@
 
         getFileSize: function (file) {
             var fileSize = this.getFileLength(file);
-            if (fileSize > 10000000) {
+            if (fileSize > 20000000) {
                 return false;
             }
             var kb = Math.round(fileSize / 1000);
