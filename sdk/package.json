@@ -1,6 +1,6 @@
 {
   "name": "easemob-kefu-webim",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "description": "Easemob kefu webim sdk",
   "main": "index.js",
   "scripts": {
