@@ -198,7 +198,6 @@ var CryptoJS = require('crypto-js');
         this.body = {};
     };
     Message.file.prototype.set = function (opt) {
-        console.log(opt);
         opt.file = opt.file || _utils.getFileUrl(opt.fileInputId);
 
         this.value = opt.file;
@@ -220,7 +219,6 @@ var CryptoJS = require('crypto-js');
             , flashUpload: opt.flashUpload
             , body: opt.body
         };
-        console.log(this.body);
         !opt.roomType && delete this.body.roomType;
     };
 
