@@ -4803,7 +4803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var EMPTYFN = function () {
 	    };
 	    var _code = __webpack_require__(2).code;
-	    var WEBIM_FILESIZE_LIMIT = 10485760;
+	    var WEBIM_FILESIZE_LIMIT = 20971520;
 
 	    var _createStandardXHR = function () {
 	        try {
