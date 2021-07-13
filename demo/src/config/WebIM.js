@@ -2,8 +2,8 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-// import websdk from './websdk3.5.2'
-import websdk from 'easemob-websdk'
+import websdk from './websdk3.6.3'
+// import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
@@ -46,6 +46,8 @@ let options = {
     deviceId: WebIM.config.deviceId,
     //公有云 isHttpDNS 默认配置为true
     isHttpDNS: WebIM.config.isHttpDNS,
+    onOffline: () => {console.log('onOffline')},
+    onOnline: () => {console.log('onOnline')}
 }
 
 // 内部沙箱测试环境
