@@ -28,7 +28,7 @@ var config = {
     /*
      * Application AppKey
      */
-    appkey: '1100210705041475#item01',
+    appkey: 'easemob-demo#easeim',
     /*
      * Application Host
      */
@@ -55,7 +55,7 @@ var config = {
      * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
      * @parameter {Boolean} true or false
      */
-    isSandBox: true, //内部测试环境，集成时设为false
+    isSandBox: false, //内部测试环境，集成时设为false
     /**
      * Whether to console.log
      * @parameter {Boolean} true or false
