@@ -11,6 +11,7 @@ var _ = require('underscore');
 var Strophe = window.Strophe
 var isStropheLog;
 var stropheConn = null
+var abc = "";
 
 window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
 
@@ -168,7 +169,9 @@ Strophe.Websocket.prototype._onMessage = function (message) {
 
     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
         if(elem.textContent == "Replaced by new connection"){
-           connection.textContentError()
+            abc.onError({
+                type: "Replaced by new connection",
+            })
         }
         return;
     }
@@ -805,6 +808,8 @@ var connection = function (options) {
     
     // global params
     isStropheLog = options.isStropheLog || false;
+
+    abc = this;
 };
 
 /**
@@ -3222,11 +3227,8 @@ connection.prototype.closed = function () {
     this.onError(message);
 };
 
-connection.prototype.textContentError = function(){
-    var message = {
-        type: "Replaced by new connection"
-    };
-    this.onError(message);
+connection.prototype.textContentError = function(error){
+    return error
 }
 
 /**
