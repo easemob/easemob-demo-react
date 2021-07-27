@@ -167,9 +167,10 @@ Strophe.Websocket.prototype._onMessage = function (message) {
     }
 
     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
-        if(elem.textContent !== "Replaced by new connection"){
-            return;
+        if(elem.textContent == "Replaced by new connection"){
+           connection.textContentError()
         }
+        return;
     }
 
     //handle unavailable presence stanza before disconnecting
@@ -3220,6 +3221,13 @@ connection.prototype.closed = function () {
     };
     this.onError(message);
 };
+
+connection.prototype.textContentError = function(){
+    var message = {
+        type: "Replaced by new connection"
+    };
+    this.onError(message);
+}
 
 /**
  * used for blacklist
