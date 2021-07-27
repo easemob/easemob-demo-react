@@ -167,7 +167,10 @@ Strophe.Websocket.prototype._onMessage = function (message) {
     }
 
     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
-        console.log(elem, Strophe.Status.ERROR)
+        this._conn.onError({
+            type: "reconnectionbymuti",
+            data: elem.textContent
+        });
         return;
     }
 
