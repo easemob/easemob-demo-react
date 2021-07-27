@@ -165,11 +165,11 @@ Strophe.Websocket.prototype._onMessage = function (message) {
         data = this._streamWrap(message.data);
         elem = new DOMParser().parseFromString(data, "text/xml").documentElement;
     }
-    // 信息记录,错误信息可以从这获取
-    connection.prototype.textContentLog = elem.textContent;
 
     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
-        return;
+        if(elem.textContent !== "Replaced by new connection"){
+            return;
+        }
     }
 
     //handle unavailable presence stanza before disconnecting
