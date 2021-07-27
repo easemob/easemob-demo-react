@@ -60,12 +60,12 @@ var config = {
      * Whether to console.log
      * @parameter {Boolean} true or false
      */
-    isDebug: false,
+    isDebug: true,
     /**
      * will auto connect the websocket server autoReconnectNumMax times in background when client is offline.
      * won't auto connect if autoReconnectNumMax=0.
      */
-    autoReconnectNumMax: 5,
+    autoReconnectNumMax: 10,
     /**
      * webrtc supports WebKit and https only
      */

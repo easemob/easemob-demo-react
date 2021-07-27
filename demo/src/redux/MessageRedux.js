@@ -225,8 +225,8 @@ const { Types, Creators } = createActions({
                 success: function () {
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
-                fail: function () {
-                    console.warn('发送txt失败，确认是否被禁言、拉黑等')
+                fail: function (e) {
+                    console.warn('发送txt失败，确认是否被禁言、拉黑等',e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 ext: message.ext || ''
@@ -309,8 +309,8 @@ const { Types, Creators } = createActions({
                 },
                 success: function (id) {
                 },
-                fail: function () {
-                    console.warn('发送img失败，确认是否被禁言、拉黑等')
+                fail: function (e) {
+                    console.warn('发送img失败，确认是否被禁言、拉黑等',e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 // body: {
@@ -378,10 +378,13 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                     callback()
                 },
+                onFileUploadProgress: function (e){
+                    console.log('----onFileUploadProgress--', e)
+                },
                 success: function (id) {
                 },
-                fail: function () {
-                    console.warn('发送file失败，确认是否被禁言、拉黑等')
+                fail: function (e) {
+                    console.warn('发送file失败，确认是否被禁言、拉黑等',e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
             })
@@ -390,7 +393,9 @@ const { Types, Creators } = createActions({
             if (chatType === 'groupchat' || chatType === 'chatroom') {
                 msgObj.setGroup('groupchat')
             }
-
+            // msgObj.body.onFileUploadProgress = function(e){
+            //     console.log('----onFileUploadProgress', e)
+            // }
             WebIM.conn.send(msgObj.body)
             pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'file')
             // NOTE: parseFromLocal will overwrite original id of msgObj
@@ -430,8 +435,8 @@ const { Types, Creators } = createActions({
                 success: function(data){
                     console.log('语音发送成功', data)
                 },
-                fail: function () {
-                    console.warn('发送audio失败，确认是否被禁言、拉黑等')
+                fail: function (e) {
+                    console.warn('发送audio失败，确认是否被禁言、拉黑等', e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 flashUpload: WebIM.flashUpload
