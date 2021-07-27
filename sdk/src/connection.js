@@ -167,6 +167,7 @@ Strophe.Websocket.prototype._onMessage = function (message) {
     }
 
     if (this._check_streamerror(elem, Strophe.Status.ERROR)) {
+        console.log(elem, Strophe.Status.ERROR)
         return;
     }
 
@@ -557,7 +558,7 @@ var _loginCallback = function (status, msg, conn) {
         conn.retry && _handleMessageQueue(conn);
         conn.heartBeat();
         conn.isAutoLogin && conn.setPresence();
-        console.log("conn",conn);
+        // console.log("conn",conn);
 
         try {
             if (conn.unSendMsgArr.length > 0) {
@@ -618,7 +619,8 @@ var _loginCallback = function (status, msg, conn) {
     } else if (status == Strophe.Status.ERROR) {
         conn.context.status = _code.STATUS_ERROR;
         error = {
-            type: _code.WEBIM_CONNCTION_SERVER_ERROR
+            type: _code.WEBIM_CONNCTION_SERVER_ERROR,
+            msg: msg,
         };
 
         conflict && (error.conflict = true);
@@ -1265,7 +1267,7 @@ connection.prototype.signup = function (options) {
  */
 
 connection.prototype.open = function (options) {
-    console.log(8888888);
+    // console.log(8888888);
     
     var appkey = options.appKey,
         orgName = appkey.split('#')[0],
@@ -1701,7 +1703,7 @@ connection.prototype.handlePresence = function (msginfo) {
             &&
             !isDecline
         ) {
-            console.log(2222222, msginfo, info, isApply);
+            // console.log(2222222, msginfo, info, isApply);
             // info.type = 'joinPublicGroupSuccess';
         } else if (presence_type === 'unavailable' || type === 'unavailable') {// There is no roomtype when a chat room is deleted.
             if (info.destroy) {// Group or Chat room Deleted.
