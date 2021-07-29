@@ -648,7 +648,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
     let chatId = bySelf || type !== 'chat' ? to : from
     // chatId = type === "stranger" ? from
-    if(type === 'stranger'){
+    if(type === 'stranger' && !bySelf){
         chatId = from
     }
     // change type as stranger
