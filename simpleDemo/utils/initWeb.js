@@ -20,7 +20,6 @@ WebIM.conn = new WebIM.connection({
 //实时获取时间
 var newDate;
 window.onload = function () {
-    var show = document.getElementById("show");
     setInterval(function () {
         var time = new Date();   // 程序计时的月从0开始取值后+1   
         var m = time.getMonth() + 1;
@@ -42,28 +41,6 @@ WebIM.conn.listen({
     onTextMessage: function (message) {
         console.log('onTextMessage: ', message);
         //判断是否有扩展字段，会议ID是否为空，如果有会议ID 就加入会议
-        if (message.ext.conferenceId != undefined) {
-            var truthBeTold = window.confirm((message.from + "邀请您加入会议"));
-            if (truthBeTold) {
-                //使用会议ID，密码加入会议
-                var ext = "收到邀请加入会议"
-                emedia.mgr.joinConference(message.ext.conferenceId, message.ext.password, ext).then(function () {
-                    console.log("收到邀请加入会议成功")
-                    var constaints = { audio: true, video: false };
-                    var videoTag = $('#meVideo')[0];
-                    //发布视频流
-                    emedia.mgr.publish(constaints, videoTag, ext).then(function (pushedStream) {
-                        console.log('>>> 收到邀请加入会议，发布视频流成功', pushedStream);
-
-                    }).catch(function (error) {
-                        console.log('>>> 收到邀请加入会议，发布视频流失败', error);
-                    });
-                }).catch(function (error) {
-                    console.log("收到邀请加入会议失败")
-                })
-            }
-        }
-
     },    //收到文本消息
     onEmojiMessage: function (message) {
         console.log('onEmojiMessage: ', message);
@@ -242,104 +219,3 @@ WebIM.conn.listen({
         console.log('onMutedMessage: ', message);
     }         //如果用户在A群组被禁言，在A群发消息会走这个回调并且消息不会传递给群其它成员
 });
-
-//初始化WebRTC
-if (WebIM.WebRTC)
-    WebIM.call = new WebIM.WebRTC.Call({
-        connection: WebIM.conn,
-        mediaStreamConstaints: {
-            audio: true,
-            video: true
-            /**
-            * 修改默认摄像头，可以按照以下设置，不支持视频过程中切换
-            * video:{ 'facingMode': "user" } 调用前置摄像头
-            * video: { facingMode: { exact: "environment" } } 后置
-            */
-        },
-
-        listener: {
-            onAcceptCall: function (from, options) {
-                console.log('onAcceptCall::', 'from: ', from, 'options: ', options);
-            },
-            //通过streamType区分视频流和音频流，streamType: 'VOICE'(音频流)，'VIDEO'(视频流)
-            onGotRemoteStream: function (stream, streamType) {
-                console.log('onGotRemoteStream::', 'stream: ', stream, 'streamType: ', streamType);
-                var video = $('#youVideo')[0];
-                video.srcObject = stream;
-            },
-            onGotLocalStream: function (stream, streamType) {
-                console.log('onGotLocalStream::', 'stream:', stream, 'streamType: ', streamType);
-                var video = $('#meVideo')[0];
-                video.srcObject = stream;
-            },
-            onRinging: function (caller, streamType) {
-                console.log(">>>>onRinging", caller, streamType)
-                if (streamType != "VOICE") {
-                    var videoCall = window.confirm((caller + ": 对您发起实时视频呼叫"));
-                } else {
-                    var videoCall = window.confirm((caller + ": 对您发起实时音频呼叫"));
-                };
-                if (videoCall) {
-                    WebIM.call.acceptCall();
-                } else {
-                    WebIM.call.endCall();
-                }
-            },
-            onTermCall: function (reason) {
-                console.log('onTermCall::');
-                console.log('reason:', reason);
-                //开启录制功能，需要的  confrId
-                var confrId = WebIM.call.getServerRecordId();
-                console.log('>>>>>>>', confrId)
-            },
-            onIceConnectionStateChange: function (iceState) {
-                console.log('onIceConnectionStateChange::', 'iceState:', iceState);
-            },
-            onError: function (e) {
-                console.log(e);
-            }
-        }
-    });
-
-//初始化EMedia
-const emedia = webrtc.emedia
-emedia.config({
-    restPrefix: 'https://a1.easemob.com', //配置服务器域名、必填 比如: 'https://a1-hsb.easemob.com'
-    appkey: WebIM.config.appkey           // 配置appkey、必填
-});
-//有人加入会议，其他人调用joinXX等方法，如果加入成功，已经在会议中的人将会收到
-emedia.mgr.onMemberJoined = function (member) {
-    console.log('>>>>>', member.name, ' 加入会议')
-    userMember =  member.name;
-};
-// emedia.mgr.onMemberJoin = function (member) {
-//     console.log('>>>>加入', JSON.stringify(member) + "加入会议", new Date());
-//     userMember = member.name;
-//     console.log('>>>>onMemberJoin',userMember)
-// };
-//有人退出会议
-emedia.mgr.onMemberExited = function (member) {
-    console.log('>>>>>', member.name, ' 退出会议')
-};
-
-
-//有媒体流添加；比如 自己调用了publish方法（stream.located() === true时），或其他人调用了publish方法。
-emedia.mgr.onStreamAdded = function (member, stream) {
-    console.log('>>>>> 收到流 ', member, stream);
-    let streamPush = stream.located();
-    if (!streamPush) {
-        var video = $('#youVideo')[0];
-        //没有流，直接绑定，有流选择空闲的video 绑定
-        if (video.nickname == undefined) {
-            video.nickname = member.name
-            //自动订阅成员流
-            emedia.mgr.subscribe(member, stream, true, true, video)
-            console.log('push>>>>>>>', video)
-            //成员流,信息
-            userStream = stream;
-        } else {
-            var video = $('#deskVideo')[0];
-            emedia.mgr.subscribe(member, stream, true, true, video);
-        }
-    }
-};

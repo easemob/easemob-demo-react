@@ -8,9 +8,7 @@
     <title>环信测试demo</title>
 
     <script src="./utils/WebIMConfig.js"></script>
-    <script src="./sdk/websdk3.1.4.js"></script>
-    <script src="./sdk/EMedia_x1v1.js"></script>
-
+    <script src="./sdk/Easemob-chat-3.6.3.js"></script>
     <script src="./utils/jquery-3.4.1.js"></script>
     <!-- 引入IM 初始化文件÷-->
     <script src="./utils/initWeb.js"></script>
@@ -19,8 +17,7 @@
     <script src="./easmeob-im/friend.js"></script>
     <script src="./easmeob-im/group.js"></script>
     <script src="./easmeob-im/chatroom.js"></script>
-    <script src="./easmeob-im/webrtc.js"></script>
-    <script src="./easmeob-im/confrence.js"></script>
+    <script src="./easmeob-im/info.js"></script>
 
 </head>
 
@@ -36,8 +33,8 @@
         群文件ID：<input type="text" id="gFileId"><br>
         群组类型：<input type="text" id="gType">
         聊天室类型：<input type="text" id="rType"><br>
-        会议ID：<input type="text" id="confrenceId">
-        会议密码：<input type="text" id="confrencePwd">
+        用户头像：<input type="text" id="userAvatar">
+        用户昵称：<input type="text" id="userName"><br>
     </div>
 
     <h3>Registered login</h3>
@@ -45,6 +42,11 @@
         <button id="register">注册</button>
         <button id="login">登陆</button>
         <button id="logout">退出</button>
+    </div>
+    <h3>UserInfo</h3>
+    <div>
+        <button id="updateInfo">设置/修改用户属性</button>
+        <button id="fetchInfo">获取用户属性</button>
     </div>
     <h3>Message</h3>
     <div>
@@ -133,41 +135,6 @@
         <button id="setRoomBlack">将成员加入黑名单</button>
         <button id="removeRoomBlack">将成员移除黑名单</button>
     </div>
-    <h3>WebRTC</h3>
-    <div>
-        <button id="rtCall">视频呼叫</button>
-        <button id="rtEndCall"> 挂断</button>
-        <button id="rtAudioCall">音频呼叫</button><br><br>
-    </div>
-    <h3>Confer</h3>
-    <div>
-        <button id="createConfr">创建会议</button>
-        <button id="inviteUser">邀请用户</button>
-        <button id="cancelPushSteam">取消发布流</button>
-        <button id="cancelStream">取消订阅流</button>
-        <button id="subscriStream">订阅成员流</button>
-        <button id="pushDeskStream">共享桌面</button>
-        <button id="pauseMeVideo">暂停自己视频</button>
-        <button id="resumeMeVideo">恢复自己视频</button>
-        <button id="pauseMeAudio">暂停自己音频</button>
-        <button id="resumeMeAudio">恢复自己音频</button>
-        <button id="resumeAudio">仅订阅音频</button>
-        <button id="pauseAudio">仅暂停订阅音频</button>
-        <button id="resumeVideo">仅订阅视频</button>
-        <button id="pauseVideo">仅暂停订阅视频</button>
-        <button id="removeUser">移除成员</button>
-        <button id="exitConfr">离开会议</button>
-        <button id="destroyConfr">销毁会议</button>
-        <button id="joinConfrence">根据ID/密码加入会议</button>
-       
-    </div>
-    <div>
-        <video id="meVideo" style="border: 1px solid red; width: 300px; height: 200px; " muted=true autoplay>
-        </video>
-        <video id="youVideo" style="border: 1px solid blue ;  width: 300px; height: 200px; " autoplay>
-        </video>
-        <video id="deskVideo" style="border: 1px solid black ;  width: 300px; height: 200px; " autoplay></video>
-    </div>
     <script>
         var uname,          //登陆ID
             upwd,           //登陆密码
@@ -179,10 +146,9 @@
             gFileId,        //群文件ID
             gType,          //判断群组类型
             roomType,       //判断聊天室类型
-            userMember,     //member 成员信息
-            userStream,     //用于接收用户视频流
-            confrenceId,    //会议ID，用于直接加入
-            confrencePwd    //会议密码，用于直接加入
+            userAvatarUrl,  //用户头像
+            userNickname    //用户属性
+
         //获取 name 值
         $("#name").bind("input propertychange", function (event) {
             uname = $("#name").val()
@@ -223,15 +189,14 @@
         $('#rType').bind("input propertychange", function (event) {
             roomType = $("#rType").val()
         })
-        // 获取 confrenceId 值
-        $('#confrenceId').bind("input propertychange", function (event) {
-            confrenceId = $("#confrenceId").val()
+        //获取 userAvatar 值
+        $('#userAvatar').bind("input propertychange", function (event) {
+            userAvatarUrl = $("#userAvatar").val()
         })
-        //获取 confrencePwd 值
-        $('#confrencePwd').bind("input propertychange", function (event) {
-            confrencePwd = $("#confrencePwd").val()
+        //获取 userAvatar 值
+        $('#userNickname').bind("input propertychange", function (event) {
+            userNickname = $("#userName").val()
         })
-
     </script>
 
 </body>
