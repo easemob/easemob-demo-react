@@ -75,7 +75,7 @@ class MultiAVModal extends React.Component {
 
 
 	async join(){
-        const appId = "15cb0d28b87b425ea613fc46f7c9f974";
+        const appId = WebIM.config.AgoraAppId;
         let {joinedMembers, confr} = this.props;
         let imUserName = WebIM.conn.context.jid.name
         let params = {

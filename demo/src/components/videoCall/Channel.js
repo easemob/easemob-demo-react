@@ -62,7 +62,7 @@ class Channel extends React.Component{
 
 	async join(){
 		let {channel, token, type} = this.props.confr
-        const appId = '15cb0d28b87b425ea613fc46f7c9f974';
+        const appId = WebIM.config.AgoraAppId;
         let imUserName = WebIM.conn.context.jid.name
         let params = {
         	username: imUserName,

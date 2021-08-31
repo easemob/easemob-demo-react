@@ -111,7 +111,9 @@ var config = {
      */
     enableLocalStorage: true,
 
-    deviceId: 'webim'
+    deviceId: 'webim',
+
+    AgoraAppId: '', // 需要替换成自己的声网 appId
 }
 export default config
 
