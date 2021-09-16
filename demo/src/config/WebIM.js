@@ -3,7 +3,7 @@
 /* eslint-enable */
 
 // import websdk from './Easemob-chat-3.6.3'
-import websdk from 'easemob-websdk'
+import websdk from './Easemob-chat-3.6.3'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
