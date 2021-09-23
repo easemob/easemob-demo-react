@@ -2,6 +2,7 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
+// add dataReport sdk
 import websdk from './Easemob-chat-3.6.3'
 // import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
