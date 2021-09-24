@@ -3,7 +3,9 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-chat-3.6.3'
+// import websdk from './Easemob-chat-3.6.3'
+import websdk from './Easemob-chat'
+
 // import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
@@ -28,11 +30,12 @@ console.group = console.group || function () {}
 console.groupEnd = console.groupEnd || function () {}
 
 // init DOMParser / document for strophe and sdk
-let WebIM = window.WebIM || {}
+let WebIM = window.WebIM = {}
 WebIM.config = config
 WebIM.loglevel = loglevel
-
-
+WebIM.message = websdk.message
+WebIM.statusCode = websdk.statusCode
+WebIM.utils = websdk.utils
 let options = {
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
@@ -61,9 +64,16 @@ if (WebIM.config.isSandBox) {
     WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 
+// WebIM.logger.setConfig({
+//     useCache: true,
+//     maxCache: 3 * 1024 * 1024
+// })
+
 WebIM.conn = new websdk.connection(options)
 
-websdk.debug(true)
+// websdk.debug(true)
+
+
 
 const appKeyPair = WebIM.config.appkey.split('#')
 export let api = Api.create({
