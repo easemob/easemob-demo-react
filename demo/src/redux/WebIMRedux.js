@@ -193,7 +193,7 @@ WebIM.conn.listen({
     },
     // handle all exception
     onError: error => {
-        console.log('error', error)
+        console.log('onError', error)
         // 16: server-side close the websocket connection
         if (error.type == WebIM.statusCode.WEBIM_CONNCTION_DISCONNECTED) {
             console.log(
