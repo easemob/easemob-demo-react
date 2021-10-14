@@ -61,6 +61,10 @@ const { Types, Creators } = createActions({
                 },
                 error: e => {
                     if (e.type === 17) {
+                        let data = JSON.parse(e.data)
+                        if(data.error_description.includes('already in group')){
+                            return message.error(users.toString() + ' already in group');
+                        }
                         message.error('你没有权限做此操作');
                     }
                     // dispatch(Creators.setLoading(false))

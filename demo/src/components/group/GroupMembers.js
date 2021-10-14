@@ -48,7 +48,7 @@ class GroupMembers extends React.Component {
         const admins = _.get(groupMember, `${roomId}.admins`, [])
         const muted = _.get(groupMember, `${roomId}.muted`, [])
         const data = _.map(members, (val, key) => {
-            const { affiliation, info } = val
+            const { affiliation, info, name } = val
             if (affiliation.toLowerCase() === 'owner') {
                 owner = key.toLowerCase()
                 if (key === currentUser.toLowerCase()) {
@@ -57,7 +57,7 @@ class GroupMembers extends React.Component {
             }
             const isAdmin = _.includes(admins, key)
             const isMuted = _.includes(muted, key)
-            return { name: info.nickname || val.name, key, affiliation, isAdmin, isMuted }
+            return { name: info.nickname || val.name, key, affiliation, isAdmin, isMuted, id: name }
         })
         const columns = [
             {
@@ -71,16 +71,16 @@ class GroupMembers extends React.Component {
                 render: (text, record) => {
                     // const isAdmin = _.includes(admins, currentUser)
                     const canOperate =
-                        record.name !== currentUser && // self
-                        record.name !== owner && // owner
+                        record.id !== currentUser && // self
+                        record.id !== owner && // owner
                         (isOwner || _.includes(admins, currentUser))
-                    // return data.length > 0 && (isAdmin || (isOwner && owner !== record.name))
+                    // return data.length > 0 && (isAdmin || (isOwner && owner !== record.id))
                     const AdminIcons = (props) => {
                         const { admins, record } = props
-                        return _.includes(admins, record.name)
+                        return _.includes(admins, record.id)
                             ? <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('removeAdmin')}
-                                onConfirm={() => this.removeAdmin(roomId, record.name)}
+                                onConfirm={() => this.removeAdmin(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('removeAdmin')} placement="left">
                                     <Icon type="arrow-down" style={iconStyle} />
@@ -88,7 +88,7 @@ class GroupMembers extends React.Component {
                             </Popconfirm>
                             : <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('setAdmin')}
-                                onConfirm={() => this.setAdmin(roomId, record.name)}
+                                onConfirm={() => this.setAdmin(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('setAdmin')} placement="left">
                                     <Icon type="arrow-up" style={iconStyle} />
@@ -97,10 +97,10 @@ class GroupMembers extends React.Component {
                     }
                     const MuteIcons = (props) => {
                         const { muted, record } = props
-                        return _.hasIn(muted, [ 'byName', record.name ])
+                        return _.hasIn(muted, [ 'byName', record.id ])
                             ? <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('removeMute')}
-                                onConfirm={() => this.removeMute(roomId, record.name)}
+                                onConfirm={() => this.removeMute(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('removeMute')} placement="left">
                                     <Icon type="unlock" style={iconStyle} />
@@ -108,7 +108,7 @@ class GroupMembers extends React.Component {
                             </Popconfirm>
                             : <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('mute')}
-                                onConfirm={() => this.mute(roomId, record.name)}
+                                onConfirm={() => this.mute(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('mute')} placement="left">
                                     <Icon type="lock" style={iconStyle} />
@@ -123,7 +123,7 @@ class GroupMembers extends React.Component {
                             <MuteIcons record={record} muted={muted} />
                             <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('groupBlockSingle')}
-                                onConfirm={() => this.groupBlockSingle(roomId, record.name)}
+                                onConfirm={() => this.groupBlockSingle(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('groupBlockSingle')} placement="left">
                                     <Icon type="frown-o" style={iconStyle} />
@@ -131,7 +131,7 @@ class GroupMembers extends React.Component {
                             </Popconfirm>
                             <Popconfirm
                                 title={I18n.t('confirm') + ' ' + I18n.t('removeSingleGroupMember')}
-                                onConfirm={() => this.removeSingleGroupMember(roomId, record.name)}
+                                onConfirm={() => this.removeSingleGroupMember(roomId, record.id)}
                             >
                                 <Tooltip title={I18n.t('removeSingleGroupMember')} placement="left">
                                     <Icon type="usergroup-delete" style={iconStyle} />
