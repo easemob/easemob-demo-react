@@ -38,7 +38,7 @@ const logger = WebIM.loglevel.getLogger('WebIMRedux')
 
 WebIM.conn.listen({
     // success connect
-    onOpened: msg => {
+    onOpened: () => {
         const username = store.getState().login.username
         const token = utils.getToken()
         const hash = utils.getHash()
@@ -263,8 +263,8 @@ WebIM.conn.listen({
             store.dispatch(LoginActions.loginFailure(error))
         }
     },
-    onClosed: msg => {
-        console.log('onClosed', msg)
+    onClosed: () => {
+        console.log('onClosed')
         // msg.msg && message.error(msg.msg)
         //store.dispatch(Creators.logoutSuccess())
     },
@@ -294,7 +294,6 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.updateMessageMid(id, mid))
     },
     onRecallMessage: message => {
-        console.log('撤回消息', message)
         store.dispatch(MessageActions.deleteMessage(message)) 
         logger.info('onRecallMessage', message)
     },

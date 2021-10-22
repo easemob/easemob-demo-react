@@ -4,9 +4,9 @@
 
 // add dataReport sdk
 // import websdk from './Easemob-chat-3.6.3'
-import websdk from './Easemob-chat'
+// import websdk from './Easemob-chat'
 
-// import websdk from 'easemob-websdk'
+import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
@@ -36,6 +36,7 @@ WebIM.loglevel = loglevel
 WebIM.message = websdk.message
 WebIM.statusCode = websdk.statusCode
 WebIM.utils = websdk.utils
+WebIM.logger = websdk.logger
 let options = {
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
