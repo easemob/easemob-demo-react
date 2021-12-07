@@ -49,7 +49,8 @@ class AddGroupModal extends React.Component {
                         members: members,
                         public: type === 'public',
                         approval: canJoin === 'yes',
-                        allowinvites: allowInvite
+                        allowinvites: allowInvite,
+                        inviteNeedConfirm: false
                         // invite_need_confirm // default: member
                     },
                     success: () => {

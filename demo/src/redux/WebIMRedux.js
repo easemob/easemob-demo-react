@@ -88,8 +88,12 @@ WebIM.conn.listen({
         // }
     },
     onPresence: msg => {
-        // console.log("onPresence", msg, store.getState())
+        console.log("onPresence", msg)
         switch (msg.type) {
+        case 'invite_accept':
+        console.log()
+            console.log('invite_accept')
+            break;
         case 'joinGroupNotifications':
             logger.info('joinGroupNotifications')
             store.dispatch(CommonActions.setShowGroupRequestModal(true))
@@ -416,6 +420,7 @@ WebIM.conn.listen({
     },
     onFileMessage: message => {
         const { type, from, to } = message
+        console.log("onFileMessage", message)
         store.dispatch(MessageActions.addMessage(message, 'file'))
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
