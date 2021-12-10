@@ -285,11 +285,11 @@ WebIM.conn.listen({
         store.dispatch(BlacklistActions.updateBlacklist(list))
     },
     onReadMessage: message => {
-        logger.info('onReadMessage', message)
+        console.info('onReadMessage', message)
         store.dispatch(MessageActions.updateMessageStatus(message, 'read'))
     },
     onDeliveredMessage: message => {
-        logger.info('onDeliveredMessage', message)
+        console.log('onDeliveredMessage', message)
         // store.dispatch(MessageActions.updateMessageStatus(message, "sent"))
     },
     onReceivedMessage: message => {
@@ -320,7 +320,7 @@ WebIM.conn.listen({
 
 
         store.dispatch(MessageActions.addMessage(message, 'txt'))     
-        //type === 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
+        store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
         switch (type) {
         case 'chat':
             store.dispatch(RosterActions.topRoster(from))

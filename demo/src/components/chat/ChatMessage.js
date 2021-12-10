@@ -74,6 +74,8 @@ export default class ChatMessage extends Component {
             fail: (err) => {
                 message.error('撤回失败')
             }
+        }).then((res)=>{
+            console.log('撤回消息成功',res)
         })
     }
 
