@@ -21,7 +21,7 @@
     "less": "^3.12.2",
     "less-loader": "^4.0.5",
     "less-vars-to-js": "^1.1.2",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "node-notifier": "^8.0.0",
     "react-dev-utils": "10.0.0",
     "react-draggable": "^3.0.3",
