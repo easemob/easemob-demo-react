@@ -705,22 +705,32 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     
     return state
 }
-
-export const deleteMessage = (state,{ id, isSelf }) => {
-    id = id.mid || id
-    const byId = state.getIn([ 'byId', id ])
+/**
+ * id 自己手动撤回时id为本地消息Id, 接收到onRecallMessage时 id为{ from: 'from', to: 'to', id: 'id', mid: 'mid' }
+ */
+export const deleteMessage = (state,{ id: msg, isSelf }) => {
+    let { from } = msg
+    let id = msg.mid || msg
+    let byId = state.getIn([ 'byId', id ])
+    if(!byId){
+        id =  state.getIn([ 'byMid', id ]).id
+        byId = state.getIn([ 'byId', id ])
+    }
     if(byId){
         const { type, chatId } = byId
+        const isSingleChat = type === 'chat' // 是否是单聊
         let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
         const index = messages.indexOf(found)
         let bySelf = found.getIn([ 'bySelf' ])
+        let foundFrom = isSingleChat ? '' : found.getIn([ 'from' ]) || WebIM.conn.user
+        let recallMsg = isSelf ? '消息已撤回' :`${from} 撤回了${foundFrom}的一条消息`
         if(found.getIn([ 'body', 'type' ]) != 'txt'){
             messages.splice(index, 1)
             messages.splice(index,0,{
                 body: {
                     type: 'txt',
-                    msg: isSelf?'消息已撤回':found.getIn([ 'from' ])+'撤回了一条消息'
+                    msg: recallMsg
                 },
                 time: found.getIn([ 'time' ]),
                 from: found.getIn([ 'from' ]),
@@ -734,8 +744,7 @@ export const deleteMessage = (state,{ id, isSelf }) => {
                 bySelf: bySelf
             })
         }else{
-            let nMsg = bySelf ? '消息已撤回' : found.from+'撤回了一条消息'
-            let message = found.setIn([ 'body', 'msg' ], nMsg)
+            let message = found.setIn([ 'body', 'msg' ], recallMsg)
             // message = found.setIn([ "status",], 'read')
             //console.log('删除了这条消息',message)
             messages.splice(messages.indexOf(found), 1, message)
