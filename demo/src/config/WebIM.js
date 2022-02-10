@@ -4,7 +4,7 @@
 
 // add dataReport sdk
 // import websdk from './Easemob-chat-3.6.3'
-import websdk from './Easemob-chat-4.0.2'
+import websdk from './Easemob-chat-4.0.4'
 
 // import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
