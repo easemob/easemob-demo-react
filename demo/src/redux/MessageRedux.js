@@ -723,7 +723,7 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
         let found = _.find(messages, { id: id })
         const index = messages.indexOf(found)
         let bySelf = found.getIn([ 'bySelf' ])
-        let foundFrom = isSingleChat ? '' : found.getIn([ 'from' ]) || WebIM.conn.user
+        let foundFrom = found.getIn([ 'from' ]) || WebIM.conn.user
         let recallMsg = isSelf ? '消息已撤回' :`${from} 撤回了${foundFrom}的一条消息`
         if(found.getIn([ 'body', 'type' ]) != 'txt'){
             messages.splice(index, 1)
