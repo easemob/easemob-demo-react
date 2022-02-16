@@ -18,13 +18,13 @@ var config = {
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws",
+    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2.easemob.com/ws",
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com",
+    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1.easemob.com",
     /*
      * Application AppKey
      */
@@ -55,7 +55,7 @@ var config = {
      * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
      * @parameter {Boolean} true or false
      */
-    isSandBox: true, //内部测试环境，集成时设为false
+    isSandBox: false, //内部测试环境，集成时设为false
     /**
      * Whether to console.log
      * @parameter {Boolean} true or false
