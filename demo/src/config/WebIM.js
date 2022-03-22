@@ -55,16 +55,16 @@ let options = {
 }
 
 // 内部沙箱测试环境
-if (window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1) {
-    WebIM.config.isSandBox = true
-}
+// if (window.location.href.indexOf('webim-hsb-ly.easemob.com') !== -1) {
+//     WebIM.config.isSandBox = true
+// }
 if (WebIM.config.isSandBox) {
     options.url =  (window.location.protocol === "https:" ? "https:" : "http:") + '//im-api-v2-hsb.easemob.com/ws';
     options.apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;
     options.isHttpDNS = false;
-    WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
+    // WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 
 // WebIM.logger.setConfig({
