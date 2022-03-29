@@ -23,7 +23,7 @@ upload(){
     echo -e "\nZIP files...\n"
 	zip -r $TRAVIS_TAG.zip chatdemo-webim
     
-    UPLOAD_PARAMS="-v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v="$TRAVIS_TAG" -F p=zip -F file=@"$TRAVIS_TAG".zip -u ci-deploy:Xyc-R5c-SdS-2Qr "
+    UPLOAD_PARAMS="-v -F r=releases -F hasPom=false -F e=zip -F g=com.easemob.chatdemo2 -F a=webim -F v="$TRAVIS_TAG" -F p=zip -F file=@"$TRAVIS_TAG".zip -u ci-deploy:${EASEMOB_NEXUS_PASSWORD} "
     UPLOAD_URL="https://hk.nexus.op.easemob.com/nexus/service/local/artifact/maven/content"
     echo -e "\nUPLOAD ZIP..."
     echo -e $UPLOAD_PARAMS"\n"$UPLOAD_URL"\n"
