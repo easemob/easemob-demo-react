@@ -43,7 +43,7 @@ var config = {
     * 公有云配置默认为 true，
     * 私有云配置请设置 isHttpDNS = false , 详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
     */
-    isHttpDNS: true,
+    isHttpDNS: false,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
