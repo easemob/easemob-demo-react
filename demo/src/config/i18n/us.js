@@ -121,4 +121,5 @@ export const us = {
     waiting: 'waiting ',
     waitingVideo: ' on video...',
     waitingVoice: ' on voice...',
+    serverConfiguration: 'Server Configuration',
 }

@@ -123,4 +123,5 @@ export const cn = {
     waiting: '等待对方接受邀请',
     waitingVideo: ' 视频中...',
     waitingVoice: ' 语音中...',
+    serverConfiguration: '服务器配置',
 }
