@@ -43,7 +43,7 @@ var config = {
     * 公有云配置默认为 true，
     * 私有云配置请设置 isHttpDNS = false , 详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
     */
-    isHttpDNS: false,
+    isHttpDNS: true,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
@@ -55,7 +55,7 @@ var config = {
      * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
      * @parameter {Boolean} true or false
      */
-    isSandBox: true, //内部测试环境，集成时设为false
+    isSandBox: false, //内部测试环境，集成时设为false
     /**
      * Whether to console.log
      * @parameter {Boolean} true or false

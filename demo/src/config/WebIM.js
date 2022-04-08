@@ -40,7 +40,7 @@ WebIM.logger = websdk.logger
 let options = {
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
-    isReport: true,
+    // isReport: true,
     https: WebIM.config.https,
     isAutoLogin: false,
     heartBeatWait: WebIM.config.heartBeatWait,
