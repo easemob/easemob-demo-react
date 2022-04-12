@@ -9,8 +9,8 @@
 // var location = {
 //     protocol: "https"
 // }
-
-
+const { appkey, https, rest } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
+console.log(appkey, https, rest, 'appkey, https, rest')
 
 var config = {
     /*
@@ -18,17 +18,17 @@ var config = {
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//im-api-v2-hsb.easemob.com/ws",
+    socketServer: rest?.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws',
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: (window.location.protocol === "https:" ? "https:" : "http:") + "//a1-hsb.easemob.com",
+    restServer: rest?.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com',
     /*
      * Application AppKey
      */
-    appkey: 'easemob-demo#easeim',
+    appkey: appkey || 'easemob-demo#easeim',
     /*
      * Application Host
      */
@@ -37,13 +37,13 @@ var config = {
      * Whether to use HTTPS
      * @parameter {Boolean} true or false
      */
-    https: true,
+    https: https || true,
 
     /*
     * 公有云配置默认为 true，
     * 私有云配置请设置 isHttpDNS = false , 详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
     */
-    isHttpDNS: false,
+    isHttpDNS: rest?.imServer && rest?.restServer ? false : true,
     /*
      * isMultiLoginSessions
      * true: A visitor can sign in to multiple webpages and receive messages at all the webpages.
@@ -55,7 +55,7 @@ var config = {
      * isSandBox=false: socketURL: 'im-api.easemob.com',          apiURL: '//a1.easemob.com',
      * @parameter {Boolean} true or false
      */
-    isSandBox: true, //内部测试环境，集成时设为false
+    isSandBox: rest?.imServer && rest?.restServer ? true : false, //内部测试环境，集成时设为false
     /**
      * Whether to console.log
      * @parameter {Boolean} true or false

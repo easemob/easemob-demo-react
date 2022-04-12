@@ -122,4 +122,10 @@ export const us = {
     waitingVideo: ' on video...',
     waitingVoice: ' on voice...',
     serverConfiguration: 'Server Configuration',
+    saveSetting: 'Save Setting',
+    appKey: 'AppKey',
+    imServerAddress: 'IM Server Address',
+    port: 'Port',
+    restServerAddress: 'REST Server Address',
+    settingSuccess: 'Setting Success',
 }

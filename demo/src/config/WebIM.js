@@ -39,7 +39,7 @@ WebIM.statusCode = websdk.statusCode
 WebIM.utils = websdk.utils
 WebIM.logger = websdk.logger
 let options = {
-    isReport:true,
+    isReport: true,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
     https: WebIM.config.https,
@@ -61,11 +61,11 @@ let options = {
 //     WebIM.config.isSandBox = true
 // }
 if (WebIM.config.isSandBox) {
-    options.url =  (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
-    options.apiUrl = (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
+    options.url =  WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+    options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;
-    options.isHttpDNS = false
+    // options.isHttpDNS = false
     // WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 
@@ -73,9 +73,9 @@ if (WebIM.config.isSandBox) {
 //     useCache: true,
 //     maxCache: 3 * 1024 * 1024
 // })
-
+console.log('%c 这里', 'color:red;font-size: 20px;')
 WebIM.conn = new websdk.connection(options)
-
+console.log('%c 之后', 'color:red;font-size: 20px;')
 // websdk.debug(true)
 
 
