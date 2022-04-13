@@ -42,6 +42,7 @@ let options = {
     isReport: true,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
+    // isReport: true,
     https: WebIM.config.https,
     isAutoLogin: false,
     heartBeatWait: WebIM.config.heartBeatWait,
