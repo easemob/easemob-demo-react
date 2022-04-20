@@ -3,10 +3,10 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-chat-4.0.4'
+// import websdk from './Easemob-chat-4.0.4'
 // import websdk from './Easemob-chat'
 
-// import websdk from 'easemob-websdk'
+import websdk from 'easemob-websdk'
 // import webrtc from 'easemob-webrtc'
 // import emedia from './EMedia_sdk-dev'
 import config from 'WebIMConfig'
