@@ -95,7 +95,7 @@ var config = {
      * sender, in order to tell the sender the message has delivered.
      * See call back function onReceivedMessage
      */
-    delivery: true,
+    delivery: false,
     /**
      * Size of message cache for group chating like group, chatroom etc. For use in this demo
      */
