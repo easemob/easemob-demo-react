@@ -300,6 +300,7 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 onFileUploadComplete: function (data) {
+                    console.log('sendPictureMessage', data)
                     let url = data.uri + '/' + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = 'sent'
