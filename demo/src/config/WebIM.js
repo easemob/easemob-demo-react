@@ -14,7 +14,8 @@ import emoji from './emoji'
 import Api from 'axios'
 import { message } from 'antd'
 import loglevel from '@/utils/loglevel'
-import AgoraRTC from "agora-rtc-sdk-ng"
+import AgoraRTC from 'agora-rtc-sdk-ng'
+
 
 
 const rtc = {
@@ -23,7 +24,7 @@ const rtc = {
     // 用来放置本地音视频频轨道对象。
     localAudioTrack: null,
     localVideoTrack: null,
-};
+}
 
 console = console || {}
 console.group = console.group || function () {}
@@ -38,6 +39,7 @@ WebIM.statusCode = websdk.statusCode
 WebIM.utils = websdk.utils
 WebIM.logger = websdk.logger
 let options = {
+    isReport: true,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
     // isReport: true,
@@ -60,11 +62,11 @@ let options = {
 //     WebIM.config.isSandBox = true
 // }
 if (WebIM.config.isSandBox) {
-    options.url =  (window.location.protocol === "https:" ? "https:" : "http:") + '//im-api-v2-hsb.easemob.com/ws';
-    options.apiUrl = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
+    options.url =  WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+    options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;
-    options.isHttpDNS = false;
+    // options.isHttpDNS = false
     // WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 
@@ -72,9 +74,9 @@ if (WebIM.config.isSandBox) {
 //     useCache: true,
 //     maxCache: 3 * 1024 * 1024
 // })
-
+console.log('%c 这里', 'color:red;font-size: 20px;')
 WebIM.conn = new websdk.connection(options)
-
+console.log('%c 之后', 'color:red;font-size: 20px;')
 // websdk.debug(true)
 
 
@@ -119,8 +121,8 @@ api.interceptors.response.use(
 WebIM.api = api
 WebIM.emoji = emoji
 
-WebIM.rtc = rtc;
-WebIM.AgoraRTC = AgoraRTC;
+WebIM.rtc = rtc
+WebIM.AgoraRTC = AgoraRTC
 export default WebIM
 
 
