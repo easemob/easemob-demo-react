@@ -300,6 +300,7 @@ const { Types, Creators } = createActions({
                     callback()
                 },
                 onFileUploadComplete: function (data) {
+                    console.log('sendPictureMessage', data)
                     let url = data.uri + '/' + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = 'sent'
@@ -441,10 +442,16 @@ const { Types, Creators } = createActions({
                 },
                 flashUpload: WebIM.flashUpload
             })
-            if(chatType === 'groupchat' || chatType === 'chatroom'){
-                // msgObj.setGroup('groupchat')
+            // if(chatType === 'groupchat' || chatType === 'chatroom'){
+            //     // msgObj.setGroup('groupchat')
+            //     msgObj.setChatType('groupChat')
+            // }
+            if (chatType == 'groupchat') {
                 msgObj.setChatType('groupChat')
+            } else if(chatType == 'chatroom') {
+                msgObj.setChatType('chatRoom')
             }
+            
             WebIM.conn.send(msgObj.body)
             pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'audio')
             pMessage.id = id

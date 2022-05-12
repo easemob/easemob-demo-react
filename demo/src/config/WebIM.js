@@ -3,7 +3,7 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-chat-rpt'
+import websdk from './Easemob-chat-4.0.5'
 // import websdk from './Easemob-chat'
 
 // import websdk from 'easemob-websdk'
@@ -42,6 +42,7 @@ let options = {
     isReport: true,
     isMultiLoginSessions: WebIM.config.isMultiLoginSessions,
     isDebug: WebIM.config.isDebug,
+    // isReport: true,
     https: WebIM.config.https,
     isAutoLogin: false,
     heartBeatWait: WebIM.config.heartBeatWait,
