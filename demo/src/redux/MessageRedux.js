@@ -592,7 +592,7 @@ const { Types, Creators } = createActions({
                 WebIM.conn.send(msgObj.body);
                 msgObj.body.type = 'groupchat'
             }else if( chatType === 'chatroom'){
-                msgObj.setChatType('groupChat')
+                msgObj.setChatType('chatroom')
                 WebIM.conn.send(msgObj.body);
                 msgObj.body.type = 'chatroom'
             } else{
