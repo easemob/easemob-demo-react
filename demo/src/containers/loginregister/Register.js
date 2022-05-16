@@ -5,6 +5,7 @@ import { Button, Row, Form, Input } from "antd"
 import { config } from "@/config"
 import styles from "./index.less"
 import RegisterActions from "@/redux/RegisterRedux"
+import ServerActions from '@/redux/ServerRedux'
 import WebIM from "@/config/WebIM"
 
 const FormItem = Form.Item
@@ -14,6 +15,7 @@ const Register = ({
     login,
     doRegister,
     jumpLogin,
+    jumpServer,
     form: { getFieldDecorator, validateFieldsAndScroll }
 }) => {
 
@@ -95,6 +97,7 @@ const Register = ({
                 <p>
                     {I18N.haveaccount}
                     <span onClick={jumpLogin}>{I18N.signIn}</span>
+                    <span onClick={jumpServer}>{I18N.serverConfiguration}</span>
                 </p>
             </div>
         </div>
@@ -119,6 +122,8 @@ export default connect(
         doRegister: (username, password, nickname) =>
             dispatch(RegisterActions.register(username, password, nickname)),
         jumpLogin: () =>
-            dispatch(RegisterActions.jumpLogin())
+            dispatch(RegisterActions.jumpLogin()),
+        jumpServer: () => 
+            dispatch(ServerActions.jumpServer()),
     })
 )(Form.create()(Register))

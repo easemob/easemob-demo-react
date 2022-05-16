@@ -5,6 +5,7 @@ import { Button, Row, Form, Input, Checkbox } from 'antd'
 import { config } from '@/config'
 import styles from './index.less'
 import LoginActions from '@/redux/LoginRedux'
+import ServerActions from '@/redux/ServerRedux'
 import WebIM from '@/config/WebIM'
 
 const FormItem = Form.Item
@@ -15,6 +16,7 @@ const Login = ({
     doLogin,
     doLoginByToken,
     jumpRegister,
+    jumpServer,
     form: { getFieldDecorator, validateFieldsAndScroll }
 }) => {
     const { loginLoading } = login
@@ -37,7 +39,7 @@ const Login = ({
     // const b = a.b.c
     // console.log(messageList, "---")
 
-    const logo = WebIM.config.i18n == 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
+    const logo = WebIM.config.i18n === 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
         <div className="form x-login">
             <div className="logo">
@@ -74,6 +76,7 @@ const Login = ({
                 <p>
                     {I18N.noaccount}
                     <span onClick={jumpRegister}>{I18N.signUp}</span>
+                    <span onClick={jumpServer}>{I18N.serverConfiguration}</span>
                 </p>
             </div>
         </div>
@@ -96,6 +99,7 @@ export default connect(
     dispatch => ({
         doLogin: (username, password) => dispatch(LoginActions.login(username, password)),
         doLoginByToken: (username, token) => dispatch(LoginActions.loginByToken(username, token)),
-        jumpRegister: () => dispatch(LoginActions.jumpRegister())
+        jumpRegister: () => dispatch(LoginActions.jumpRegister()),
+        jumpServer: () => dispatch(ServerActions.jumpServer())
     })
 )(Form.create()(Login))

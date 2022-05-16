@@ -270,7 +270,7 @@ WebIM.conn.listen({
     onClosed: () => {
         console.log('onClosed')
         // msg.msg && message.error(msg.msg)
-        //store.dispatch(Creators.logoutSuccess())
+        // store.dispatch(Creators.logoutSuccess())
     },
     
     // 好友相关回调
@@ -634,6 +634,9 @@ const { Types, Creators } = createActions({
             // if (WebIM.conn.isOpened()) {
             // WebIM.conn.close("logout")
             // }
+            localStorage.removeItem('webIMCustomSetting')
+            window.localStorage.setItem('webImLogout', false)
+            window.location.reload()
         }
     }
 })

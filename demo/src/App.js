@@ -14,6 +14,7 @@ import Login from '@/containers/loginregister/Login'
 import Chat from '@/containers/chat/Chat'
 import ChinaMobile from '@/containers/chinamobile/Chinamobile'
 import Register from '@/containers/loginregister/Register'
+import Server from '@/containers/loginregister/Server'
 import LoginActions from '@/redux/LoginRedux'
 import Loading from '@/components/common/LoadingComponent'
 import { store } from '@/redux'
@@ -91,7 +92,7 @@ class App extends Component {
     render() {
         const { isLogin, token, isLoading } = this.props
         const { hasToken } = this.state
-        //console.log("App render:", isLogin, token, isLoading, hasToken)
+        console.log("App render:", isLogin, token, isLoading, hasToken)
         if (!isLogin && hasToken && !debug) return <Loading show={true} />
 
         // const authorizedComponent = <AuthorizedComponent {...this.props} token={token} Layout={Layout} />
@@ -103,6 +104,7 @@ class App extends Component {
                 <Switch>
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/register" component={Register} />
+                    <Route exact path="/server" component={Server} />
                     <Route path="/cnm" component={ChinaMobile} />
                     {/* <Route path="/" children={authorizedComponent} /> */}
                     {/* <Route path="/" component={AuthorizedComponent} /> */}

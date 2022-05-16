@@ -77,7 +77,8 @@ export default {
         return Cookie.get('web_im_' + username)
     },
     getUserName() {
-        return username
+        const webImLogout = JSON.parse(window.localStorage.getItem('webImLogout')) === null ? true : JSON.parse(window.localStorage.getItem('webImLogout'))
+        return webImLogout && username
     },
     getLatestMessage(messageList) {
         let latestMessage = ''

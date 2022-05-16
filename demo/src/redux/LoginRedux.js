@@ -25,7 +25,7 @@ const { Types, Creators } = createActions({
     login: (username, password) => {
         return (dispatch, getState) => {
             dispatch(Creators.setLoging(username, password, null))
-
+            console.log(WebIM, 'WebIM')
             // if (WebIM.conn.isOpened()) {
             //     WebIM.conn.close("logout")
             // }
@@ -40,6 +40,7 @@ const { Types, Creators } = createActions({
 
                     dispatch(Creators.setLoginToken(username, token.access_token))
                     dispatch(Creators.setLoginSuccess(username))
+                    window.localStorage.setItem('webImLogout', true)
 
                 },
                 error: e => {

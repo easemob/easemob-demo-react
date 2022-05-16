@@ -123,4 +123,11 @@ export const cn = {
     waiting: '等待对方接受邀请',
     waitingVideo: ' 视频中...',
     waitingVoice: ' 语音中...',
+    serverConfiguration: '服务器配置',
+    saveSetting: '保存配置',
+    appKey: 'AppKey',
+    imServerAddress: 'IM服务器地址',
+    port: '端口号',
+    restServerAddress: 'REST服务器地址',
+    settingSuccess: '保存成功',
 }
