@@ -18,17 +18,23 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
             WebIM.conn.getRoster({
-                success: roster => {
+                success: async(roster) => {
                     console.log('roster', roster)
-                    let rosterNames = roster.map(item => item.name)
-                    WebIM.conn.fetchUserInfoById(rosterNames).then((res) => {
-                        let infos = res.data
-                        roster.forEach((item) => {
-                            item.info = infos[item.name]
+                    try{
+                        let rosterNames = roster.map(item => item.name)
+                        await WebIM.conn.fetchUserInfoById(rosterNames).then((res) => {
+                            let infos = res.data
+                            roster.forEach((item) => {
+                                item.info = infos[item.name]
+                            })
+                            return roster
                         })
+                    }catch(e){
+                        console.log('111',e);
+                    }finally{
                         dispatch(Creators.updateRoster(roster))
                         dispatch(CommonActions.fetched())
-                    })
+                    }
                 },
                 error: error => {
                     //TODO ERROR
