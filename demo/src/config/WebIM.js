@@ -2,7 +2,7 @@
 //import "script-loader!easemob-websdk/dist/strophe-1.2.8.js"
 /* eslint-enable */
 
-import websdk from './Easemob-chat-4.0.5'
+import websdk from './Easemob-chat-4.0.7'
 
 // import websdk from './Easemob-chat'
 
