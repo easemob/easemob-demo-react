@@ -87,8 +87,8 @@ class HeaderOps extends Component {
         }
     }
 
-    componentWillMount = async () => {
-        let info = await this.props.getUserInfo(WebIM.conn.context.userId)
+    componentWillMount = () => {
+        let info = this.props.getUserInfo(WebIM.conn.context.userId)
         this.userInfo = info.data[WebIM.conn.context.userId]
         this.props.setOwnInfo(this.userInfo)
     }
