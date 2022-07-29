@@ -21,9 +21,16 @@
 		bottom: @box-height * 2;
 		background: #fff;
 		padding: 0 16px;
-		overflow: scroll;
+		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 		-webkit-transform: translate3d(0, 0, 0);
+	}
+	&-content-tip {
+		position: absolute;
+	    top: 150px;
+	    width: 50%;
+	    left: 25%;
+	    color: #bbb;
 	}
 
 	&-footer {

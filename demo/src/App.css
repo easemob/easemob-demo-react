@@ -24,7 +24,14 @@ body {
 .App-intro {
     font-size: large;
 }
-
+.app-box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
 @keyframes App-logo-spin {
     from {
         transform: rotate(0deg);

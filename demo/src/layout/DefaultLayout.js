@@ -429,7 +429,6 @@ class DefaultLayout extends Component {
                     <Content
                         className="x-layout-chat"
                         style={{
-                            overflow: 'scroll',
                             margin: collapsed ? '0' : `0 0 0 ${SIDER_WIDTH}px`
                         }}
                     >
