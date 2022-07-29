@@ -1,305 +1,69 @@
-## 说明
-WebIM 3 (webim-h5) 在2.x的基础上, 主要做了以下更新:
-1. 更换新版基于私有协议重写的sdk
-2. 群组增加接受邀请/拒绝加群邀请功能
-3. 修复部分bug
+# React Demo（WebIM）介绍
 
-WebIM 2 (webim-h5) 在1.x的基础上, 主要做了以下更新:
-1. 响应式布局, 一套Demo同时支持PC和H5,自适应不同终端屏幕尺寸
-2. 完全基于React + Redux的单向数据流
-3. 引入ant-design组件库，方便开发者后续开发
-4. 支持所有的现代浏览器(不支持IE6-11)
+更新时间：2022-07-15
 
-## SDK位置：
-demo/src/config
-websdk为IM SDk
-Emedia_x1v1 为单人音视频SDK
-Emedia_sdk-dev 为多人音视频SDK
+-----
 
-## 注意
-+ sdk 文件夹下 webimSDK为即时通讯sdk, EMedia_x1v1为单人音视频sdk, EMedia_sdk-dev为多人音视频sdk,同时EMedia_x1v1依赖webimSDK, 音视频必须用https
-+ simpleDemo 为简单demo，提供最简单直接的api调用示例
-+ demo 为基于react+redux写的完整功能的demo
-+ 更多关于sdk[集成文档](http://docs-im.easemob.com/im/web/intro/start)
+环信即时通讯 WEB 端提供示例应用可供体验。为方便体验，建议使用你自己的 Demo 应用，具体步骤如下：
 
-## 安装
+1. 在 [环信即时通讯云 IM 管理后台](https://console.easemob.com/user/login) 通过邮箱注册，可以看到默认的 Demo 应用（默认应用是全功能开通的应用）；
+
+2. 在上图页面 Demo 应用右侧点击 **查看**，选择 **开放注册**；
+
+[![img](https://docs-im.easemob.com/_media/ccim/android/quickstart/3.png?w=600&tok=83515c)](https://docs-im.easemob.com/_detail/ccim/android/quickstart/3.png?id=ccim%3Aandroid%3Aquickstart%3Ademo)
+
+3. 打开 Demo，点击 **服务器配置**；
+
+
+4. 将 Demo 的 App Key 填入，点击 **保存配置**；
+
+5. 然后点击 **注册用户** 进行体验。
+
+**注意**
+
+注册模式分两种，开放注册和授权注册。只有开放注册时，才可以客户端注册。
+
+- 开放注册是为了测试使用，正式环境中不推荐使用该方式注册环信账号；
+- 授权注册的流程应该是你的应用服务器通过环信提供的 REST API 注册，之后将 token 保存到你的应用服务器或返回给客户端。
+
+## 代码下载
+
+- 下载源代码：[github 源码地址](https://github.com/easemob/webim)
+
+欢迎大家提交 PR 改进和修复 WebIM 中的问题。
+
+## 运行 WebIM 工程
+
+从[IM SDK 及 Demo 下载](https://www.easemob.com/download/im) 下载 WEB SDK 压缩包，然后解压。解压后在 `demo` 文件夹下，即为 WebIM 的工程目录。
 
 1. 初始化安装
-	- 在/demo下执行 `npm i` `npm install` 
+	- 在/demo下执行 `npm install` 
 
 2. 运行demo
-	- `cd demo && npm start` （requires node@>=6）
+	- `cd demo && npm start`
 	
 	   http://localhost:3001
 	- `cd demo && HTTPS=true npm start` (webrtc supports HTTPS only)
 	
 	   https://localhost:3001
 
-3. 发布demo
-`cd demo && npm run build `
-/demo/build 目录下的就是可以运行和部署的版本
-
- 
-## FAQ
-  
-### 1. 如果在npm i的过程中遇到
-
-```
-> phantomjs-prebuilt@2.1.14 install /Users/will/work/my-project/node_modules/phantomjs-prebuilt
-> node install.js
-
-PhantomJS not found on PATH
-Downloading https://github.com/Medium/phantomjs/releases/download/v2.1.1/phantomjs-2.1.1-macosx.zip
-Saving to /var/folders/mh/2ptfthxj2qb49jscj1b0gjsm0000gn/T/phantomjs/phantomjs-2.1.1-macosx.zip
-Receiving...
-
-Error making request.
-Error: connect ETIMEDOUT 54.231.113.227:443
-    at Object.exports._errnoException (util.js:1018:11)
-    at exports._exceptionWithHostPort (util.js:1041:20)
-    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1090:14)
-```
-
-FIX: 这个问题，可以尝试PHANTOMJS_CDNURL=https://npm.taobao.org/mirrors/phantomjs/ npm install --save-dev phantomjs-prebuilt来解决
+## 主要模块介绍
 
 
-### 2. 执行npm start时如果出现
+Demo 中有几大模块
 
-```
-> node scripts/start.js
-
-/Users/wenke/www/web-im/demo/scripts/start.js:23
-const {
-      ^
-
-SyntaxError: Unexpected token {
-    at exports.runInThisContext (vm.js:53:16)
-    at Module._compile (module.js:373:25)
-    at Object.Module._extensions..js (module.js:416:10)
-    at Module.load (module.js:343:32)
-    at Function.Module._load (module.js:300:12)
-    at Function.Module.runMain (module.js:441:10)
-    at startup (node.js:139:18)
-    at node.js:974:3
-```
-FIX: 请检查node版本是否是v6.0+ 
-
-### 3. Redux State 的数据结构如下：
+- components —— 项目中定义的组件
+- config —— SDK 初始化配置
+- containers —— 容器组件，包含 contact, chat, login/regester
+- layout —— chat 部分的布局
+- selectors —— 缓存数据，优化性能
+- utils —— 数据库和工具方法
 
 
-```
-{
-	// ---------------------------------
-	// 响应式断点
-	// ---------------------------------
-	//xs: "480px"
-	//sm: "768px"
- 	//md: "992px"
-	//lg: "1200px"
-	//xl: "1600px"
-	breakpoint: {
-		xs: false,
-		sm: false,
-		md: false,
-		lg: false,
-		xl: false
-	},
-	
-	// ---------------------------------
-	// UI相关
-	// ---------------------------------
-	common: {
-		fetching: false,
-		isGetGroupAlready: true,
-		isGetChatRoomAlready: false,
-		showGroupRequestModal: false   //群主管理加入群消息
-	},
-	
-	// ---------------------------------	
-	// 用户登录信息
-	// ---------------------------------
-	login: {
-		username: 'sunylt',
-		password: null,
-		token: "YWMtZ0m-opwTEeeS-e0Ko59rsU1-S6DcShHjkNXh_7qs2vV",
-		fetching: false,
-		error: false
-		isLogin: true,
-	},
-	
-	// ---------------------------------
-	// 多语言
-	// ---------------------------------
-	i18n: {
-	
-		// 已配置语言
-		translations: {
-			cn: {},
-			us: {},
-		},
-		
-		// 当前语言
-		locale: "cn"
-	},
-	
-	
-	// 注册信息，没进行注册操作为{}
-	register: {
-		username: "123abcdbb",
-		password: "123",
-		fetching: false,
-		registerError: null
-	},
-	
-	// 预留 暂无用
-	contacts: {}
-	
-	// 预留 暂无用
-    im: {}
 
-	// ---------------------------------	
-	// 数据实体
-	// ---------------------------------
-	entities: {
-	    // 好友
-		roster: {
-			byName: {
-				name: { subscription,jid, ask, name, groups }
-				...
-			},
-			names: ['lwz2' ...],
-			// 好友列表在此，因为好友列表来源于roster，息息相关
-			friends: [],
-		},
-		// 群组
-		group: {
-			loadingFailed: <Boolean>,
-			isLoading: <Booleadn>,
-			rightSiderOffset: <Number>, //控制右侧群组管理面板
-			byId: {
-				groupId: {groupid, groupname},
-				....
-			},
-			names: [groupName_#-#_groupId, ....]
-		},
-		// 聊天室
-		chatroom: {
-			byId: {
-				chatId: {chatId, name, owner, affiliations_count}
-				...
-			},
-			names: [chatName_#-#_chatId, ....]
-		},
-		// 陌生人
-		stranger: {
-		},
-		
-		// 群组成员信息
-		groupMember: {
-			groupId: {
-				muted: {byName: {}},//群主可见，禁言列表
-				byName: {
-					name: {name: <String: name>, affiliation: 'member'}
-				},
-				names: [],
-				admins: [],  //群管理员可见
-			},
-			...
-		}
-		
-		// 订阅通知
-		subscribe: {
-			byFrom: {}
-		},
-		
-		// 黑名单列表
-		blacklist: {
-			byName: {}
-			name: []
-		},
-		
-		// 消息
-		message: {
-		
-			// 所有消息
-			byId: {
-				mid: {"type":"chat|groupchat|chatroom|stranger|error", "chatId": <String: chatId>},
-				...
-			}
-			
-			// 单聊消息列表
-			chat: {
-				chatId: [
-                         {message},
-                         ...
-                        ]
-			},
-			
-			// 群组消息列表
-			groupChat: {
-				chatId: [
-                         {message},
-                         ...
-                        ]
-			},
-			
-			// 聊天室消息列表
-			chatroom: {
-				chatId: [
-                         {message},
-                         ...
-                        ]
-			},
-			
-			// 陌生人消息列表
-			stranger: {
-				chatId: [
-                         {message},
-                         ...
-                        ]
-			},
-			
-			// 预留 暂无用
-			extra: {}
-			
-			// 未读消息记录
-			unread: {
-			    // 好友
-				chat: {
-					chatId: <Number: unreadNum>,
-					...
-				},
-				// 群组
-				groupchat: {
-					chatId: <Number: unreadNum>,
-					...
-				},
-				// 聊天室
-				chatroom: {
-					chatId: <Number: unreadNum>,
-					...
-				},
-				// 陌生人
-				stranger: {
-					chatId: <Number: unreadNum>,
-					...
-				}
-			}
-			
-			// 自己发的消息mid跟本地id对照
-			byMid: {
-				messageId: {id: <String: localId>},
-				...
-			},
-		},
-		
-		// 加入群申请
-		groupRequest: {
-			byGid: {}
-		}
-	}
-}
-```
+
+
+
 
 
 

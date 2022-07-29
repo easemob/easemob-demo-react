@@ -74,9 +74,7 @@ if (WebIM.config.isSandBox) {
 //     useCache: true,
 //     maxCache: 3 * 1024 * 1024
 // })
-console.log('%c 这里', 'color:red;font-size: 20px;')
 WebIM.conn = new websdk.connection(options)
-console.log('%c 之后', 'color:red;font-size: 20px;')
 // websdk.debug(true)
 
 
