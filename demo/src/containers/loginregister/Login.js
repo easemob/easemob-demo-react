@@ -78,7 +78,7 @@ const Login = ({
                     {I18N.noaccount}
                     <span onClick={jumpRegister}>{I18N.signUp}</span>
                     {/*<span onClick={jumpServer}>{I18N.serverConfiguration}</span>*/}
-                    <span onClick={jumpServer}>{I18N.findBackPassword}</span>
+                    {/*<span onClick={jumpServer}>{I18N.findBackPassword}</span>*/}
                 </p>
             </div>
         </div>
