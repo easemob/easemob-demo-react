@@ -8,14 +8,16 @@ import { message } from 'antd'
 import { history } from '@/utils'
 import { store } from '@/redux'
 import WebIM from '@/config/WebIM'
+import axios from 'axios'
 /* ------------- Types and Action Creators ------------- */
-
+const domain = 'http://a1.easemob.com'
 const { Types, Creators } = createActions({
 
     jumpLogin: null,
     registerRequest: [ 'username', 'password', 'nickname' ],
     registerSuccess: [ 'username' ],
     registerFailure: [ 'registerError' ],
+    setImageVerifyUrl: [ 'url', 'imageId' ],
     // ------------- async -----------------
 
     register: (username, password, nickname) => {
@@ -51,6 +53,64 @@ const { Types, Creators } = createActions({
             WebIM.conn.registerUser(options)
         }
     },
+
+    // 发短信获取验证码
+    getCaptcha: (phoneNumber, imageCode) => {
+        return (dispatch, getState) => {
+            const imageId = getState().register.imageId
+            axios.post(domain+'/inside/app/sms/send', {
+                phoneNumber,
+                imageId,
+                imageCode
+            })
+            .then(function (response) {
+                message.success('短信已发送')
+            })
+            .catch(function (error) {
+                console.log('error', error.response);
+                if(error.response.status == '400'){
+                    message.error('图片验证码错误')
+                }
+            });
+        }
+    },
+    // 获取图片验证码
+    getImageVerification: () => {
+        return (dispatch, getState) => {
+            axios.get(domain+'/inside/app/image')
+            .then(function (response) {
+            // 处理成功情况
+                const url = domain + '/inside/app/image/' + response.data.data.image_id
+                dispatch(Creators.setImageVerifyUrl(url, response.data.data.image_id))
+                // https://a1.easemob.com/inside/app/image/dd2a51f0-1872-11ed-9d35-17fdda8f1000
+            })
+        }
+    },
+    // 在 appserver 注册用户
+    registerUser: ({userId,userPassword,phoneNumber,smsCode}=options) => {
+        return (dispatch, getState) => {
+            const registerState = getState().register
+            const {imageId, imageCode} = registerState
+            axios.post(domain+'/inside/app/user/register', {
+                userId,
+                userPassword,
+                phoneNumber,
+                smsCode,
+                imageId,
+                imageCode
+            })
+            .then(function (response) {
+                dispatch(Creators.registerSuccess(username))
+                return response
+            })
+            .catch(function (error) {
+                if(error.response.status == '400'){
+                    message.error(error.response.data.errorInfo)
+                }
+                console.log(error.response);
+            });
+        }
+    }
 })
 
 export const RegisterTypes = Types
@@ -58,7 +118,7 @@ export default Creators
 
 /* ------------- Initial State ------------- */
 
-export const INITIAL_STATE = Immutable({})
+export const INITIAL_STATE = Immutable({imageVerifyUrl: '', imageId: '', isSuccess: false})
 
 /* ------------- Reducers ------------- */
 export const jumpLogin = (state) => {
@@ -79,14 +139,16 @@ export const registerSuccess = (state = INITIAL_STATE, { username }) => {
     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
     message.success(username + ', ' + I18N.signUpSuccessfully)
     history.push('/login')
-    return Immutable.merge(state, { fetching: false, registerError: null })
+    return Immutable.merge(state, { fetching: false, registerError: null, isSuccess: true})
 }
 
 export const registerFailure = (state = INITIAL_STATE, { registerError }) => {
-    console.log('registerFailure', registerError)
-    return Immutable.merge(state, { fetching: false, registerError })
+    return Immutable.merge(state, { fetching: false, registerError,  isSuccess: false })
 }
 
+export const setImageVerifyUrl = (state = INITIAL_STATE, { url, imageId }) => {
+    return Immutable.merge(state, { imageVerifyUrl: url, imageId })
+}
 /* ------------- Hookup Reducers To Types ------------- */
 
 export const reducer = createReducer(INITIAL_STATE, {
@@ -95,6 +157,7 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.REGISTER_REQUEST]: registerRequest,
     [Types.REGISTER_SUCCESS]: registerSuccess,
     [Types.REGISTER_FAILURE]: registerFailure,
+    [Types.SET_IMAGE_VERIFY_URL]: setImageVerifyUrl
 })
 
 /* ------------- Selectors ------------- */

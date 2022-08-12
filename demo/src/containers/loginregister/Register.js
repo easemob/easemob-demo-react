@@ -1,35 +1,89 @@
-import React from "react"
+import React, {useEffect, useState} from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { Button, Row, Form, Input } from "antd"
+import { Button, Row, Form, Input, Select, Col } from "antd"
 import { config } from "@/config"
 import styles from "./index.less"
 import RegisterActions from "@/redux/RegisterRedux"
+// import LoginActions from '@/redux/LoginRedux'
 import ServerActions from '@/redux/ServerRedux'
 import WebIM from "@/config/WebIM"
-
+const { Option } = Select;
 const FormItem = Form.Item
 
 const Register = ({
     I18N,
     login,
+    imageVerifyUrl,
     doRegister,
     jumpLogin,
-    jumpServer,
-    form: { getFieldDecorator, validateFieldsAndScroll }
+    getImageVerification,
+    sendSms,
+    registerUser,
+    isSuccess,
+    form: { getFieldDecorator, validateFieldsAndScroll, getFieldValue, validateFields }
 }) => {
-
-
+    let timer
+    let times = 50
+    let [smsBtnText, setSmsBtnText] = useState(I18N.getCaptcha)
     const { loginLoading } = login
-
     function handleOk() {
         validateFieldsAndScroll((errors, values) => {
             if (errors) {
                 return
             }
-            doRegister(values.username, values.password, values.username)
+            registerUser({
+                userId: values.username,
+                userPassword: values.password,
+                phoneNumber: values.phoneNumber,
+                smsCode: values.captcha,
+            })
+            //doRegister(values.username, values.password, values.username)
         })
     }
+
+    const getCaptcha = () => {
+        if(typeof smsBtnText != 'string') return
+        const imageCode = getFieldValue('imageCode')
+        const phoneNumber = getFieldValue('phoneNumber')
+        validateFields(['imageCode', 'phoneNumber'], (errors, values) => {
+            if(errors){
+                return
+            }
+            sendSms(values.phoneNumber, values.imageCode)
+            
+            countDown()
+        });
+    }
+
+    const countDown = () => {
+        timer && clearTimeout(timer)
+        timer = setTimeout(() => {
+            setSmsBtnText(times--)
+            if (times === 0) {
+                times = 50
+                setSmsBtnText(I18N.getCaptcha)
+                return clearTimeout(timer)
+            }
+            countDown()
+        }, 1000)
+    }
+
+    const prefixSelector = getFieldDecorator('prefix', {
+      initialValue: '86',
+    })(
+      <Select style={{ width: 70 }} isSelectOptGroup>
+        <Option value="86">+86</Option>
+      </Select>,
+    );
+
+    if(isSuccess){
+        clearTimeout(timer)
+    }
+
+    useEffect( () => {
+        getImageVerification()
+    }, [])
 
     const logo = WebIM.config.i18n == "cn" ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
@@ -40,6 +94,7 @@ const Register = ({
                     {config.name}
                 </span>
             </div>
+
             <form>
                 <FormItem hasFeedback>
                     {getFieldDecorator("username", {
@@ -72,6 +127,40 @@ const Register = ({
                         />
                     )}
                 </FormItem>
+
+                <Form.Item hasFeedback>
+                  {getFieldDecorator('phoneNumber', {
+                    rules: [{ required: true, message: 'Please input your phone number!' }],
+                  })(<Input addonBefore={prefixSelector} placeholder={I18N.phoneNumber}/>)}
+                </Form.Item>
+                <FormItem>
+                  <Row gutter={8}>
+                    <Col span={16}>
+                      {getFieldDecorator('imageCode', {
+                        rules: [{ required: true, message: 'Please input the captcha you got!' }],
+                      })(<Input placeholder={I18N.imageVerification}/>)}
+                    </Col>
+                    <Col span={8}>
+                      <div className="image-verification">
+                        <img src={imageVerifyUrl} style={{width: '100%', height: '100%'}} onClick={getImageVerification}></img>
+                      </div>
+                    </Col>
+                  </Row>
+                </FormItem>
+
+                <FormItem>
+                  <Row gutter={8}>
+                    <Col span={12}>
+                      {getFieldDecorator('captcha', {
+                        rules: [{ required: true, message: 'Please input the captcha you got!' }],
+                      })(<Input size="default" placeholder={I18N.captcha}/>)}
+                    </Col>
+                    <Col span={12}>
+                      <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
+                    </Col>
+                  </Row>
+                </FormItem>
+
                 {/*<FormItem hasFeedback>
                     {getFieldDecorator("nickname")(
                         <Input
@@ -97,7 +186,6 @@ const Register = ({
                 <p>
                     {I18N.haveaccount}
                     <span onClick={jumpLogin}>{I18N.signIn}</span>
-                    <span onClick={jumpServer}>{I18N.serverConfiguration}</span>
                 </p>
             </div>
         </div>
@@ -112,18 +200,28 @@ Register.propTypes = {
 }
 
 export default connect(
-    ({ i18n, login }) => ({
+    ({ i18n, login, register }) => {
+        return ({
         I18N: i18n.locale && i18n.translations && i18n.translations[i18n.locale] || {},
         login: {
             loginLoading: false
-        }
-    }),
+        },
+        imageVerifyUrl: register.imageVerifyUrl,
+        isSuccess: register.isSuccess
+    })},
     dispatch => ({
         doRegister: (username, password, nickname) =>
             dispatch(RegisterActions.register(username, password, nickname)),
         jumpLogin: () =>
             dispatch(RegisterActions.jumpLogin()),
-        jumpServer: () => 
-            dispatch(ServerActions.jumpServer()),
+        getImageVerification: () => {
+            dispatch(RegisterActions.getImageVerification())
+        },
+        sendSms: (phoneNumber, imageCode) => {
+            dispatch(RegisterActions.getCaptcha(phoneNumber, imageCode))
+        },
+        registerUser: (option) => {
+            dispatch(RegisterActions.registerUser(option))
+        }
     })
 )(Form.create()(Register))

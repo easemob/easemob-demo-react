@@ -22,7 +22,8 @@ body {
     // flex-direction: column;
     // flex: auto;
     // position: relative;
-    overflow: auto;
+    flex: 1;
+    // overflow: auto;
     background: @layout-body-background;
 
     &&-has-sider {
@@ -44,6 +45,9 @@ body {
         height: 100px;
         line-height: @layout-header-height;
         overflow: hidden;
+        position: absolute;
+        top: 0;
+        width: 100%;
     }
 
     &-footer {
@@ -86,7 +90,8 @@ body {
         transition: all .3s @ease-out;
         background: #fff;
         border-right: 1px solid #d6dce0;
-        overflow-y: scroll;
+        overflow-x: hidden;
+        overflow-y: auto;
 
         /* fix firefox can't set width smaller than content on flex item */
         min-width: 0;

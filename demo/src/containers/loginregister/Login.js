@@ -17,6 +17,7 @@ const Login = ({
     doLoginByToken,
     jumpRegister,
     jumpServer,
+    getToken,
     form: { getFieldDecorator, validateFieldsAndScroll }
 }) => {
     const { loginLoading } = login
@@ -26,7 +27,8 @@ const Login = ({
             if (errors) {
                 return
             }
-            console.log(values)
+            getToken(values.username, values.password)
+            return
             if (values.type) {
                 doLoginByToken(values.username, values.password)
             } else {
@@ -35,9 +37,6 @@ const Login = ({
         })
     }
 
-    // const a = {}
-    // const b = a.b.c
-    // console.log(messageList, "---")
 
     const logo = WebIM.config.i18n === 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
@@ -65,7 +64,9 @@ const Login = ({
                         ]
                     })(<Input size="large" type="password" onPressEnter={handleOk} placeholder={I18N.password}/>)}
                 </FormItem>
-                <FormItem hasFeedback>{getFieldDecorator('type')(<Checkbox>{I18N.tokenSignin}</Checkbox>)}</FormItem>
+
+                {/*<FormItem hasFeedback>{getFieldDecorator('type')(<Checkbox>{I18N.tokenSignin}</Checkbox>)}</FormItem>*/}
+
                 <Row>
                     <Button type="primary" size="large" onClick={handleOk} loading={loginLoading}>
                         {I18N.signIn}
@@ -76,7 +77,8 @@ const Login = ({
                 <p>
                     {I18N.noaccount}
                     <span onClick={jumpRegister}>{I18N.signUp}</span>
-                    <span onClick={jumpServer}>{I18N.serverConfiguration}</span>
+                    {/*<span onClick={jumpServer}>{I18N.serverConfiguration}</span>*/}
+                    <span onClick={jumpServer}>{I18N.findBackPassword}</span>
                 </p>
             </div>
         </div>
@@ -100,6 +102,7 @@ export default connect(
         doLogin: (username, password) => dispatch(LoginActions.login(username, password)),
         doLoginByToken: (username, token) => dispatch(LoginActions.loginByToken(username, token)),
         jumpRegister: () => dispatch(LoginActions.jumpRegister()),
-        jumpServer: () => dispatch(ServerActions.jumpServer())
+        jumpServer: () => dispatch(ServerActions.jumpServer()),
+        getToken: (username, password) => dispatch(LoginActions.getToken(username, password)) 
     })
 )(Form.create()(Login))

@@ -28,7 +28,8 @@ var config = {
     /*
      * Application AppKey
      */
-    appkey: appkey || 'easemob-demo#easeim',
+    // easemob-demo#easeim
+    appkey: appkey || 'easemob#easeim',
     /*
      * Application Host
      */

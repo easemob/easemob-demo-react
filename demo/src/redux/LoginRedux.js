@@ -7,10 +7,10 @@ import Cookie from 'js-cookie'
 import { message } from 'antd'
 import { history } from '@/utils'
 import { store } from '@/redux'
-
+import axios from 'axios'
 
 /* ------------- Types and Action Creators ------------- */
-
+const domain = 'http://a1.easemob.com'
 const { Types, Creators } = createActions({
     setLoginToken: [ 'username', 'token' ],
     setLoging: [ 'username', 'password', 'token' ],
@@ -37,11 +37,9 @@ const { Types, Creators } = createActions({
                 success(token) {
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                     message.success(I18N.loginSuccessfully, 1)
-
                     dispatch(Creators.setLoginToken(username, token.access_token))
                     dispatch(Creators.setLoginSuccess(username))
                     window.localStorage.setItem('webImLogout', true)
-
                 },
                 error: e => {
                     dispatch(Creators.stopLoging())
@@ -63,14 +61,10 @@ const { Types, Creators } = createActions({
     loginByToken: (username, token) => {
         return (dispatch, getState) => {
             dispatch(Creators.setLoging(username, null, token))
-
-            // if (WebIM.conn.isOpened()) {
-            //     WebIM.conn.close("logout")
-            // }
             WebIM.conn.open({
                 // apiUrl: WebIM.config.restServer,
                 user: username.trim().toLowerCase(),
-                pwd: token,
+                // pwd: token,
                 accessToken: token,
                 appKey: WebIM.config.appkey
                 // there is no success callback when login by token
@@ -82,7 +76,31 @@ const { Types, Creators } = createActions({
                 dispatch(Creators.setOwnInfo(info))
             })
         }
-    }
+    },
+
+    getToken: (username, password) => {
+        return (dispatch, getState) => {
+            axios.post(domain+'/inside/app/user/login', {
+                userId: username,
+                userPassword: password
+            })
+            .then(function (response) {
+                console.log(response);
+                const {phoneNumber, token} = response.data
+                let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
+                message.success(I18N.loginSuccessfully, 1)
+                dispatch(Creators.setLoginToken(username, token))
+                dispatch(Creators.setLoginSuccess(username))
+                window.localStorage.setItem('webImLogout', true)
+
+                dispatch(Creators.loginByToken(username, token))
+            })
+            .catch(function (error) {
+                console.log(error);
+                dispatch(Creators.stopLoging())
+            });
+        }
+    },
 })
 
 export const LoginTypes = Types

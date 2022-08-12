@@ -99,7 +99,7 @@ class App extends Component {
         // const authorizedComponent = <Layout {...this.props} token={token} />
 
         return (
-            <div>
+            <div className="app-box">
                 <Loading show={false} />
                 <Switch>
                     <Route exact path="/login" component={Login} />
