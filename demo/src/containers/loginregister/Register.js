@@ -8,17 +8,21 @@ import RegisterActions from "@/redux/RegisterRedux"
 // import LoginActions from '@/redux/LoginRedux'
 import ServerActions from '@/redux/ServerRedux'
 import WebIM from "@/config/WebIM"
+import axios from 'axios'
+import { message } from 'antd'
+const domain = window.location.protocol+'//a1.easemob.com'
+
 const { Option } = Select;
 const FormItem = Form.Item
 
 const Register = ({
     I18N,
     login,
+    imageId,
     imageVerifyUrl,
     doRegister,
     jumpLogin,
     getImageVerification,
-    sendSms,
     registerUser,
     isSuccess,
     form: { getFieldDecorator, validateFieldsAndScroll, getFieldValue, validateFields }
@@ -51,8 +55,25 @@ const Register = ({
                 return
             }
             sendSms(values.phoneNumber, values.imageCode)
-            
+
+        });
+    }
+
+    const sendSms = (phoneNumber, imageCode) => {
+        axios.post(domain+'/inside/app/sms/send', {
+            phoneNumber,
+            imageId,
+            imageCode
+        })
+        .then((response) => {
+            message.success('短信已发送')
             countDown()
+        })
+        .catch(function (error) {
+            console.log('error', error.response);
+            if(error.response.status == '400'){
+                message.error(error.response.data.errorInfo)
+            }
         });
     }
 
@@ -207,7 +228,8 @@ export default connect(
             loginLoading: false
         },
         imageVerifyUrl: register.imageVerifyUrl,
-        isSuccess: register.isSuccess
+        isSuccess: register.isSuccess,
+        imageId: register.imageId
     })},
     dispatch => ({
         doRegister: (username, password, nickname) =>
@@ -216,9 +238,6 @@ export default connect(
             dispatch(RegisterActions.jumpLogin()),
         getImageVerification: () => {
             dispatch(RegisterActions.getImageVerification())
-        },
-        sendSms: (phoneNumber, imageCode) => {
-            dispatch(RegisterActions.getCaptcha(phoneNumber, imageCode))
         },
         registerUser: (option) => {
             dispatch(RegisterActions.registerUser(option))

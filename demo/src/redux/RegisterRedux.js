@@ -54,26 +54,6 @@ const { Types, Creators } = createActions({
         }
     },
 
-    // 发短信获取验证码
-    getCaptcha: (phoneNumber, imageCode) => {
-        return (dispatch, getState) => {
-            const imageId = getState().register.imageId
-            axios.post(domain+'/inside/app/sms/send', {
-                phoneNumber,
-                imageId,
-                imageCode
-            })
-            .then(function (response) {
-                message.success('短信已发送')
-            })
-            .catch(function (error) {
-                console.log('error', error.response);
-                if(error.response.status == '400'){
-                    message.error('图片验证码错误')
-                }
-            });
-        }
-    },
     // 获取图片验证码
     getImageVerification: () => {
         return (dispatch, getState) => {
@@ -83,6 +63,9 @@ const { Types, Creators } = createActions({
                 const url = domain + '/inside/app/image/' + response.data.data.image_id
                 dispatch(Creators.setImageVerifyUrl(url, response.data.data.image_id))
                 // https://a1.easemob.com/inside/app/image/dd2a51f0-1872-11ed-9d35-17fdda8f1000
+            })
+            .catch(() => {
+                message.error('获取图片验证码失败，请刷新重试！')
             })
         }
     },
