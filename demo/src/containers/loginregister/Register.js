@@ -55,7 +55,6 @@ const Register = ({
                 return
             }
             sendSms(values.phoneNumber, values.imageCode)
-
         });
     }
 
@@ -73,6 +72,7 @@ const Register = ({
             console.log('error', error.response);
             if(error.response.status == '400'){
                 message.error(error.response.data.errorInfo)
+                getImageVerification()
             }
         });
     }
