@@ -38,7 +38,6 @@
     "@testing-library/user-event": "^7.1.2",
     "@typescript-eslint/eslint-plugin": "^2.10.0",
     "@typescript-eslint/parser": "^2.10.0",
-    "agora-chat-sdk": "^4.0.0",
     "agora-rtc-sdk-ng": "^4.2.1",
     "ansi-styles": "^3.2.0",
     "autoprefixer": "7.1.1",
