@@ -737,7 +737,8 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
             messages.splice(index,0,{
                 body: {
                     type: 'txt',
-                    msg: recallMsg
+                    msg: recallMsg,
+                    isRecall:true,
                 },
                 time: found.getIn([ 'time' ]),
                 from: found.getIn([ 'from' ]),
@@ -750,8 +751,12 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
                 type: 'chat',
                 bySelf: bySelf
             })
-        }else{
-            let message = found.setIn([ 'body', 'msg' ], recallMsg)
+        } else {
+            let message = found.setIn([ 'body' ], {
+                ...found.getIn([ 'body']),
+                msg: recallMsg,
+                isRecall:true
+            })
             // message = found.setIn([ "status",], 'read')
             //console.log('删除了这条消息',message)
             messages.splice(messages.indexOf(found), 1, message)
