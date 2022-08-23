@@ -110,7 +110,9 @@ class HeaderOps extends Component {
         const tabsLeft = [
             [ '2', `音视频会议设置`, 'video-camera'],
             [ '0', `${I18n.t('friends')}${I18n.t('blacklist')}`, 'minus-circle-o' ],
-            [ '1', `${I18n.t('quit')}(${title})`, 'logout' ]
+            [ '1', `${I18n.t('quit')}(${title})`, 'logout' ],
+            [ '3', `意见反馈`, 'mail' ]
+
         ]
 
         const tabsRight = [
@@ -119,13 +121,28 @@ class HeaderOps extends Component {
             [ '2', I18n.t('createGroup'), 'usergroup-add' ]
         ]
 
-        const tabsLeftItem = tabsLeft.map(([ key, name, icon ]) =>
-            <Menu.Item key={key}>
-                <span>
-                    <Icon type={icon} /> <span>{name}</span>
-                </span>
-            </Menu.Item>
-        )
+        const tabsLeftItem = tabsLeft.map(([key, name, icon])=>{
+            if(key==='3'){
+                return   (
+                    <Menu.Item key={key}>
+                        <a  href="mailto:yunying@easemob.com">
+                            <span>
+                                <Icon type={icon} style={{fontSize:'12px', marginRight:"8px"}}/> <span>{name}</span>
+                            </span>
+                        </a>
+                    </Menu.Item>
+                )
+            } else {
+                return(
+                    <Menu.Item key={key}>
+                        <span>
+                            <Icon type={icon} /> <span>{name}</span>
+                        </span>
+                    </Menu.Item>
+                )    
+            }
+          
+        })
 
         const tabsRightItem = tabsRight.map(([ key, name, icon ]) =>
             <Menu.Item key={key}>
