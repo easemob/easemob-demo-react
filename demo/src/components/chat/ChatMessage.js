@@ -84,22 +84,27 @@ export default class ChatMessage extends Component {
         this.props.onClickIdCard(data)
     }
 
+
     render() {
         const { bySelf, from, time, body, status, toJid, fromNick} = this.props
         const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
         const localFormat = renderTime(time)
         let useDropdown = true
-        if (body.msg == '消息已撤回' || !bySelf) {
+        if (body.isRecall) {
             useDropdown = false
         }
         let content = null
-        const menu = (
+        const menu = bySelf? (
             <Menu onClick={this.oncontextmenu(toJid)}>
                 <Menu.Item>
                     撤回
                 </Menu.Item>
             </Menu>
-        )
+        ): <Menu onClick={this.oncontextmenu(toJid)}>
+                <Menu.Item>
+                    举报
+                </Menu.Item>
+            </Menu>
         switch (body.type) {
         case 'txt':
             content = useDropdown ? (
