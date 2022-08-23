@@ -68,6 +68,7 @@ const ResetPassword = ({
             message.error("用户ID和手机号不匹配");
             break;
           default:
+            message.error("用户信息校验失败，请重试！")
             break;
         }
       });
