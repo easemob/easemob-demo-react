@@ -51,6 +51,7 @@ const rootReducer = combineReducers({
     common: require('./CommonRedux').reducer,
     login: require('./LoginRedux').reducer,
     register: require('./RegisterRedux').reducer,
+    resetpassword: require('./ResetPasswordRedux').reducer,
     server: require('./ServerRedux').reducer,
     i18n: i18nReducer,
     contacts: require('./ContactsScreenRedux').reducer,

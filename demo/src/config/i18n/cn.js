@@ -136,4 +136,8 @@ export const cn = {
     restServerAddress: 'REST服务器地址',
     settingSuccess: '保存成功',
     againstFraudTips: '本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！',
+    newPassword: '新密码',
+    confirmPassword: '确认密码',
+    complete: '完成',
+
 }
