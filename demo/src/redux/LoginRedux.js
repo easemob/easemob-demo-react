@@ -96,7 +96,17 @@ const { Types, Creators } = createActions({
                 dispatch(Creators.loginByToken(username, token))
             })
             .catch(function (error) {
-                console.log(error);
+                switch (error.response.data.errorInfo) {
+                    case "UserId password error.":
+                        message.error('用户名或密码错误！')
+                        break;
+                        case `UserId ${username} does not exist.`:
+                            message.error('登录用户不存在')
+                        break;
+                    default:
+                        message.error('登录失败，请重试！')
+                        break;
+                }
                 dispatch(Creators.stopLoging())
             });
         }
