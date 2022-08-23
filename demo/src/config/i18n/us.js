@@ -134,4 +134,7 @@ export const us = {
     restServerAddress: 'REST Server Address',
     settingSuccess: 'Setting Success',
     againstFraudTips: 'This application is only used for function development and testing of Huanxin products. Please do not use it for illegal purposes. Any involved in transfer, remittance, naked chat, online love, online shopping refund, investment and financial management are all fraud, do not believe!',
+    newPassword: 'new password',
+    confirmPassword: 'confirm password',
+    complete: 'Complete',
 }
