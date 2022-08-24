@@ -195,25 +195,6 @@ const ResetPassword = ({
           </Form.Item>
           <FormItem>
             <Row gutter={8}>
-              <Col span={12}>
-                {getFieldDecorator("captcha", {
-                  rules: [
-                    {
-                      required: true,
-                      message: "Please input the captcha you got!"
-                    }
-                  ]
-                })(<Input size="default" placeholder={I18N.captcha} />)}
-              </Col>
-              <Col span={12}>
-                <Button size="large" onClick={getCaptcha}>
-                  {smsBtnText}
-                </Button>
-              </Col>
-            </Row>
-          </FormItem>
-          <FormItem>
-            <Row gutter={8}>
               <Col span={16}>
                 {getFieldDecorator("imageCode", {
                   rules: [
@@ -232,6 +213,25 @@ const ResetPassword = ({
                     onClick={getImageVerification}
                   ></img>
                 </div>
+              </Col>
+            </Row>
+          </FormItem>
+          <FormItem>
+            <Row gutter={8}>
+              <Col span={12}>
+                {getFieldDecorator("captcha", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "Please input the captcha you got!"
+                    }
+                  ]
+                })(<Input size="default" placeholder={I18N.captcha} />)}
+              </Col>
+              <Col span={12}>
+                <Button size="large" onClick={getCaptcha}>
+                  {smsBtnText}
+                </Button>
               </Col>
             </Row>
           </FormItem>
