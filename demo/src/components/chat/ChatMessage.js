@@ -91,6 +91,7 @@ export default class ChatMessage extends Component {
     // 举报消息
     reportMsg = ()=>{
         const reason = this.state.reportReason
+        let self = this
         if(reason){
             Modal.confirm({
                 title: '确认举报该消息吗？',
@@ -103,8 +104,10 @@ export default class ChatMessage extends Component {
                         messageId: reportMsgId
                     }).then(()=>{
                         message.success('举报成功')
+                        self.setState({reportMsgVisible: false})
                     }).catch(()=>{
                         message.error('举报失败')
+                        self.setState({reportMsgVisible: false})
                     })
                 },
             })
