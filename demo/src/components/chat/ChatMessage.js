@@ -2,14 +2,45 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { I18n } from 'react-redux-i18n'
-import { Menu, Dropdown, Card, Tag, message, Modal,Input, Avatar } from 'antd'
+import { Menu, Dropdown, Card, Tag, message, Modal,Input, Avatar, Select } from 'antd'
 import { renderTime, deepGet } from '@/utils'
 import emoji from '@/config/emoji'
 import Audio from '@/components/chat/Audio'
 import WebIM from '@/config/WebIM'
 const defaultAvatar = 'https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/Image1.png'
 const { TextArea } = Input
+const { Option } = Select
 let reportMsgId = ''
+const ReportType = [
+    {
+      key: "1",
+      value: "涉政"
+    },
+    {
+      key: "2",
+      value: "涉黄"
+    },
+    {
+      key: "3",
+      value: "广告"
+    },
+    {
+      key: "4",
+      value: "辱骂"
+    },
+    {
+      key: "5",
+      value: "暴恐"
+    },
+    {
+        key: "6",
+        value: "违禁"
+    },
+    {
+        key: "7",
+        value: "其他"
+    }
+  ];
 export default class ChatMessage extends Component {
     static propTypes = {
         bySelf: PropTypes.any,
@@ -23,7 +54,7 @@ export default class ChatMessage extends Component {
         ok: PropTypes.func,
         type: PropTypes.any,
     }
-    state = { showImgModal: false, reportMsgVisible: false, reportReason: '' }
+    state = { showImgModal: false, reportMsgVisible: false, reportReason: '', reportType: '涉政' }
 
     renderTxt = txt => {
         if (txt === undefined) {return []}
@@ -99,7 +130,7 @@ export default class ChatMessage extends Component {
                 cancelText:'取消',
                 onOk() {
                     WebIM.conn.reportMessage({
-                        reportType: 'UserReport', // 用户主动上报。
+                        reportType: self.state.reportType,// 举报类型
                         reportReason: reason, // 举报原因。
                         messageId: reportMsgId
                     }).then(()=>{
@@ -341,6 +372,14 @@ export default class ChatMessage extends Component {
                     this.reportMsg()
                 }}
             >   
+                <p>请选择举报类型：</p>
+                <Select style={{width: '100%', marginBottom: "10px"}} onSelect={(e)=>{this.setState({ reportType: e})}} value={this.state.reportType}>
+                    {
+                        ReportType.map((item)=>{ 
+                            return <Option key={item.value}>{item.value}</Option>
+                        })
+                    }
+                </Select>
                 <p>请输入举报原因：</p>
                 <TextArea 
                     value={this.state.reportReason}
