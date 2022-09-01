@@ -44,6 +44,7 @@ var config = {
     * 公有云配置默认为 true，
     * 私有云配置请设置 isHttpDNS = false , 详细文档：http://docs-im.easemob.com/im/web/other/privatedeploy
     */
+
     isHttpDNS: rest.imServer && rest.restServer ? false : true,
     /*
      * isMultiLoginSessions
@@ -96,7 +97,7 @@ var config = {
      * sender, in order to tell the sender the message has delivered.
      * See call back function onReceivedMessage
      */
-    delivery: true,
+    delivery: false,
     /**
      * Size of message cache for group chating like group, chatroom etc. For use in this demo
      */

@@ -2,12 +2,45 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { I18n } from 'react-redux-i18n'
-import { Menu, Dropdown, Card, Tag, message, Modal, Avatar } from 'antd'
+import { Menu, Dropdown, Card, Tag, message, Modal,Input, Avatar, Select } from 'antd'
 import { renderTime, deepGet } from '@/utils'
 import emoji from '@/config/emoji'
 import Audio from '@/components/chat/Audio'
 import WebIM from '@/config/WebIM'
 const defaultAvatar = 'https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/Image1.png'
+const { TextArea } = Input
+const { Option } = Select
+let reportMsgId = ''
+const ReportType = [
+    {
+      key: "1",
+      value: "涉政"
+    },
+    {
+      key: "2",
+      value: "涉黄"
+    },
+    {
+      key: "3",
+      value: "广告"
+    },
+    {
+      key: "4",
+      value: "辱骂"
+    },
+    {
+      key: "5",
+      value: "暴恐"
+    },
+    {
+        key: "6",
+        value: "违禁"
+    },
+    {
+        key: "7",
+        value: "其他"
+    }
+  ];
 export default class ChatMessage extends Component {
     static propTypes = {
         bySelf: PropTypes.any,
@@ -21,10 +54,10 @@ export default class ChatMessage extends Component {
         ok: PropTypes.func,
         type: PropTypes.any,
     }
-    state = { showImgModal: false }
+    state = { showImgModal: false, reportMsgVisible: false, reportReason: '', reportType: '涉政' }
 
     renderTxt = txt => {
-        if (txt == undefined) {return []}
+        if (txt === undefined) {return []}
         let rnTxt = []
         let match = null
         const regex = /(\[.*?\])/g
@@ -62,6 +95,9 @@ export default class ChatMessage extends Component {
         this.setState({ showImgModal: false })
     }
 
+    onReportReasonChange = ({ target: { value } }) => {
+        this.setState({ reportReason: value })
+    }
 
     oncontextmenu = (toJid) => () => {
         WebIM.conn.recallMessage({
@@ -83,23 +119,61 @@ export default class ChatMessage extends Component {
         let userId = data.uid
         this.props.onClickIdCard(data)
     }
+    // 举报消息
+    reportMsg = ()=>{
+        const reason = this.state.reportReason
+        let self = this
+        if(reason){
+            Modal.confirm({
+                title: '确认举报该消息吗？',
+                okText:'确认',
+                cancelText:'取消',
+                onOk() {
+                    WebIM.conn.reportMessage({
+                        reportType: self.state.reportType,// 举报类型
+                        reportReason: reason, // 举报原因。
+                        messageId: reportMsgId
+                    }).then(()=>{
+                        message.success('举报成功')
+                        self.setState({reportMsgVisible: false})
+                    }).catch(()=>{
+                        message.error('举报失败')
+                        self.setState({reportMsgVisible: false})
+                    })
+                },
+            })
+          
+        } else {
+            message.info('请填写举报原因！')
+        }
+       
+    }
+
 
     render() {
-        const { bySelf, from, time, body, status, toJid, fromNick} = this.props
+        const { bySelf, from, time, body, status, toJid, fromNick, id } = this.props
         const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
         const localFormat = renderTime(time)
         let useDropdown = true
-        if (body.msg == '消息已撤回' || !bySelf) {
+        if (body.isRecall) {
             useDropdown = false
         }
         let content = null
-        const menu = (
+        const menu = bySelf? (
             <Menu onClick={this.oncontextmenu(toJid)}>
                 <Menu.Item>
                     撤回
                 </Menu.Item>
             </Menu>
-        )
+        ): <Menu onClick={()=>{
+            // 服务器消息id
+            reportMsgId = id
+            this.setState({ reportMsgVisible: true })
+        }}>
+            <Menu.Item>
+                    举报
+            </Menu.Item>
+        </Menu>
         switch (body.type) {
         case 'txt':
             content = useDropdown ? (
@@ -210,7 +284,7 @@ export default class ChatMessage extends Component {
         case 'audio':
             content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                    <div className="x-message-audio" style={bySelf&&{display:'inline-block'}}>
+                    <div className="x-message-audio" style={bySelf&&{ display:'inline-block' }}>
                         <Audio url={body.url} length={body.length} />
                     </div>
                 </Dropdown>
@@ -222,16 +296,16 @@ export default class ChatMessage extends Component {
             break
         case 'custom':
             content = useDropdown ? (
-                <div className={classNames("x-message-idCard", bySelf ? 'x-message-idCard-right' : '')} data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
+                <div className={classNames('x-message-idCard', bySelf ? 'x-message-idCard-right' : '')} data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
                     <div>
-                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar||defaultAvatar}></Avatar>
+                        <Avatar style={{ width:'100%', height:'100%' }} src={body.customExts.avatar||defaultAvatar}></Avatar>
                     </div>
                     <div>{body.customExts.nickname||body.customExts.uid}</div>
                 </div>
             ):(
                 <div className="x-message-idCard" data={body.customExts} onClick={this.handleIdCardClick.bind(this,body.customExts)}>
                     <div>
-                        <Avatar style={{width:'100%', height:'100%'}} src={body.customExts.avatar||defaultAvatar}></Avatar>
+                        <Avatar style={{ width:'100%', height:'100%' }} src={body.customExts.avatar||defaultAvatar}></Avatar>
                     </div>
                     <div>{body.customExts.nickname||body.customExts.uid}</div>
                 </div>
@@ -285,6 +359,33 @@ export default class ChatMessage extends Component {
                 <img
                     src={body.url}
                     style={{ maxWidth:'100%' }} />
+            </Modal>
+
+            <Modal
+                title="消息举报"
+                visible={this.state.reportMsgVisible}
+                onCancel={()=>{reportMsgId = '';this.setState({ reportMsgVisible: false })}}
+                destroyOnClose={true}
+                okText="确认"
+                cancelText="取消"
+                onOk = {()=>{
+                    this.reportMsg()
+                }}
+            >   
+                <p>请选择举报类型：</p>
+                <Select style={{width: '100%', marginBottom: "10px"}} onSelect={(e)=>{this.setState({ reportType: e})}} value={this.state.reportType}>
+                    {
+                        ReportType.map((item)=>{ 
+                            return <Option key={item.value}>{item.value}</Option>
+                        })
+                    }
+                </Select>
+                <p>请输入举报原因：</p>
+                <TextArea 
+                    value={this.state.reportReason}
+                    onChange={this.onReportReasonChange}
+                    placeholder="请输入举报原因"
+                    autoSize={{ minRows: 3, maxRows: 5 }}/>
             </Modal>
         </div>
     }

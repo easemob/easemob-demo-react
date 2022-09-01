@@ -15,6 +15,7 @@ import Chat from '@/containers/chat/Chat'
 import ChinaMobile from '@/containers/chinamobile/Chinamobile'
 import Register from '@/containers/loginregister/Register'
 import Server from '@/containers/loginregister/Server'
+import ResetPassword from '@/containers/loginregister/ResetPassword'
 import LoginActions from '@/redux/LoginRedux'
 import Loading from '@/components/common/LoadingComponent'
 import { store } from '@/redux'
@@ -105,6 +106,7 @@ class App extends Component {
                     <Route exact path="/login" component={Login} />
                     <Route exact path="/register" component={Register} />
                     <Route exact path="/server" component={Server} />
+                    <Route exact path="/resetpassword" component={ResetPassword} />
                     <Route path="/cnm" component={ChinaMobile} />
                     {/* <Route path="/" children={authorizedComponent} /> */}
                     {/* <Route path="/" component={AuthorizedComponent} /> */}
