@@ -274,8 +274,7 @@ WebIM.conn.listen({
     },
     
     // 好友相关回调
-    onContactInvited: (msg) => {debugger
-        console.log('onContactInvited', msg)},
+    onContactInvited: (msg) => {console.log('onContactInvited', msg)},
     onContactDeleted: (msg) => {console.log('onContactDeleted', msg)},
     onContactAdded: (msg) => {console.log('onContactAdded', msg)},
     onContactRefuse: (msg) => {console.log('onContactRefuse', msg)},
