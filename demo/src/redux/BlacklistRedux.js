@@ -13,7 +13,9 @@ const { Types, Creators } = createActions({
     // update black list
     getBlacklist: () => {
         return (dispatch, getState) => {
-            WebIM.conn.getBlacklist()
+            WebIM.conn.getBlocklist().then(res=>{
+                dispatch(Creators.updateBlacklist(res.data))
+            })
         }
     },
     // add to black list

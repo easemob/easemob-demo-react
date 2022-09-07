@@ -110,14 +110,14 @@ WebIM.conn.listen({
                 var truthBeTold = window.confirm((message.from + "申请添加您为好友:"));
                 if (truthBeTold) {
                     // 同意对方添加好友
-                    WebIM.conn.subscribed({
+                    WebIM.conn.acceptContactInvite({
                         to: message.from,
                         message: "[resp:true]"
                     });
                     console.log("同意添加好友");
                 } else {
                     // 拒绝对方添加好友
-                    WebIM.conn.unsubscribed({
+                    WebIM.conn.declineContactInvite({
                         to: message.from,
                         message: "rejectAddFriend" // 拒绝添加好友回复信息
                     });
@@ -178,14 +178,6 @@ WebIM.conn.listen({
                 break;
         }
     },       //处理“广播”或“发布-订阅”消息，如联系人订阅请求、处理群组、聊天室被踢解散等消息
-    onRoster: function (message) {
-        for (var i = 0, l = message.length; i < l; i++) {
-            var ros = message[i];
-            if (ros.subscription === 'both' || ros.subscription === 'to') {
-                console.log(ros.name)
-            }
-        }
-    },         //处理好友申请
     onInviteMessage: function (message) {
         console.log('Invite');
     },  //处理群组邀请
@@ -198,10 +190,6 @@ WebIM.conn.listen({
     onError: function (message) {
         console.log('onError: ', message);
 
-    },          //失败回调
-    onBlacklistUpdate: function (list) {       //黑名单变动
-        // 查询黑名单，将好友拉黑，将好友从黑名单移除都会回调这个函数，list则是黑名单现有的所有好友信息
-        console.log(list);
     },
     onReceivedMessage: function (message) {
         console.log('onReceivedMessage: ', message);
@@ -212,9 +200,6 @@ WebIM.conn.listen({
     onReadMessage: function (message) {
         console.log('onReadMessage: ', message);
     },        //收到消息已读回执
-    onCreateGroup: function (message) {
-        console.log('onCreateGroup: ', message);
-    },        //创建群组成功回执（需调用createGroupNew）
     onMutedMessage: function (message) {
         console.log('onMutedMessage: ', message);
     }         //如果用户在A群组被禁言，在A群发消息会走这个回调并且消息不会传递给群其它成员

@@ -16,7 +16,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(Creators.removeSubscribe(name))
 
-            WebIM.conn.subscribed({
+            WebIM.conn.acceptContactInvite({
                 to: name,
                 message: '[resp:true]'
             })
@@ -28,7 +28,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             dispatch(Creators.removeSubscribe(name))
 
-            WebIM.conn.unsubscribed({
+            WebIM.conn.declineContactInvite({
                 to: name,
                 message: new Date().toLocaleString()
             })

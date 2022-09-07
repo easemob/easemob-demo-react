@@ -17,7 +17,7 @@ const { Types, Creators } = createActions({
     getContacts: () => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
-            WebIM.conn.getRoster({
+            WebIM.conn.getContacts({
                 success: async(roster) => {
                     console.log('roster', roster)
                     try{
@@ -48,7 +48,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             //loading
             dispatch(CommonActions.fetching())
-            WebIM.conn.removeRoster({
+            WebIM.conn.deleteContact({
                 to: id,
                 success: function() {
                     //loading end
@@ -70,7 +70,7 @@ const { Types, Creators } = createActions({
     addContact: id => {
         return (dispatch, getState) => {
             const u = getState().login.username
-            WebIM.conn.subscribe({
+            WebIM.conn.addContact({
                 to: id,
                 message: u + I18n.t('request')
             })
