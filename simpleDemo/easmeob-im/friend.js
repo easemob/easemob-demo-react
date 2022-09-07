@@ -2,7 +2,7 @@
 $(function () {
     //获取好友
     $('#getRoasters').click(function () {
-        WebIM.conn.getRoster({
+        WebIM.conn.getContacts({
             success: function (res) {
                 console.log('获取好友')
             }
@@ -10,7 +10,7 @@ $(function () {
     })
     //添加好友
     $("#addRoster").click(function () {
-        WebIM.conn.subscribe({
+        WebIM.conn.addContact({
             to: toID,
             message: '加个好友呗!'
         });
@@ -18,14 +18,14 @@ $(function () {
     })
     //删除好友
     $('#removeRoster').click(function () {
-        WebIM.conn.removeRoster({
+        WebIM.conn.deleteContact({
             to: toID
         });
         $('#toName').val('');
     })
     //获取黑名单列表
     $('#getBlackList').click(function () {
-        WebIM.conn.getBlacklist();
+        WebIM.conn.getBlocklist();
     })
     //将好友加入黑名单
     $('#addBlackList').click(function () {

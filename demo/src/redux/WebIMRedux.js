@@ -274,16 +274,14 @@ WebIM.conn.listen({
     },
     
     // 好友相关回调
-    onContactInvited: (msg) => {console.log('onContactInvited', msg)},
+    onContactInvited: (msg) => {debugger
+        console.log('onContactInvited', msg)},
     onContactDeleted: (msg) => {console.log('onContactDeleted', msg)},
     onContactAdded: (msg) => {console.log('onContactAdded', msg)},
     onContactRefuse: (msg) => {console.log('onContactRefuse', msg)},
     onContactAgreed: (msg) => {console.log('onContactAgreed', msg)},
 
     // 消息相关回调
-    onBlacklistUpdate: list => {
-        store.dispatch(BlacklistActions.updateBlacklist(list))
-    },
     onReadMessage: message => {
         console.info('onReadMessage', message)
         store.dispatch(MessageActions.updateMessageStatus(message, 'read'))
