@@ -18,7 +18,7 @@ class BlacklistModal extends React.Component {
         const items = blacklist.names.map((name, index) => {
             return (
                 <p key={name} style={{ height: 30 }}>
-                    {name}
+                    {blacklist.byName[name]}
                     <i
                         style={{
                             cursor: 'pointer', 'margin-right': '16px'

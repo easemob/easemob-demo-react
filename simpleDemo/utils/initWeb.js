@@ -110,17 +110,14 @@ WebIM.conn.listen({
                 var truthBeTold = window.confirm((message.from + "申请添加您为好友:"));
                 if (truthBeTold) {
                     // 同意对方添加好友
-                    WebIM.conn.acceptContactInvite({
-                        to: message.from,
-                        message: "[resp:true]"
-                    });
+                    WebIM.conn.acceptContactInvite(message.from)
+
                     console.log("同意添加好友");
                 } else {
                     // 拒绝对方添加好友
-                    WebIM.conn.declineContactInvite({
-                        to: message.from,
-                        message: "rejectAddFriend" // 拒绝添加好友回复信息
-                    });
+                    WebIM.conn.declineContactInvite(
+                     message.from // 拒绝添加好友回复信息
+                    );
                     console.log("拒绝添加好友");
                 }
                 break;
