@@ -148,7 +148,9 @@ export default class ChatMessage extends Component {
         }
        
     }
-
+    handleClick = (e)=>{
+        e.stopPropagation();
+    }
 
     render() {
         const { bySelf, from, time, body, status, toJid, fromNick, id } = this.props
@@ -235,9 +237,9 @@ export default class ChatMessage extends Component {
                                     </p>
                                 </div>
                                 <div className="ant-col-12">
-                                    {/* <a href={body.url} download={body.filename}>
+                                    {!bySelf && <a href={body.url} download={body.filename} onClick={this.handleClick}>
                                         {I18n.t('download')}
-                                    </a> */}
+                                    </a>}
                                 </div>
                             </div>
                         </div>

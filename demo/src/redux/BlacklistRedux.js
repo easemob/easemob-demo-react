@@ -14,7 +14,7 @@ const { Types, Creators } = createActions({
     getBlacklist: () => {
         return (dispatch, getState) => {
             WebIM.conn.getBlocklist().then(res=>{
-                dispatch(Creators.updateBlacklist(res.data))
+                res.data && dispatch(Creators.updateBlacklist(res.data))
             })
         }
     },
@@ -22,44 +22,34 @@ const { Types, Creators } = createActions({
     doAddBlacklist: id => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
+            try{
+                WebIM.conn.addUsersToBlocklist({name:id});
+                let blacklist = getState().entities.blacklist.byName.asMutable()
+                let index = blacklist.findIndex(i=>blacklist[i]==id)
+                if(index>-1) return
+                blacklist.push(id);
+                dispatch(Creators.updateBlacklist(blacklist))
+            }catch(e){
 
-            let blacklist = getState().entities.blacklist.byName.asMutable()
-            let roster = getState().entities.roster.byName
-            if (blacklist[id]) return
-            blacklist[id] = roster[id]
-            WebIM.conn.addToBlackList({
-                // list: blacklist,
-                // type: "jid",
-                name: id,
-                success: function () {
-                    // TODO: add to black list directly , shouldn't  re-pull
-                    dispatch(CommonActions.fetched())
-                },
-                error: function () {
-                    dispatch(CommonActions.fetched())
-                }
-            })
+            }finally{
+                dispatch(CommonActions.fetched())
+            }
         }
     },
     // delete from blacklist
     doRemoveBlacklist: id => {
         return (dispatch, getState) => {
             dispatch(CommonActions.fetching())
-
-            let blacklist = getState().entities.blacklist.byName.asMutable()
-            delete blacklist[id]
-            WebIM.conn.removeFromBlackList({
-                // list: blacklist,
-                // type: "jid",
-                name: id,
-                success: function () {
-                    // TODO: delete from black list directly , shouldn't  re-pull
-                    dispatch(CommonActions.fetched())
-                },
-                error: function () {
-                    dispatch(CommonActions.fetched())
-                }
-            })
+            try{
+                let blacklist = getState().entities.blacklist.byName.asMutable()
+                WebIM.conn.removeUserFromBlackList({name:blacklist[id]})
+                blacklist.splice(id,1)
+                dispatch(Creators.updateBlacklist(blacklist))
+                dispatch(CommonActions.fetched())
+                // delete blacklist[id]
+            }catch(e){
+                dispatch(CommonActions.fetched())
+            }
         }
     }
 })

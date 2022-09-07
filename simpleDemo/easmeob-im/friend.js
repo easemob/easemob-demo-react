@@ -10,17 +10,12 @@ $(function () {
     })
     //添加好友
     $("#addRoster").click(function () {
-        WebIM.conn.addContact({
-            to: toID,
-            message: '加个好友呗!'
-        });
+        WebIM.conn.addContact(toID,u + '加个好友呗!')
         $('toName').val('');
     })
     //删除好友
     $('#removeRoster').click(function () {
-        WebIM.conn.deleteContact({
-            to: toID
-        });
+        WebIM.conn.deleteContact(toID)
         $('#toName').val('');
     })
     //获取黑名单列表

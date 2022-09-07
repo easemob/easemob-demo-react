@@ -48,32 +48,20 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             //loading
             dispatch(CommonActions.fetching())
-            WebIM.conn.deleteContact({
-                to: id,
-                success: function() {
-                    //loading end
-                    dispatch(CommonActions.fetched())
-                    dispatch(Creators.getContacts())
-
-                    // WebIM.conn.unsubscribed({
-                    //     to: id
-                    // })
-                },
-                error: function() {
-                    //TODO ERROR
-                    dispatch(CommonActions.fetched())
-                }
-            })
+            try{
+                WebIM.conn.deleteContact(id)
+                dispatch(CommonActions.fetched())
+                dispatch(Creators.getContacts())
+            }catch(e){
+                dispatch(CommonActions.fetched())
+            }
         }
     },
     // add contact
     addContact: id => {
         return (dispatch, getState) => {
             const u = getState().login.username
-            WebIM.conn.addContact({
-                to: id,
-                message: u + I18n.t('request')
-            })
+            WebIM.conn.addContact(id,u + I18n.t('request'))
         }
     },
 
