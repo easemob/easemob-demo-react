@@ -71,11 +71,10 @@ class Channel extends React.Component{
         }
         const {accessToken, agoraUserId} = await this.props.getRtctoken(params)
 
-
+        this.interval()
        	// let res = this.props.getConfDetail(params)
        	console.log('会议详情', accessToken, agoraUserId)
         const uid = await rtc.client.join(appId, channel, accessToken, agoraUserId);
-
         // 通过麦克风采集的音频创建本地音频轨道对象。
         rtc.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
         
@@ -95,7 +94,6 @@ class Channel extends React.Component{
         }
 
         console.log("publish success! --- ");
-        this.interval()
     }
 	async close(){
 		console.log('click hangup')
