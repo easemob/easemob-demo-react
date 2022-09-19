@@ -55,7 +55,7 @@
     "create-react-class": "^15.6.3",
     "css-loader": "3.4.2",
     "deepcopy": "^0.6.3",
-    "dexie": "^2.0.0-rc.1",
+    "dexie": "^3.2.2",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "easemob-webrtc": "^3.2.2",
