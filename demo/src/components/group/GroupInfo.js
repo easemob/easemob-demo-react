@@ -44,6 +44,15 @@ class GroupInfo extends React.Component {
             showInviteToGroupModal: false
         }
     }
+
+    shouldComponentUpdate(nextProps){
+        if(nextProps.room.groupId != this.props.room.groupId){
+            this.props.newGetGroupInfoAsync(nextProps.room.groupId)
+            return true
+        }
+        return false
+    }
+
     componentDidMount(){
         const { room } = this.props
         let groupId = room.groupId
