@@ -310,11 +310,12 @@ WebIM.conn.listen({
         let bySelf = from == username
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
         let chatId = bySelf || type !== 'chat' ? to : from
-        if (type === 'chat' &&(( _.get(rootState,'entities.roster.byName['+chatId+'].subscription')  === 'none') || !(_.get(rootState,'entities.roster.byName['+chatId+'].subscription')))){
+        if (type === 'chat' && message.from != 'huanhuan' &&
+            (( _.get(rootState,'entities.roster.byName['+chatId+'].subscription')  === 'none') ||
+             !(_.get(rootState,'entities.roster.byName['+chatId+'].subscription')))){
             message.type = 'stranger'
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,'txt'))            
         }
-
 
         store.dispatch(MessageActions.addMessage(message, 'txt'))     
         store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack

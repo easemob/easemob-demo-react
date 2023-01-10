@@ -28,7 +28,7 @@ const { Types, Creators } = createActions({
         return (dispatch, getState) => {
             WebIM.conn.createGroupNew(options).then((res) => {
                 const groupId = res?.data?.groupid
-                const url = `${location.protocol}//a1.easemob.com/inside/app/group/${groupId}?appkey=${encodeURIComponent(WebIM.conn.appKey)}`
+                const url = `${WebIM.config.restServer}/inside/app/group/${groupId}?appkey=${encodeURIComponent(WebIM.conn.appKey)}`
                 axios.post(url).then( (res) => {
                     console.log('report groupid', res)
                 })

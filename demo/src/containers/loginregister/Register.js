@@ -10,7 +10,7 @@ import ServerActions from '@/redux/ServerRedux'
 import WebIM from "@/config/WebIM"
 import axios from 'axios'
 import { message } from 'antd'
-const domain = window.location.protocol+'//a1.easemob.com'
+const domain = WebIM.config.restServer
 
 const { Option } = Select;
 const FormItem = Form.Item

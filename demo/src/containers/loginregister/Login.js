@@ -8,7 +8,7 @@ import LoginActions from '@/redux/LoginRedux'
 import ServerActions from '@/redux/ServerRedux'
 import WebIM from '@/config/WebIM'
 import axios from 'axios'
-const domain = window.location.protocol+'//a1.easemob.com'
+const domain = WebIM.config.restServer
 const FormItem = Form.Item
 
 const Login = ({

@@ -4,7 +4,7 @@ import Immutable from "seamless-immutable";
 import { message } from "antd";
 import axios from "axios";
 /* ------------- Types and Action Creators ------------- */
-const domain = window.location.protocol + "//a1.easemob.com";
+const domain = WebIM.config.restServer
 const { Types, Creators } = createActions({
   setImageVerifyUrl: ["url", "imageId"],
   // ------------- async -----------------  
