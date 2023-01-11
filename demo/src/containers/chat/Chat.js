@@ -406,7 +406,15 @@ class Chat extends React.Component {
         })
         const inviteStatus = 1
         this.props.setCallStatus(inviteStatus)
-
+        let to = selectItem
+        rtc.timer = setTimeout(() => {
+            if (selectTab === 'contact') {
+                this.props.cancelCall(to)
+                this.props.hangup()
+            }else{
+                // 多人不做超时
+            }
+        }, 30000)
     }
 
     handleScroll = (e) => {
