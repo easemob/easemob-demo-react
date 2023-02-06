@@ -46,7 +46,7 @@ class GroupInfo extends React.Component {
     }
 
     componentWillReceiveProps(nextProps){
-        if(nextProps.room.groupId != this.props.room.groupId){
+        if(nextProps.room.groupId != this.props.room.groupId && nextProps.room.groupId){
             this.props.newGetGroupInfoAsync(nextProps.room.groupId)
         }
     }
