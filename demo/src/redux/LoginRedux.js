@@ -80,20 +80,20 @@ const { Types, Creators } = createActions({
 
     getToken: (phoneNumber, smsCode) => {
         return (dispatch, getState) => {
-            axios.post(domain+'/inside/app/user/login/V1', {
+            axios.post(domain+'/inside/app/user/login/V2', {
                 phoneNumber: phoneNumber,
                 smsCode: smsCode
             })
             .then(function (response) {
                 console.log(response);
-                const {token} = response.data
+                const {token, chatUserName} = response.data
                 let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                 message.success(I18N.loginSuccessfully, 1)
-                dispatch(Creators.setLoginToken(phoneNumber, token))
-                dispatch(Creators.setLoginSuccess(phoneNumber))
+                dispatch(Creators.setLoginToken(chatUserName, token))
+                dispatch(Creators.setLoginSuccess(chatUserName))
                 window.localStorage.setItem('webImLogout', true)
 
-                dispatch(Creators.loginByToken(phoneNumber, token))
+                dispatch(Creators.loginByToken(chatUserName, token))
             })
             .catch(function (error) {
                 switch (error.response.data.errorInfo) {
