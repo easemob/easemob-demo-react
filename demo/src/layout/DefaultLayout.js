@@ -268,7 +268,7 @@ class DefaultLayout extends Component {
             this.props.listGroupMemberAsync({ groupId })
             this.props.getMutedAsync(groupId)
             this.props.getGroupAdminAsync(groupId)
-        }
+        }        
     }
 
 

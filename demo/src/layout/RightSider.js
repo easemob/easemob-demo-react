@@ -30,6 +30,7 @@ class RightSider extends React.Component {
             <div>
                 <GroupInfo
                     title={I18n.t('groupInfo')}
+                    roomId={roomId}
                     room={this.props.room}
                     owner="adsf"
                     description="asdf"
