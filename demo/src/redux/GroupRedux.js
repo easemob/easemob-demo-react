@@ -228,14 +228,14 @@ export const newGetGroupInfo = (state, { response }) => {
 };
 
 export const setGroupMemberAttr = (state, { response }) => {
-  const { groupId, attributes } = response;
+  const { groupId, attributes, isDelete } = response;
   let dt = state.groupMemberAttrs || {};
   let groupMembersDt = dt?.[groupId] || {};
 
   return state.merge({
     groupMemberAttrs: {
       ...dt,
-      ...{ [groupId]: { ...groupMembersDt, ...attributes } }
+      ...{ [groupId]: isDelete ? {} : { ...groupMembersDt, ...attributes } }
     }
   });
 };
