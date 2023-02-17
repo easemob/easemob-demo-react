@@ -137,7 +137,7 @@ class GroupMembers extends React.Component {
       const isMuted = _.includes(muted, key);
       return {
         name:
-          groupInfo?.groupMemberAttrs?.[roomId]?.[name]?.nickName ||
+          groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
           info.nickname ||
           val.name,
         key,
@@ -258,7 +258,7 @@ class GroupMembers extends React.Component {
           }
         >
           <span>
-            {groupInfo?.groupMemberAttrs?.[roomId]?.[WebIM.conn.user]?.nickName}
+            {groupInfo?.groupMemberAttrsMap?.[roomId]?.[WebIM.conn.user]?.nickName}
           </span>
           <Modal
             visible={visible}

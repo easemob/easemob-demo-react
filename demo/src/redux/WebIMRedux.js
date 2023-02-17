@@ -110,7 +110,7 @@ WebIM.conn.listen({
             )
             store.dispatch(GroupActions.setGroupMemberAttr({
                 groupId: msg.gid,
-                isDelete: true
+                resetUid: msg.from
             }))
             break
         case 'removedFromGroup':

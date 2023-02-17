@@ -483,7 +483,7 @@ class Chat extends React.Component {
         if(groupId){
             clearTimeout(scrollTimer)
             scrollTimer = setTimeout(()=>{
-                handler(groupId, this.props.entities.group?.groupMemberAttrs)?.then((res)=>{
+                handler(groupId, this.props.entities.group?.groupMemberAttrsMap)?.then((res)=>{
                     this.props.setGroupMemberAttr({groupId, attributes:res.data})
                 })
             }, timeout)
@@ -556,7 +556,7 @@ class Chat extends React.Component {
             if(!from){
                 from = WebIM.conn.user
             }
-          return this.props.entities.group?.groupMemberAttrs?.[groupId]?.[from]?.nickName || userinfos[from]?.info?.nickname || from;
+          return this.props.entities.group?.groupMemberAttrsMap?.[groupId]?.[from]?.nickName || userinfos[from]?.info?.nickname || from;
         }
     };
 

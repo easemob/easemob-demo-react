@@ -47,7 +47,7 @@ const { Types, Creators } = createActions({
                     dispatch(GroupActions.deleteGroup(groupId))
                     dispatch(GroupActions.setGroupMemberAttr({
                         groupId,
-                        isDelete: true
+                        reset: true
                     }))
                     
                     history.push('/group')

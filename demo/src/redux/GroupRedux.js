@@ -139,7 +139,7 @@ const { Types, Creators } = createActions({
   getUserAttrs: (groupId) => {
     return (dispatch, getState) => {
       if (
-        !getState().entities?.group?.groupMemberAttrs?.[groupId]?.[
+        !getState().entities?.group?.groupMemberAttrsMap?.[groupId]?.[
           WebIM.conn.user
         ]
       ) {
@@ -174,7 +174,7 @@ export const INITIAL_STATE = Immutable({
   rightSiderOffset: 0,
   byId: {},
   names: [],
-  groupMemberAttrs: {}
+  groupMemberAttrsMap: {}
 });
 
 /* ------------- Reducers ------------- */
@@ -228,14 +228,24 @@ export const newGetGroupInfo = (state, { response }) => {
 };
 
 export const setGroupMemberAttr = (state, { response }) => {
-  const { groupId, attributes, isDelete } = response;
-  let dt = state.groupMemberAttrs || {};
+  const { groupId, attributes = {}, reset, resetUid } = response;
+  let dt = state.groupMemberAttrsMap || {};
   let groupMembersDt = dt?.[groupId] || {};
 
+  let groupMembersAttr = {
+    [groupId]: reset ? {} : { ...groupMembersDt, ...attributes }
+  };
+
+  if (resetUid) {
+    groupMembersAttr = {
+      [groupId]: { ...groupMembersAttr[groupId], ...{ [resetUid]: {} } }
+    };
+  }
+
   return state.merge({
-    groupMemberAttrs: {
+    groupMemberAttrsMap: {
       ...dt,
-      ...{ [groupId]: isDelete ? {} : { ...groupMembersDt, ...attributes } }
+      ...groupMembersAttr
     }
   });
 };
