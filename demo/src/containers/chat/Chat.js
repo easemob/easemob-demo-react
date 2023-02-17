@@ -318,8 +318,10 @@ class Chat extends React.Component {
         // this.scollBottom()
     }
 
-    componentDidUpdate(props) {
-        // this.scollBottom()
+    componentDidUpdate(prevProps, prevState) {
+        if(prevProps?.entities?.group?.groupMemberAttrsMap === this.props?.entities?.group?.groupMemberAttrsMap){
+            this.scollBottom()
+        }
     }
 
     /**
