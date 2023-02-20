@@ -49,7 +49,7 @@ function isContain(dom) {
 
 var scrollTimer;
 const timeout = 500;
-function handler (groupId, groupMemberAttrs) {
+function getCurrentUids (groupId, groupMemberAttrs) {
     let arr = [];
     let hasAttrUidList = Object.keys(groupMemberAttrs?.[groupId] || {})
     let childrenList = document.getElementsByClassName('x-message-group')
@@ -63,13 +63,7 @@ function handler (groupId, groupMemberAttrs) {
       }  
 
     let uids =  [...new Set(arr)]
-    if(uids.length > 0){
-        return WebIM.conn.getMembersAttributes({
-            groupId,
-            userIdList: uids,
-            keys: []
-        })
-    }
+    return uids
 };
 
 class Chat extends React.Component {
@@ -485,9 +479,22 @@ class Chat extends React.Component {
         if(groupId){
             clearTimeout(scrollTimer)
             scrollTimer = setTimeout(()=>{
-                handler(groupId, this.props.entities.group?.groupMemberAttrsMap)?.then((res)=>{
-                    this.props.setGroupMemberAttr({groupId, attributes:res.data})
-                })
+                let uids = getCurrentUids(groupId, this.props.entities.group?.groupMemberAttrsMap);
+                if(uids.length > 0) {
+                    return WebIM.conn.getGroupMembersAttributes({
+                        groupId,
+                        userIds: uids,
+                        keys: []
+                    }).then((res)=>{
+                        this.props.setGroupMemberAttr({groupId, attributes:res.data})
+                    }).catch((e)=>{
+                        let attrs = {}
+                        uids.forEach((item) => {
+                            attrs[item] =  {nickName: ''}
+                        })
+                        this.props.setGroupMemberAttr({groupId, attributes:attrs})
+                    })
+                }
             }, timeout)
         }  
     }

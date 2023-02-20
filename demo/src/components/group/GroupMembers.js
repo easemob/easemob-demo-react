@@ -88,7 +88,7 @@ class GroupMembers extends React.Component {
       }
     };
     WebIM.conn
-      .setMemberAttributes(opt)
+      .setGroupMemberAttributes(opt)
       .then((res) => {
         message.success("修改我的群昵称成功");
         this.props.setGroupMemberAttr({
@@ -101,6 +101,7 @@ class GroupMembers extends React.Component {
         });
       })
       .catch((e) => {
+        console.log(e, 'e')
         message.error("修改我的群昵称失败");
       });
   };

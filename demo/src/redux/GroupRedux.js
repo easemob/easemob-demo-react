@@ -24,6 +24,8 @@ const { Types, Creators } = createActions({
   topGroup: ["groupId"],
   newGetGroupInfo: ["response"],
   setGroupMemberAttr: ["response"],
+  removeGroupAllMemberAttr: ["response"],
+  removeGroupMemberAttr: ["response"],
 
   // ---------------async------------------
   createGroups: (options) => {
@@ -144,7 +146,7 @@ const { Types, Creators } = createActions({
         ]
       ) {
         WebIM.conn
-          .getMemberAttributes({
+          .getGroupMemberAttributes({
             userId: WebIM.conn.user,
             groupId: groupId
           })
@@ -249,6 +251,40 @@ export const setGroupMemberAttr = (state, { response }) => {
     }
   });
 };
+
+export const removeGroupAllMemberAttr = (state, { response }) => {
+  const { groupId } = response;
+  let dt = state.groupMemberAttrsMap || {};
+
+  let groupMembersAttr = {
+    [groupId]: {}
+  };
+
+  return state.merge({
+    groupMemberAttrsMap: {
+      ...dt,
+      ...groupMembersAttr
+    }
+  });
+}
+
+export const removeGroupMemberAttr = (state, { response }) => {
+  const { groupId , uid } = response;
+  let dt = state.groupMemberAttrsMap || {};
+
+  if (resetUid) {
+    groupMembersAttr = {
+      [groupId]: { ...groupMembersAttr[groupId], ...{ [uid]: {} } }
+    };
+  }
+
+  return state.merge({
+    groupMemberAttrsMap: {
+      ...dt,
+      ...groupMembersAttr
+    }
+  });
+}
 
 /**
  *

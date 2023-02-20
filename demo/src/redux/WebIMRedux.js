@@ -108,9 +108,9 @@ WebIM.conn.listen({
             message.error(
                 `${msg.from}${I18n.t('LeaveGroup')}${msg.gid}.`
             )
-            store.dispatch(GroupActions.setGroupMemberAttr({
+            store.dispatch(GroupActions.removeGroupMemberAttr({
                 groupId: msg.gid,
-                resetUid: msg.from
+                uid: msg.from
             }))
             break
         case 'removedFromGroup':

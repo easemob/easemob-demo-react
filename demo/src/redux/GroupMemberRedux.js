@@ -45,9 +45,8 @@ const { Types, Creators } = createActions({
                     dispatch(GroupActions.switchRightSider({ rightSiderOffset: 0 }))
                     dispatch(Creators.operateGroupMember(groupId, username, 'del'))
                     dispatch(GroupActions.deleteGroup(groupId))
-                    dispatch(GroupActions.setGroupMemberAttr({
-                        groupId,
-                        reset: true
+                    dispatch(GroupActions.removeGroupAllMemberAttr({
+                        groupId
                     }))
                     
                     history.push('/group')
