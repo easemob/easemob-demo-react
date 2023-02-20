@@ -351,6 +351,7 @@ class Chat extends React.Component {
         const inviteStatus = 1
         this.props.setCallStatus(inviteStatus)
         let to = selectItem
+        rtc.timer && clearTimeout(rtc.timer)
         rtc.timer = setTimeout(() => {
             if (selectTab === 'contact') {
                 this.props.cancelCall(to)
@@ -406,7 +407,16 @@ class Chat extends React.Component {
         })
         const inviteStatus = 1
         this.props.setCallStatus(inviteStatus)
-
+        let to = selectItem
+        rtc.timer && clearTimeout(rtc.timer)
+        rtc.timer = setTimeout(() => {
+            if (selectTab === 'contact') {
+                this.props.cancelCall(to)
+                this.props.hangup()
+            }else{
+                // 多人不做超时
+            }
+        }, 30000)
     }
 
     handleScroll = (e) => {
@@ -503,7 +513,8 @@ class Chat extends React.Component {
             messageList,
             messageListByMid,
             confrModal,
-            inviteModal
+            inviteModal,
+            entities
         } = this.props
         const { selectItem, selectTab } = match.params
         
@@ -516,6 +527,8 @@ class Chat extends React.Component {
         let name = selectItem
         let webrtcButtons = []
         let userinfos = {}
+
+        let isShowDeleteGroupNotice = selectTab === 'group' && entities?.group?.currentGroupCustom !== 'default'
         if (selectTab === 'contact') {
             let withInfoUsers = this.props.entities.roster.byName
             userinfos = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname: name
@@ -586,8 +599,7 @@ class Chat extends React.Component {
         return (
             <div className="x-chat">
                 <div className="x-list-item x-chat-header">
-                    <div className="fl">
-                        {collapsed
+                {collapsed
                             ? <Icon
                                 type="arrow-left"
                                 onClick={back}
@@ -595,11 +607,16 @@ class Chat extends React.Component {
                                     cursor: 'pointer',
                                     fontSize: 20,
                                     verticalAlign: 'middle',
-                                    marginRight: 10
+                                    marginRight: 10,
+                                    float: 'left',
+                                    lineHeight: '50px'
                                 }}
                             />
                             : null}
-                        {name}
+                    <div className={`fl ${isShowDeleteGroupNotice?"notice":''}`}>
+                        
+                        <span>{name}</span>
+                        {isShowDeleteGroupNotice ?<span>该群仅供试用，72小时后将被删除</span>: ''}
                     </div>
                     <div className="fr">
                         <span style={{ color: '#8798a4', cursor: 'pointer' }}>

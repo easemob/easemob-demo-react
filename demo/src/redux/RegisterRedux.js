@@ -10,7 +10,7 @@ import { store } from '@/redux'
 import WebIM from '@/config/WebIM'
 import axios from 'axios'
 /* ------------- Types and Action Creators ------------- */
-const domain = window.location.protocol+'//a1.easemob.com'
+const domain = WebIM.config.restServer
 const { Types, Creators } = createActions({
 
     jumpLogin: null,

@@ -7,6 +7,7 @@ import CommonActions from '@/redux/CommonRedux'
 import _ from 'lodash'
 import { config } from '@/config'
 import { store } from '@/redux'
+import axios from 'axios'
 
 const logger = WebIM.loglevel.getLogger('GroupRedux')
 
@@ -25,7 +26,13 @@ const { Types, Creators } = createActions({
     // ---------------async------------------
     createGroups: options => {
         return (dispatch, getState) => {
-            WebIM.conn.createGroupNew(options)
+            WebIM.conn.createGroupNew(options).then((res) => {
+                const groupId = res?.data?.groupid
+                const url = `${WebIM.config.restServer}/inside/app/group/${groupId}?appkey=${encodeURIComponent(WebIM.conn.appKey)}`
+                axios.post(url).then( (res) => {
+                    console.log('report groupid', res)
+                })
+            })
         }
     },
     getGroups: () => {
@@ -178,10 +185,12 @@ export const updateGroup = (state, { groups }) => {
 
 export const newGetGroupInfo = (state, { response }) => {
     let allowinvites
+    let custom
     response.data.map((v, i) => {
+        custom = v.custom
         return allowinvites = v.allowinvites
     })
-    return state.merge({ allowinvites:allowinvites })
+    return state.merge({ allowinvites:allowinvites, currentGroupCustom:custom })
 }
 /**
  * 

@@ -3,7 +3,7 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-chat-4.1.2'
+import websdk from './Easemob-chat-4.1.3'
 // import websdk from './Easemob-chat'
 
 // import websdk from 'easemob-websdk'
@@ -66,7 +66,7 @@ if (WebIM.config.isSandBox) {
     options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;
-    // options.isHttpDNS = false
+    options.isHttpDNS = false
     // WebIM.config.restServer = (window.location.protocol === "https:" ? "https:" : "http:") + '//a1-hsb.easemob.com';
 }
 

@@ -63,7 +63,7 @@ body {
     /*border: 0 solid #ADB9C1;*/
     box-shadow: 0 0 10px #ADB9C1;
     max-height: 99%;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 

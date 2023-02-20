@@ -78,30 +78,42 @@ const { Types, Creators } = createActions({
         }
     },
 
-    getToken: (username, password) => {
+    getToken: (phoneNumber, smsCode) => {
         return (dispatch, getState) => {
-            axios.post(domain+'/inside/app/user/login', {
-                userId: username,
-                userPassword: password
+            axios.post(domain+'/inside/app/user/login/V2', {
+                phoneNumber: phoneNumber,
+                smsCode: smsCode
             })
             .then(function (response) {
                 console.log(response);
-                const {phoneNumber, token} = response.data
+                const {token, chatUserName} = response.data
                 let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
                 message.success(I18N.loginSuccessfully, 1)
-                dispatch(Creators.setLoginToken(username, token))
-                dispatch(Creators.setLoginSuccess(username))
+                dispatch(Creators.setLoginToken(chatUserName, token))
+                dispatch(Creators.setLoginSuccess(chatUserName))
                 window.localStorage.setItem('webImLogout', true)
 
-                dispatch(Creators.loginByToken(username, token))
+                dispatch(Creators.loginByToken(chatUserName, token))
             })
             .catch(function (error) {
                 switch (error.response.data.errorInfo) {
                     case "UserId password error.":
                         message.error('用户名或密码错误！')
                         break;
-                        case `UserId ${username} does not exist.`:
-                            message.error('登录用户不存在')
+                    case `UserId ${phoneNumber} does not exist.`:
+                        message.error('登录用户不存在')
+                        break;
+                    case 'phone number illegal':
+                        message.error('请输入正确的手机号')
+                        break;
+                    case 'SMS verification code error.':
+                        message.error('验证码错误')
+                        break;
+                    case 'Sms code cannot be empty':
+                        message.error('验证码不能为空')
+                        break;
+                    case 'Please send SMS to get mobile phone verification code.':
+                        message.error('请使用短信验证码登录')
                         break;
                     default:
                         message.error('登录失败，请重试！')
