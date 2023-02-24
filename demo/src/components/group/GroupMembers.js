@@ -51,7 +51,7 @@ class GroupMembers extends React.Component {
   componentWillUnmount() {
     this.unListen && this.unListen();
   }
-  
+
   setAdmin = (groupId, name) => this.props.setAdminAsync(groupId, name);
 
   removeAdmin = (groupId, name) => this.props.removeAdminAsync(groupId, name);
@@ -67,8 +67,11 @@ class GroupMembers extends React.Component {
     this.props.removeSingleGroupMemberAsync(groupId, name);
 
   showModal = () => {
+    let { groupInfo, roomId } = this.props;
     this.setState({
-      visible: true
+      visible: true,
+      nickName:
+        groupInfo?.groupMemberAttrsMap?.[roomId]?.[WebIM.conn.user]?.nickName
     });
   };
 
@@ -90,7 +93,7 @@ class GroupMembers extends React.Component {
     WebIM.conn
       .setGroupMemberAttributes(opt)
       .then((res) => {
-        message.success("修改我的群昵称成功");
+        message.success(I18n.t("editGroupNickSuccess"));
         this.props.setGroupMemberAttr({
           groupId: this.props.roomId,
           attributes: { [userId]: { nickName } }
@@ -101,8 +104,8 @@ class GroupMembers extends React.Component {
         });
       })
       .catch((e) => {
-        console.log(e, 'e')
-        message.error("修改我的群昵称失败");
+        console.log(e, "e");
+        message.error(I18n.t("editGroupNickFailed"));
       });
   };
 
@@ -246,7 +249,7 @@ class GroupMembers extends React.Component {
     return (
       <>
         <Card
-          title="我在群里的昵称"
+          title={I18n.t("myGroupNick")}
           extra={
             <div
               onClick={() => {
@@ -259,14 +262,17 @@ class GroupMembers extends React.Component {
           }
         >
           <span>
-            {groupInfo?.groupMemberAttrsMap?.[roomId]?.[WebIM.conn.user]?.nickName}
+            {
+              groupInfo?.groupMemberAttrsMap?.[roomId]?.[WebIM.conn.user]
+                ?.nickName
+            }
           </span>
           <Modal
             visible={visible}
             onCancel={this.hideModal}
-            cancelText="取消"
-            okText="确认"
-            title="编辑我的群昵称"
+            cancelText={I18n.t("cancel")}
+            okText={I18n.t("confirm")}
+            title={I18n.t("editGroupNickname")}
             onOk={() => {
               this.handleOk({ userId: currentUser });
             }}
@@ -276,7 +282,7 @@ class GroupMembers extends React.Component {
               onChange={(e) => {
                 this.setState({ nickName: e.target.value });
               }}
-              placeholder="请输入群昵称"
+              placeholder={I18n.t("editNickTip")}
             ></Input>
           </Modal>
         </Card>

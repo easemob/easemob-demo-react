@@ -137,4 +137,11 @@ export const us = {
     newPassword: 'new password',
     confirmPassword: 'confirm password',
     complete: 'Complete',
+    myGroupNick: 'My nickname in group',
+    editGroupNickname: 'Edit my group attributes',
+    editNickTip: 'Please input the group name',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    editGroupNickSuccess: 'Edit success',
+    editGroupNickFailed: 'Edit failed',
 }

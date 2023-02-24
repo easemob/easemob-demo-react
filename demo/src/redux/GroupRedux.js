@@ -230,19 +230,13 @@ export const newGetGroupInfo = (state, { response }) => {
 };
 
 export const setGroupMemberAttr = (state, { response }) => {
-  const { groupId, attributes = {}, reset, resetUid } = response;
+  const { groupId, attributes = {} } = response;
   let dt = state.groupMemberAttrsMap || {};
   let groupMembersDt = dt?.[groupId] || {};
 
   let groupMembersAttr = {
-    [groupId]: reset ? {} : { ...groupMembersDt, ...attributes }
+    [groupId]: { ...groupMembersDt, ...attributes }
   };
-
-  if (resetUid) {
-    groupMembersAttr = {
-      [groupId]: { ...groupMembersAttr[groupId], ...{ [resetUid]: {} } }
-    };
-  }
 
   return state.merge({
     groupMemberAttrsMap: {
@@ -266,13 +260,13 @@ export const removeGroupAllMemberAttr = (state, { response }) => {
       ...groupMembersAttr
     }
   });
-}
+};
 
 export const removeGroupMemberAttr = (state, { response }) => {
-  const { groupId , uid } = response;
+  const { groupId, uid } = response;
   let dt = state.groupMemberAttrsMap || {};
 
-  if (resetUid) {
+  if (uid) {
     groupMembersAttr = {
       [groupId]: { ...groupMembersAttr[groupId], ...{ [uid]: {} } }
     };
@@ -284,7 +278,7 @@ export const removeGroupMemberAttr = (state, { response }) => {
       ...groupMembersAttr
     }
   });
-}
+};
 
 /**
  *
