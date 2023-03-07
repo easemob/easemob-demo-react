@@ -9,6 +9,7 @@
 // var location = {
 //     protocol: "https"
 // }
+
 const { appkey, https, rest={} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
 console.log(appkey, https, rest, 'appkey, https, rest')
 
@@ -18,13 +19,13 @@ var config = {
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws',
+    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws',
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com',
+    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     /*
      * Application AppKey
      */
