@@ -6,7 +6,7 @@
  */
 
 // 沙箱调试
-const isSandBox = true
+const isSandBox = false
 
 var config = {
     /*
