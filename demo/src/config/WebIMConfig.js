@@ -5,28 +5,27 @@
  * In this way , others won't be influenced by this config while git pull.
  */
 
-// 沙箱调试
-const isSandBox = false
+// for react native
+// var location = {
+//     protocol: "https"
+// }
+
+const { appkey, https, rest={} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
+console.log(appkey, https, rest, 'appkey, https, rest')
 
 var config = {
     /*
-   * websocket server
-   * im-api-v2.easemob.com/ws 线上环境
-   * im-api-v2-hsb.easemob.com/ws 沙箱环境
-   */
-    socketServer:
-    (window.location.protocol === 'https:' ? 'https:' : 'http:') +
-    // '//im-api-v2-hsb.easemob.com/ws',
-    '//msync-api-a1-test.easemob.com/ws',
+     * websocket server
+     * im-api-v2.easemob.com/ws 线上环境
+     * im-api-v2-hsb.easemob.com/ws 沙箱环境
+     */
+    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2.easemob.com/ws',
     /*
-   * Backend REST API URL
-   * a1.easemob.com 线上环境
-   * a1-hsb.easemob.com 沙箱环境
-   */
-    restServer:
-    (window.location.protocol === 'https:' ? 'https:' : 'http:') +
-    // '//a1-hsb.easemob.com',
-    '//a1-test.easemob.com',
+     * Backend REST API URL
+     * a1.easemob.com 线上环境
+     * a1-hsb.easemob.com 沙箱环境
+     */
+    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1.easemob.com',
     /*
    * Application AppKey
    */
