@@ -265,10 +265,14 @@ export const removeGroupAllMemberAttr = (state, { response }) => {
 export const removeGroupMemberAttr = (state, { response }) => {
   const { groupId, uid } = response;
   let dt = state.groupMemberAttrsMap || {};
+  let groupMembersDt = dt?.[groupId] || {};
+  let groupMembersAttr = {
+    [groupId]: {}
+  };
 
   if (uid) {
     groupMembersAttr = {
-      [groupId]: { ...groupMembersAttr[groupId], ...{ [uid]: {} } }
+      [groupId]: { ...groupMembersDt, ...{ [uid]: {} } }
     };
   }
 
@@ -351,7 +355,9 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.SWITCH_RIGHT_SIDER]: switchRightSider,
   [Types.TOP_GROUP]: topGroup,
   [Types.NEW_GET_GROUP_INFO]: newGetGroupInfo,
-  [Types.SET_GROUP_MEMBER_ATTR]: setGroupMemberAttr
+  [Types.SET_GROUP_MEMBER_ATTR]: setGroupMemberAttr,
+  [Types.REMOVE_GROUP_ALL_MEMBER_ATTR]: removeGroupAllMemberAttr,
+  [Types.REMOVE_GROUP_MEMBER_ATTR]: removeGroupMemberAttr
 });
 
 /* ------------- Selectors ------------- */
