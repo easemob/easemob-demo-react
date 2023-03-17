@@ -1,18 +1,18 @@
-import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { withRouter } from "react-router-dom"
-import _ from "lodash"
-import ContactItem from "@/components/contact/ContactItem"
-import utils from "@/utils"
-import GroupActions from "@/redux/GroupRedux"
-import ChatRoomActions from "@/redux/ChatRoomRedux"
-import getTabMessages from "@/selectors/ChatSelector"
-import getCurrentContacts from "@/selectors/ContactSelector"
+import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import _ from 'lodash'
+import ContactItem from '@/components/contact/ContactItem'
+import utils from '@/utils'
+import GroupActions from '@/redux/GroupRedux'
+import ChatRoomActions from '@/redux/ChatRoomRedux'
+import getTabMessages from '@/selectors/ChatSelector'
+import getCurrentContacts from '@/selectors/ContactSelector'
 
 const Contact = ({ history, match, common, location, contacts, group, chatroom, stranger, message, blacklist, getGroups, getChatRooms, ...rest }) => {
     const { pathname } = location
-    const paths = pathname.split("/")
+    const paths = pathname.split('/')
     const chatType = paths[1]
     const chatId = paths[2]
 
@@ -20,21 +20,21 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
     // console.log(history, match, location, pathname, chatType, chatId)
 
     const chatTypes = {
-        "contact": "chat",
-        "group": "groupchat",
-        "chatroom": "chatroom",
-        "stranger": "stranger"
+        'contact': 'chat',
+        'group': 'groupchat',
+        'chatroom': 'chatroom',
+        'stranger': 'stranger'
     }
 
     const items = []
     switch (chatType) {
-    case "contact":
+    case 'contact':
         const { byId, chat } = message
-        let userInfos = _.get(contacts, "byName", {}) || {}
-        _.forEach(_.get(contacts, "friends", []), (name, index) => {
+        let userInfos = _.get(contacts, 'byName', {}) || {}
+        _.forEach(_.get(contacts, 'friends', []), (name, index) => {
             if (_.includes(blacklist.names, name)) return
             const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], name ], []))
-            const count = message.getIn([ "unread", "chat", name ], 0)
+            const count = message.getIn([ 'unread', 'chat', name ], 0)
             items[index] = {
                 name,
                 info: userInfos[name]?.info || {},
@@ -43,53 +43,53 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
             }
         })
         break
-    case "group":
+    case 'group':
         if (!common.isGetGroupAlready) {
             getGroups()
         } else {
-            _.forEach(_.get(contacts, "names", []), (v, index) => {
-                const [ name, id ] = v.split("_#-#_")
+            _.forEach(_.get(contacts, 'names', []), (v, index) => {
+                const [ name, id ] = v.split('_#-#_')
                 const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], id ], []))
-                const count = message.getIn([ "unread", "groupchat", name ], 0)
+                const count = message.getIn([ 'unread', 'groupchat', name ], 0)
                 items[index] = {
                     name,
                     id,
                     unread: count,
-                    latestMessage: "",
-                    latestTime: "",
+                    latestMessage: '',
+                    latestTime: '',
                     ...info
                 }
             })
         }
         break
-    case "chatroom":
+    case 'chatroom':
         if (!common.isGetChatRoomAlready) {
             getChatRooms()
         } else {
-            _.forEach(_.get(contacts, "names", []), (v, index) => {
-                const [ name, id ] = v.split("_#-#_")
+            _.forEach(_.get(contacts, 'names', []), (v, index) => {
+                const [ name, id ] = v.split('_#-#_')
                 const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], id ], []))
-                const count = message.getIn([ "unread", "chatroom", name ], 0)
+                const count = message.getIn([ 'unread', 'chatroom', name ], 0)
                 items[index] = {
                     name,
                     id,
                     unread: count,
-                    latestMessage: "",
-                    latestTime: "",
+                    latestMessage: '',
+                    latestTime: '',
                     ...info
                 }
             })
         }
         break
-    case "stranger":
-        _.forEach(_.get(contacts, "byId", []), (v, name) => {
+    case 'stranger':
+        _.forEach(_.get(contacts, 'byId', []), (v, name) => {
             const info = utils.getLatestMessage(_.get(message, [ chatTypes[chatType], name ], []))
-            const count = message.getIn([ "unread", "stranger", name ], 0)
+            const count = message.getIn([ 'unread', 'stranger', name ], 0)
             items.push({
                 name,
                 unread: count,
-                latestMessage: "",
-                latestTime: "",
+                latestMessage: '',
+                latestTime: '',
                 ...info
             })
         })

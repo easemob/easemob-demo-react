@@ -108,6 +108,10 @@ WebIM.conn.listen({
             message.error(
                 `${msg.from}${I18n.t('LeaveGroup')}${msg.gid}.`
             )
+            store.dispatch(GroupActions.removeGroupMemberAttr({
+                groupId: msg.gid,
+                uid: msg.from
+            }))
             break
         case 'removedFromGroup':
             message.error(
@@ -614,6 +618,29 @@ WebIM.conn.listen({
         }
     }
 })
+
+WebIM.conn.addEventHandler("event", {
+    onGroupEvent: ({id, userId, attributes, operation}) => {
+        if (operation === "memberAttributesUpdate") {
+            store.dispatch(GroupActions.setGroupMemberAttr({
+                groupId: id,
+                attributes: {
+                    [userId]: attributes
+                }
+            }));
+        }
+    },
+    onMultiDeviceEvent:({id, userId, attributes, operation}) => {
+        if (operation === "memberAttributesUpdate") {
+            store.dispatch(GroupActions.setGroupMemberAttr({
+                groupId: id,
+                attributes: {
+                    [userId]: attributes
+                }
+            }));
+        }
+    },
+});
 
 /* ------------- Types and Action Creators ------------- */
 

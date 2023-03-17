@@ -13,34 +13,34 @@ const { Option } = Select
 let reportMsgId = ''
 const ReportType = [
     {
-      key: "1",
-      value: "涉政"
+        key: '1',
+        value: '涉政'
     },
     {
-      key: "2",
-      value: "涉黄"
+        key: '2',
+        value: '涉黄'
     },
     {
-      key: "3",
-      value: "广告"
+        key: '3',
+        value: '广告'
     },
     {
-      key: "4",
-      value: "辱骂"
+        key: '4',
+        value: '辱骂'
     },
     {
-      key: "5",
-      value: "暴恐"
+        key: '5',
+        value: '暴恐'
     },
     {
-        key: "6",
-        value: "违禁"
+        key: '6',
+        value: '违禁'
     },
     {
-        key: "7",
-        value: "其他"
+        key: '7',
+        value: '其他'
     }
-  ];
+]
 export default class ChatMessage extends Component {
     static propTypes = {
         bySelf: PropTypes.any,
@@ -135,10 +135,10 @@ export default class ChatMessage extends Component {
                         messageId: reportMsgId
                     }).then(()=>{
                         message.success('举报成功')
-                        self.setState({reportMsgVisible: false})
+                        self.setState({ reportMsgVisible: false })
                     }).catch(()=>{
                         message.error('举报失败')
-                        self.setState({reportMsgVisible: false})
+                        self.setState({ reportMsgVisible: false })
                     })
                 },
             })
@@ -149,7 +149,7 @@ export default class ChatMessage extends Component {
        
     }
     handleClick = (e)=>{
-        e.stopPropagation();
+        e.stopPropagation()
     }
 
     render() {
@@ -286,7 +286,7 @@ export default class ChatMessage extends Component {
         case 'audio':
             content = useDropdown ? (
                 <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                    <div className="x-message-audio" style={{display: bySelf?'inline-block':'block'}}>
+                    <div className="x-message-audio" style={{ display: bySelf?'inline-block':'block' }}>
                         <Audio url={body.url} length={body.length} />
                     </div>
                 </Dropdown>
@@ -332,7 +332,7 @@ export default class ChatMessage extends Component {
             break
         }
 
-        return <div className={cls}>
+        return <div className={cls} uid={from}>
             <div className="x-message-user">
                 {fromNick}
             </div>
@@ -375,7 +375,7 @@ export default class ChatMessage extends Component {
                 }}
             >   
                 <p>请选择举报类型：</p>
-                <Select style={{width: '100%', marginBottom: "10px"}} onSelect={(e)=>{this.setState({ reportType: e})}} value={this.state.reportType}>
+                <Select style={{ width: '100%', marginBottom: '10px' }} onSelect={(e)=>{this.setState({ reportType: e })}} value={this.state.reportType}>
                     {
                         ReportType.map((item)=>{ 
                             return <Option key={item.value}>{item.value}</Option>

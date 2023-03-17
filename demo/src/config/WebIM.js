@@ -3,7 +3,7 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-chat-4.1.3'
+import websdk from './Easemob-chat-4.1.4'
 // import websdk from './Easemob-chat'
 
 // import websdk from 'easemob-websdk'

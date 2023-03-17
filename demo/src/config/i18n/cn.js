@@ -139,5 +139,11 @@ export const cn = {
     newPassword: '新密码',
     confirmPassword: '确认密码',
     complete: '完成',
-
+    myGroupNick: '我在群里的昵称',
+    editGroupNickname: '编辑我的群昵称',
+    editNickTip: '请输入群昵称',
+    cancel: '取消',
+    confirm: '确认',
+    editGroupNickSuccess: '修改我的群昵称成功',
+    editGroupNickFailed: '修改我的群昵称失败',
 }

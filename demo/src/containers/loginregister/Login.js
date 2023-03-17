@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Button, Row, Form, Input, Checkbox, Col, message } from 'antd'
@@ -10,6 +10,8 @@ import WebIM from '@/config/WebIM'
 import axios from 'axios'
 const domain = WebIM.config.restServer
 const FormItem = Form.Item
+
+const USE_PASSWORD = false
 
 const Login = ({
     I18N,
@@ -25,55 +27,54 @@ const Login = ({
     let timer
     let times = 60
     const { loginLoading } = login
-    let [smsBtnText, setSmsBtnText] = useState(I18N.getCaptcha)
+    let [ smsBtnText, setSmsBtnText ] = useState(I18N.getCaptcha)
     const handleOk = () => {
         validateFieldsAndScroll((errors, values) => {
             if (errors) {
                 return
             }
-            getToken(values.phoneNumber, values.captcha)
-            return
-            if (values.type) {
-                doLoginByToken(values.username, values.password)
+            // 使用用户名密码登录
+            if (USE_PASSWORD) {
+                doLogin(values.phoneNumber, values.captcha)
             } else {
-                doLogin(values.username, values.password)
+                getToken(values.phoneNumber, values.captcha)
             }
         })
     }
 
     const getCaptcha = () => {
-        if(typeof smsBtnText != 'string') return
+        if(typeof smsBtnText !== 'string') return
         const phoneNumber = getFieldValue('phoneNumber')
-        validateFields(['phoneNumber'], (errors, values) => {
+        validateFields([ 'phoneNumber' ], (errors, values) => {
             if(errors){
                 return
             }
             sendSms(values.phoneNumber)
-        });
+        })
     }
 
     const sendSms = (phoneNumber) => {
         axios.post(domain+`/inside/app/sms/send/${phoneNumber}`, {
             phoneNumber
         })
-        .then((response) => {
-            message.success('短信已发送')
-            countDown()
-        })
-        .catch(function (error) {
-            console.log('error', error.response);
-            if(error.response.status == '400'){
-                if(error.response.data?.errorInfo == 'phone number illegal'){
-                    message.error('请输入正确的手机号！')
-                }else if(error.response.data?.errorInfo == 'Please wait a moment while trying to send.'){
-                    message.error('你的操作过于频繁，请稍后再试！')
-                }else if(error.response.data?.errorInfo.includes('exceed the limit')){
-                    message.error('获取已达上限！')
-                }else{
-                    message.error(error.response.data?.errorInfo)
+            .then((response) => {
+                message.success('短信已发送')
+                countDown()
+            })
+            .catch(function (error) {
+                console.log('error', error.response)
+                if(error.response.status == '400'){
+                    if(error.response.data?.errorInfo == 'phone number illegal'){
+                        message.error('请输入正确的手机号！')
+                    }else if(error.response.data?.errorInfo == 'Please wait a moment while trying to send.'){
+                        message.error('你的操作过于频繁，请稍后再试！')
+                    }else if(error.response.data?.errorInfo.includes('exceed the limit')){
+                        message.error('获取已达上限！')
+                    }else{
+                        message.error(error.response.data?.errorInfo)
+                    }
                 }
-            }
-        });
+            })
     }
 
     const countDown = () => {
@@ -108,16 +109,16 @@ const Login = ({
                 </FormItem>
 
                 <FormItem>
-                  <Row gutter={8}>
-                    <Col span={14}>
-                      {getFieldDecorator('captcha', {
-                        rules: [{ required: true, message: 'Please input the captcha you got!' }],
-                      })(<Input size="default" placeholder={I18N.captcha}/>)}
-                    </Col>
-                    <Col span={10}>
-                      <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
-                    </Col>
-                  </Row>
+                    <Row gutter={8}>
+                        <Col span={14}>
+                            {getFieldDecorator('captcha', {
+                                rules: [ { required: true, message: 'Please input the captcha you got!' } ],
+                            })(<Input size="default" placeholder={I18N.captcha}/>)}
+                        </Col>
+                        <Col span={10}>
+                            <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
+                        </Col>
+                    </Row>
                 </FormItem>
 
                 {/*<FormItem hasFeedback>{getFieldDecorator('type')(<Checkbox>{I18N.tokenSignin}</Checkbox>)}</FormItem>*/}

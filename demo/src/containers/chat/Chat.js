@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { I18n } from 'react-redux-i18n'
-import _ from 'lodash'
+import _, { entries } from 'lodash'
 import { Button, Row, Form, Input, Icon, Dropdown, Menu, message, Popover, Radio } from 'antd'
 import { config } from '@/config'
 import ListItem from '@/components/list/ListItem'
@@ -38,6 +38,33 @@ const chatType = {
     chatroom: 'chatroom',
     stranger: 'stranger'
 }
+
+function isContain(dom) {
+    const totalHeight = window.innerHeight || document.documentElement.clientHeight;
+    const totalWidth = window.innerWidth || document.documentElement.clientWidth;
+    // 当滚动条滚动时，top, left, bottom, right时刻会发生改变。
+    const { top, right, bottom, left } = dom.getBoundingClientRect();
+    return (top >= 0 && left >= 0 && right <= totalWidth && bottom <= totalHeight);
+}
+
+var scrollTimer;
+const timeout = 500;
+function getCurrentUids (groupId, groupMemberAttrs) {
+    let arr = [];
+    let hasAttrUidList = Object.keys(groupMemberAttrs?.[groupId] || {})
+    let childrenList = document.getElementsByClassName('x-message-group')
+    for (var dom of childrenList) {
+        if(isContain(dom)){
+            let uid = dom.getAttribute('uid');
+            if(uid && !hasAttrUidList.includes(uid)){
+                arr.push(uid)
+            }
+        }
+      }  
+
+    let uids =  [...new Set(arr)]
+    return uids
+};
 
 class Chat extends React.Component {
     input = null // eslint-disable-line
@@ -285,8 +312,10 @@ class Chat extends React.Component {
         // this.scollBottom()
     }
 
-    componentDidUpdate() {
-        this.scollBottom()
+    componentDidUpdate(prevProps, prevState) {
+        if(prevProps?.entities?.group?.groupMemberAttrsMap === this.props?.entities?.group?.groupMemberAttrsMap){
+            this.scollBottom()
+        }
     }
 
     /**
@@ -445,6 +474,29 @@ class Chat extends React.Component {
                 _this._not_scroll_bottom = true
             }, 500)
         }
+
+        let groupId = this.props.entities.group.currentId
+        if(groupId){
+            clearTimeout(scrollTimer)
+            scrollTimer = setTimeout(()=>{
+                let uids = getCurrentUids(groupId, this.props.entities.group?.groupMemberAttrsMap);
+                if(uids.length > 0) {
+                    return WebIM.conn.getGroupMembersAttributes({
+                        groupId,
+                        userIds: uids,
+                        keys: []
+                    }).then((res)=>{
+                        this.props.setGroupMemberAttr({groupId, attributes:res.data})
+                    }).catch((e)=>{
+                        let attrs = {}
+                        uids.forEach((item) => {
+                            attrs[item] =  {nickName: ''}
+                        })
+                        this.props.setGroupMemberAttr({groupId, attributes:attrs})
+                    })
+                }
+            }, timeout)
+        }  
     }
     ok = (id) => {
         this.props.deleteMessage(id, true)
@@ -503,6 +555,20 @@ class Chat extends React.Component {
             showUserInfoMoadl: false
         })
     }
+
+    getFromNick = (selectTab, userinfos, message) => {
+        if (selectTab === "contact") {
+          return userinfos;
+        } else if(selectTab === 'group') {
+            let groupId = this.props.entities.group.currentId
+            let from = message.from
+            if(!from){
+                from = WebIM.conn.user
+            }
+          return this.props.entities.group?.groupMemberAttrsMap?.[groupId]?.[from]?.nickName || userinfos[from]?.info?.nickname || from;
+        }
+    };
+
     render() {
         this.logger.info('chat component render')
         let {
@@ -641,10 +707,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage key={i} fromNick={selectTab=='contact'?userinfos:userinfos[message.from]?.info.nickname} onClickIdCard={this.onClickIdCard} ok={this.ok}{...message} />
+                                return <ChatMessage key={i} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok}{...message} />
                             }
                         } else {
-                            return <ChatMessage key={i} fromNick={selectTab=='contact'?userinfos:userinfos[message.from]?.info.nickname} onClickIdCard={this.onClickIdCard} ok={this.ok} {...message} />
+                            return <ChatMessage key={i} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok} {...message} />
                         }
                     })}
                 </div>
@@ -756,6 +822,7 @@ export default connect(
     }),
     dispatch => ({
         switchRightSider: ({ rightSiderOffset }) => dispatch(GroupActions.switchRightSider({ rightSiderOffset })),
+        setGroupMemberAttr: (resp) => dispatch(GroupActions.setGroupMemberAttr(resp)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
         sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
