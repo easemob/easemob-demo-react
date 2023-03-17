@@ -597,7 +597,7 @@ class Chat extends React.Component {
         let isShowDeleteGroupNotice = selectTab === 'group' && entities?.group?.currentGroupCustom !== 'default'
         if (selectTab === 'contact') {
             let withInfoUsers = this.props.entities.roster.byName
-            userinfos = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname: name
+            userinfos  = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname || name: name
         }
         if (selectTab === 'group') {
             userinfos = this.props.entities.groupMember[selectItem]?.byName || {}
@@ -698,6 +698,9 @@ class Chat extends React.Component {
                         </span>
                     </div>
                 </div>
+                <div className="x-chat-content-tip">
+                    本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！
+                </div>
                 <div className="x-chat-content" ref="x-chat-content" onScroll={this.handleScroll}>
                     {/* fixed bug of messageList.map(...) */}
                     {this.state.isLoaded && <div style={{ width: '150px', height: '30px', lineHeight: '30px', backgroundColor: '#888', color: '#fff', borderRadius: '15px', textAlign: 'center', margin: '10px auto' }}>{I18n.t('noMoreMessage')}</div>}
@@ -710,9 +713,6 @@ class Chat extends React.Component {
                             return <ChatMessage key={i} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok} {...message} />
                         }
                     })}
-                </div>
-                <div className="x-chat-content-tip">
-                    本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！
                 </div>
                 <div className="x-chat-footer">
                     <div className="x-list-item x-chat-ops">
