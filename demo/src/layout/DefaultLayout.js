@@ -434,7 +434,7 @@ class DefaultLayout extends Component {
                     >
                         <Route
                             path="/:selectTab/:selectItem"
-                            render={props => <Chat collapsed={collapsed} {...props} />}
+                            render={props => <Chat collapsed={collapsed} {...props} roomId={roomId} />}
                         />
                     </Content>
                     <div
