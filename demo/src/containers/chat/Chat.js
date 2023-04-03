@@ -27,6 +27,7 @@ import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
 import UserInfoModal from '@/components/contact/UserInfoModal'
+import { MENTION_ALL } from "@/const/"
 let groupMemberNickIdMap = {};
 const rtc = WebIM.rtc;
 const { TextArea } = Input
@@ -224,7 +225,7 @@ class Chat extends React.Component {
           ? {
               msg: value,
               ext: {
-                em_at_list: mentionList.includes("ALL") ? "ALL" : [...new Set(atList)]
+                em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [...new Set(atList)]
               }
             }
           : {
@@ -588,24 +589,26 @@ class Chat extends React.Component {
     }
 
     getGroupMember = () => {
-      let {entities, roomId} = this.props;
-      const members = _.get(entities.groupMember, `${roomId}.byName`, []);
-      let groupInfo= entities.group
-      return _.map(members, (val, key) => {
-        const {info, name } = val;
-       
-        let nickname =
-          groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
-          info.nickname ||
-          val.name;
-        groupMemberNickIdMap[nickname] = name;
-  
-        return {
-          name: nickname,
-          key,
-          id: name
-        };
-      });
+        let { entities, roomId } = this.props;
+        const members = _.get(entities.groupMember, `${roomId}.byName`, []);
+        let groupInfo = entities.group;
+        return _.map(members, (val, key) => {
+          const { info, name } = val;
+    
+          let nickname =
+            groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
+            info.nickname ||
+            val.name;
+          groupMemberNickIdMap[nickname] = name;
+    
+          return {
+            name: nickname,
+            key,
+            id: name
+          };
+        }).filter((item) => {
+          return item.id !== WebIM.conn.user;
+        });
     };
 
     getFromNick = (selectTab, userinfos, message) => {
@@ -834,8 +837,8 @@ class Chat extends React.Component {
                           placeholder={I18n.t("message")}
                           ref={(node) => (this.input = node)}
                         >
-                          <Mentions.Option key={"ALL"} value={"ALL"}>
-                            ALL
+                          <Mentions.Option key={MENTION_ALL} value={MENTION_ALL}>
+                            {MENTION_ALL}
                           </Mentions.Option>
                           {this.getGroupMember().map((member) => {
                             return (
@@ -935,6 +938,6 @@ export default connect(
         setCallStatus: (status) => dispatch(VideoCallActions.setCallStatus(status)),
         cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
         setGid: (gid) => dispatch(VideoCallActions.setGid(gid)),
-        hangup: () => dispatch(VideoCallActions.hangup())
+        hangup: () => dispatch(VideoCallActions.hangup()),
     })
 )(Chat)

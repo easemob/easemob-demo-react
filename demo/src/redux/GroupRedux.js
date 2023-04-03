@@ -4,7 +4,7 @@ import WebIM from "@/config/WebIM";
 import { history } from "@/utils";
 import GroupMemberActions from "@/redux/GroupMemberRedux";
 import CommonActions from "@/redux/CommonRedux";
-import _ from "lodash";
+import _, { set } from "lodash";
 import { config } from "@/config";
 import { store } from "@/redux";
 import axios from "axios";
@@ -26,6 +26,9 @@ const { Types, Creators } = createActions({
   setGroupMemberAttr: ["response"],
   removeGroupAllMemberAttr: ["response"],
   removeGroupMemberAttr: ["response"],
+  pushMentionedGroupId: ["response"],
+  removeMentionedGroupId: ["response"],
+
 
   // ---------------async------------------
   createGroups: (options) => {
@@ -176,6 +179,7 @@ export const INITIAL_STATE = Immutable({
   rightSiderOffset: 0,
   byId: {},
   names: [],
+  mentionedGroupList: [],
   groupMemberAttrsMap: {}
 });
 
@@ -284,6 +288,29 @@ export const removeGroupMemberAttr = (state, { response }) => {
   });
 };
 
+export const pushMentionedGroupId = (state, { response }) => {
+  const { groupId } = response;
+  let dt = state.mentionedGroupList || [];
+
+  return state.merge({
+    mentionedGroupList: [...new Set([...dt, groupId])]
+  });
+};
+
+export const removeMentionedGroupId = (state, { response }) => {
+  const { groupId } = response;
+  let dt = [...state.mentionedGroupList] || [];
+  let idx = dt.indexOf(groupId)
+
+  if(idx > -1){
+    dt.splice(idx, 1);
+  }
+
+  return state.merge({
+    mentionedGroupList: [...dt]
+  });
+};
+
 /**
  *
  * @param {*} state
@@ -357,7 +384,11 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.NEW_GET_GROUP_INFO]: newGetGroupInfo,
   [Types.SET_GROUP_MEMBER_ATTR]: setGroupMemberAttr,
   [Types.REMOVE_GROUP_ALL_MEMBER_ATTR]: removeGroupAllMemberAttr,
-  [Types.REMOVE_GROUP_MEMBER_ATTR]: removeGroupMemberAttr
+  [Types.REMOVE_GROUP_MEMBER_ATTR]: removeGroupMemberAttr,
+  [Types.PUSH_MENTIONED_GROUP_ID]: pushMentionedGroupId,
+  [Types.REMOVE_MENTIONED_GROUP_ID]: removeMentionedGroupId,
+
+  
 });
 
 /* ------------- Selectors ------------- */

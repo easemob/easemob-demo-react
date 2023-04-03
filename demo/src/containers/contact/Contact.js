@@ -16,7 +16,6 @@ const Contact = ({ history, match, common, location, contacts, group, chatroom, 
     const chatType = paths[1]
     const chatId = paths[2]
 
-
     // console.log(history, match, location, pathname, chatType, chatId)
 
     const chatTypes = {
@@ -117,10 +116,12 @@ export default withRouter(
             contacts: getCurrentContacts(state, props.match.params),
             message: state.entities.message,
             blacklist: state.entities.blacklist,
+            mentionedGroupIdLit: state.entities.group.mentionedGroupList,
         }),
         dispatch => ({
             doLogin: (username, password) => {
             },
+            removeMentionedGroupId:(resp) => dispatch(GroupActions.removeMentionedGroupId(resp)),
             getGroups: () => dispatch(GroupActions.getGroups()),
             getChatRooms: () => dispatch(ChatRoomActions.getChatRooms())
         })

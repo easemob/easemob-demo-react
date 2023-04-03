@@ -11,49 +11,49 @@ const { username } = qs.parse(lo.hash.split('?')[1]);
 
 (function(doc, win) {
     var docEl = doc.documentElement,
-        resizeEvt = "orientationchange" in window ? "orientationchange" : "resize",
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
         recalc = function() {
             if (docEl.clientWidth > 750) {
-                docEl.style.fontSize = "100px";
+                docEl.style.fontSize = '100px'
             } else {
-                var width = docEl.clientWidth / 7.5;
-                docEl.style.fontSize = width + "px";
+                var width = docEl.clientWidth / 7.5
+                docEl.style.fontSize = width + 'px'
             }
-        };
-    if (!doc.addEventListener) return;
-    win.addEventListener(resizeEvt, recalc, false);
-    doc.addEventListener("DOMContentLoaded", recalc, false);
-})(document, window);
+        }
+    if (!doc.addEventListener) return
+    win.addEventListener(resizeEvt, recalc, false)
+    doc.addEventListener('DOMContentLoaded', recalc, false)
+})(document, window)
 
 Math.uuid = function (len, radix) {
-    var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-    var chars = CHARS, uuid = [], i; 
-    radix = radix || chars.length;
+    var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('')
+    var chars = CHARS, uuid = [], i 
+    radix = radix || chars.length
 
     if (len) {
         // Compact form
-        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix];
+        for (i = 0; i < len; i++) uuid[i] = chars[0 | Math.random() * radix]
     } else {
         // rfc4122, version 4 form
-        var r;
+        var r
 
         // rfc4122 requires these characters
-        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-';
-        uuid[14] = '4';
+        uuid[8] = uuid[13] = uuid[18] = uuid[23] = '-'
+        uuid[14] = '4'
 
         // Fill in random data. At i==19 set the high bits of clock sequence
         // as
         // per rfc4122, sec. 4.1.5
         for (i = 0; i < 36; i++) {
             if (!uuid[i]) {
-                r = 0 | Math.random() * 16;
-                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+                r = 0 | Math.random() * 16
+                uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r]
             }
         }
     }
 
-    return uuid.join('');
-};
+    return uuid.join('')
+}
 
 
 
@@ -83,6 +83,7 @@ export default {
     getLatestMessage(messageList) {
         let latestMessage = ''
         let latestTime = ''
+        let ext = null
         if (messageList.length > 0) {
             const latestData = messageList[messageList.length - 1]
             const latestType = _.get(latestData, 'body.type', '')
@@ -98,10 +99,12 @@ export default {
             }
 
             latestTime = renderTime(latestData.time)
+            ext = latestData.ext
         }
         return {
             latestMessage,
-            latestTime
+            latestTime,
+            ext,
         }
     },
     isDescendant(parent, child) {

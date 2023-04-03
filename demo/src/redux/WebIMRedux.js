@@ -14,6 +14,7 @@ import MessageActions from '@/redux/MessageRedux'
 import GroupRequestActions from '@/redux/GroupRequestRedux'
 import GroupMemberActions from '@/redux/GroupMemberRedux'
 import VideoCallAcctions from '@/redux/VideoCallRedux'
+import { MENTION_ALL } from "@/const"
 import { store } from '@/redux'
 import { history } from '@/utils'
 import utils from '@/utils'
@@ -306,7 +307,7 @@ WebIM.conn.listen({
         logger.info('onLocationMessage', message)
     },
     onTextMessage: message => {
-        console.log("onTextMessage", message)
+        console.log("onTextMessage", {...message})
         let { from, to } = message 
         let { type } = message
         let rootState = store.getState()
@@ -319,6 +320,14 @@ WebIM.conn.listen({
              !(_.get(rootState,'entities.roster.byName['+chatId+'].subscription')))){
             message.type = 'stranger'
             store.dispatch(StrangerActions.updateStrangerMessage(from,message,'txt'))            
+        }
+        if(type === 'groupchat'){
+            let mentionList = message?.ext?.em_at_list
+            if(mentionList && type.from !== WebIM.conn.user){
+                if(mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)){
+                    store.dispatch(GroupActions.pushMentionedGroupId({groupId: to}))     
+                }
+            }
         }
 
         store.dispatch(MessageActions.addMessage(message, 'txt'))     
