@@ -18,7 +18,7 @@ const ContactItem = ({ chatType, items, collapse, hasLogo, mentionedGroupIdLit, 
 
     // 清除群组提醒提示
     const clearGroupMentioned = (item)=>{
-        if(item.chatType === 'group'){
+        if(chatType === 'group'){
             removeMentionedGroupId({ groupId: item.id })
         }
     }
