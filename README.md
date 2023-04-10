@@ -1,5 +1,49 @@
 # React Demo（WebIM）介绍
 
+
+更新时间：2022-04-10
+
+-----
+## 新增群组Mentions 功能, 使用Antd Mentions组件
+
+实现方案: 
+
+文本消息新增扩展字段`em_at_list`, 表示被@的用户ID,
+
+- 'ALL' 表示@所有人
+- ['userId', 'userId2'] 表示@指定用户
+
+```javascript
+const MENTION_ALL = 'ALL';
+let mentionList = ['userId', 'userId1'];
+let isMentionALl = true
+
+let txt = {
+	to: 'groupId',
+	chatType: 'groupChat',
+	msg: '@user 你好',
+	type: 'txt',
+	ext: {
+		em_at_list: isMentionALl ? MENTION_ALL : atList
+	}
+}
+```
+收到文本消息, 如扩展字段包含`em_at_list`则表示为@消息，
+如果`em_at_list`包含当前用户,则进行UI更新
+
+```javascript
+// onTextMessage回调中
+let mentionList = message?.ext?.em_at_list
+// 如果存在mentionList, 并且不是当前用户多端同步的消息
+if(mentionList && message.from !== WebIM.conn.user){
+	// 如果是@所有人或者mentionList包含当前用户ID
+	if(mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)){
+		// 则进行UI更新
+	}
+}
+```
+
+
 更新时间：2022-07-15
 
 -----
