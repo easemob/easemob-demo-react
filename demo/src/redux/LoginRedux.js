@@ -10,7 +10,8 @@ import { store } from '@/redux'
 import axios from 'axios'
 
 /* ------------- Types and Action Creators ------------- */
-const domain = window.location.protocol+'//a1.easemob.com'
+// const domain = window.location.protocol+'//a1-hsb.easemob.com'//沙箱环境
+const domain = window.location.protocol+'//a1.easemob.com'//线上环境
 const { Types, Creators } = createActions({
     setLoginToken: [ 'username', 'token' ],
     setLoging: [ 'username', 'password', 'token' ],
