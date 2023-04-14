@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { I18n } from 'react-redux-i18n'
 import _, { entries } from 'lodash'
-import { Button, Row, Form, Input, Icon, Dropdown, Menu, message, Popover, Radio } from 'antd'
+import { Button, Row, Form, Input, Icon, Dropdown, Menu, message, Popover, Radio, Mentions } from 'antd'
 import { config } from '@/config'
 import ListItem from '@/components/list/ListItem'
 import ChatMessage from '@/components/chat/ChatMessage'
@@ -27,6 +27,8 @@ import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
 import UserInfoModal from '@/components/contact/UserInfoModal'
+import { MENTION_ALL } from "@/const/"
+let groupMemberNickIdMap = {};
 const rtc = WebIM.rtc;
 const { TextArea } = Input
 const FormItem = Form.Item
@@ -83,6 +85,7 @@ class Chat extends React.Component {
             visible: false,
             checkedValue: '',
             showUserInfoMoadl: false,
+            mentionList: []
         }
         this.userInfo = {}
         this.showEdit = false
@@ -180,31 +183,60 @@ class Chat extends React.Component {
         })
     }
 
+    setMentionList({value}) {
+      this.setState({
+        mentionList: [...this.state.mentionList, value]
+      })
+    }
+
     handleChange(e) {
-        const v = e.target.value
-        const splitValue = this.state.value ? this.state.value.split('') : []
-        splitValue.pop()
-        if (v == splitValue.join('')) {
-            this.handleEmojiCancel()
-        } else {
-            this.setState({
-                value: v
-            })
-        }
+      const { selectTab } = this.props.match.params;
+      const v = chatType[selectTab] === "groupchat" ? e : e?.target?.value;
+      const splitValue = this.state?.value ? this.state?.value.split("") : [];
+      splitValue.pop();
+      if (v == splitValue.join("")) {
+        this.handleEmojiCancel();
+      } else {
+        this.setState({
+          value: v
+        });
+      }
     }
 
     handleSend(e) {
-        const {
-            match,
-            message
-        } = this.props
-        const { selectItem, selectTab } = match.params
-        const { value } = this.state
-        if (!value) return
-        this.props.sendTxtMessage(chatType[selectTab], selectItem, {
-            msg: value
+      if (e.charCode === 13) {
+        e.preventDefault?.();
+        const { match } = this.props;
+        const { selectItem, selectTab } = match.params;
+        const isGroupChat = chatType[selectTab] === "groupchat";
+        const { value, mentionList } = this.state;
+        let atList = [];
+        if (isGroupChat && mentionList.length) {
+          atList = mentionList
+            .filter((item) => {
+              return value.includes(`@${item}`);
+            })
+            .map((nickItem) => {
+              return groupMemberNickIdMap[nickItem];
+            });
+        }
+        if (!value) return;
+        let msg = isGroupChat
+          ? {
+              msg: value,
+              ext: {
+                em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [...new Set(atList)]
+              }
+            }
+          : {
+              msg: value
+            };
+        this.props.sendTxtMessage(chatType[selectTab], selectItem, msg);
+        this.setState({
+          mentionList: []
         })
-        this.emitEmpty()
+        this.emitEmpty();
+      }
     }
 
     emitEmpty() {
@@ -556,6 +588,29 @@ class Chat extends React.Component {
         })
     }
 
+    getGroupMember = () => {
+        let { entities, roomId } = this.props;
+        const members = _.get(entities.groupMember, `${roomId}.byName`, []);
+        let groupInfo = entities.group;
+        return _.map(members, (val, key) => {
+          const { info, name } = val;
+    
+          let nickname =
+            groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
+            info.nickname ||
+            val.name;
+          groupMemberNickIdMap[nickname] = name;
+    
+          return {
+            name: nickname,
+            key,
+            id: name
+          };
+        }).filter((item) => {
+          return item.id !== WebIM.conn.user;
+        });
+    };
+
     getFromNick = (selectTab, userinfos, message) => {
         if (selectTab === "contact") {
           return userinfos;
@@ -580,8 +635,10 @@ class Chat extends React.Component {
             messageListByMid,
             confrModal,
             inviteModal,
+            roomId,
             entities
         } = this.props
+
         const { selectItem, selectTab } = match.params
         
 
@@ -768,20 +825,57 @@ class Chat extends React.Component {
                         </Popover>
                     </div>
                     <div className="x-list-item x-chat-send">
-                        <Input
-                            value={this.state.value}
-                            onChange={this.handleChange}
-                            onPressEnter={this.handleSend}
-                            placeholder={I18n.t('message')}
-                            addonAfter={
-                                <i
-                                    className="fontello icon-paper-plane"
-                                    onClick={this.handleSend}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            }
-                            ref={node => (this.input = node)}
-                        />
+                    {chatType[selectTab] === "groupchat" ? (
+                      <>
+                        <Mentions
+                          value={this.state.value}
+                          onChange={this.handleChange}
+                          onSelect={(e) => {
+                            this.setMentionList(e);
+                          }}
+                          onKeyPress={this.handleSend}
+                          placeholder={I18n.t("message")}
+                          ref={(node) => (this.input = node)}
+                        >
+                          <Mentions.Option key={MENTION_ALL} value={MENTION_ALL}>
+                            {MENTION_ALL}
+                          </Mentions.Option>
+                          {this.getGroupMember().map((member) => {
+                            return (
+                              <Mentions.Option key={member.id} value={`${member.name}`}>
+                                {member.name}
+                              </Mentions.Option>
+                            );
+                          })}
+                        </Mentions>
+                        <div>
+                          <i
+                            className="fontello icon-paper-plane"
+                            onClick={() => {
+                              this.handleSend({ charCode: 13 });
+                            }}
+                            style={{ cursor: "pointer" }}
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <Input
+                        value={this.state.value}
+                        onChange={this.handleChange}
+                        onKeyPress={this.handleSend}
+                        placeholder={I18n.t("message")}
+                        addonAfter={
+                          <i
+                            className="fontello icon-paper-plane"
+                            onClick={() => {
+                              this.handleSend({ charCode: 13 });
+                            }}
+                            style={{ cursor: "pointer" }}
+                          />
+                        }
+                        ref={(node) => (this.input = node)}
+                      />
+                    )}
                         {/*<TextArea rows={2} />*/}
                     </div>
                 </div>
@@ -844,6 +938,6 @@ export default connect(
         setCallStatus: (status) => dispatch(VideoCallActions.setCallStatus(status)),
         cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
         setGid: (gid) => dispatch(VideoCallActions.setGid(gid)),
-        hangup: () => dispatch(VideoCallActions.hangup())
+        hangup: () => dispatch(VideoCallActions.hangup()),
     })
 )(Chat)

@@ -73,6 +73,8 @@
 	}
 
 	&-send {
+		display: flex;
+		align-items: center;
 		width: 100%;
 		height: @box-height;
 
@@ -80,7 +82,7 @@
 			display: block;
 			margin-top: (@box-height - 28px) / 2;
 		}
-		.ant-input {
+		.ant-input, .ant-mentions {
 			box-sizing: border-box;
 			border: 0;
 			font-size: 14px;
