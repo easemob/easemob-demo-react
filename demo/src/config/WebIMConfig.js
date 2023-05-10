@@ -13,14 +13,14 @@
 const { appkey, https, rest={} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
 console.log(appkey, https, rest, 'appkey, https, rest')
 
-const isSandBox = false;
+const isSandBox = true
 var config = {
     /*
      * websocket server
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox? '//im-api-v2-hsb.easemob.com/ws':'//im-api-v2.easemob.com/ws'),
+    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox? '//180.184.170.140:8280/ws':'//im-api-v2.easemob.com/ws'),
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
@@ -31,7 +31,7 @@ var config = {
    * Application AppKey
    */
     // easemob-demo#easeim
-    appkey: isSandBox ? '91446724#514456' : 'easemob#easeim',
+    appkey: isSandBox ? 'easemob-demo#sdk111' : 'easemob#easeim',
     /*
    * Application Host
    */

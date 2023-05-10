@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { I18n } from 'react-redux-i18n'
-import { Menu, Dropdown, Card, Tag, message, Modal,Input, Avatar, Select } from 'antd'
+import { Menu, Dropdown, Card, Tag, message, Modal,Input, Avatar, Select, Button } from 'antd'
 import { renderTime, deepGet } from '@/utils'
 import emoji from '@/config/emoji'
 import Audio from '@/components/chat/Audio'
@@ -54,7 +54,15 @@ export default class ChatMessage extends Component {
         ok: PropTypes.func,
         type: PropTypes.any,
     }
-    state = { showImgModal: false, reportMsgVisible: false, reportReason: '', reportType: '涉政' }
+    
+    state = { 
+        showImgModal: false, 
+        reportMsgVisible: false, 
+        reportReason: '', 
+        reportType: '涉政',
+        showModify: false, // 是否是编辑状态
+        editMsgText: '' // 消息编辑的文本内容
+    }
 
     renderTxt = txt => {
         if (txt === undefined) {return []}
@@ -99,20 +107,53 @@ export default class ChatMessage extends Component {
         this.setState({ reportReason: value })
     }
 
-    oncontextmenu = (toJid) => () => {
-        WebIM.conn.recallMessage({
-            to: this.props.to,
-            mid: toJid,
-            type: this.props.type,
-            success: () => {
-                this.props.ok(deepGet(this, 'props.id'))
-            },
-            fail: (err) => {
-                message.error('撤回失败')
-            }
-        }).then((res)=>{
-            console.log('撤回消息成功',res)
+    modifyMessage = () => {
+        const { type,to, toJid }= this.props
+        let chatType = 'singleChat'
+        if(type === 'groupchat'){
+            chatType ='groupChat'
+        }
+        let msg = WebIM.message.create({
+            chatType,
+            type: 'txt',
+            to,
+            msg: this.state.editMsgText,
         })
+        
+        WebIM.conn.modifyMessage({
+            messageId: toJid,
+            modifiedMessage: msg
+        }).then(() => {
+            this.setState({
+                editMsgText: '',
+                showModify: false
+            })
+        }).catch((e)=>{
+            console.log(e, '编辑消息失败')
+        })
+    }
+
+    oncontextmenu =  (e) => {
+        if(e.key === 'recall') {
+            WebIM.conn.recallMessage({
+                to: this.props.to,
+                mid: this.props.toJid,
+                type: this.props.type,
+                success: () => {
+                    this.props.ok(deepGet(this, 'props.id'))
+                },
+                fail: (err) => {
+                    message.error(`撤回失败:${err.reason}`)
+                }
+            }).then((res)=>{
+                console.log('撤回消息成功',res)
+            })
+        } else if (e.key === 'edit') {
+            this.setState({
+                showModify: true,
+                editMsgText: this.props.body.msg
+            })
+        }
     }
 
     handleIdCardClick = (data) => {
@@ -153,7 +194,7 @@ export default class ChatMessage extends Component {
     }
 
     render() {
-        const { bySelf, from, time, body, status, toJid, fromNick, id } = this.props
+        const { bySelf, from, time, body, status, fromNick, id } = this.props
         const cls = classNames('x-message-group', bySelf ? 'x-message-right' : '')
         const localFormat = renderTime(time)
         let useDropdown = true
@@ -162,10 +203,13 @@ export default class ChatMessage extends Component {
         }
         let content = null
         const menu = bySelf? (
-            <Menu onClick={this.oncontextmenu(toJid)}>
-                <Menu.Item>
+            <Menu onClick={this.oncontextmenu}>
+                <Menu.Item key='recall'>
                     撤回
                 </Menu.Item>
+                {this.props.body.type === 'txt' &&  <Menu.Item  key='edit'>
+                    编辑
+                </Menu.Item>}
             </Menu>
         ): <Menu onClick={()=>{
             // 服务器消息id
@@ -173,21 +217,34 @@ export default class ChatMessage extends Component {
             this.setState({ reportMsgVisible: true })
         }}>
             <Menu.Item>
-                    举报
+                举报
             </Menu.Item>
         </Menu>
         switch (body.type) {
         case 'txt':
             content = useDropdown ? (
-                <Dropdown overlay={menu} trigger={[ 'click' ]}>
-                    <p className="x-message-text" >
-                        {this.renderTxt(body.msg || body.url)}
+                this.state.showModify ? (
+                    <p className="x-message-text">
+                        <TextArea
+                            value={this.state.editMsgText}
+                            onChange={(e) => {
+                                this.setState({ editMsgText: e.target.value })
+                            }}
+                        />
+                        <Button onClick={this.modifyMessage} type="link">
+                            保存
+                        </Button>
+                        <Button type="link">取消</Button>
                     </p>
-                </Dropdown>
+                ) : (
+                    <Dropdown overlay={menu} trigger={[ 'click' ]}>
+                        <p className="x-message-text">
+                            {this.renderTxt(body.msg || body.url)}
+                        </p>
+                    </Dropdown>
+                )
             ) : (
-                <p className="x-message-text" >
-                    {this.renderTxt(body.msg)}
-                </p>
+                <p className="x-message-text">{this.renderTxt(body.msg)}</p>
             )
             break
         case 'img':

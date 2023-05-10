@@ -198,14 +198,14 @@ function copy(message, tpl) {
 }
 
 const { Types, Creators } = createActions({
-    addMessage: [ 'message', 'bodyType' ],
+    addMessage: [ 'message', 'bodyType', 'insertDB' ],
     deleteMessage: [ 'id', 'isSelf' ],
     updateMessageStatus: [ 'message', 'status' ],
     updateMessageMid: [ 'id', 'mid' ],
     muteMessage: [ 'mid' ],
     demo: [ 'chatType' ],
     //clearMessage: [ "chatType", "id" ],
-    clearUnread: [ "chatType", "id" ],
+    clearUnread: [ 'chatType', 'id' ],
     // ---------------async------------------
     sendTxtMessage: (chatType, chatId, message = {}) => {
         // console.log('sendTxtMessage', chatType, chatId, message)
@@ -222,7 +222,7 @@ const { Types, Creators } = createActions({
                 to,
                 // roomType: chatroom,
                 chatType: 'singleChat',
-                success: function () {
+                success: function (res) {
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
                 fail: function (e) {
@@ -242,7 +242,9 @@ const { Types, Creators } = createActions({
             //     msgObj.setGroup('groupchat')
             // }
 
-            WebIM.conn.send(msgObj.body)
+            WebIM.conn.send(msgObj.body).then((res)=>{
+                AppDB.updateMessageJid(id, res.serverMsgId)
+            })
             dispatch(Creators.addMessage(pMessage, type))
 
             //测试发自定义消息
@@ -521,6 +523,9 @@ const { Types, Creators } = createActions({
                         'id': id,
                         'messages': res
                     })
+                    res.forEach((msg)=>{
+                        dispatch(Creators.addMessage(msg, msg.body.type, false))
+                    })
                 }
                 cb && cb(res.length)
             })
@@ -566,12 +571,12 @@ const { Types, Creators } = createActions({
         return (dispatch) => {
             const msgObj = new WebIM.message('custom', WebIM.conn.getUniqueId())
 
-            var customEvent = "userCard";  // 创建自定义事件
+            var customEvent = 'userCard'  // 创建自定义事件
             var customExts = {
                 uid: msg.userId,
                 nickname: msg.nick,
                 avatar: msg.avatar
-            };   // 消息内容，key/value 需要 string 类型
+            }   // 消息内容，key/value 需要 string 类型
             msgObj.set({
                 to: chatId,  // 接收消息对象（用户id）
                 customEvent,
@@ -584,19 +589,19 @@ const { Types, Creators } = createActions({
                 fail: function(e){
                     console.log('发送失败')
                 }
-            });
+            })
 
             chatType = chatType.toLowerCase()
             if(chatType === 'groupchat'){
                 msgObj.setChatType('groupChat')
-                WebIM.conn.send(msgObj.body);
+                WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'groupchat'
             }else if( chatType === 'chatroom'){
                 msgObj.setChatType('chatroom')
-                WebIM.conn.send(msgObj.body);
+                WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'chatroom'
             } else{
-                WebIM.conn.send(msgObj.body);
+                WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'chat'
             }
             
@@ -640,7 +645,7 @@ export const INITIAL_STATE = Immutable({
  * @param bodyType enum [txt]
  * @returns {*}
  */
-export const addMessage = (state, { message, bodyType = 'txt' }) => {
+export const addMessage = (state, { message, bodyType = 'txt', insertDB = true }) => {
     !message.status && (message = parseFromServer(message, bodyType))
     const rootState = store.getState()
     const username = _.get(rootState, 'login.username', '')
@@ -689,7 +694,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     !isPushed && chatData.push(_message)
 
     // add a message to db, if by myselt, isUnread equals 0
-    !isPushed && AppDB.addMessage(_message, !bySelf ? 1 : 0)
+    !isPushed && insertDB && AppDB.addMessage(_message, !bySelf ? 1 : 0)
 
     const maxCacheSize = _.includes([ 'group', 'chatroom' ], type) ? WebIM.config.groupMessageCacheSize : WebIM.config.p2pMessageCacheSize
     if (chatData.length > maxCacheSize) {
@@ -719,10 +724,12 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
     let { from } = msg
     let id = msg.mid || msg
     let byId = state.getIn([ 'byId', id ])
+
     if(!byId){
         id =  state.getIn([ 'byMid', id ]).id
         byId = state.getIn([ 'byId', id ])
     }
+
     if(byId){
         const { type, chatId } = byId
         const isSingleChat = type === 'chat' // 是否是单聊
@@ -753,7 +760,7 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
             })
         } else {
             let message = found.setIn([ 'body' ], {
-                ...found.getIn([ 'body']),
+                ...found.getIn([ 'body' ]),
                 msg: recallMsg,
                 isRecall:true
             })

@@ -102,6 +102,19 @@ const AppDB = {
         })
     },
 
+    // update send msg jid
+    updateMessageJid(id, jid) {
+        const $_TABLE = this.$_TABLE
+        return this.exec(resolve => {
+            $_TABLE.where('id')
+                .equals(id)
+                .modify({ 'toJid': jid })
+                .then(res => {
+                    resolve(res)
+                })
+        })
+    },
+
     deleteMessage(id){
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
