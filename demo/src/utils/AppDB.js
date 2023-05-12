@@ -115,6 +115,19 @@ const AppDB = {
         })
     },
 
+    // update send editedInfo
+    updateMessageEditedInfo(id, body) {
+        const $_TABLE = this.$_TABLE
+        return this.exec(resolve => {
+            $_TABLE.where('id')
+                .equals(id)
+                .modify({ body: body })
+                .then(res => {
+                    resolve(res)
+                })
+        })
+    },
+
     deleteMessage(id){
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {

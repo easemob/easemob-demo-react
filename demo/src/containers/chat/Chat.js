@@ -530,8 +530,12 @@ class Chat extends React.Component {
             }, timeout)
         }  
     }
-    ok = (id) => {
+    recallMsg = (id) => {
         this.props.deleteMessage(id, true)
+    }
+
+    editedMsg = (id, msg) => {
+        this.props.editedMessage(id, msg)
     }
 
     handleHoverChange = (visible)=>{
@@ -764,10 +768,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok}{...message} />
+                                return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                             }
                         } else {
-                            return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok} {...message} />
+                            return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                         }
                     })}
                 </div>
@@ -919,6 +923,7 @@ export default connect(
         setGroupMemberAttr: (resp) => dispatch(GroupActions.setGroupMemberAttr(resp)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
+        editedMessage: (id, message) => dispatch(MessageActions.editedMessage(id, message)),
         sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
         sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),
         sendCustomMsg: (chatType, id, message) => dispatch(MessageActions.sendCustomMsg(chatType, id, message)),

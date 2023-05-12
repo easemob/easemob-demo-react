@@ -200,6 +200,7 @@ function copy(message, tpl) {
 const { Types, Creators } = createActions({
     addMessage: [ 'message', 'bodyType', 'insertDB' ],
     deleteMessage: [ 'id', 'isSelf' ],
+    editedMessage: [ 'id', 'editedMsg' ],
     updateMessageStatus: [ 'message', 'status' ],
     updateMessageMid: [ 'id', 'mid' ],
     muteMessage: [ 'mid' ],
@@ -775,6 +776,33 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
     return state
 }
 
+export const editedMessage = (state,{ id:msg, editedMsg }) => {
+    let id = msg.mid || msg
+    let byId = state.getIn([ 'byId', id ])
+
+    if(!byId){
+        id =  state.getIn([ 'byMid', id ]).id
+        byId = state.getIn([ 'byId', id ])
+    }
+
+    if(byId){
+        const { type, chatId } = byId
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: id })
+        let msg = editedMsg.msg
+        let body =  {
+            ...found.getIn([ 'body' ]),
+            msg: msg,
+            modifiedInfo: editedMsg.modifiedInfo
+        }
+        let message = found.setIn([ 'body' ], body)
+        messages.splice(messages.indexOf(found), 1, message)
+        state = state.setIn([ type, chatId ], messages)
+        AppDB.updateMessageEditedInfo(id, body )
+    }
+    return state
+}
+
 /**
  * update message status
  * @param state
@@ -862,6 +890,7 @@ export const fetchMessage = (state, { id, chatType, messages, offset }) => {
 export const reducer = createReducer(INITIAL_STATE, {
     [Types.ADD_MESSAGE]: addMessage,
     [Types.DELETE_MESSAGE]: deleteMessage,
+    [Types.EDITED_MESSAGE]: editedMessage,
     [Types.UPDATE_MESSAGE_STATUS]: updateMessageStatus,
     [Types.UPDATE_MESSAGE_MID]: updateMessageMid,
     [Types.MUTE_MESSAGE]: muteMessage,

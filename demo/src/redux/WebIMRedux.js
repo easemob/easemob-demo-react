@@ -649,6 +649,10 @@ WebIM.conn.addEventHandler("event", {
             }));
         }
     },
+    onModifiedMessage: message => {
+        store.dispatch(MessageActions.editedMessage(message.id, message)) 
+        logger.info('onModifiedMessage', message)
+    },
 });
 
 /* ------------- Types and Action Creators ------------- */
