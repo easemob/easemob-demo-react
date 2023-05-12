@@ -85,7 +85,8 @@ class Chat extends React.Component {
             visible: false,
             checkedValue: '',
             showUserInfoMoadl: false,
-            mentionList: []
+            mentionList: [],
+            canModifiedMsg: false
         }
         this.userInfo = {}
         this.showEdit = false
@@ -615,7 +616,17 @@ class Chat extends React.Component {
         });
     };
 
+    isCanModifiedMessage = () =>{
+      let { entities, roomId } = this.props;
+      let allMember =  _.get(entities.groupMember, `${roomId}.byName`, []);
+      let admins =  _.get(entities.groupMember, `${roomId}.admins`, []);
+      this.setState({
+        canModifiedMsg: admins?.includes(WebIM.conn.user) || allMember?.[WebIM.conn.user]?.affiliation === 'owner'
+      })
+    }
+
     getFromNick = (selectTab, userinfos, message) => {
+
         if (selectTab === "contact") {
           return userinfos;
         } else if(selectTab === 'group') {
@@ -768,10 +779,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
+                                return <ChatMessage key={message.id} canModifiedMsg={this.state.canModifiedMsg} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                             }
                         } else {
-                            return <ChatMessage key={message.id} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
+                            return <ChatMessage key={message.id} canModifiedMsg={this.state.canModifiedMsg}  fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                         }
                     })}
                 </div>

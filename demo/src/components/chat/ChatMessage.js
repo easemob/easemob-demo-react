@@ -123,7 +123,7 @@ export default class ChatMessage extends Component {
   };
 
   modifyMessage = () => {
-    const { type, to, toJid } = this.props;
+    const { type, to, toJid, id } = this.props;
     let chatType = "singleChat";
     if (type === "groupchat") {
       chatType = "groupChat";
@@ -136,7 +136,7 @@ export default class ChatMessage extends Component {
     });
     WebIM.conn
       .modifyMessage({
-        messageId: toJid,
+        messageId: toJid || id,
         modifiedMessage: msg
       })
       .then((res) => {
@@ -151,6 +151,13 @@ export default class ChatMessage extends Component {
         message.error("编辑消息失败");
       });
   };
+
+  cancelModify= () =>{
+    this.setState({
+        editMsgText: "",
+        showModify: false
+    });
+  }
 
   oncontextmenu = (e) => {
     if (e.key === "recall") {
@@ -225,6 +232,7 @@ export default class ChatMessage extends Component {
       useDropdown = false;
     }
     let content = null;
+    
     const menu = bySelf ? (
       <Menu onClick={this.oncontextmenu}>
         <Menu.Item key="recall">撤回</Menu.Item>
@@ -234,13 +242,23 @@ export default class ChatMessage extends Component {
       </Menu>
     ) : (
       <Menu
-        onClick={() => {
-          // 服务器消息id
-          reportMsgId = id;
-          this.setState({ reportMsgVisible: true });
+        onClick={(e) => {
+         if(e.key === 'report'){
+            // 服务器消息id
+            reportMsgId = id;
+            this.setState({ reportMsgVisible: true });
+         }else{
+            this.setState({
+                showModify: true,
+                editMsgText: this.props.body.msg
+            });
+         }
         }}
       >
-        <Menu.Item>举报</Menu.Item>
+        <Menu.Item key="report">举报</Menu.Item>
+        {this.props.body.type === "txt"  && this.props.type === 'groupchat' && this.props.canModifiedMsg && (
+          <Menu.Item key="edit">编辑</Menu.Item>
+        )}
       </Menu>
     );
     switch (body.type) {
@@ -257,7 +275,7 @@ export default class ChatMessage extends Component {
               <Button onClick={this.modifyMessage} type="link">
                 保存
               </Button>
-              <Button type="link">取消</Button>
+              <Button onClick={this.cancelModify} type="link">取消</Button>
             </p>
           ) : (
             <Dropdown overlay={menu} trigger={["click"]}>

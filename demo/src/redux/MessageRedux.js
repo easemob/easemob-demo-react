@@ -781,7 +781,7 @@ export const editedMessage = (state,{ id:msg, editedMsg }) => {
     let byId = state.getIn([ 'byId', id ])
 
     if(!byId){
-        id =  state.getIn([ 'byMid', id ]).id
+        id =  state.getIn([ 'byMid', id ])?.id
         byId = state.getIn([ 'byId', id ])
     }
 
