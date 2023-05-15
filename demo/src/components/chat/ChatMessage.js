@@ -147,8 +147,7 @@ export default class ChatMessage extends Component {
         });
       })
       .catch((err) => {
-        console.log(err, 'err')
-        message.error("编辑消息失败");
+        message.error(`编辑消息失败:${err.message}`);
       });
   };
 

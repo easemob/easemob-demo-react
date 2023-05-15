@@ -8541,6 +8541,9 @@ function modifyMessage(option) {
     messageId = _a.messageId,
     modifiedMessage = _a.modifiedMessage;
   _logger__WEBPACK_IMPORTED_MODULE_27__.logger.debug('Call modifyMessage', messageId, modifiedMessage);
+  if (messageId === '') {
+    throw Error('Invalid parameter: "messageId"');
+  }
   if (modifiedMessage.type !== 'txt') {
     throw Error('Invalid parameter: "modifiedMessage.type"');
   }
@@ -14317,6 +14320,7 @@ function decodeCommSyncDLMsg(result) {
   CommSyncDLMessage = CommSyncDLMessage.decode(result.payload);
   var msgId = new (long__WEBPACK_IMPORTED_MODULE_53___default())(CommSyncDLMessage.serverId.low, CommSyncDLMessage.serverId.high, CommSyncDLMessage.serverId.unsigned).toString();
   var metaId = new (long__WEBPACK_IMPORTED_MODULE_53___default())(CommSyncDLMessage.metaId.low, CommSyncDLMessage.metaId.high, CommSyncDLMessage.metaId.unsigned).toString();
+  console.log(CommSyncDLMessage, 'CommSyncDLMessage');
   // 判断下行消息状态
   if (CommSyncDLMessage.status) {
     // 消息状态正常
@@ -14583,6 +14587,30 @@ function decodeCommSyncDLMsg(result) {
         case 'group is disabled':
           type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.GROUP_IS_DISABLED;
           CommSyncDLMessage.status.reason = 'group is disabled';
+          break;
+        case 'Sorry, edit limit reached':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.MODIFY_MESSAGE_LIMIT_REACHED;
+          CommSyncDLMessage.status.reason = 'Modify message limit reached';
+          break;
+        case 'Sorry,  message does not exist':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.MODIFY_MESSAGE_NOT_EXIST;
+          CommSyncDLMessage.status.reason = 'The message does not exist.';
+          break;
+        case 'Sorry, You do not have permission':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.PERMISSION_DENIED;
+          CommSyncDLMessage.status.reason = 'You do not have  the modified permission.';
+          break;
+        case 'Sorry, format is incorrect':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.MODIFY_MESSAGE_FORMAT_ERROR;
+          CommSyncDLMessage.status.reason = 'The modify messaged format error.';
+          break;
+        case 'Sorry, edit  is not available':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.SERVICE_NOT_ENABLED;
+          CommSyncDLMessage.status.reason = 'The message modify function is not activated.';
+          break;
+        case 'Sorry, edit fail':
+          type = _status__WEBPACK_IMPORTED_MODULE_54__.Code.MODIFY_MESSAGE_FAILED;
+          CommSyncDLMessage.status.reason = 'Modify message failed.';
           break;
         default:
           if (CommSyncDLMessage.status.reason.includes('grpID') && CommSyncDLMessage.status.reason.includes('does not exist!')) {
@@ -20866,6 +20894,18 @@ var Code;
   /** Chat thread already exists. */
   /** chatThread 已经存在。 */
   Code[Code["THREAD_ALREADY_EXIST"] = 1301] = "THREAD_ALREADY_EXIST";
+  /** The message does not exist. */
+  /** 被编辑的消息不存在。 */
+  Code[Code["MODIFY_MESSAGE_NOT_EXIST"] = 1302] = "MODIFY_MESSAGE_NOT_EXIST";
+  /** The modified limit reached. */
+  /** 编辑次数已经达到上限。 */
+  Code[Code["MODIFY_MESSAGE_LIMIT_REACHED"] = 1303] = "MODIFY_MESSAGE_LIMIT_REACHED";
+  /** The modify messaged format error. */
+  /** 编辑消息格式错误。 */
+  Code[Code["MODIFY_MESSAGE_FORMAT_ERROR"] = 1304] = "MODIFY_MESSAGE_FORMAT_ERROR";
+  /** The modify message failed. */
+  /** 编辑消息失败。 */
+  Code[Code["MODIFY_MESSAGE_FAILED"] = 1305] = "MODIFY_MESSAGE_FAILED";
 })(Code || (Code = {}));
 
 
