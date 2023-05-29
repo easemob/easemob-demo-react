@@ -1,0 +1,40 @@
+.message-reply-container{
+    display: flex;
+    align-items: center;
+    .message-close{
+        transform: rotate(45deg);
+        display: inline-block;
+        margin: 0 4px 0 10px;
+        cursor: pointer;
+    }
+}
+.message-reply{
+    bottom: -10px;
+    /* width: fit-content; */
+    right: 0;
+    color: #666666;
+    font-size: 12px;
+    line-height: 20px;
+    background: #F0F0F0;
+    border-radius: 16px;
+    padding: 4px 8px;
+    // margin-top: -12px;
+
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    .msg-file{
+        color: #999999;
+        :hover{
+            color: #00ba6e;
+        }
+    }
+    .reply-txt{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        text-align: left;
+        max-height: 60px;
+        word-break: break-all;
+    }
+}
