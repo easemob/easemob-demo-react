@@ -59,7 +59,7 @@
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "easemob-webrtc": "^3.2.2",
-    "easemob-websdk": "^4.1.5",
+    "easemob-websdk": "^4.1.7",
     "easemob-whiteboards": "^1.0.2",
     "eruda": "^1.2.5",
     "eslint": "^6.6.0",
