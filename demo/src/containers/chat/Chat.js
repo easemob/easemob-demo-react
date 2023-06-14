@@ -69,7 +69,7 @@ function getCurrentUids(groupId, groupMemberAttrs) {
         }
     }
 
-    let uids = [ ...new Set(arr) ]
+    let uids = [...new Set(arr)]
     return uids
 };
 
@@ -192,7 +192,7 @@ class Chat extends React.Component {
 
     setMentionList({ value }) {
         this.setState({
-            mentionList: [ ...this.state.mentionList, value ]
+            mentionList: [...this.state.mentionList, value]
         })
     }
 
@@ -233,7 +233,7 @@ class Chat extends React.Component {
                 ? {
                     msg: value,
                     ext: {
-                        em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [ ...new Set(atList) ]
+                        em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [...new Set(atList)]
                     }
                 }
                 : {
@@ -283,18 +283,18 @@ class Chat extends React.Component {
         let tabs = null
         if (selectTab == 'contact') {
             tabs = [
-                [ '0', `${I18n.t('block')}`, 'iconfont icon-circle-minus' ],
-                [ '1', `${I18n.t('delAFriend')}`, 'iconfont icon-trash' ]
+                ['0', `${I18n.t('block')}`, 'iconfont icon-circle-minus'],
+                ['1', `${I18n.t('delAFriend')}`, 'iconfont icon-trash']
             ]
         } else {
             // stranger
             tabs = [
-                [ '2', `${I18n.t('addFriend')}`, 'anticon anticon-user-add' ],
-                [ '3', `${I18n.t('delete')}`, 'iconfont icon-trash' ]
+                ['2', `${I18n.t('addFriend')}`, 'anticon anticon-user-add'],
+                ['3', `${I18n.t('delete')}`, 'iconfont icon-trash']
             ]
         }
 
-        const tabsItem = tabs.map(([ key, name, icon ]) =>
+        const tabsItem = tabs.map(([key, name, icon]) =>
             <Menu.Item key={key}>
                 <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: 'middle' }} />
                 <span>
@@ -318,32 +318,32 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const search = history.location.search
         switch (key) {
-        case '0':
-            // block a friend
-            this.props.doAddBlacklist(selectItem)
-            history.push('/contact' + search)
-            break
-        case '1':
-            // delete a friend
-            this.props.removeContact(selectItem)
-            history.push('/contact' + search)
-            break
-        case '2':
-            // add a friend
-            this.props.addContact(selectItem)
-            message.success(`${I18n.t('addFriendMessage')}`)
-            break
-        case '3':
-            // delete
-            this.props.deleteStranger(selectItem)
-            history.push('/stranger' + search)
-            break
-        default:
+            case '0':
+                // block a friend
+                this.props.doAddBlacklist(selectItem)
+                history.push('/contact' + search)
+                break
+            case '1':
+                // delete a friend
+                this.props.removeContact(selectItem)
+                history.push('/contact' + search)
+                break
+            case '2':
+                // add a friend
+                this.props.addContact(selectItem)
+                message.success(`${I18n.t('addFriendMessage')}`)
+                break
+            case '3':
+                // delete
+                this.props.deleteStranger(selectItem)
+                history.push('/stranger' + search)
+                break
+            default:
         }
     }
 
     onClearMessage = () => {
-        const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
+        const { selectItem, selectTab } = _.get(this.props, ['match', 'params'], {})
         const chatTypes = { 'contact': 'chat', 'group': 'groupchat', 'chatroom': 'chatroom', 'stranger': 'stranger' }
         const chatType = chatTypes[selectTab]
         this.props.clearMessage(chatType, selectItem)
@@ -496,7 +496,7 @@ class Chat extends React.Component {
             // TODO: optimization needed
             setTimeout(function () {
                 const offset = _this.props.messageList ? _this.props.messageList.length : 0
-                const { selectItem, selectTab } = _.get(_this.props, [ 'match', 'params' ], {})
+                const { selectItem, selectTab } = _.get(_this.props, ['match', 'params'], {})
                 const chatTypes = { 'contact': 'chat', 'group': 'groupchat', 'chatroom': 'chatroom', 'stranger': 'stranger' }
                 const chatType = chatTypes[selectTab]
 
@@ -593,27 +593,27 @@ class Chat extends React.Component {
             let msgId = bySelf ? reply.toJid : reply.id
             let msgPreview = ''
             switch (reply.body.type) {
-            case 'txt':
-                msgPreview = reply.body.msg
-                break
-            case 'img':
-                msgPreview = '[Image]'
-                break
-            case 'audio':
-                msgPreview = '[Voice]'
-                break
-            case 'video':
-                msgPreview = '[Video]'
-                break
-            case 'file':
-                msgPreview = '[File]'
-                break
-            case 'custom':
-                msgPreview = '[Custom]'
-                break
-            default:
-                msgPreview = '[unknown]'
-                break
+                case 'txt':
+                    msgPreview = reply.body.msg
+                    break
+                case 'img':
+                    msgPreview = '[Image]'
+                    break
+                case 'audio':
+                    msgPreview = '[Voice]'
+                    break
+                case 'video':
+                    msgPreview = '[Video]'
+                    break
+                case 'file':
+                    msgPreview = '[File]'
+                    break
+                case 'custom':
+                    msgPreview = '[Custom]'
+                    break
+                default:
+                    msgPreview = '[unknown]'
+                    break
             }
             msg.ext.msgQuote = {
                 'msgID': msgId, //原消息 id
@@ -705,6 +705,12 @@ class Chat extends React.Component {
         anchorElement.scrollIntoView(
             { behavior: 'smooth' }
         )
+
+        anchorElement.childNodes[1].childNodes[0].classList.add('twinkle')
+
+        setTimeout(() => {
+            anchorElement.childNodes[1].childNodes[0].classList.remove('twinkle')
+        }, 2000)
     }
 
     render() {
@@ -724,7 +730,7 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
 
         const back = () => {
-            const redirectPath = '/' + [ selectTab ].join('/') + location.search
+            const redirectPath = '/' + [selectTab].join('/') + location.search
             history.push(redirectPath)
         }
 
@@ -830,7 +836,7 @@ class Chat extends React.Component {
                                 ? <Dropdown
                                     overlay={this.renderContactMenu(selectTab)}
                                     placement="bottomRight"
-                                    trigger={[ 'click' ]}
+                                    trigger={['click']}
                                 >
                                     <Icon type="ellipsis" />
                                 </Dropdown>
@@ -935,14 +941,14 @@ class Chat extends React.Component {
                                     )
                                 })}
                             </Mentions><div>
-                                <i
-                                    className="fontello icon-paper-plane"
-                                    onClick={() => {
-                                        this.handleSend({ charCode: 13 })
-                                    }}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            </div></>
+                                    <i
+                                        className="fontello icon-paper-plane"
+                                        onClick={() => {
+                                            this.handleSend({ charCode: 13 })
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </div></>
                         ) : (
                             <Input
                                 value={this.state.value}
