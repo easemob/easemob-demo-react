@@ -13,7 +13,7 @@
 const { appkey, https, rest={} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
 console.log(appkey, https, rest, 'appkey, https, rest')
 
-const isSandBox = true
+const isSandBox = false
 var config = {
     /*
      * websocket server
@@ -31,7 +31,7 @@ var config = {
    * Application AppKey
    */
     // easemob-demo#easeim
-    appkey: isSandBox ? 'easemob-demo#sdk111' : 'easemob#easeim',
+    appkey: isSandBox ? 'easemob-demo#support' : 'easemob#easeim',
     /*
    * Application Host
    */

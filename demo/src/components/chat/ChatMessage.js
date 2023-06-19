@@ -140,7 +140,7 @@ export default class ChatMessage extends Component {
         modifiedMessage: msg
       })
       .then((res) => {
-        this.props.onEditedMsg(deepGet(this, "props.id"), res.message)
+        this.props.onEditedMsg(deepGet(this, "props.id"), res.message);
         this.setState({
           editMsgText: "",
           showModify: false
@@ -151,12 +151,12 @@ export default class ChatMessage extends Component {
       });
   };
 
-  cancelModify= () =>{
+  cancelModify = () => {
     this.setState({
-        editMsgText: "",
-        showModify: false
+      editMsgText: "",
+      showModify: false
     });
-  }
+  };
 
   oncontextmenu = (e) => {
     if (e.key === "recall") {
@@ -225,13 +225,13 @@ export default class ChatMessage extends Component {
     const { bySelf, from, time, body, status, fromNick, id } = this.props;
     const cls = classNames("x-message-group", bySelf ? "x-message-right" : "");
     const localFormat = renderTime(time);
-    const isModified  = body?.modifiedInfo
+    const isModified = body?.modifiedInfo;
     let useDropdown = true;
     if (body.isRecall) {
       useDropdown = false;
     }
     let content = null;
-    
+
     const menu = bySelf ? (
       <Menu onClick={this.oncontextmenu}>
         <Menu.Item key="recall">撤回</Menu.Item>
@@ -242,22 +242,22 @@ export default class ChatMessage extends Component {
     ) : (
       <Menu
         onClick={(e) => {
-         if(e.key === 'report'){
+          if (e.key === "report") {
             // 服务器消息id
             reportMsgId = id;
             this.setState({ reportMsgVisible: true });
-         }else{
+          } else {
             this.setState({
-                showModify: true,
-                editMsgText: this.props.body.msg
+              showModify: true,
+              editMsgText: this.props.body.msg
             });
-         }
+          }
         }}
       >
         <Menu.Item key="report">举报</Menu.Item>
-        {this.props.body.type === "txt"  && this.props.type === 'groupchat' && this.props.canModifiedMsg && (
-          <Menu.Item key="edit">编辑</Menu.Item>
-        )}
+        {this.props.body.type === "txt" &&
+          this.props.type === "groupchat" &&
+          this.props.canModifiedMsg && <Menu.Item key="edit">编辑</Menu.Item>}
       </Menu>
     );
     switch (body.type) {
@@ -274,16 +274,22 @@ export default class ChatMessage extends Component {
               <Button onClick={this.modifyMessage} type="link">
                 保存
               </Button>
-              <Button onClick={this.cancelModify} type="link">取消</Button>
+              <Button onClick={this.cancelModify} type="link">
+                取消
+              </Button>
             </p>
           ) : (
             <Dropdown overlay={menu} trigger={["click"]}>
               <p className="x-message-text">
                 {this.renderTxt(body.msg || body.url)}
-                {isModified &&
-                <Tooltip placement="topRight" title={JSON.stringify(body.modifiedInfo)}>
-                    <span style={{cursor: 'pointer'}}>（EDITED）</span>    
-                </Tooltip>}
+                {isModified && (
+                  <Tooltip
+                    placement="topRight"
+                    title={JSON.stringify(body.modifiedInfo)}
+                  >
+                    <span style={{ cursor: "pointer" }}>（EDITED）</span>
+                  </Tooltip>
+                )}
               </p>
             </Dropdown>
           )
