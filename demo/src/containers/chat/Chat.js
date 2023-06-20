@@ -27,10 +27,14 @@ import AddAVMemberModal from '@/components/videoCall/AddAVMemberModal'
 import ModalComponent from '@/components/common/ModalComponent'
 import RecordAudio from '@/components/recorder/index'
 import UserInfoModal from '@/components/contact/UserInfoModal'
-import { MENTION_ALL } from "@/const/"
-let groupMemberNickIdMap = {};
-
-const rtc = WebIM.rtc;
+import { MENTION_ALL } from '@/const/'
+import ReplyMessage from '@/components/chat/ReplyMessage'
+// import { getLinkPreview, getPreviewFromContent } from 'link-preview-js'
+// import fetch from 'isomorphic-unfetch'
+// import spotify from 'spotify-url-info'
+// const { getData, getPreview, getTracks, getDetails } = spotify(fetch)
+let groupMemberNickIdMap = {}
+const rtc = WebIM.rtc
 const { TextArea } = Input
 const FormItem = Form.Item
 const { PAGE_NUM } = config
@@ -43,29 +47,29 @@ const chatType = {
 }
 
 function isContain(dom) {
-    const totalHeight = window.innerHeight || document.documentElement.clientHeight;
-    const totalWidth = window.innerWidth || document.documentElement.clientWidth;
+    const totalHeight = window.innerHeight || document.documentElement.clientHeight
+    const totalWidth = window.innerWidth || document.documentElement.clientWidth
     // 当滚动条滚动时，top, left, bottom, right时刻会发生改变。
-    const { top, right, bottom, left } = dom.getBoundingClientRect();
-    return (top >= 0 && left >= 0 && right <= totalWidth && bottom <= totalHeight);
+    const { top, right, bottom, left } = dom.getBoundingClientRect()
+    return (top >= 0 && left >= 0 && right <= totalWidth && bottom <= totalHeight)
 }
 
-var scrollTimer;
-const timeout = 500;
-function getCurrentUids (groupId, groupMemberAttrs) {
-    let arr = [];
+var scrollTimer
+const timeout = 500
+function getCurrentUids(groupId, groupMemberAttrs) {
+    let arr = []
     let hasAttrUidList = Object.keys(groupMemberAttrs?.[groupId] || {})
     let childrenList = document.getElementsByClassName('x-message-group')
     for (var dom of childrenList) {
-        if(isContain(dom)){
-            let uid = dom.getAttribute('uid');
-            if(uid && !hasAttrUidList.includes(uid)){
+        if (isContain(dom)) {
+            let uid = dom.getAttribute('uid')
+            if (uid && !hasAttrUidList.includes(uid)) {
                 arr.push(uid)
             }
         }
-      }  
+    }
 
-    let uids =  [...new Set(arr)]
+    let uids = [...new Set(arr)]
     return uids
 };
 
@@ -130,10 +134,11 @@ class Chat extends React.Component {
             // todo i18n
             return message.error(`${I18n.t('invalidType')}: ${file.filetype}`, 1)
         }
-
-        this.props.sendImgMessage(chatType[selectTab], selectItem, { isRoom }, file, () => {
+        let msg = this.addReplyMsg({})
+        this.props.sendImgMessage(chatType[selectTab], selectItem, { isRoom }, file, msg.ext, () => {
             this.image.value = null
         })
+        this.props.replyMessage(null)
     }
 
     fileChange(e) {
@@ -147,10 +152,11 @@ class Chat extends React.Component {
             this.file.value = null
             return false
         }
-
-        this.props.sendFileMessage(chatType[selectTab], selectItem, { isRoom }, file, () => {
+        let msg = this.addReplyMsg({})
+        this.props.sendFileMessage(chatType[selectTab], selectItem, { isRoom }, file, msg.ext, () => {
             this.file.value = null
         })
+        this.props.replyMessage(null)
     }
 
     handleEmojiSelect(v) {
@@ -184,60 +190,63 @@ class Chat extends React.Component {
         })
     }
 
-    setMentionList({value}) {
-      this.setState({
-        mentionList: [...this.state.mentionList, value]
-      })
+    setMentionList({ value }) {
+        this.setState({
+            mentionList: [...this.state.mentionList, value]
+        })
     }
 
     handleChange(e) {
-      const { selectTab } = this.props.match.params;
-      const v = chatType[selectTab] === "groupchat" ? e : e?.target?.value;
-      const splitValue = this.state?.value ? this.state?.value.split("") : [];
-      splitValue.pop();
-      if (v == splitValue.join("")) {
-        this.handleEmojiCancel();
-      } else {
-        this.setState({
-          value: v
-        });
-      }
+        const { selectTab } = this.props.match.params
+        const v = chatType[selectTab] === 'groupchat' ? e : e?.target?.value
+        const splitValue = this.state?.value ? this.state?.value.split('') : []
+        splitValue.pop()
+        if (v == splitValue.join('')) {
+            this.handleEmojiCancel()
+        } else {
+            this.setState({
+                value: v
+            })
+        }
     }
 
     handleSend(e) {
-      if (e.charCode === 13) {
-        e.preventDefault?.();
-        const { match } = this.props;
-        const { selectItem, selectTab } = match.params;
-        const isGroupChat = chatType[selectTab] === "groupchat";
-        const { value, mentionList } = this.state;
-        let atList = [];
-        if (isGroupChat && mentionList.length) {
-          atList = mentionList
-            .filter((item) => {
-              return value.includes(`@${item}`);
-            })
-            .map((nickItem) => {
-              return groupMemberNickIdMap[nickItem];
-            });
-        }
-        if (!value) return;
-        let msg = isGroupChat
-          ? {
-              msg: value,
-              ext: {
-                em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [...new Set(atList)]
-              }
+        if (e.charCode === 13) {
+            e.preventDefault?.()
+            const { match } = this.props
+            const { selectItem, selectTab } = match.params
+            const isGroupChat = chatType[selectTab] === 'groupchat'
+            const { value, mentionList } = this.state
+
+            let atList = []
+            if (isGroupChat && mentionList.length) {
+                atList = mentionList
+                    .filter((item) => {
+                        return value.includes(`@${item}`)
+                    })
+                    .map((nickItem) => {
+                        return groupMemberNickIdMap[nickItem]
+                    })
             }
-          : {
-              msg: value
-            };
-        this.props.sendTxtMessage(chatType[selectTab], selectItem, msg);
-        this.setState({
-          mentionList: []
-        })
-        this.emitEmpty();
-      }
+            if (!value) return
+            let msg = isGroupChat
+                ? {
+                    msg: value,
+                    ext: {
+                        em_at_list: mentionList.includes(MENTION_ALL) ? MENTION_ALL : [...new Set(atList)]
+                    }
+                }
+                : {
+                    msg: value
+                }
+            msg = this.addReplyMsg(msg)
+            this.props.sendTxtMessage(chatType[selectTab], selectItem, msg)
+            this.setState({
+                mentionList: []
+            })
+            this.emitEmpty()
+            this.props.replyMessage(null)
+        }
     }
 
     emitEmpty() {
@@ -274,18 +283,18 @@ class Chat extends React.Component {
         let tabs = null
         if (selectTab == 'contact') {
             tabs = [
-                [ '0', `${I18n.t('block')}`, 'iconfont icon-circle-minus' ],
-                [ '1', `${I18n.t('delAFriend')}`, 'iconfont icon-trash' ]
+                ['0', `${I18n.t('block')}`, 'iconfont icon-circle-minus'],
+                ['1', `${I18n.t('delAFriend')}`, 'iconfont icon-trash']
             ]
         } else {
             // stranger
             tabs = [
-                [ '2', `${I18n.t('addFriend')}`, 'anticon anticon-user-add' ],
-                [ '3', `${I18n.t('delete')}`, 'iconfont icon-trash' ]
+                ['2', `${I18n.t('addFriend')}`, 'anticon anticon-user-add'],
+                ['3', `${I18n.t('delete')}`, 'iconfont icon-trash']
             ]
         }
 
-        const tabsItem = tabs.map(([ key, name, icon ]) =>
+        const tabsItem = tabs.map(([key, name, icon]) =>
             <Menu.Item key={key}>
                 <i className={icon} style={{ fontSize: 20, marginRight: 12, verticalAlign: 'middle' }} />
                 <span>
@@ -309,32 +318,32 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const search = history.location.search
         switch (key) {
-        case '0':
-            // block a friend
-            this.props.doAddBlacklist(selectItem)
-            history.push('/contact' + search)
-            break
-        case '1':
-            // delete a friend
-            this.props.removeContact(selectItem)
-            history.push('/contact' + search)
-            break
-        case '2':
-            // add a friend
-            this.props.addContact(selectItem)
-            message.success(`${I18n.t('addFriendMessage')}`)
-            break
-        case '3':
-            // delete
-            this.props.deleteStranger(selectItem)
-            history.push('/stranger' + search)
-            break
-        default:
+            case '0':
+                // block a friend
+                this.props.doAddBlacklist(selectItem)
+                history.push('/contact' + search)
+                break
+            case '1':
+                // delete a friend
+                this.props.removeContact(selectItem)
+                history.push('/contact' + search)
+                break
+            case '2':
+                // add a friend
+                this.props.addContact(selectItem)
+                message.success(`${I18n.t('addFriendMessage')}`)
+                break
+            case '3':
+                // delete
+                this.props.deleteStranger(selectItem)
+                history.push('/stranger' + search)
+                break
+            default:
         }
     }
 
     onClearMessage = () => {
-        const { selectItem, selectTab } = _.get(this.props, [ 'match', 'params' ], {})
+        const { selectItem, selectTab } = _.get(this.props, ['match', 'params'], {})
         const chatTypes = { 'contact': 'chat', 'group': 'groupchat', 'chatroom': 'chatroom', 'stranger': 'stranger' }
         const chatType = chatTypes[selectTab]
         this.props.clearMessage(chatType, selectItem)
@@ -346,7 +355,7 @@ class Chat extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if(prevProps?.entities?.group?.groupMemberAttrsMap === this.props?.entities?.group?.groupMemberAttrsMap){
+        if (prevProps?.entities?.group?.groupMemberAttrsMap === this.props?.entities?.group?.groupMemberAttrsMap) {
             this.scollBottom()
         }
     }
@@ -368,7 +377,7 @@ class Chat extends React.Component {
         if (this.timer) clearTimeout(this.timer)
     }
 
-    callVideo = () =>{
+    callVideo = () => {
         if (this.props.callStatus > 0) {
             console.log(this.props.callStatus)
             return Message.error('正在通话中')
@@ -379,7 +388,7 @@ class Chat extends React.Component {
         } = this.props
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行视频通话'
-        const callId = WebIM.conn.getUniqueId().toString();
+        const callId = WebIM.conn.getUniqueId().toString()
         const channelName = Math.uuid(8)
         if (selectTab === 'contact') {
             this.props.sendTxtMessage(chatType[selectTab], selectItem, {
@@ -395,7 +404,7 @@ class Chat extends React.Component {
                 }
             })
             this.props.updateConfr({
-                ext:{
+                ext: {
                     channelName: channelName,
                     type: 1,
                     callerDevId: WebIM.conn.context.jid.clientResource,
@@ -405,7 +414,7 @@ class Chat extends React.Component {
                 callerIMName: WebIM.conn.context.jid.name,
                 calleeIMName: selectItem
             })
-        }else  if (selectTab === 'group'){
+        } else if (selectTab === 'group') {
             this.props.showInviteModal()
             this.props.setGid(selectItem)
             // this.props.updateConfrInfo(selectItem, false, false)
@@ -418,7 +427,7 @@ class Chat extends React.Component {
             if (selectTab === 'contact') {
                 this.props.cancelCall(to)
                 this.props.hangup()
-            }else{
+            } else {
                 // 多人不做超时
             }
         }, 30000)
@@ -440,7 +449,7 @@ class Chat extends React.Component {
         const { selectItem, selectTab } = match.params
         const value = '邀请您进行语音通话'
 
-        const callId = WebIM.conn.getUniqueId().toString();
+        const callId = WebIM.conn.getUniqueId().toString()
         const channelName = Math.uuid(8)
         this.props.sendTxtMessage(chatType[selectTab], selectItem, {
             msg: value,
@@ -456,7 +465,7 @@ class Chat extends React.Component {
             }
         })
         this.props.updateConfr({
-            ext:{
+            ext: {
                 channelName: channelName,
                 token: null,
                 type: 0,
@@ -475,7 +484,7 @@ class Chat extends React.Component {
             if (selectTab === 'contact') {
                 this.props.cancelCall(to)
                 this.props.hangup()
-            }else{
+            } else {
                 // 多人不做超时
             }
         }, 30000)
@@ -487,7 +496,7 @@ class Chat extends React.Component {
             // TODO: optimization needed
             setTimeout(function () {
                 const offset = _this.props.messageList ? _this.props.messageList.length : 0
-                const { selectItem, selectTab } = _.get(_this.props, [ 'match', 'params' ], {})
+                const { selectItem, selectTab } = _.get(_this.props, ['match', 'params'], {})
                 const chatTypes = { 'contact': 'chat', 'group': 'groupchat', 'chatroom': 'chatroom', 'stranger': 'stranger' }
                 const chatType = chatTypes[selectTab]
 
@@ -509,27 +518,27 @@ class Chat extends React.Component {
         }
 
         let groupId = this.props.entities.group.currentId
-        if(groupId){
+        if (groupId) {
             clearTimeout(scrollTimer)
-            scrollTimer = setTimeout(()=>{
-                let uids = getCurrentUids(groupId, this.props.entities.group?.groupMemberAttrsMap);
-                if(uids.length > 0) {
+            scrollTimer = setTimeout(() => {
+                let uids = getCurrentUids(groupId, this.props.entities.group?.groupMemberAttrsMap)
+                if (uids.length > 0) {
                     return WebIM.conn.getGroupMembersAttributes({
                         groupId,
                         userIds: uids,
                         keys: []
-                    }).then((res)=>{
-                        this.props.setGroupMemberAttr({groupId, attributes:res.data})
-                    }).catch((e)=>{
+                    }).then((res) => {
+                        this.props.setGroupMemberAttr({ groupId, attributes: res.data })
+                    }).catch((e) => {
                         let attrs = {}
                         uids.forEach((item) => {
-                            attrs[item] =  {nickName: ''}
+                            attrs[item] = { nickName: '' }
                         })
-                        this.props.setGroupMemberAttr({groupId, attributes:attrs})
+                        this.props.setGroupMemberAttr({ groupId, attributes: attrs })
                     })
                 }
             }, timeout)
-        }  
+        }
     }
     recallMsg = (id) => {
         this.props.deleteMessage(id, true)
@@ -547,24 +556,23 @@ class Chat extends React.Component {
 
     onChange = e => {
         this.setState({
-          checkedValue: e.target.value,
-        });
+            checkedValue: e.target.value,
+        })
     };
 
-    sendIdCardMsg = async ()=>{
+    sendIdCardMsg = async () => {
         const { selectItem, selectTab } = this.props.match.params
         let chatType
         if (selectTab === 'contact') {
             chatType = 'singleChat'
-        } else if(selectTab === 'group'){
+        } else if (selectTab === 'group') {
             chatType = 'groupchat'
         } else {
             chatType = 'chatroom'
         }
 
-
         let userId = this.state.checkedValue
-        
+
         let info = await this.props.getUserInfo(userId)
         info = info.data[userId]
         let msg = {
@@ -572,13 +580,56 @@ class Chat extends React.Component {
             nick: info.nickname || '',
             avatar: info.avatarurl || ''
         }
+        msg = this.addReplyMsg(msg)
         this.props.sendCustomMsg(chatType, selectItem, msg)
-         this.setState({
+        this.setState({
             visible: false
         })
+        this.props.replyMessage(null)
     }
-    onClickIdCard = async (data) =>{
-        let res  = await this.props.getUserInfo(data.uid)
+    addReplyMsg = (msg) => {
+        const { reply } = this.props.entities.message
+        if (reply) {
+            if (!msg.ext) {
+                msg.ext = {}
+            }
+            let bySelf = reply.from == WebIM.conn.user || reply.from == ''
+            let msgId = bySelf ? reply.toJid : reply.id
+            let msgPreview = ''
+            switch (reply.body.type) {
+                case 'txt':
+                    msgPreview = reply.body.msg
+                    break
+                case 'img':
+                    msgPreview = '[Image]'
+                    break
+                case 'audio':
+                    msgPreview = '[Voice]'
+                    break
+                case 'video':
+                    msgPreview = '[Video]'
+                    break
+                case 'file':
+                    msgPreview = '[File]'
+                    break
+                case 'custom':
+                    msgPreview = '[Custom]'
+                    break
+                default:
+                    msgPreview = '[unknown]'
+                    break
+            }
+            msg.ext.msgQuote = {
+                'msgID': msgId, //原消息 id
+                'msgPreview': msgPreview, //原消息的描述，用于显示在消息列表气泡中，超过字符限制将被截取,
+                'msgSender': reply.from || WebIM.conn.user,//原消息的发送者，建议使用备注名或昵称,
+                'msgType': reply.body.type, //原消息类型,
+            }
+        }
+        return msg
+    }
+    onClickIdCard = async (data) => {
+        let res = await this.props.getUserInfo(data.uid)
         let info = res.data[data.uid]
         this.userInfo = info
         this.userInfo.userId = data.uid
@@ -594,26 +645,26 @@ class Chat extends React.Component {
     }
 
     getGroupMember = () => {
-        let { entities, roomId } = this.props;
-        const members = _.get(entities.groupMember, `${roomId}.byName`, []);
-        let groupInfo = entities.group;
+        let { entities, roomId } = this.props
+        const members = _.get(entities.groupMember, `${roomId}.byName`, [])
+        let groupInfo = entities.group
         return _.map(members, (val, key) => {
-          const { info, name } = val;
-    
-          let nickname =
-            groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
-            info.nickname ||
-            val.name;
-          groupMemberNickIdMap[nickname] = name;
-    
-          return {
-            name: nickname,
-            key,
-            id: name
-          };
+            const { info, name } = val
+
+            let nickname =
+                groupInfo?.groupMemberAttrsMap?.[roomId]?.[name]?.nickName ||
+                info.nickname ||
+                val.name
+            groupMemberNickIdMap[nickname] = name
+
+            return {
+                name: nickname,
+                key,
+                id: name
+            }
         }).filter((item) => {
-          return item.id !== WebIM.conn.user;
-        });
+            return item.id !== WebIM.conn.user
+        })
     };
 
     isCanModifiedMessage = () =>{
@@ -624,18 +675,54 @@ class Chat extends React.Component {
     }
 
     getFromNick = (selectTab, userinfos, message) => {
-
-        if (selectTab === "contact") {
-          return userinfos;
-        } else if(selectTab === 'group') {
+        if (selectTab === 'contact') {
+            return userinfos
+        } else if (selectTab === 'group') {
             let groupId = this.props.entities.group.currentId
             let from = message.from
-            if(!from){
+            if (!from) {
                 from = WebIM.conn.user
             }
-          return this.props.entities.group?.groupMemberAttrsMap?.[groupId]?.[from]?.nickName || userinfos[from]?.info?.nickname || from;
+            return this.props.entities.group?.groupMemberAttrsMap?.[groupId]?.[from]?.nickName || userinfos[from]?.info?.nickname || from
         }
     };
+
+    reply = (mid, data) => {
+        let ext = data.ext?.asMutable() || {}
+        let msgId = data.bySelf ? data.toJid : data.id
+        ext.msgQuote = {
+            msgID: msgId,
+            msgPreview: data.body.msg,
+            msgSender: data.from || WebIM.conn.user,
+            msgType: data.body.type
+        }
+
+        let msg = {
+            ...data,
+            bySelf: false,
+            ext
+        }
+        this.props.replyMessage(msg)
+    }
+
+    gotoMessage = (data) => {
+        const msgId = data.ext?.msgQuote.msgID
+        const replyMsgType = data.ext?.msgQuote.msgType
+        let anchorElement = document.getElementById(msgId)
+
+        if (!anchorElement) {
+            return message.error('原消息无法定位')
+        }
+        anchorElement.scrollIntoView(
+            { behavior: 'smooth' }
+        )
+
+        anchorElement.childNodes[1].childNodes[0].classList.add('twinkle')
+
+        setTimeout(() => {
+            anchorElement.childNodes[1].childNodes[0].classList.remove('twinkle')
+        }, 2000)
+    }
 
     render() {
         this.logger.info('chat component render')
@@ -649,14 +736,12 @@ class Chat extends React.Component {
             confrModal,
             inviteModal,
             roomId,
-            entities
+            entities,
         } = this.props
-
         const { selectItem, selectTab } = match.params
-        
 
         const back = () => {
-            const redirectPath = '/' + [ selectTab ].join('/') + location.search
+            const redirectPath = '/' + [selectTab].join('/') + location.search
             history.push(redirectPath)
         }
 
@@ -667,7 +752,7 @@ class Chat extends React.Component {
         let isShowDeleteGroupNotice = selectTab === 'group' && entities?.group?.currentGroupCustom !== 'default'
         if (selectTab === 'contact') {
             let withInfoUsers = this.props.entities.roster.byName
-            userinfos  = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname || name: name
+            userinfos = name = withInfoUsers ? withInfoUsers[selectItem]?.info?.nickname || name : name
         }
         if (selectTab === 'group') {
             userinfos = this.props.entities.groupMember[selectItem]?.byName || {}
@@ -697,12 +782,13 @@ class Chat extends React.Component {
 
         const { showWebRTC } = this.state
 
-        const content = ()=>{
+
+        const content = () => {
             const radioStyle = {
                 display: 'block',
                 height: '30px',
                 lineHeight: '30px',
-            };
+            }
 
             const container = {
                 height: '150px',
@@ -716,7 +802,7 @@ class Chat extends React.Component {
             users.forEach((item, index) => {
                 list.push(
                     <Radio style={radioStyle} value={item} key={item}>
-                      {withInfoUsers[item]?.info?.nickname || item}
+                        {withInfoUsers[item]?.info?.nickname || item}
                     </Radio>
                 )
             })
@@ -732,27 +818,28 @@ class Chat extends React.Component {
                 </div>
             )
         }
+
         return (
             <div className="x-chat">
                 <div className="x-list-item x-chat-header">
-                {collapsed
-                            ? <Icon
-                                type="arrow-left"
-                                onClick={back}
-                                style={{
-                                    cursor: 'pointer',
-                                    fontSize: 20,
-                                    verticalAlign: 'middle',
-                                    marginRight: 10,
-                                    float: 'left',
-                                    lineHeight: '50px'
-                                }}
-                            />
-                            : null}
-                    <div className={`fl ${isShowDeleteGroupNotice?"notice":''}`}>
-                        
+                    {collapsed
+                        ? <Icon
+                            type="arrow-left"
+                            onClick={back}
+                            style={{
+                                cursor: 'pointer',
+                                fontSize: 20,
+                                verticalAlign: 'middle',
+                                marginRight: 10,
+                                float: 'left',
+                                lineHeight: '50px'
+                            }}
+                        />
+                        : null}
+                    <div className={`fl ${isShowDeleteGroupNotice ? 'notice' : ''}`}>
+
                         <span>{name}</span>
-                        {isShowDeleteGroupNotice ?<span>该群仅供试用，72小时后将被删除</span>: ''}
+                        {isShowDeleteGroupNotice ? <span>该群仅供试用，72小时后将被删除</span> : ''}
                     </div>
                     <div className="fr">
                         <span style={{ color: '#8798a4', cursor: 'pointer' }}>
@@ -760,7 +847,7 @@ class Chat extends React.Component {
                                 ? <Dropdown
                                     overlay={this.renderContactMenu(selectTab)}
                                     placement="bottomRight"
-                                    trigger={[ 'click' ]}
+                                    trigger={['click']}
                                 >
                                     <Icon type="ellipsis" />
                                 </Dropdown>
@@ -777,14 +864,19 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
+                                return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()} onReply={this.reply} gotoMessage={this.gotoMessage} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                             }
                         } else {
-                            return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()}  fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
+                            return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()} onReply={this.reply} gotoMessage={this.gotoMessage}  fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                         }
                     })}
                 </div>
+                {
+                    entities.message.reply ? <ReplyMessage message={entities.message.reply} onCancel={() => this.props.replyMessage(null)} close></ReplyMessage> : ''
+                }
+
                 <div className="x-chat-footer">
+
                     <div className="x-list-item x-chat-ops">
                         {/* emoji */}
                         <div className="x-chat-ops-icon ib">
@@ -794,7 +886,7 @@ class Chat extends React.Component {
                         <label
                             htmlFor="uploadImage"
                             className="x-chat-ops-icon ib"
-                            onClick={() => this.image && this.image.focus()&&this.image.click()}>
+                            onClick={() => this.image && this.image.focus() && this.image.click()}>
                             <i className="iconfont icon-picture" />
                             <input
                                 id="uploadImage"
@@ -808,7 +900,7 @@ class Chat extends React.Component {
                         <label
                             htmlFor="uploadFile"
                             className="x-chat-ops-icon ib"
-                            onClick={() => this.file && this.file.focus() &&this.file.click()}>
+                            onClick={() => this.file && this.file.focus() && this.file.click()}>
                             <i className="icon iconfont icon-file-empty" />
                             <input
                                 id="uploadFile"
@@ -820,75 +912,72 @@ class Chat extends React.Component {
                         </label>
                         {/* webrtc video && audio && 发送音频 */}
                         {webrtcButtons}
-                        {WebIM.config.isWebRTC && <RecordAudio match={match}/>}
+                        {WebIM.config.isWebRTC && <RecordAudio match={match} />}
                         {/* clear */}
                         <label htmlFor="clearMessage" className="x-chat-ops-icon ib" onClick={this.onClearMessage}>
                             <i className="icon iconfont icon-trash"></i>
                         </label>
 
-                        
-                        <Popover 
-                            content={content()} 
-                            title="" 
+
+                        <Popover
+                            content={content()}
+                            title=""
                             trigger="click"
                             visible={this.state.visible}
                             onVisibleChange={this.handleHoverChange}
                         >
-                            <Icon type="idcard" style={{padding:'0 15px'}} className="icon iconfont icon-trash"/>
+                            <Icon type="idcard" style={{ padding: '0 15px' }} className="icon iconfont icon-trash" />
                         </Popover>
                     </div>
                     <div className="x-list-item x-chat-send">
-                    {chatType[selectTab] === "groupchat" ? (
-                      <>
-                        <Mentions
-                          value={this.state.value}
-                          onChange={this.handleChange}
-                          onSelect={(e) => {
-                            this.setMentionList(e);
-                          }}
-                          onKeyPress={this.handleSend}
-                          placeholder={I18n.t("message")}
-                          ref={(node) => (this.input = node)}
-                        >
-                          <Mentions.Option key={MENTION_ALL} value={MENTION_ALL}>
-                            {MENTION_ALL}
-                          </Mentions.Option>
-                          {this.getGroupMember().map((member) => {
-                            return (
-                              <Mentions.Option key={member.id} value={`${member.name}`}>
-                                {member.name}
-                              </Mentions.Option>
-                            );
-                          })}
-                        </Mentions>
-                        <div>
-                          <i
-                            className="fontello icon-paper-plane"
-                            onClick={() => {
-                              this.handleSend({ charCode: 13 });
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <Input
-                        value={this.state.value}
-                        onChange={this.handleChange}
-                        onKeyPress={this.handleSend}
-                        placeholder={I18n.t("message")}
-                        addonAfter={
-                          <i
-                            className="fontello icon-paper-plane"
-                            onClick={() => {
-                              this.handleSend({ charCode: 13 });
-                            }}
-                            style={{ cursor: "pointer" }}
-                          />
-                        }
-                        ref={(node) => (this.input = node)}
-                      />
-                    )}
+                        {chatType[selectTab] === 'groupchat' ? (
+                            <><Mentions
+                                value={this.state.value}
+                                onChange={this.handleChange}
+                                onSelect={(e) => {
+                                    this.setMentionList(e)
+                                }}
+                                onKeyPress={this.handleSend}
+                                placeholder={I18n.t('message')}
+                                ref={(node) => (this.input = node)}
+                            >
+                                <Mentions.Option key={MENTION_ALL} value={MENTION_ALL}>
+                                    {MENTION_ALL}
+                                </Mentions.Option>
+                                {this.getGroupMember().map((member) => {
+                                    return (
+                                        <Mentions.Option key={member.id} value={`${member.name}`}>
+                                            {member.name}
+                                        </Mentions.Option>
+                                    )
+                                })}
+                            </Mentions><div>
+                                    <i
+                                        className="fontello icon-paper-plane"
+                                        onClick={() => {
+                                            this.handleSend({ charCode: 13 })
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </div></>
+                        ) : (
+                            <Input
+                                value={this.state.value}
+                                onChange={this.handleChange}
+                                onKeyPress={this.handleSend}
+                                placeholder={I18n.t('message')}
+                                addonAfter={
+                                    <i
+                                        className="fontello icon-paper-plane"
+                                        onClick={() => {
+                                            this.handleSend({ charCode: 13 })
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                }
+                                ref={(node) => (this.input = node)}
+                            />
+                        )}
                         {/*<TextArea rows={2} />*/}
                     </div>
                 </div>
@@ -913,7 +1002,7 @@ class Chat extends React.Component {
                     component={UserInfoModal}
                     onModalClose={this.handleInfoModalClose}
                 />
-            </div>
+            </div >
         )
     }
 }
@@ -925,6 +1014,7 @@ export default connect(
         inviteModal: state.callVideo.inviteModal,
         callStatus: state.callVideo.callStatus,
         entities: state.entities,
+        reply: state.reply,
         state: state
     }),
     dispatch => ({
@@ -953,5 +1043,6 @@ export default connect(
         cancelCall: (to) => dispatch(VideoCallActions.cancelCall(to)),
         setGid: (gid) => dispatch(VideoCallActions.setGid(gid)),
         hangup: () => dispatch(VideoCallActions.hangup()),
+        replyMessage: (message) => dispatch(MessageActions.replyMessage(message)),
     })
 )(Chat)

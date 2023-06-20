@@ -198,7 +198,7 @@ function copy(message, tpl) {
 }
 
 const { Types, Creators } = createActions({
-    addMessage: [ 'message', 'bodyType', 'insertDB' ],
+    addMessage: [ 'message', 'bodyType' ],
     deleteMessage: [ 'id', 'isSelf' ],
     editedMessage: [ 'id', 'editedMsg' ],
     updateMessageStatus: [ 'message', 'status' ],
@@ -207,6 +207,7 @@ const { Types, Creators } = createActions({
     demo: [ 'chatType' ],
     //clearMessage: [ "chatType", "id" ],
     clearUnread: [ 'chatType', 'id' ],
+    replyMessage: [ 'message' ],
     // ---------------async------------------
     sendTxtMessage: (chatType, chatId, message = {}) => {
         // console.log('sendTxtMessage', chatType, chatId, message)
@@ -227,7 +228,7 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
                 fail: function (e) {
-                    console.warn('发送txt失败，确认是否被禁言、拉黑等',e)
+                    console.warn('发送txt失败，确认是否被禁言、拉黑等', e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 ext: message.ext || ''
@@ -236,7 +237,7 @@ const { Types, Creators } = createActions({
             // 最新的写法，也兼容老的写法，其他类型消息用的老写法
             if (chatType == 'groupchat') {
                 msgObj.setChatType('groupChat')
-            } else if(chatType == 'chatroom') {
+            } else if (chatType == 'chatroom') {
                 msgObj.setChatType('chatRoom')
             }
             // if (chatType == 'groupchat' || chatType == 'chatroom') {
@@ -268,7 +269,7 @@ const { Types, Creators } = createActions({
 
         }
     },
-    sendImgMessage: (chatType, chatId, message = {}, source = {}, callback = () => {
+    sendImgMessage: (chatType, chatId, message = {}, source = {}, ext = {}, callback = () => {
     }) => {
         return (dispatch, getState) => {
             let pMessage = null
@@ -278,13 +279,13 @@ const { Types, Creators } = createActions({
             const msgObj = new WebIM.message(type, id)
             msgObj.set({
                 // apiUrl: WebIM.config.restServer,
-                ext: {
-                    // file_length: source.fileSize,
-                    // filename: source.fileName || "",
-                    // filetype: source.fileName && source.fileName.split(".").pop(),
-                    // width: source.width,
-                    // height: source.height
-                },
+                ext: ext,// {
+                // file_length: source.fileSize,
+                // filename: source.fileName || "",
+                // filetype: source.fileName && source.fileName.split(".").pop(),
+                // width: source.width,
+                // height: source.height
+                // },
                 file: source,
                 // file: {
                 // 	data: {
@@ -314,7 +315,7 @@ const { Types, Creators } = createActions({
                 success: function (id) {
                 },
                 fail: function (e) {
-                    console.warn('发送img失败，确认是否被禁言、拉黑等',e)
+                    console.warn('发送img失败，确认是否被禁言、拉黑等', e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
                 // body: {
@@ -342,7 +343,7 @@ const { Types, Creators } = createActions({
             dispatch(Creators.addMessage(pMessage, type))
         }
     },
-    sendFileMessage: (chatType, chatId, message = {}, source = {}, callback = () => {}) => {
+    sendFileMessage: (chatType, chatId, message = {}, source = {}, ext = {}, callback = () => { }) => {
         return (dispatch, getState) => {
             let pMessage = null
             const id = WebIM.conn.getUniqueId()
@@ -352,11 +353,12 @@ const { Types, Creators } = createActions({
             msgObj.set({
                 // apiUrl: WebIM.config.restServer,
                 ext: {
-                    file_length: source.data.size
+                    file_length: source.data.size,
                     // filename: source.fileName || "",
                     // filetype: source.fileName && source.fileName.split(".").pop(),
                     // width: source.width,
                     // height: source.height
+                    ...ext
                 },
                 file: source,
                 // file: {
@@ -382,13 +384,13 @@ const { Types, Creators } = createActions({
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                     callback()
                 },
-                onFileUploadProgress: function (e){
+                onFileUploadProgress: function (e) {
                     console.log('----onFileUploadProgress--', e)
                 },
                 success: function (id) {
                 },
                 fail: function (e) {
-                    console.warn('发送file失败，确认是否被禁言、拉黑等',e)
+                    console.warn('发送file失败，确认是否被禁言、拉黑等', e)
                     dispatch(Creators.updateMessageStatus(pMessage, 'fail'))
                 },
             })
@@ -411,14 +413,17 @@ const { Types, Creators } = createActions({
             dispatch(Creators.addMessage(pMessage, type))
         }
     },
-    sendRecorder:(obj) =>{
-        return (dispatch) =>{
+    sendRecorder: (obj) => {
+        return (dispatch) => {
             let pMessage = null
             let bodyType = 'audio'
             const { chatId, chatType, file, duration } = obj
             const id = WebIM.conn.getUniqueId()
             const msgObj = new WebIM.message('audio', id)
             let isRoom = chatType === 'chatroom'
+            const rootState = store.getState()
+            let reply = rootState.entities.message.reply
+
             msgObj.set({
                 // apiUrl: WebIM.config.restServer,
                 file: file,
@@ -426,17 +431,17 @@ const { Types, Creators } = createActions({
                 type: 'audio',
                 roomType: isRoom,
                 length: duration,
-                onFileUploadError: function(error){
+                onFileUploadError: function (error) {
                     console.log('语音上传失败', error)
                 },
-                onFileUploadComplete: function(data){
+                onFileUploadComplete: function (data) {
                     console.log('上传成功', data)
                     let url = data.uri + '/' + data.entities[0].uuid
                     pMessage.body.url = url
                     pMessage.body.status = 'sent'
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
-                success: function(data){
+                success: function (data) {
                     console.log('语音发送成功', data)
                 },
                 fail: function (e) {
@@ -451,15 +456,18 @@ const { Types, Creators } = createActions({
             // }
             if (chatType == 'groupchat') {
                 msgObj.setChatType('groupChat')
-            } else if(chatType == 'chatroom') {
+            } else if (chatType == 'chatroom') {
                 msgObj.setChatType('chatRoom')
             }
-            
+            if (reply) {
+                msgObj.body.ext = reply.ext
+            }
             WebIM.conn.send(msgObj.body)
             pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'audio')
             pMessage.id = id
             pMessage.body.url = file.url
             dispatch(Creators.addMessage(pMessage, bodyType))
+            dispatch(Creators.replyMessage(null))
         }
     },
     addAudioMessage: (message, bodyType) => {
@@ -536,14 +544,14 @@ const { Types, Creators } = createActions({
     clearUnread: (chatType, id) => {
         return (dispatch) => {
             dispatch({ 'type': 'CLEAR_UNREAD', 'chatType': chatType, 'id': id })
-            AppDB.readMessage(chatType, id).then(res => {})
+            AppDB.readMessage(chatType, id).then(res => { })
         }
     },
 
     clearMessage: (chatType, id) => {
         return (dispatch) => {
             dispatch({ 'type': 'CLEAR_MESSAGE', 'chatType': chatType, 'id': id })
-            AppDB.clearMessage(chatType, id).then(res => {})
+            AppDB.clearMessage(chatType, id).then(res => { })
         }
     },
 
@@ -551,7 +559,7 @@ const { Types, Creators } = createActions({
         return (dispatch) => {
             const msgObj = new WebIM.message('read', WebIM.conn.getUniqueId())
             msgObj.set({ id: msg.id, to: msg.from, ext: { logo: 'easemob' } })
-            WebIM.conn.send(msgObj.body)            
+            WebIM.conn.send(msgObj.body)
         }
     },
 
@@ -560,11 +568,11 @@ const { Types, Creators } = createActions({
             const msgObj = new WebIM.message('channel', WebIM.conn.getUniqueId())
             let to = msg.to
             if (msg.type == 'groupchat' || msg.type == 'chatroom') {
-                msgObj.set({ to, chatType: 'groupChat', fail: function(err){console.log('err', err)} })
-            }else{
+                msgObj.set({ to, chatType: 'groupChat', fail: function (err) { console.log('err', err) } })
+            } else {
                 msgObj.set({ to })
             }
-            WebIM.conn.send(msgObj.body)            
+            WebIM.conn.send(msgObj.body)
         }
     },
 
@@ -582,30 +590,30 @@ const { Types, Creators } = createActions({
                 to: chatId,  // 接收消息对象（用户id）
                 customEvent,
                 customExts,
-                ext:{}, 
+                ext: msg.ext,
                 chatType: chatType,
                 success: function (id, serverMsgId) {
                     console.log('发送成功')
                 },
-                fail: function(e){
+                fail: function (e) {
                     console.log('发送失败')
                 }
             })
 
             chatType = chatType.toLowerCase()
-            if(chatType === 'groupchat'){
+            if (chatType === 'groupchat') {
                 msgObj.setChatType('groupChat')
                 WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'groupchat'
-            }else if( chatType === 'chatroom'){
+            } else if (chatType === 'chatroom') {
                 msgObj.setChatType('chatroom')
                 WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'chatroom'
-            } else{
+            } else {
                 WebIM.conn.send(msgObj.body)
                 msgObj.body.type = 'chat'
             }
-            
+
             var pMessage = parseFromLocal(chatType, chatId, msgObj.body, 'custom')
             pMessage = {
                 ...pMessage.body,
@@ -635,7 +643,8 @@ export const INITIAL_STATE = Immutable({
         groupchat: {},
         chatroom: {},
         stranger: {},
-    }
+    },
+    reply: null
 })
 
 /* ------------- Reducers ------------- */
@@ -653,7 +662,7 @@ export const addMessage = (state, { message, bodyType = 'txt', insertDB = true }
     const { id, to, status } = message
     let { type } = message
     type = type.toLowerCase()
-    if (type == 'singleChat') {type == 'chat'}
+    if (type == 'singleChat') { type == 'chat' }
     // where the message comes from, when from current user, it is null
     const from = message.from || username
     // bySelf is true when sent by current user, otherwise is false
@@ -661,7 +670,7 @@ export const addMessage = (state, { message, bodyType = 'txt', insertDB = true }
     // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
     let chatId = bySelf || type !== 'chat' ? to : from
     // chatId = type === "stranger" ? from
-    if(type === 'stranger' && !bySelf){
+    if (type === 'stranger' && !bySelf) {
         chatId = from
     }
     // change type as stranger
@@ -702,36 +711,34 @@ export const addMessage = (state, { message, bodyType = 'txt', insertDB = true }
         const deletedChats = chatData.splice(0, chatData.length - maxCacheSize)
         let byId = state.getIn([ 'byId' ])
         byId = _.omit(byId, _.map(deletedChats, 'id'))
-        state = state.setIn([ 'byId' ], byId)     
+        state = state.setIn([ 'byId' ], byId)
     }
 
     state = state.setIn([ type, chatId ], chatData)
 
     // unread
-    const activeContact = _.get(rootState,[ 'common', 'activeContact' ])
+    const activeContact = _.get(rootState, [ 'common', 'activeContact' ])
     if (!bySelf && !isPushed && message.from !== activeContact) {
         let count = state.getIn([ 'unread', type, chatId ], 0)
         state = state.setIn([ 'unread', type, chatId ], ++count)
     }
 
     state = state.setIn([ 'byId', id ], { type, chatId })
-    
+
     return state
 }
 /**
  * id 自己手动撤回时id为本地消息Id, 接收到onRecallMessage时 id为{ from: 'from', to: 'to', id: 'id', mid: 'mid' }
  */
-export const deleteMessage = (state,{ id: msg, isSelf }) => {
+export const deleteMessage = (state, { id: msg, isSelf }) => {
     let { from } = msg
     let id = msg.mid || msg
     let byId = state.getIn([ 'byId', id ])
-
-    if(!byId){
-        id =  state.getIn([ 'byMid', id ]).id
+    if (!byId) {
+        id = state.getIn([ 'byMid', id ]).id
         byId = state.getIn([ 'byId', id ])
     }
-
-    if(byId){
+    if (byId) {
         const { type, chatId } = byId
         const isSingleChat = type === 'chat' // 是否是单聊
         let messages = state.getIn([ type, chatId ]).asMutable()
@@ -739,14 +746,14 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
         const index = messages.indexOf(found)
         let bySelf = found.getIn([ 'bySelf' ])
         let foundFrom = found.getIn([ 'from' ]) || WebIM.conn.user
-        let recallMsg = isSelf ? '消息已撤回' :`${from} 撤回了${foundFrom}的一条消息`
-        if(found.getIn([ 'body', 'type' ]) != 'txt'){
+        let recallMsg = isSelf ? '消息已撤回' : `${from} 撤回了${foundFrom}的一条消息`
+        if (found.getIn([ 'body', 'type' ]) != 'txt') {
             messages.splice(index, 1)
-            messages.splice(index,0,{
+            messages.splice(index, 0, {
                 body: {
                     type: 'txt',
                     msg: recallMsg,
-                    isRecall:true,
+                    isRecall: true,
                 },
                 time: found.getIn([ 'time' ]),
                 from: found.getIn([ 'from' ]),
@@ -763,7 +770,7 @@ export const deleteMessage = (state,{ id: msg, isSelf }) => {
             let message = found.setIn([ 'body' ], {
                 ...found.getIn([ 'body' ]),
                 msg: recallMsg,
-                isRecall:true
+                isRecall: true
             })
             // message = found.setIn([ "status",], 'read')
             //console.log('删除了这条消息',message)
@@ -813,11 +820,11 @@ export const editedMessage = (state,{ id:msg, editedMsg }) => {
 export const updateMessageStatus = (state, { message, status = '' }) => {
     let { id } = message
     if (!id) id = state.getIn([ 'byMid', message.mid, 'id' ]) //消息体里根本没有mid ... 也不可能没有id ...
-    let mids = state.getIn([ 'byMid' ])||{}
+    let mids = state.getIn([ 'byMid' ]) || {}
     let mid
-    for( var i in mids){
+    for (var i in mids) {
         // console.log('ii',i)
-        if(mids[i].id == id){
+        if (mids[i].id == id) {
             mid = i
         }
     }
@@ -829,7 +836,7 @@ export const updateMessageStatus = (state, { message, status = '' }) => {
         let msg = found.setIn([ 'status' ], status)
         msg = found.setIn([ 'toJid' ], mid)
         messages.splice(messages.indexOf(found), 1, msg)
-        AppDB.updateMessageStatus(id, status).then(res => {})
+        AppDB.updateMessageStatus(id, status).then(res => { })
         state = state.setIn([ type, chatId ], messages)
     }
     return state
@@ -849,6 +856,7 @@ export const updateMessageMid = (state, { id, mid }) => {
     const byId = state.getIn([ 'byId', id ])
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
+
         let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
         let msg = found.setIn([ 'toJid' ], mid)
@@ -885,6 +893,11 @@ export const fetchMessage = (state, { id, chatType, messages, offset }) => {
     return state.setIn([ chatType, id ], data)
 }
 
+export const replyMessage = (state, { message }) => {
+    state = state.setIn([ 'reply' ], message)
+    return state
+}
+
 /* ------------- Hookup Reducers To Types ------------- */
 
 export const reducer = createReducer(INITIAL_STATE, {
@@ -897,7 +910,8 @@ export const reducer = createReducer(INITIAL_STATE, {
     [Types.CLEAR_MESSAGE]: clearMessage,
     [Types.CLEAR_UNREAD]: clearUnread,
     [Types.INIT_UNREAD]: initUnread,
-    [Types.FETCH_MESSAGE]: fetchMessage
+    [Types.FETCH_MESSAGE]: fetchMessage,
+    [Types.REPLY_MESSAGE]: replyMessage
 })
 
 /* ------------- Selectors ------------- */

@@ -14,7 +14,7 @@ const { PAGE_NUM } = config
 const AppDB = {
 
     // init db
-    init: function(username) {
+    init: function (username) {
 
         if (!DB_ENABLE || this.db) {
             return
@@ -22,18 +22,18 @@ const AppDB = {
 
         // create a database, use username as db name
         const db = new Dexie(username)
-        
+
         // create a table, use TABLE_NAME as table name
         db.version(DB_VERSION).stores({
-            [TABLE_NAME] : TABLE_INDEX_KEYS.join(',')
+            [TABLE_NAME]: TABLE_INDEX_KEYS.join(',')
         })
 
         this.db = db
         this.$_TABLE = db.table(TABLE_NAME)
     },
-    
+
     exec(cb1, cb2) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             if (DB_ENABLE) {
                 cb1(resolve)
             } else {
@@ -138,17 +138,18 @@ const AppDB = {
         })
     },
 
-    updateMessageMid(mid, id){
+    updateMessageMid(mid, id) {
         setTimeout(() => {
             const $_TABLE = this.$_TABLE
             return this.exec(resolve => {
                 $_TABLE.where('id')
-                    .equals(id)
+                    .equals(id.toString())
                     .modify({ 'toJid': mid })
-                    .then(res => console.log('res',res))
+                    .then(res => console.log('res', res))
+                    .catch(error => console.log(error))
             })
-        }, 1000)
-        
+        }, 200)
+
     },
     // add a message to the database
     addMessage(message, isUnread = 0) {
@@ -156,7 +157,7 @@ const AppDB = {
         if (!message.error) {
             return this.exec(resolve => {
                 $_TABLE.where('id').equals(message.id).count().then(res => {
-                    if (res === 0 ) {
+                    if (res === 0) {
                         message.isUnread = isUnread
                         $_TABLE.add(message)
                             .then(res => resolve(res))

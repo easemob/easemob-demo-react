@@ -7,7 +7,7 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-
+	background-color: #fff;
 	&-header {
 		border-bottom: 1px solid #d6dce0;
 		box-sizing: border-box;
@@ -98,4 +98,29 @@
 			background-color: #fff;
 		}
 	}
+}
+
+
+.twinkle{
+	animation: fadeInOut 2s;
+}
+
+@keyframes fadeInOut {
+    0% {
+        background-color: #eceff1;
+    }
+
+    25% {
+        background-color: #fff;
+    }
+
+	50% {
+		background-color: #eceff1;
+	}
+	75% {
+        background-color: #fff;
+    }
+	100% {
+        background-color: #eceff1;
+    }
 }

@@ -27,7 +27,7 @@ const Login = ({
     let timer
     let times = 60
     const { loginLoading } = login
-    let [ smsBtnText, setSmsBtnText ] = useState(I18N.getCaptcha)
+    let [smsBtnText, setSmsBtnText] = useState(I18N.getCaptcha)
     const handleOk = () => {
         validateFieldsAndScroll((errors, values) => {
             if (errors) {
@@ -43,10 +43,10 @@ const Login = ({
     }
 
     const getCaptcha = () => {
-        if(typeof smsBtnText !== 'string') return
+        if (typeof smsBtnText !== 'string') return
         const phoneNumber = getFieldValue('phoneNumber')
-        validateFields([ 'phoneNumber' ], (errors, values) => {
-            if(errors){
+        validateFields(['phoneNumber'], (errors, values) => {
+            if (errors) {
                 return
             }
             sendSms(values.phoneNumber)
@@ -54,7 +54,7 @@ const Login = ({
     }
 
     const sendSms = (phoneNumber) => {
-        axios.post(domain+`/inside/app/sms/send/${phoneNumber}`, {
+        axios.post(domain + `/inside/app/sms/send/${phoneNumber}`, {
             phoneNumber
         })
             .then((response) => {
@@ -63,14 +63,14 @@ const Login = ({
             })
             .catch(function (error) {
                 console.log('error', error.response)
-                if(error.response.status == '400'){
-                    if(error.response.data?.errorInfo == 'phone number illegal'){
+                if (error.response.status == '400') {
+                    if (error.response.data?.errorInfo == 'phone number illegal') {
                         message.error('请输入正确的手机号！')
-                    }else if(error.response.data?.errorInfo == 'Please wait a moment while trying to send.'){
+                    } else if (error.response.data?.errorInfo == 'Please wait a moment while trying to send.') {
                         message.error('你的操作过于频繁，请稍后再试！')
-                    }else if(error.response.data?.errorInfo.includes('exceed the limit')){
+                    } else if (error.response.data?.errorInfo.includes('exceed the limit')) {
                         message.error('获取已达上限！')
-                    }else{
+                    } else {
                         message.error(error.response.data?.errorInfo)
                     }
                 }
@@ -90,7 +90,7 @@ const Login = ({
         }, 1000)
     }
 
-    const logo = WebIM.config.i18n === 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
+    const logo = WebIM.config.i18n === 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate" />
     return (
         <div className="form x-login">
             <div className="logo">
@@ -105,15 +105,15 @@ const Login = ({
                                 required: true
                             }
                         ]
-                    })(<Input size="large" onPressEnter={handleOk} placeholder={I18N.phoneNumber}/>)}
+                    })(<Input size="large" onPressEnter={handleOk} placeholder={I18N.phoneNumber} />)}
                 </FormItem>
 
                 <FormItem>
                     <Row gutter={8}>
                         <Col span={14}>
                             {getFieldDecorator('captcha', {
-                                rules: [ { required: true, message: 'Please input the captcha you got!' } ],
-                            })(<Input size="default" placeholder={I18N.captcha}/>)}
+                                rules: [{ required: true, message: 'Please input the captcha you got!' }],
+                            })(<Input size="default" placeholder={I18N.captcha} />)}
                         </Col>
                         <Col span={10}>
                             <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
@@ -159,6 +159,6 @@ export default connect(
         doLoginByToken: (username, token) => dispatch(LoginActions.loginByToken(username, token)),
         jumpRegister: () => dispatch(LoginActions.jumpRegister()),
         jumpServer: () => dispatch(ServerActions.jumpServer()),
-        getToken: (phoneNumber, smsCode) => dispatch(LoginActions.getToken(phoneNumber, smsCode)) 
+        getToken: (phoneNumber, smsCode) => dispatch(LoginActions.getToken(phoneNumber, smsCode))
     })
 )(Form.create()(Login))

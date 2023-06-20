@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames";
 import { I18n } from "react-redux-i18n";
+import { connect } from "react-redux";
 import {
   Menu,
   Dropdown,
@@ -18,6 +19,7 @@ import {
 import { renderTime, deepGet } from "@/utils";
 import emoji from "@/config/emoji";
 import Audio from "@/components/chat/Audio";
+import ReplyMessage from "./ReplyMessage";
 import WebIM from "@/config/WebIM";
 const defaultAvatar =
   "https://download-sdk.oss-cn-beijing.aliyuncs.com/downloads/IMDemo/avatar/Image1.png";
@@ -54,7 +56,7 @@ const ReportType = [
     value: "其他"
   }
 ];
-export default class ChatMessage extends Component {
+class ChatMessage extends Component {
   static propTypes = {
     bySelf: PropTypes.any,
     from: PropTypes.any,
@@ -65,7 +67,8 @@ export default class ChatMessage extends Component {
     toJid: PropTypes.string,
     to: PropTypes.any,
     ok: PropTypes.func,
-    type: PropTypes.any
+    type: PropTypes.any,
+    onReply: PropTypes.func
   };
 
   state = {
@@ -74,7 +77,8 @@ export default class ChatMessage extends Component {
     reportReason: "",
     reportType: "涉政",
     showModify: false, // 是否是编辑状态
-    editMsgText: "" // 消息编辑的文本内容
+    editMsgText: "", // 消息编辑的文本内容
+    replyImgUrl: ""
   };
 
   renderTxt = (txt) => {
@@ -115,7 +119,7 @@ export default class ChatMessage extends Component {
     this.setState({ showImgModal: true });
   };
   handleCancel = () => {
-    this.setState({ showImgModal: false });
+    this.setState({ showImgModal: false, replyImgUrl: "" });
   };
 
   onReportReasonChange = ({ target: { value } }) => {
@@ -180,6 +184,8 @@ export default class ChatMessage extends Component {
         showModify: true,
         editMsgText: this.props.body.msg
       });
+    } else {
+      this.props.onReply?.(this.props.toJid, this.props);
     }
   };
 
@@ -221,8 +227,50 @@ export default class ChatMessage extends Component {
     e.stopPropagation();
   };
 
+  gotoMessage = (data) => {
+    let msgQuote = data.ext?.msgQuote || {};
+    if (typeof msgQuote === "string") {
+      msgQuote = JSON.parse(msgQuote);
+    }
+    const msgId = msgQuote.msgID;
+    const replyMsgType = msgQuote.msgType;
+    // 点击后文本消息跳转到原消息，附件类消息直接展示，如果都跳转原消息，去掉判断直接调 this.props.gotoMessage
+    if (replyMsgType === "txt") {
+      this.props.gotoMessage && this.props.gotoMessage(data);
+    } else {
+      const { allMsgs = {} } = this.props;
+      const { type, bySelf, to, from } = data;
+      let cvsId = "";
+      if (type === "chat") {
+        cvsId = bySelf ? to : from;
+      } else {
+        cvsId = to;
+      }
+      let msgs = allMsgs[type][cvsId] || [];
+      let msg = msgs.filter((item) => {
+        return item.id == msgId || item.toJid == msgId;
+      });
+      if (msg.length > 0) {
+        // 有重复的消息
+        msg = msg[0];
+      } else {
+        message.error("原消息无法定位");
+        return;
+      }
+      if (replyMsgType === "img") {
+        console.log("go to image msg", msg);
+        this.setState({ replyImgUrl: msg.body.url });
+        this.imgClick();
+      } else if (replyMsgType === "custom") {
+        this.handleIdCardClick({
+          uid: msg.body.customExts.uid
+        });
+      }
+    }
+  };
+
   render() {
-    const { bySelf, from, time, body, status, fromNick, id } = this.props;
+    const { bySelf, from, time, body, status, fromNick, id, ext } = this.props;
     const cls = classNames("x-message-group", bySelf ? "x-message-right" : "");
     const localFormat = renderTime(time);
     const isModified = body?.modifiedInfo;
@@ -235,9 +283,10 @@ export default class ChatMessage extends Component {
     const menu = bySelf ? (
       <Menu onClick={this.oncontextmenu}>
         <Menu.Item key="recall">撤回</Menu.Item>
-        {this.props.body.type === "txt" && (
+        {this.props.body.type === "txt" && this.props.type !== "chatroom" && (
           <Menu.Item key="edit">编辑</Menu.Item>
         )}
+        <Menu.Item key="quote">引用</Menu.Item>
       </Menu>
     ) : (
       <Menu
@@ -246,6 +295,8 @@ export default class ChatMessage extends Component {
             // 服务器消息id
             reportMsgId = id;
             this.setState({ reportMsgVisible: true });
+          } else if (e.key === "quote") {
+            this.props.onReply?.(this.props.toJid, this.props);
           } else {
             this.setState({
               showModify: true,
@@ -258,6 +309,7 @@ export default class ChatMessage extends Component {
         {this.props.body.type === "txt" &&
           this.props.type === "groupchat" &&
           this.props.canModifiedMsg && <Menu.Item key="edit">编辑</Menu.Item>}
+        <Menu.Item key="quote">引用</Menu.Item>
       </Menu>
     );
     switch (body.type) {
@@ -458,13 +510,19 @@ export default class ChatMessage extends Component {
     }
 
     return (
-      <div className={cls} uid={from}>
+      <div className={cls} uid={from} id={this.props.toJid || this.props.id}>
         <div className="x-message-user">{fromNick}</div>
         <div className="x-message-content">
           {/* 已读、未读Tag */}
           {/* {bySelf && this.props.type === 'chat' ? statusTag : ''}  */}
           {content}
         </div>
+        {ext?.msgQuote && (
+          <ReplyMessage
+            message={this.props}
+            onClick={(e, data) => this.gotoMessage(data)}
+          ></ReplyMessage>
+        )}
         {bySelf ? (
           <div className="x-message-time">
             <span className="x-message-status" /> {localFormat}
@@ -484,7 +542,10 @@ export default class ChatMessage extends Component {
           width={"800"}
           bodyStyle={{ textAlign: "center" }}
         >
-          <img src={body.url} style={{ maxWidth: "100%" }} />
+          <img
+            src={this.state.replyImgUrl || body.url}
+            style={{ maxWidth: "100%" }}
+          />
         </Modal>
 
         <Modal
@@ -525,3 +586,7 @@ export default class ChatMessage extends Component {
     );
   }
 }
+
+export default connect((state, props) => ({
+  allMsgs: state.entities.message
+}))(ChatMessage);
