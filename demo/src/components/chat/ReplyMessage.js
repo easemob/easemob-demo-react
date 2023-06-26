@@ -5,6 +5,8 @@ import './style/ReplyMessage.less'
 import { connect } from 'react-redux'
 import { Icon } from 'antd'
 import WebIM from '@/config/WebIM'
+import { renderTxt } from './ChatMessage'
+import defaultImg from '@/themes/img/default-img.png'
 const ReplyMessage = (props) => {
     const { message, onClick, onCancel, close = false, allMsgs = {}, roster = {}, myInfo = {}, groupMember = {} } = props
     const { bySelf, ext = {}, type, from, to } = message
@@ -28,7 +30,7 @@ const ReplyMessage = (props) => {
         // 去掉重复的消息
         msg = msg[0]
     }
-    if (!msg || msg.length === 0) {
+    if (!msg || msg.length === 0 || msg.body.isRecall) {
         msg = {
             body: {
                 type: msgQuote.msgType
@@ -56,14 +58,13 @@ const ReplyMessage = (props) => {
     const play = () => {
         audioRef.current.play()
     }
-
     switch (msg.body.type) {
         case 'txt':
-            content = <span className='reply-txt'>{msgQuote.msgPreview}</span>
+            content = <span className='reply-txt'>{renderTxt(msgQuote.msgPreview)}</span>
             break
         case 'img':
             content = close ? '[图片消息]' :
-                <img width={40} height={40} src={msg.body.url}></img>
+                <img width={40} height={40} src={msg.body.url || defaultImg}></img>
             break
         case 'file':
             content = close ? `[文件] ${msg.body.filename}` : <span>

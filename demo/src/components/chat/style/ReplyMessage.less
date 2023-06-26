@@ -23,6 +23,7 @@
     display: flex;
     align-items: center;
     overflow: hidden;
+    
     .msg-file{
         color: #999999;
         :hover{
@@ -34,7 +35,12 @@
         text-overflow: ellipsis;
         display: -webkit-box;
         text-align: left;
-        max-height: 60px;
+        // max-height: 40px;
         word-break: break-all;
+        display: -webkit-box; 
+        /*! autoprefixer: off */
+        -webkit-box-orient: vertical!important;
+        /*! autoprefixer: on */
+        -webkit-line-clamp: 2;
     }
 }
