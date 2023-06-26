@@ -189,9 +189,13 @@ class ChatMessage extends Component {
                 message.error('原消息无法定位')
                 return
             }
+            if (replyMsgType === 'file' && !msg.body.url) {
+                message.error('引用内容不存在')
+                return
+            }
             if (replyMsgType === 'img') {
                 if (!msg.body.url) {
-                    message.error('原消息无法定位')
+                    message.error('引用内容不存在')
                     return
                 }
                 this.setState({ replyImgUrl: msg.body.url })
