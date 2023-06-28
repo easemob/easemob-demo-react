@@ -329,11 +329,11 @@ WebIM.conn.listen({
                 }
             }
         }
-        if(type === 'groupchat'){
+        if (type === 'groupchat') {
             let mentionList = message?.ext?.em_at_list
-            if(mentionList && message.from !== WebIM.conn.user){
-                if(mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)){
-                    store.dispatch(GroupActions.pushMentionedGroupId({groupId: to}))     
+            if (mentionList && message.from !== WebIM.conn.user) {
+                if (mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)) {
+                    store.dispatch(GroupActions.pushMentionedGroupId({ groupId: to }))
                 }
             }
         }
