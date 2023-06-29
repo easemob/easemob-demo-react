@@ -56,6 +56,41 @@ const ReportType = [
     value: "其他"
   }
 ];
+
+export function renderTxt(txt) {
+  if (txt === undefined) {
+    return [];
+  }
+  let rnTxt = [];
+  let match = null;
+  const regex = /(\[.*?\])/g;
+  let start = 0;
+  let index = 0;
+  while ((match = regex.exec(txt))) {
+    index = match.index;
+    if (index > start) {
+      rnTxt.push(txt.substring(start, index));
+    }
+    if (match[1] in emoji.map) {
+      const v = emoji.map[match[1]];
+      rnTxt.push(
+        <img
+          key={WebIM.conn.getUniqueId()}
+          src={require(`../../themes/faces/${v}`)}
+          width={20}
+          height={20}
+        />
+      );
+    } else {
+      rnTxt.push(match[1]);
+    }
+    start = index + match[1].length;
+  }
+  rnTxt.push(txt.substring(start, txt.length));
+
+  return rnTxt;
+}
+
 class ChatMessage extends Component {
   static propTypes = {
     bySelf: PropTypes.any,
@@ -79,40 +114,6 @@ class ChatMessage extends Component {
     showModify: false, // 是否是编辑状态
     editMsgText: "", // 消息编辑的文本内容
     replyImgUrl: ""
-  };
-
-  renderTxt = (txt) => {
-    if (txt === undefined) {
-      return [];
-    }
-    let rnTxt = [];
-    let match = null;
-    const regex = /(\[.*?\])/g;
-    let start = 0;
-    let index = 0;
-    while ((match = regex.exec(txt))) {
-      index = match.index;
-      if (index > start) {
-        rnTxt.push(txt.substring(start, index));
-      }
-      if (match[1] in emoji.map) {
-        const v = emoji.map[match[1]];
-        rnTxt.push(
-          <img
-            key={WebIM.conn.getUniqueId()}
-            src={require(`../../themes/faces/${v}`)}
-            width={20}
-            height={20}
-          />
-        );
-      } else {
-        rnTxt.push(match[1]);
-      }
-      start = index + match[1].length;
-    }
-    rnTxt.push(txt.substring(start, txt.length));
-
-    return rnTxt;
   };
 
   imgClick = () => {
@@ -258,7 +259,10 @@ class ChatMessage extends Component {
         return;
       }
       if (replyMsgType === "img") {
-        console.log("go to image msg", msg);
+        if (!msg.body.url) {
+          message.error("原消息无法定位");
+          return;
+        }
         this.setState({ replyImgUrl: msg.body.url });
         this.imgClick();
       } else if (replyMsgType === "custom") {
@@ -333,7 +337,7 @@ class ChatMessage extends Component {
           ) : (
             <Dropdown overlay={menu} trigger={["click"]}>
               <p className="x-message-text">
-                {this.renderTxt(body.msg || body.url)}
+                {renderTxt(body.msg || body.url)}
                 {isModified && (
                   <Tooltip
                     placement="topRight"
@@ -346,7 +350,7 @@ class ChatMessage extends Component {
             </Dropdown>
           )
         ) : (
-          <p className="x-message-text">{this.renderTxt(body.msg)}</p>
+          <p className="x-message-text">{renderTxt(body.msg)}</p>
         );
         break;
       case "img":
