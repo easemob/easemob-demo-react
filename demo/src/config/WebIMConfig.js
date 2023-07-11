@@ -31,7 +31,7 @@ var config = {
    * Application AppKey
    */
     // easemob-demo#easeim
-    appkey: 'easemob-demo#wang-sgp1', //isSandBox ? '91446724#514456' : 'easemob#easeim',
+    appkey: 'easemob-demo#wang-vip6', //isSandBox ? '91446724#514456' : 'easemob#easeim',
     /*
    * Application Host
    */
