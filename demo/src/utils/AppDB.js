@@ -8,7 +8,7 @@ const DB_ENABLE = WebIMConfig.enableLocalStorage
 const DB_VERSION = '2.0'
 
 const TABLE_NAME = 'webim_history'
-const TABLE_INDEX_KEYS = ['id', 'from', 'to', 'type', 'isUnread', 'status', 'toJid']
+const TABLE_INDEX_KEYS = [ 'id', 'from', 'to', 'type', 'isUnread', 'status', 'toJid' ]
 const { PAGE_NUM } = config
 
 const AppDB = {
@@ -102,7 +102,33 @@ const AppDB = {
         })
     },
 
-    deleteMessage(id) {
+    // update send msg jid
+    updateMessageJid(id, jid) {
+        const $_TABLE = this.$_TABLE
+        return this.exec(resolve => {
+            $_TABLE.where('id')
+                .equals(id)
+                .modify({ 'toJid': jid })
+                .then(res => {
+                    resolve(res)
+                })
+        })
+    },
+
+    // update send editedInfo
+    updateMessageEditedInfo(id, body) {
+        const $_TABLE = this.$_TABLE
+        return this.exec(resolve => {
+            $_TABLE.where('id')
+                .equals(id)
+                .modify({ body: body })
+                .then(res => {
+                    resolve(res)
+                })
+        })
+    },
+
+    deleteMessage(id){
         const $_TABLE = this.$_TABLE
         return this.exec(resolve => {
             $_TABLE.where('id')

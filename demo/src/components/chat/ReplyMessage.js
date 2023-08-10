@@ -49,9 +49,9 @@ const ReplyMessage = (props) => {
         fromNick = myInfo.nickname || WebIM.conn.user
     }
     if (type !== 'chat') {
-        fromNick = groupMember[msg.to]?.byName[msg.from]?.info?.nickname || msg.from
+        fromNick = groupMember[msg.to]?.byName?.[msg.from]?.info?.nickname || msg.from
         if (!fromNick) {
-            fromNick = groupMember[msg.to]?.byName[WebIM.conn.user]?.info?.nickname || WebIM.conn.user
+            fromNick = groupMember[msg.to]?.byName?.[WebIM.conn.user]?.info?.nickname || WebIM.conn.user
         }
     }
     const audioRef = useRef(null)

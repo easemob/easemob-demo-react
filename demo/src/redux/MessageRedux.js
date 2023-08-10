@@ -119,73 +119,73 @@ export const parseFromServer = (message = {}, bodyType) => {
     // body.ext could save any customize info of message, like image size, width, height etc
     let body = copy(message, msgTpl[bodyType])
     switch (bodyType) {
-        case 'txt':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    msg: message.data,
-                    type: 'txt'
-                }
+    case 'txt':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                msg: message.data,
+                type: 'txt'
             }
-            break
-        case 'img':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    type: 'img'
-                }
+        }
+        break
+    case 'img':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'img'
             }
-            break
-        case 'file':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    type: 'file'
-                }
+        }
+        break
+    case 'file':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'file'
             }
-            break
-        case 'audio':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    type: 'audio'
-                }
+        }
+        break
+    case 'audio':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'audio'
             }
-            break
-        case 'video':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    type: 'video'
-                }
+        }
+        break
+    case 'video':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'video'
             }
-            break
-        case 'custom':
-            return {
-                ...obj,
-                status: 'sent',
-                body: {
-                    ...body,
-                    ...ext,
-                    type: 'custom'
-                }
+        }
+        break
+    case 'custom':
+        return {
+            ...obj,
+            status: 'sent',
+            body: {
+                ...body,
+                ...ext,
+                type: 'custom'
             }
-            break
+        }
+        break
     }
 }
 
@@ -198,15 +198,16 @@ function copy(message, tpl) {
 }
 
 const { Types, Creators } = createActions({
-    addMessage: ['message', 'bodyType'],
-    deleteMessage: ['id', 'isSelf'],
-    updateMessageStatus: ['message', 'status'],
-    updateMessageMid: ['id', 'mid'],
-    muteMessage: ['mid'],
-    demo: ['chatType'],
+    addMessage: [ 'message', 'bodyType' ],
+    deleteMessage: [ 'id', 'isSelf' ],
+    editedMessage: [ 'id', 'editedMsg' ],
+    updateMessageStatus: [ 'message', 'status' ],
+    updateMessageMid: [ 'id', 'mid' ],
+    muteMessage: [ 'mid' ],
+    demo: [ 'chatType' ],
     //clearMessage: [ "chatType", "id" ],
-    clearUnread: ['chatType', 'id'],
-    replyMessage: ['message'],
+    clearUnread: [ 'chatType', 'id' ],
+    replyMessage: [ 'message' ],
     // ---------------async------------------
     sendTxtMessage: (chatType, chatId, message = {}) => {
         // console.log('sendTxtMessage', chatType, chatId, message)
@@ -223,7 +224,7 @@ const { Types, Creators } = createActions({
                 to,
                 // roomType: chatroom,
                 chatType: 'singleChat',
-                success: function () {
+                success: function (res) {
                     dispatch(Creators.updateMessageStatus(pMessage, 'sent'))
                 },
                 fail: function (e) {
@@ -243,7 +244,9 @@ const { Types, Creators } = createActions({
             //     msgObj.setGroup('groupchat')
             // }
 
-            WebIM.conn.send(msgObj.body)
+            WebIM.conn.send(msgObj.body).then((res)=>{
+                AppDB.updateMessageJid(id, res.serverMsgId)
+            })
             dispatch(Creators.addMessage(pMessage, type))
 
             //测试发自定义消息
@@ -529,6 +532,9 @@ const { Types, Creators } = createActions({
                         'id': id,
                         'messages': res
                     })
+                    res.forEach((msg)=>{
+                        dispatch(Creators.addMessage(msg, msg.body.type, false))
+                    })
                 }
                 cb && cb(res.length)
             })
@@ -649,7 +655,7 @@ export const INITIAL_STATE = Immutable({
  * @param bodyType enum [txt]
  * @returns {*}
  */
-export const addMessage = (state, { message, bodyType = 'txt' }) => {
+export const addMessage = (state, { message, bodyType = 'txt', insertDB = true }) => {
     !message.status && (message = parseFromServer(message, bodyType))
     const rootState = store.getState()
     const username = _.get(rootState, 'login.username', '')
@@ -673,7 +679,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     //     message.type = "stranger";
     // }
     // update message array
-    const chatData = state.getIn([type, chatId], Immutable([])).asMutable()
+    const chatData = state.getIn([ type, chatId ], Immutable([])).asMutable()
     const _message = {
         ...message,
         bySelf,
@@ -683,7 +689,7 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
 
     // the pushed message maybe have exsited in state, ignore
     if (_message.type === 'chatroom' && bySelf) {
-        const oid = state.getIn(['byMid', _message.id, 'id'])
+        const oid = state.getIn([ 'byMid', _message.id, 'id' ])
         if (oid) {
             _message.id = oid
         }
@@ -698,26 +704,26 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
     !isPushed && chatData.push(_message)
 
     // add a message to db, if by myselt, isUnread equals 0
-    !isPushed && AppDB.addMessage(_message, !bySelf ? 1 : 0)
+    !isPushed && insertDB && AppDB.addMessage(_message, !bySelf ? 1 : 0)
 
-    const maxCacheSize = _.includes(['group', 'chatroom'], type) ? WebIM.config.groupMessageCacheSize : WebIM.config.p2pMessageCacheSize
+    const maxCacheSize = _.includes([ 'group', 'chatroom' ], type) ? WebIM.config.groupMessageCacheSize : WebIM.config.p2pMessageCacheSize
     if (chatData.length > maxCacheSize) {
         const deletedChats = chatData.splice(0, chatData.length - maxCacheSize)
-        let byId = state.getIn(['byId'])
+        let byId = state.getIn([ 'byId' ])
         byId = _.omit(byId, _.map(deletedChats, 'id'))
-        state = state.setIn(['byId'], byId)
+        state = state.setIn([ 'byId' ], byId)
     }
 
-    state = state.setIn([type, chatId], chatData)
+    state = state.setIn([ type, chatId ], chatData)
 
     // unread
-    const activeContact = _.get(rootState, ['common', 'activeContact'])
+    const activeContact = _.get(rootState, [ 'common', 'activeContact' ])
     if (!bySelf && !isPushed && message.from !== activeContact) {
-        let count = state.getIn(['unread', type, chatId], 0)
-        state = state.setIn(['unread', type, chatId], ++count)
+        let count = state.getIn([ 'unread', type, chatId ], 0)
+        state = state.setIn([ 'unread', type, chatId ], ++count)
     }
 
-    state = state.setIn(['byId', id], { type, chatId })
+    state = state.setIn([ 'byId', id ], { type, chatId })
 
     return state
 }
@@ -727,21 +733,21 @@ export const addMessage = (state, { message, bodyType = 'txt' }) => {
 export const deleteMessage = (state, { id: msg, isSelf }) => {
     let { from } = msg
     let id = msg.mid || msg
-    let byId = state.getIn(['byId', id])
+    let byId = state.getIn([ 'byId', id ])
     if (!byId) {
-        id = state.getIn(['byMid', id]).id
-        byId = state.getIn(['byId', id])
+        id = state.getIn([ 'byMid', id ]).id
+        byId = state.getIn([ 'byId', id ])
     }
     if (byId) {
         const { type, chatId } = byId
         const isSingleChat = type === 'chat' // 是否是单聊
-        let messages = state.getIn([type, chatId]).asMutable()
+        let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
         const index = messages.indexOf(found)
-        let bySelf = found.getIn(['bySelf'])
-        let foundFrom = found.getIn(['from']) || WebIM.conn.user
+        let bySelf = found.getIn([ 'bySelf' ])
+        let foundFrom = found.getIn([ 'from' ]) || WebIM.conn.user
         let recallMsg = isSelf ? '消息已撤回' : `${from} 撤回了${foundFrom}的一条消息`
-        if (found.getIn(['body', 'type']) != 'txt') {
+        if (found.getIn([ 'body', 'type' ]) != 'txt') {
             messages.splice(index, 1)
             messages.splice(index, 0, {
                 body: {
@@ -749,20 +755,20 @@ export const deleteMessage = (state, { id: msg, isSelf }) => {
                     msg: recallMsg,
                     isRecall: true,
                 },
-                time: found.getIn(['time']),
-                from: found.getIn(['from']),
-                id: found.getIn(['id']),
-                isUnread: found.getIn(['isUnread']),
+                time: found.getIn([ 'time' ]),
+                from: found.getIn([ 'from' ]),
+                id: found.getIn([ 'id' ]),
+                isUnread: found.getIn([ 'isUnread' ]),
                 status: 'read',
-                time: found.getIn(['time']),
-                to: found.getIn(['to']),
+                time: found.getIn([ 'time' ]),
+                to: found.getIn([ 'to' ]),
                 toJid: '',
                 type: 'chat',
                 bySelf: bySelf
             })
         } else {
-            let message = found.setIn(['body'], {
-                ...found.getIn(['body']),
+            let message = found.setIn([ 'body' ], {
+                ...found.getIn([ 'body' ]),
                 msg: recallMsg,
                 isRecall: true
             })
@@ -771,8 +777,35 @@ export const deleteMessage = (state, { id: msg, isSelf }) => {
             messages.splice(messages.indexOf(found), 1, message)
         }
 
-        state = state.setIn([type, chatId], messages)
+        state = state.setIn([ type, chatId ], messages)
         AppDB.deleteMessage(id)
+    }
+    return state
+}
+
+export const editedMessage = (state,{ id:msg, editedMsg }) => {
+    let id = msg.mid || msg
+    let byId = state.getIn([ 'byId', id ])
+
+    if(!byId){
+        id =  state.getIn([ 'byMid', id ])?.id
+        byId = state.getIn([ 'byId', id ])
+    }
+
+    if(byId){
+        const { type, chatId } = byId
+        let messages = state.getIn([ type, chatId ]).asMutable()
+        let found = _.find(messages, { id: id })
+        let msg = editedMsg.msg
+        let body =  {
+            ...found.getIn([ 'body' ]),
+            msg: msg,
+            modifiedInfo: editedMsg.modifiedInfo
+        }
+        let message = found.setIn([ 'body' ], body)
+        messages.splice(messages.indexOf(found), 1, message)
+        state = state.setIn([ type, chatId ], messages)
+        AppDB.updateMessageEditedInfo(id, body )
     }
     return state
 }
@@ -786,8 +819,8 @@ export const deleteMessage = (state, { id: msg, isSelf }) => {
  */
 export const updateMessageStatus = (state, { message, status = '' }) => {
     let { id } = message
-    if (!id) id = state.getIn(['byMid', message.mid, 'id']) //消息体里根本没有mid ... 也不可能没有id ...
-    let mids = state.getIn(['byMid']) || {}
+    if (!id) id = state.getIn([ 'byMid', message.mid, 'id' ]) //消息体里根本没有mid ... 也不可能没有id ...
+    let mids = state.getIn([ 'byMid' ]) || {}
     let mid
     for (var i in mids) {
         // console.log('ii',i)
@@ -795,73 +828,73 @@ export const updateMessageStatus = (state, { message, status = '' }) => {
             mid = i
         }
     }
-    const byId = state.getIn(['byId', id])
+    const byId = state.getIn([ 'byId', id ])
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
-        let messages = state.getIn([type, chatId]).asMutable()
+        let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
-        let msg = found.setIn(['status'], status)
-        msg = found.setIn(['toJid'], mid)
+        let msg = found.setIn([ 'status' ], status)
+        msg = found.setIn([ 'toJid' ], mid)
         messages.splice(messages.indexOf(found), 1, msg)
         AppDB.updateMessageStatus(id, status).then(res => { })
-        state = state.setIn([type, chatId], messages)
+        state = state.setIn([ type, chatId ], messages)
     }
     return state
 }
 
 export const clearMessage = (state, { chatType, id }) => {
-    return chatType ? state.setIn([chatType, id], []) : state
+    return chatType ? state.setIn([ chatType, id ], []) : state
 }
 
 export const clearUnread = (state, { chatType, id }) => {
     let data = state['unread'][chatType].asMutable()
     delete data[id]
-    return state.setIn(['unread', chatType], data)
+    return state.setIn([ 'unread', chatType ], data)
 }
 
 export const updateMessageMid = (state, { id, mid }) => {
-    const byId = state.getIn(['byId', id])
+    const byId = state.getIn([ 'byId', id ])
     if (!_.isEmpty(byId)) {
         const { type, chatId } = byId
 
-        let messages = state.getIn([type, chatId]).asMutable()
+        let messages = state.getIn([ type, chatId ]).asMutable()
         let found = _.find(messages, { id: id })
-        let msg = found.setIn(['toJid'], mid)
+        let msg = found.setIn([ 'toJid' ], mid)
         messages.splice(messages.indexOf(found), 1, msg)
-        state = state.setIn([type, chatId], messages)
+        state = state.setIn([ type, chatId ], messages)
     }
     AppDB.updateMessageMid(mid, Number(id))
-    return state.setIn(['byMid', mid], { id })
+    return state.setIn([ 'byMid', mid ], { id })
 }
 
 export const muteMessage = (state, { mid }) => {
-    const { id } = state.getIn(['byMid', mid], '')
-    const { type, chatId } = state.getIn(['byId', id], {})
+    const { id } = state.getIn([ 'byMid', mid ], '')
+    const { type, chatId } = state.getIn([ 'byId', id ], {})
     if (type && chatId) {
-        const messages = state.getIn([type, chatId]).asMutable()
+        const messages = state.getIn([ type, chatId ]).asMutable()
         const found = _.find(messages, { id: id })
-        const msg = found.setIn(['status'], 'muted')
+        const msg = found.setIn([ 'status' ], 'muted')
         messages.splice(messages.indexOf(found), 1, msg)
-        state = state.setIn([type, chatId], messages)
+        state = state.setIn([ type, chatId ], messages)
     }
     return state
 }
 
 export const initUnread = (state, { unreadList }) => {
-    let data = state.getIn(['unread'])
-    data = data.merge(unreadList).setIn(['chatroom'], {})
-    return state.setIn(['unread'], data)
+    let data = state.getIn([ 'unread' ])
+    data = data.merge(unreadList).setIn([ 'chatroom' ], {})
+    return state.setIn([ 'unread' ], data)
 }
 
 export const fetchMessage = (state, { id, chatType, messages, offset }) => {
     let data = state[chatType] && state[chatType][id] ? state[chatType][id].asMutable() : []
     data = messages.concat(data)
     //-----------------------
-    return state.setIn([chatType, id], data)
+    return state.setIn([ chatType, id ], data)
 }
 
 export const replyMessage = (state, { message }) => {
-    state = state.setIn(['reply'], message)
+    state = state.setIn([ 'reply' ], message)
     return state
 }
 
@@ -870,6 +903,7 @@ export const replyMessage = (state, { message }) => {
 export const reducer = createReducer(INITIAL_STATE, {
     [Types.ADD_MESSAGE]: addMessage,
     [Types.DELETE_MESSAGE]: deleteMessage,
+    [Types.EDITED_MESSAGE]: editedMessage,
     [Types.UPDATE_MESSAGE_STATUS]: updateMessageStatus,
     [Types.UPDATE_MESSAGE_MID]: updateMessageMid,
     [Types.MUTE_MESSAGE]: muteMessage,

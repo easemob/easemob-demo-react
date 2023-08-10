@@ -86,4 +86,4 @@ class ChatEmoji extends React.Component {
  }
 }
 
-export default ChatEmoji
+export default ChatEmoji;

@@ -90,7 +90,7 @@ class Chat extends React.Component {
             visible: false,
             checkedValue: '',
             showUserInfoMoadl: false,
-            mentionList: []
+            mentionList: [],
         }
         this.userInfo = {}
         this.showEdit = false
@@ -540,11 +540,15 @@ class Chat extends React.Component {
             }, timeout)
         }
     }
-    ok = (id) => {
+    recallMsg = (id) => {
         this.props.deleteMessage(id, true)
     }
 
-    handleHoverChange = (visible) => {
+    editedMsg = (id, msg) => {
+        this.props.editedMessage(id, msg)
+    }
+
+    handleHoverChange = (visible)=>{
         this.setState({
             visible
         })
@@ -662,6 +666,13 @@ class Chat extends React.Component {
             return item.id !== WebIM.conn.user
         })
     };
+
+    isCanModifiedMessage = () =>{
+      let { entities, roomId } = this.props;
+      let allMember =  _.get(entities.groupMember, `${roomId}.byName`, []);
+      let admins =  _.get(entities.groupMember, `${roomId}.admins`, []);
+      return  admins?.includes(WebIM.conn.user) || allMember?.[WebIM.conn.user]?.affiliation === 'owner'
+    }
 
     getFromNick = (selectTab, userinfos, message) => {
         if (selectTab === 'contact') {
@@ -853,10 +864,10 @@ class Chat extends React.Component {
                     {_.map(messageList, (message, i) => {
                         if (i > 0) {
                             if (message.id != messageList[i - 1].id) {
-                                return <ChatMessage id={message.id} key={i} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok} onReply={this.reply} gotoMessage={this.gotoMessage} {...message} />
+                                return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()} onReply={this.reply} gotoMessage={this.gotoMessage} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                             }
                         } else {
-                            return <ChatMessage id={message.id} key={i} fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} ok={this.ok} onReply={this.reply} gotoMessage={this.gotoMessage} {...message} />
+                            return <ChatMessage key={message.id} canModifiedMsg={this.isCanModifiedMessage()} onReply={this.reply} gotoMessage={this.gotoMessage}  fromNick={this.getFromNick(selectTab, userinfos, message)} onClickIdCard={this.onClickIdCard} onRecallMsg={this.recallMsg} onEditedMsg={this.editedMsg} {...message} />
                         }
                     })}
                 </div>
@@ -1011,8 +1022,9 @@ export default connect(
         setGroupMemberAttr: (resp) => dispatch(GroupActions.setGroupMemberAttr(resp)),
         sendTxtMessage: (chatType, id, message) => dispatch(MessageActions.sendTxtMessage(chatType, id, message)),
         deleteMessage: (id) => dispatch(MessageActions.deleteMessage(id, true)),
-        sendImgMessage: (chatType, id, message, source, ext, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, ext, callback)),
-        sendFileMessage: (chatType, id, message, source, ext, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, ext, callback)),
+        editedMessage: (id, message) => dispatch(MessageActions.editedMessage(id, message)),
+        sendImgMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendImgMessage(chatType, id, message, source, callback)),
+        sendFileMessage: (chatType, id, message, source, callback) => dispatch(MessageActions.sendFileMessage(chatType, id, message, source, callback)),
         sendCustomMsg: (chatType, id, message) => dispatch(MessageActions.sendCustomMsg(chatType, id, message)),
         clearMessage: (chatType, id) => dispatch(MessageActions.clearMessage(chatType, id)),
         listGroupMemberAsync: opt => dispatch(GroupMemberActions.listGroupMemberAsync(opt)),
