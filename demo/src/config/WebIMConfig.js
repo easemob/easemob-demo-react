@@ -10,7 +10,7 @@
 //     protocol: "https"
 // }
 
-const { appkey, https, rest={} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
+const { appkey, https, rest = {} } = localStorage.getItem('webIMCustomSetting') ? JSON.parse(localStorage.getItem('webIMCustomSetting')) : {}
 console.log(appkey, https, rest, 'appkey, https, rest')
 
 const isSandBox = false
@@ -20,13 +20,13 @@ var config = {
      * im-api-v2.easemob.com/ws 线上环境
      * im-api-v2-hsb.easemob.com/ws 沙箱环境
      */
-    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox? '//180.184.170.140:8280/ws':'//im-api-v2.easemob.com/ws'),
+    socketServer: rest.imServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox ? '//im-api-v2-hsb.easemob.com/ws' : '//im-api-v2.easemob.com/ws'),
     /*
      * Backend REST API URL
      * a1.easemob.com 线上环境
      * a1-hsb.easemob.com 沙箱环境
      */
-    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox ? '//a1-hsb.easemob.com': '//a1.easemob.com'),
+    restServer: rest.restServer || (window.location.protocol === 'https:' ? 'https:' : 'http:') + (isSandBox ? '//a1-hsb.easemob.com' : '//a1.easemob.com'),
     /*
    * Application AppKey
    */
@@ -74,7 +74,7 @@ var config = {
    * webrtc supports WebKit and https only
    */
     isWebRTC:
-    window.RTCPeerConnection && /^https\:$/.test(window.location.protocol),
+        window.RTCPeerConnection && /^https\:$/.test(window.location.protocol),
     /*
    * Upload pictures or file to your own server and send message with url
    * @parameter {Boolean} true or false
@@ -118,6 +118,8 @@ var config = {
 
     deviceId: `${new Date().getTime()}`,
 
-    AgoraAppId: '15cb0d28b87b425ea613fc46f7c9f974' // 需要替换成自己的声网 appId，此 appId 有限量，仅供参考使用，同时获取声网 token 的接口仅能供此 appId 使用，换成自己的 appId 后需要自己去实现 app server 获取声网token。
+    AgoraAppId: '15cb0d28b87b425ea613fc46f7c9f974', // 需要替换成自己的声网 appId，此 appId 有限量，仅供参考使用，同时获取声网 token 的接口仅能供此 appId 使用，换成自己的 appId 后需要自己去实现 app server 获取声网token。
+
+    usePassword: false,
 }
 export default config

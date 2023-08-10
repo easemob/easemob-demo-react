@@ -3,7 +3,7 @@
 /* eslint-enable */
 
 // add dataReport sdk
-import websdk from './Easemob-modifyMessage'
+import websdk from './Easemob-chat-4.2.0'
 // import websdk from './Easemob-chat'
 
 // import websdk from 'easemob-websdk'
@@ -27,8 +27,8 @@ const rtc = {
 }
 
 console = console || {}
-console.group = console.group || function () {}
-console.groupEnd = console.groupEnd || function () {}
+console.group = console.group || function () { }
+console.groupEnd = console.groupEnd || function () { }
 
 // init DOMParser / document for strophe and sdk
 let WebIM = window.WebIM = {}
@@ -53,8 +53,8 @@ let options = {
     deviceId: WebIM.config.deviceId,
     //公有云 isHttpDNS 默认配置为true
     isHttpDNS: WebIM.config.isHttpDNS,
-    onOffline: () => {console.log('onOffline')},
-    onOnline: () => {console.log('onOnline')}
+    onOffline: () => { console.log('onOffline') },
+    onOnline: () => { console.log('onOnline') }
 }
 
 // 内部沙箱测试环境
@@ -62,7 +62,7 @@ let options = {
 //     WebIM.config.isSandBox = true
 // }
 if (WebIM.config.isSandBox) {
-    options.url =  WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
+    options.url = WebIM.config.socketServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//im-api-v2-hsb.easemob.com/ws'
     options.apiUrl = WebIM.config.restServer // (window.location.protocol === 'https:' ? 'https:' : 'http:') + '//a1-hsb.easemob.com'
     // options.url = `${window.location.protocol}//172.17.2.47:8280/ws`;
     // options.apiUrl = `${window.location.protocol}//172.17.2.47:8080`;

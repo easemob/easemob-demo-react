@@ -10,14 +10,17 @@ import { store } from '@/redux'
 import axios from 'axios'
 
 /* ------------- Types and Action Creators ------------- */
-// const domain = window.location.protocol+'//a1-hsb.easemob.com'//沙箱环境
-const domain = window.location.protocol+'//a1.easemob.com'//线上环境
+const domain1 = window.location.protocol + '//a1-hsb.easemob.com'//沙箱环境
+const domain2 = window.location.protocol + '//a1.easemob.com'//线上环境
+
+const domain = WebIM.config.isSandBox ? domain1 : domain2
+
 const { Types, Creators } = createActions({
-    setLoginToken: [ 'username', 'token' ],
-    setLoging: [ 'username', 'password', 'token' ],
+    setLoginToken: ['username', 'token'],
+    setLoging: ['username', 'password', 'token'],
     stopLoging: null,
-    setLoginSuccess: [ 'username' ],
-    loginFailure: [ 'error' ],
+    setLoginSuccess: ['username'],
+    loginFailure: ['error'],
     jumpRegister: null,
     logout: null,
     setOwnInfo: ['info'],
@@ -33,7 +36,7 @@ const { Types, Creators } = createActions({
             let options = {
                 user: username.trim().toLowerCase(),
                 pwd: password,
-                 // accessToken: password,
+                // accessToken: password,
                 appKey: WebIM.config.appkey,
                 success(token) {
                     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
@@ -81,47 +84,47 @@ const { Types, Creators } = createActions({
 
     getToken: (phoneNumber, smsCode) => {
         return (dispatch, getState) => {
-            axios.post(domain+'/inside/app/user/login/V2', {
+            axios.post(domain + '/inside/app/user/login/V2', {
                 phoneNumber: phoneNumber,
                 smsCode: smsCode
             })
-            .then(function (response) {
-                console.log(response);
-                const {token, chatUserName} = response.data
-                let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
-                message.success(I18N.loginSuccessfully, 1)
-                dispatch(Creators.setLoginToken(chatUserName, token))
-                dispatch(Creators.setLoginSuccess(chatUserName))
-                window.localStorage.setItem('webImLogout', true)
+                .then(function (response) {
+                    console.log(response);
+                    const { token, chatUserName } = response.data
+                    let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
+                    message.success(I18N.loginSuccessfully, 1)
+                    dispatch(Creators.setLoginToken(chatUserName, token))
+                    dispatch(Creators.setLoginSuccess(chatUserName))
+                    window.localStorage.setItem('webImLogout', true)
 
-                dispatch(Creators.loginByToken(chatUserName, token))
-            })
-            .catch(function (error) {
-                switch (error.response.data.errorInfo) {
-                    case "UserId password error.":
-                        message.error('用户名或密码错误！')
-                        break;
-                    case `UserId ${phoneNumber} does not exist.`:
-                        message.error('登录用户不存在')
-                        break;
-                    case 'phone number illegal':
-                        message.error('请输入正确的手机号')
-                        break;
-                    case 'SMS verification code error.':
-                        message.error('验证码错误')
-                        break;
-                    case 'Sms code cannot be empty':
-                        message.error('验证码不能为空')
-                        break;
-                    case 'Please send SMS to get mobile phone verification code.':
-                        message.error('请使用短信验证码登录')
-                        break;
-                    default:
-                        message.error('登录失败，请重试！')
-                        break;
-                }
-                dispatch(Creators.stopLoging())
-            });
+                    dispatch(Creators.loginByToken(chatUserName, token))
+                })
+                .catch(function (error) {
+                    switch (error.response.data.errorInfo) {
+                        case "UserId password error.":
+                            message.error('用户名或密码错误！')
+                            break;
+                        case `UserId ${phoneNumber} does not exist.`:
+                            message.error('登录用户不存在')
+                            break;
+                        case 'phone number illegal':
+                            message.error('请输入正确的手机号')
+                            break;
+                        case 'SMS verification code error.':
+                            message.error('验证码错误')
+                            break;
+                        case 'Sms code cannot be empty':
+                            message.error('验证码不能为空')
+                            break;
+                        case 'Please send SMS to get mobile phone verification code.':
+                            message.error('请使用短信验证码登录')
+                            break;
+                        default:
+                            message.error('登录失败，请重试！')
+                            break;
+                    }
+                    dispatch(Creators.stopLoging())
+                });
         }
     },
 })

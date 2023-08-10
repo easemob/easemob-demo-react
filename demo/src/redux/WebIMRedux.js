@@ -55,13 +55,13 @@ WebIM.conn.listen({
 
         // presence to be online and receive message
         // WebIM.conn.setPresence()
-    
+
         // get roster
         store.dispatch(RosterActions.getContacts())
-        
+
         // dispatch login success callback
         store.dispatch(LoginActions.setLoginSuccess())
-        
+
         // fetch blacklist
         store.dispatch(BlacklistActions.getBlacklist())
 
@@ -82,122 +82,122 @@ WebIM.conn.listen({
         //     if (WebIM.call) {
         //         return
         //     }
-    
+
         //     console.log("InitWebRTC end..........")    
-    
-            
+
+
         // }
     },
     onPresence: msg => {
         console.log("onPresence", msg)
         switch (msg.type) {
-        case 'invite_accept':
-        console.log()
-            console.log('invite_accept')
-            break;
-        case 'joinGroupNotifications':
-            logger.info('joinGroupNotifications')
-            store.dispatch(CommonActions.setShowGroupRequestModal(true))
-            store.dispatch(GroupRequestActions.addGroupRequest(msg))
-            break
-        case 'deleteGroupChat':
-            message.error(`group${msg.gid} was destroyed.`)
-            store.dispatch(GroupActions.getGroups())
-            store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
-            break
-        case 'leaveGroup': // 某人离开群
-            message.error(
-                `${msg.from}${I18n.t('LeaveGroup')}${msg.gid}.`
-            )
-            store.dispatch(GroupActions.removeGroupMemberAttr({
-                groupId: msg.gid,
-                uid: msg.from
-            }))
-            break
-        case 'removedFromGroup':
-            message.error(
-                `${msg.kicked || I18n.t('you')} ${I18n.t('dismissed')}${I18n.t('by')}${msg.owner ||
+            case 'invite_accept':
+                console.log()
+                console.log('invite_accept')
+                break;
+            case 'joinGroupNotifications':
+                logger.info('joinGroupNotifications')
+                store.dispatch(CommonActions.setShowGroupRequestModal(true))
+                store.dispatch(GroupRequestActions.addGroupRequest(msg))
+                break
+            case 'deleteGroupChat':
+                message.error(`group${msg.gid} was destroyed.`)
+                store.dispatch(GroupActions.getGroups())
+                store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
+                break
+            case 'leaveGroup': // 某人离开群
+                message.error(
+                    `${msg.from}${I18n.t('LeaveGroup')}${msg.gid}.`
+                )
+                store.dispatch(GroupActions.removeGroupMemberAttr({
+                    groupId: msg.gid,
+                    uid: msg.from
+                }))
+                break
+            case 'removedFromGroup':
+                message.error(
+                    `${msg.kicked || I18n.t('you')} ${I18n.t('dismissed')}${I18n.t('by')}${msg.owner ||
                     I18n.t('admin')} .`
-            )
-            store.dispatch(GroupActions.getGroups())
-            store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
-            break
-        case 'invite': //手机端邀请入群
-            store.dispatch(CommonActions.setShowGroupInviteModal(true))
-            store.dispatch(GroupRequestActions.addGroupRequest(msg))
-            break
-        case 'direct_joined': //被拉进群
-            message.success(`${msg.from}${I18n.t('invite')}${I18n.t('you')}${I18n.t('join')}${msg.gid}`)
-            store.dispatch(GroupActions.getGroups())
-            break
-        case 'joinPublicGroupSuccess':
-            message.success(`${I18n.t('joinGroup')} ${msg.from} ${I18n.t('successfully')}`)
-            store.dispatch(GroupActions.getGroups())
-            break
-        case 'joinPublicGroupDeclined':
-            message.error(
-                `${I18n.t('join')}${I18n.t('group')}${msg.gid}${I18n.t('refuse')}${I18n.t('by')}${msg.owner}`
-            )
-            break
-        case 'joinChatRoomSuccess': // Join the chat room successfully
-            // Demo.currentChatroom = msg.from;
-            break
-        case 'reachChatRoomCapacity': // Failed to join the chat room
-            // Demo.currentChatroom = null;
-            message.error(`${I18n.t('joinGroup')}${I18n.t('failed')}`)
-            break
-        case 'subscribe':
-            // jion friend action is subscribe/publish pattern，so when you agree to add a friend
-            // it will notify the other side automatic，when state equasl [resp:true], do nothing
-            // if (msg.status === "[resp:true]") {
-            //     return
-            // }
+                )
+                store.dispatch(GroupActions.getGroups())
+                store.dispatch(MessageActions.clearUnread('groupchat', msg.gid))
+                break
+            case 'invite': //手机端邀请入群
+                store.dispatch(CommonActions.setShowGroupInviteModal(true))
+                store.dispatch(GroupRequestActions.addGroupRequest(msg))
+                break
+            case 'direct_joined': //被拉进群
+                message.success(`${msg.from}${I18n.t('invite')}${I18n.t('you')}${I18n.t('join')}${msg.gid}`)
+                store.dispatch(GroupActions.getGroups())
+                break
+            case 'joinPublicGroupSuccess':
+                message.success(`${I18n.t('joinGroup')} ${msg.from} ${I18n.t('successfully')}`)
+                store.dispatch(GroupActions.getGroups())
+                break
+            case 'joinPublicGroupDeclined':
+                message.error(
+                    `${I18n.t('join')}${I18n.t('group')}${msg.gid}${I18n.t('refuse')}${I18n.t('by')}${msg.owner}`
+                )
+                break
+            case 'joinChatRoomSuccess': // Join the chat room successfully
+                // Demo.currentChatroom = msg.from;
+                break
+            case 'reachChatRoomCapacity': // Failed to join the chat room
+                // Demo.currentChatroom = null;
+                message.error(`${I18n.t('joinGroup')}${I18n.t('failed')}`)
+                break
+            case 'subscribe':
+                // jion friend action is subscribe/publish pattern，so when you agree to add a friend
+                // it will notify the other side automatic，when state equasl [resp:true], do nothing
+                // if (msg.status === "[resp:true]") {
+                //     return
+                // }
 
-            store.dispatch(SubscribeActions.addSubscribe(msg))
-            break
-        case 'subscribed':
-            store.dispatch(RosterActions.getContacts())
-            // Alert.alert(msg.from + " " + I18n.t("subscribed"))
-            message.warning(msg.from + '' + I18n.t('subscribed'))
-            break
-        case 'unsubscribe': // The sender deletes a friend.
-        case 'unsubscribed': // The other party has removed you from the friend list.
-            store.dispatch(RosterActions.getContacts())
-            store.dispatch(MessageActions.clearUnread('chat', msg.from))
-            // Alert.alert(msg.from + " " + I18n.t("unsubscribed"))
-            if ('code' in msg) {
-                message.warning(msg.from + ' ' + I18n.t('refuse'))
-            } else {
-                message.warning(msg.from + ' ' + I18n.t('unsubscribed'))
-            }
-            break
-        case 'memberJoinPublicGroupSuccess':
-            message.success(`${msg.from}${I18n.t('join')}${I18n.t('group')}${msg.gid}${I18n.t('successfully')}`)
-            store.dispatch(GroupMemberActions.listGroupMemberAsync({groupId: msg.gid}))
-            break
-        case 'memberJoinChatRoomSuccess':
-            message.success(`${msg.from}${I18n.t('join')}${I18n.t('chatroom')}${msg.gid}${I18n.t('successfully')}`)
-            break
-        case 'leaveChatRoom': // Leave the chat room
-            message.warning(`${msg.from} left the chatroom: ${msg.gid}` )
-            break
-        case 'addMute':
-            message.warning('you was muted')
-            break
-        case 'removeMute':
-            message.success('you was unmuted')
-            break
-        case 'addAdmin':
-            message.success('you were set to be an admin')
-            break
-        case 'removeAdmin':
-            message.success('your admin has been canceled')
-            break
-        case 'changeOwner':
-            message.success('You`ve become group managerd')
-            break
-        default:
-            break
+                store.dispatch(SubscribeActions.addSubscribe(msg))
+                break
+            case 'subscribed':
+                store.dispatch(RosterActions.getContacts())
+                // Alert.alert(msg.from + " " + I18n.t("subscribed"))
+                message.warning(msg.from + '' + I18n.t('subscribed'))
+                break
+            case 'unsubscribe': // The sender deletes a friend.
+            case 'unsubscribed': // The other party has removed you from the friend list.
+                store.dispatch(RosterActions.getContacts())
+                store.dispatch(MessageActions.clearUnread('chat', msg.from))
+                // Alert.alert(msg.from + " " + I18n.t("unsubscribed"))
+                if ('code' in msg) {
+                    message.warning(msg.from + ' ' + I18n.t('refuse'))
+                } else {
+                    message.warning(msg.from + ' ' + I18n.t('unsubscribed'))
+                }
+                break
+            case 'memberJoinPublicGroupSuccess':
+                message.success(`${msg.from}${I18n.t('join')}${I18n.t('group')}${msg.gid}${I18n.t('successfully')}`)
+                store.dispatch(GroupMemberActions.listGroupMemberAsync({ groupId: msg.gid }))
+                break
+            case 'memberJoinChatRoomSuccess':
+                message.success(`${msg.from}${I18n.t('join')}${I18n.t('chatroom')}${msg.gid}${I18n.t('successfully')}`)
+                break
+            case 'leaveChatRoom': // Leave the chat room
+                message.warning(`${msg.from} left the chatroom: ${msg.gid}`)
+                break
+            case 'addMute':
+                message.warning('you was muted')
+                break
+            case 'removeMute':
+                message.success('you was unmuted')
+                break
+            case 'addAdmin':
+                message.success('you were set to be an admin')
+                break
+            case 'removeAdmin':
+                message.success('your admin has been canceled')
+                break
+            case 'changeOwner':
+                message.success('You`ve become group managerd')
+                break
+            default:
+                break
         }
     },
     // handle all exception
@@ -277,13 +277,13 @@ WebIM.conn.listen({
         // msg.msg && message.error(msg.msg)
         // store.dispatch(Creators.logoutSuccess())
     },
-    
+
     // 好友相关回调
-    onContactInvited: (msg) => {console.log('onContactInvited', msg)},
-    onContactDeleted: (msg) => {console.log('onContactDeleted', msg)},
-    onContactAdded: (msg) => {console.log('onContactAdded', msg)},
-    onContactRefuse: (msg) => {console.log('onContactRefuse', msg)},
-    onContactAgreed: (msg) => {console.log('onContactAgreed', msg)},
+    onContactInvited: (msg) => { console.log('onContactInvited', msg) },
+    onContactDeleted: (msg) => { console.log('onContactDeleted', msg) },
+    onContactAdded: (msg) => { console.log('onContactAdded', msg) },
+    onContactRefuse: (msg) => { console.log('onContactRefuse', msg) },
+    onContactAgreed: (msg) => { console.log('onContactAgreed', msg) },
 
     // 消息相关回调
     onReadMessage: message => {
@@ -300,15 +300,15 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.updateMessageMid(id, mid))
     },
     onRecallMessage: message => {
-        store.dispatch(MessageActions.deleteMessage(message)) 
+        store.dispatch(MessageActions.deleteMessage(message))
         logger.info('onRecallMessage', message)
     },
-    onLocationMessage: message =>{ //位置消息
+    onLocationMessage: message => { //位置消息
         logger.info('onLocationMessage', message)
     },
     onTextMessage: message => {
-        console.log("onTextMessage", {...message})
-        let { from, to } = message 
+        console.log("onTextMessage", { ...message })
+        let { from, to } = message
         let { type } = message
         let rootState = store.getState()
         let username = _.get(rootState, 'login.username', '')
@@ -316,98 +316,106 @@ WebIM.conn.listen({
         // root id: when sent by current user or in group chat, is id of receiver. Otherwise is id of sender
         let chatId = bySelf || type !== 'chat' ? to : from
         if (type === 'chat' && message.from != 'huanhuan' &&
-            (( _.get(rootState,'entities.roster.byName['+chatId+'].subscription')  === 'none') ||
-             !(_.get(rootState,'entities.roster.byName['+chatId+'].subscription')))){
+            ((_.get(rootState, 'entities.roster.byName[' + chatId + '].subscription') === 'none') ||
+                !(_.get(rootState, 'entities.roster.byName[' + chatId + '].subscription')))) {
             message.type = 'stranger'
-            store.dispatch(StrangerActions.updateStrangerMessage(from,message,'txt'))            
+            store.dispatch(StrangerActions.updateStrangerMessage(from, message, 'txt'))
         }
-        if(type === 'groupchat'){
+        if (type === 'groupchat') {
             let mentionList = message?.ext?.em_at_list
-            if(mentionList && message.from !== WebIM.conn.user){
-                if(mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)){
-                    store.dispatch(GroupActions.pushMentionedGroupId({groupId: to}))     
+            if (mentionList && message.from !== WebIM.conn.user) {
+                if (mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)) {
+                    store.dispatch(GroupActions.pushMentionedGroupId({ groupId: to }))
+                }
+            }
+        }
+        if (type === 'groupchat') {
+            let mentionList = message?.ext?.em_at_list
+            if (mentionList && message.from !== WebIM.conn.user) {
+                if (mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)) {
+                    store.dispatch(GroupActions.pushMentionedGroupId({ groupId: to }))
                 }
             }
         }
 
-        store.dispatch(MessageActions.addMessage(message, 'txt'))     
-        store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
+        store.dispatch(MessageActions.addMessage(message, 'txt'))
+        // type == 'chat' && store.dispatch(MessageActions.sendRead(message))   // 去掉群组消息回复的ack
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            //新的会议要求消息，使用text message实现
-            if(WebIM && WebIM.call && message && message.ext && message.ext.msg_extension){
-                var msgExtension = typeof(message.ext.msg_extension) == 'string'?JSON.parse(message.ext.msg_extension):message.ext.msg_extension
-                var options = {
-                    confrId: message.ext.conferenceId,
-                    password: message.ext.password || '',
-                    gid: msgExtension.group_id,
-                    inviter: msgExtension.inviter
-                }
-                WebIM.call.listener.onInvite(from, options)
-            }
-
-            if (message.ext && message.ext.action === 'invite') {
-                console.log('收到邀请消息', store.getState().callVideo)
-
-                let callVideo = store.getState().callVideo;
-                message.calleeIMName = message.to
-                message.callerIMName = message.from
-
-                if (message.from == WebIM.conn.context.jid.name) {
-                    return // 自己在另一端发出的邀请
-                }
-                if (callVideo.callStatus > CALLSTATUS.idle) { // 正忙
-                    if (message.ext.callId == callVideo.callId) { // 多人会议中邀请别人
-                        store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
-                        store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                    }else{
-                        return store.dispatch(VideoCallAcctions.answerCall('busy', {callId: message.ext.callId, callerDevId:message.ext.callerDevId, to: from}))
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                //新的会议要求消息，使用text message实现
+                if (WebIM && WebIM.call && message && message.ext && message.ext.msg_extension) {
+                    var msgExtension = typeof (message.ext.msg_extension) == 'string' ? JSON.parse(message.ext.msg_extension) : message.ext.msg_extension
+                    var options = {
+                        confrId: message.ext.conferenceId,
+                        password: message.ext.password || '',
+                        gid: msgExtension.group_id,
+                        inviter: msgExtension.inviter
                     }
+                    WebIM.call.listener.onInvite(from, options)
                 }
-                store.dispatch(VideoCallAcctions.updateConfr(message))
 
-                // if (message.ext.type === 2) { // 多人
-                //     if (callVideo.callStatus > CALLSTATUS.idle) {
-                //         return
-                //     }
-                //     confirm({
-                //         title: from + '邀请您进入多人会议',
-                //         okText: '确认',
-                //         cancelText: '拒绝',
-                //         onOk() {
-                //             store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
-                //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                //             store.dispatch(VideoCallAcctions.answerCall('accept', { callId:message.ext.callId, callerDevId: message.ext.callerDevId, to:from}))
-                //         },
-                //         onCancel() {
-                //             console.log('Cancel')
-                //             store.dispatch(VideoCallAcctions.answerCall('refuse', { callId:message.ext.callId, callerDevId:message.ext.callerDevId, to:from}))
-                //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
-                //             store.dispatch(VideoCallAcctions.updateConfr({}))
-                //         }
-                //     })
-                // }else{
+                if (message.ext && message.ext.action === 'invite') {
+                    console.log('收到邀请消息', store.getState().callVideo)
+
+                    let callVideo = store.getState().callVideo;
+                    message.calleeIMName = message.to
+                    message.callerIMName = message.from
+
+                    if (message.from == WebIM.conn.context.jid.name) {
+                        return // 自己在另一端发出的邀请
+                    }
+                    if (callVideo.callStatus > CALLSTATUS.idle) { // 正忙
+                        if (message.ext.callId == callVideo.callId) { // 多人会议中邀请别人
+                            store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                            store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                        } else {
+                            return store.dispatch(VideoCallAcctions.answerCall('busy', { callId: message.ext.callId, callerDevId: message.ext.callerDevId, to: from }))
+                        }
+                    }
+                    store.dispatch(VideoCallAcctions.updateConfr(message))
+
+                    // if (message.ext.type === 2) { // 多人
+                    //     if (callVideo.callStatus > CALLSTATUS.idle) {
+                    //         return
+                    //     }
+                    //     confirm({
+                    //         title: from + '邀请您进入多人会议',
+                    //         okText: '确认',
+                    //         cancelText: '拒绝',
+                    //         onOk() {
+                    //             store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
+                    //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
+                    //             store.dispatch(VideoCallAcctions.answerCall('accept', { callId:message.ext.callId, callerDevId: message.ext.callerDevId, to:from}))
+                    //         },
+                    //         onCancel() {
+                    //             console.log('Cancel')
+                    //             store.dispatch(VideoCallAcctions.answerCall('refuse', { callId:message.ext.callId, callerDevId:message.ext.callerDevId, to:from}))
+                    //             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
+                    //             store.dispatch(VideoCallAcctions.updateConfr({}))
+                    //         }
+                    //     })
+                    // }else{
                     store.dispatch(VideoCallAcctions.sendAlerting(from, message.ext.callerDevId, message.ext.callId)) // 回复alerting消息
                     store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.alerting)) // 更改为alerting状态
-                // }
-            }
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        case 'stranger':
-            // todo: remove chatdata to stranger list
-            // store.dispatch(RosterActions.topRoster(from))
-            // message.type = "stranger";
-            store.dispatch(MessageActions.addMessage(message, 'txt'))                    
-            store.dispatch(StrangerActions.topStranger(from))
-            break
-        default:
-            break
+                    // }
+                }
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            case 'stranger':
+                // todo: remove chatdata to stranger list
+                // store.dispatch(RosterActions.topRoster(from))
+                // message.type = "stranger";
+                store.dispatch(MessageActions.addMessage(message, 'txt'))
+                store.dispatch(StrangerActions.topStranger(from))
+                break
+            default:
+                break
         }
     },
     onPictureMessage: message => {
@@ -416,17 +424,17 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.addMessage(message, 'img'))
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        default:
-            break
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            default:
+                break
         }
     },
     onFileMessage: message => {
@@ -435,17 +443,17 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.addMessage(message, 'file'))
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        default:
-            break
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            default:
+                break
         }
     },
     onAudioMessage: message => {
@@ -454,17 +462,17 @@ WebIM.conn.listen({
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))
 
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        default:
-            break
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            default:
+                break
         }
     },
     onVideoMessage: message => {
@@ -472,17 +480,17 @@ WebIM.conn.listen({
         store.dispatch(MessageActions.addMessage(message, 'video'))
         type === 'chat' && store.dispatch(MessageActions.sendRead(message))
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        default:
-            break
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            default:
+                break
         }
     },
     onInviteMessage: msg => {
@@ -498,23 +506,23 @@ WebIM.conn.listen({
     },
     onCustomMessage: msg => {
         console.log('onCustomMessage', msg)
-        let {customEvent, type, from, to} = msg
+        let { customEvent, type, from, to } = msg
         if (msg.customEvent == "userCard" && typeof msg.customExts == 'string') {
             msg.customExts = JSON.parse(msg.customExts)
         }
         store.dispatch(MessageActions.addMessage(msg, 'custom'))
         switch (type) {
-        case 'chat':
-            store.dispatch(RosterActions.topRoster(from))
-            break
-        case 'groupchat':
-            store.dispatch(GroupActions.topGroup(to))
-            break
-        case 'chatroom':
-            store.dispatch(ChatRoomActions.topChatroom(to))
-            break
-        default:
-            break
+            case 'chat':
+                store.dispatch(RosterActions.topRoster(from))
+                break
+            case 'groupchat':
+                store.dispatch(GroupActions.topGroup(to))
+                break
+            case 'chatroom':
+                store.dispatch(ChatRoomActions.topChatroom(to))
+                break
+            default:
+                break
         }
     },
     onChannelMessage: msg => console.log('onChannelMessage', msg),
@@ -531,7 +539,7 @@ WebIM.conn.listen({
             let callerDevId = ''
             let callId = '';
             let callVideo = store.getState().callVideo;
-            switch(msgInfo.action){
+            switch (msgInfo.action) {
                 case "alert":
                     deviceId = msgInfo.calleeDevId
                     callerDevId = msgInfo.callerDevId
@@ -563,7 +571,7 @@ WebIM.conn.listen({
                     console.log('收到回复的answerCall', msg)
                     console.log('清除定时器1')
                     rtc.timer && clearTimeout(rtc.timer)
-                    
+
                     deviceId = msgInfo.calleeDevId
 
                     if (msgInfo.callerDevId != WebIM.conn.context.jid.clientResource) {
@@ -573,22 +581,22 @@ WebIM.conn.listen({
                     if (msgInfo.result !== 'accept') {
                         if (msgInfo.result === 'busy') {
                             message.error('对方正忙')
-                        }else if(msgInfo.result === 'refuse'){
+                        } else if (msgInfo.result === 'refuse') {
                             message.error('对方已拒绝')
                         }
-                        
+
                         if (callVideo.confr.type !== 2) { // 单人情况挂断，多人不挂断
                             store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
                             store.dispatch(VideoCallAcctions.hangup())
                             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
                         }
-                    }else{
+                    } else {
                         store.dispatch(VideoCallAcctions.confirmCallee(msg.from, deviceId, msgInfo.result))
                     }
                     break;
                 case "confirmCallee":
                     console.log('收到confirmCallee', msg)
-                    if ( msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
+                    if (msgInfo.calleeDevId != WebIM.conn.context.jid.clientResource) {
                         if (msg.to == WebIM.conn.context.jid.name) {
                             store.dispatch(VideoCallAcctions.hangup())
                             store.dispatch(VideoCallAcctions.setCallStatus(CALLSTATUS.idle))
@@ -596,7 +604,7 @@ WebIM.conn.listen({
                         }
                         return
                     }
-                    
+
                     if (msg.ext.result != 'accept' && callVideo.callStatus != 7) {
                         // 不在通话中收到 busy refuse时挂断
                         store.dispatch(VideoCallAcctions.hangup())
@@ -629,7 +637,7 @@ WebIM.conn.listen({
 })
 
 WebIM.conn.addEventHandler("event", {
-    onGroupEvent: ({id, userId, attributes, operation}) => {
+    onGroupEvent: ({ id, userId, attributes, operation }) => {
         if (operation === "memberAttributesUpdate") {
             store.dispatch(GroupActions.setGroupMemberAttr({
                 groupId: id,
@@ -639,7 +647,7 @@ WebIM.conn.addEventHandler("event", {
             }));
         }
     },
-    onMultiDeviceEvent:({id, userId, attributes, operation}) => {
+    onMultiDeviceEvent: ({ id, userId, attributes, operation }) => {
         if (operation === "memberAttributesUpdate") {
             store.dispatch(GroupActions.setGroupMemberAttr({
                 groupId: id,

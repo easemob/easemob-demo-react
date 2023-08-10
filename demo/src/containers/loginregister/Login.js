@@ -11,7 +11,7 @@ import axios from 'axios'
 const domain = WebIM.config.restServer
 const FormItem = Form.Item
 
-const USE_PASSWORD = false
+const USE_PASSWORD = WebIM.config.usePassword
 
 const Login = ({
     I18N,
