@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { Button, Row, Form, Input, Select, Col } from "antd"
-import { config } from "@/config"
-import styles from "./index.less"
-import RegisterActions from "@/redux/RegisterRedux"
+import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { Button, Row, Form, Input, Select, Col } from 'antd'
+import { config } from '@/config'
+import styles from './index.less'
+import RegisterActions from '@/redux/RegisterRedux'
 // import LoginActions from '@/redux/LoginRedux'
 import ServerActions from '@/redux/ServerRedux'
-import WebIM from "@/config/WebIM"
+import WebIM from '@/config/WebIM'
 import axios from 'axios'
 import { message } from 'antd'
 const domain = WebIM.config.restServer
 
-const { Option } = Select;
+const { Option } = Select
 const FormItem = Form.Item
 
 const Register = ({
@@ -29,7 +29,7 @@ const Register = ({
 }) => {
     let timer
     let times = 50
-    let [smsBtnText, setSmsBtnText] = useState(I18N.getCaptcha)
+    let [ smsBtnText, setSmsBtnText ] = useState(I18N.getCaptcha)
     const { loginLoading } = login
     function handleOk() {
         validateFieldsAndScroll((errors, values) => {
@@ -47,15 +47,15 @@ const Register = ({
     }
 
     const getCaptcha = () => {
-        if(typeof smsBtnText != 'string') return
+        if(typeof smsBtnText !== 'string') return
         const imageCode = getFieldValue('imageCode')
         const phoneNumber = getFieldValue('phoneNumber')
-        validateFields(['imageCode', 'phoneNumber'], (errors, values) => {
+        validateFields([ 'imageCode', 'phoneNumber' ], (errors, values) => {
             if(errors){
                 return
             }
             sendSms(values.phoneNumber, values.imageCode)
-        });
+        })
     }
 
     const sendSms = (phoneNumber, imageCode) => {
@@ -64,17 +64,17 @@ const Register = ({
             imageId,
             imageCode
         })
-        .then((response) => {
-            message.success('短信已发送')
-            countDown()
-        })
-        .catch(function (error) {
-            console.log('error', error.response);
-            if(error.response.status == '400'){
-                message.error(error.response.data.errorInfo)
-                getImageVerification()
-            }
-        });
+            .then((response) => {
+                message.success('短信已发送')
+                countDown()
+            })
+            .catch(function (error) {
+                console.log('error', error.response)
+                if(error.response.status == '400'){
+                    message.error(error.response.data.errorInfo)
+                    getImageVerification()
+                }
+            })
     }
 
     const countDown = () => {
@@ -91,12 +91,12 @@ const Register = ({
     }
 
     const prefixSelector = getFieldDecorator('prefix', {
-      initialValue: '86',
+        initialValue: '86',
     })(
-      <Select style={{ width: 70 }} isSelectOptGroup>
-        <Option value="86">+86</Option>
-      </Select>,
-    );
+        <Select style={{ width: 70 }} isSelectOptGroup>
+            <Option value="86">+86</Option>
+        </Select>,
+    )
 
     if(isSuccess){
         clearTimeout(timer)
@@ -104,9 +104,9 @@ const Register = ({
 
     useEffect( () => {
         getImageVerification()
-    }, [])
+    }, [ getImageVerification ])
 
-    const logo = WebIM.config.i18n == "cn" ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
+    const logo = WebIM.config.i18n == 'cn' ? <i className='font'>V</i> : <i className="iconfont icon-hyphenate"/>
     return (
         <div className="form x-login">
             <div className="logo">
@@ -118,7 +118,7 @@ const Register = ({
 
             <form>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("username", {
+                    {getFieldDecorator('username', {
                         rules: [
                             {
                                 required: true
@@ -133,7 +133,7 @@ const Register = ({
                     )}
                 </FormItem>
                 <FormItem hasFeedback>
-                    {getFieldDecorator("password", {
+                    {getFieldDecorator('password', {
                         rules: [
                             {
                                 required: true
@@ -150,36 +150,36 @@ const Register = ({
                 </FormItem>
 
                 <Form.Item hasFeedback>
-                  {getFieldDecorator('phoneNumber', {
-                    rules: [{ required: true, message: 'Please input your phone number!' }],
-                  })(<Input addonBefore={prefixSelector} placeholder={I18N.phoneNumber}/>)}
+                    {getFieldDecorator('phoneNumber', {
+                        rules: [ { required: true, message: 'Please input your phone number!' } ],
+                    })(<Input addonBefore={prefixSelector} placeholder={I18N.phoneNumber}/>)}
                 </Form.Item>
                 <FormItem>
-                  <Row gutter={8}>
-                    <Col span={16}>
-                      {getFieldDecorator('imageCode', {
-                        rules: [{ required: true, message: 'Please input the captcha you got!' }],
-                      })(<Input placeholder={I18N.imageVerification}/>)}
-                    </Col>
-                    <Col span={8}>
-                      <div className="image-verification">
-                        <img src={imageVerifyUrl} style={{width: '100%', height: '100%'}} onClick={getImageVerification}></img>
-                      </div>
-                    </Col>
-                  </Row>
+                    <Row gutter={8}>
+                        <Col span={16}>
+                            {getFieldDecorator('imageCode', {
+                                rules: [ { required: true, message: 'Please input the captcha you got!' } ],
+                            })(<Input placeholder={I18N.imageVerification}/>)}
+                        </Col>
+                        <Col span={8}>
+                            <div className="image-verification">
+                                <img src={imageVerifyUrl} style={{ width: '100%', height: '100%' }} onClick={getImageVerification}></img>
+                            </div>
+                        </Col>
+                    </Row>
                 </FormItem>
 
                 <FormItem>
-                  <Row gutter={8}>
-                    <Col span={12}>
-                      {getFieldDecorator('captcha', {
-                        rules: [{ required: true, message: 'Please input the captcha you got!' }],
-                      })(<Input size="default" placeholder={I18N.captcha}/>)}
-                    </Col>
-                    <Col span={12}>
-                      <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
-                    </Col>
-                  </Row>
+                    <Row gutter={8}>
+                        <Col span={12}>
+                            {getFieldDecorator('captcha', {
+                                rules: [ { required: true, message: 'Please input the captcha you got!' } ],
+                            })(<Input size="default" placeholder={I18N.captcha}/>)}
+                        </Col>
+                        <Col span={12}>
+                            <Button size="large" onClick={getCaptcha}>{smsBtnText}</Button>
+                        </Col>
+                    </Row>
                 </FormItem>
 
                 {/*<FormItem hasFeedback>
@@ -223,14 +223,14 @@ Register.propTypes = {
 export default connect(
     ({ i18n, login, register }) => {
         return ({
-        I18N: i18n.locale && i18n.translations && i18n.translations[i18n.locale] || {},
-        login: {
-            loginLoading: false
-        },
-        imageVerifyUrl: register.imageVerifyUrl,
-        isSuccess: register.isSuccess,
-        imageId: register.imageId
-    })},
+            I18N: i18n.locale && i18n.translations && i18n.translations[i18n.locale] || {},
+            login: {
+                loginLoading: false
+            },
+            imageVerifyUrl: register.imageVerifyUrl,
+            isSuccess: register.isSuccess,
+            imageId: register.imageId
+        })},
     dispatch => ({
         doRegister: (username, password, nickname) =>
             dispatch(RegisterActions.register(username, password, nickname)),
