@@ -1,0 +1,67 @@
+.color-picker-pointer{
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    background-color: #fff;
+    transform: translateX(-6px) translateY(-4px);
+    border: 1px solid hsl(203deg, 8%, 90%);
+}
+.color-setting-content{
+    width: 100%;
+    &-item{
+        height: 54px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+    }
+
+    &-ellipse{
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+        background-color: #464E53;
+        margin: 8px;
+    }
+
+    &-body{
+        flex: 1;
+        border-bottom: 1px solid #E3E6E8;
+        height: 53px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 12px;
+        &-label{
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        &-picker{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+        }
+    }
+
+    &-body-dark{
+        border-bottom: 1px solid #464E53;
+        color: #E3E6E8;
+    }
+}
+
+.feature-setting-item{
+    margin-bottom: 28px;
+}
+.feature-setting-content{
+    width: 100%;
+    padding: 0;
+}
+
+.user-info-content-item-dropdown{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+

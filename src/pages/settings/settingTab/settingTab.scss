@@ -1,0 +1,108 @@
+
+.setting-tab{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+
+    &-menu{
+        width: 360px;
+        background-color: #F1F2F3;
+        border-right: 1px solid #E3E6E8;
+
+        &-header{
+            display: flex;
+            width: 360px;
+            height: 60px;
+            padding: 17px 308px 17px 16px;
+            align-items: center;
+            flex-shrink: 0;
+            color: #171A1C;
+            box-sizing: border-box;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .setting-tab-group{
+            &-title{
+                padding: 0 14px;
+                height: 24px;
+                color: #75828A;
+                font-size: 14px;
+                font-style: normal;
+                font-weight: 500;
+                line-height: 20px;
+                line-height: 24px;
+            }
+            .setting-menu-item.active{
+                background-color: var(--cui-primary-color95);
+                & > div {
+                    color: var(--cui-primary-color5);
+                }
+                & svg{
+                    fill: var(--cui-primary-color5);
+                }
+                .setting-menu-item-name{
+                    border: none;
+                }
+            }
+            .setting-menu-item{
+                height: 54px;
+                background: #F9FAFA;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding-left: 12px;
+                cursor: pointer;
+                &-icon{
+                    width: 24px;
+                    height: 24px;
+                }
+
+                &-name{
+                    border-bottom: 1px solid #E3E6E8;
+                    flex: 1;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    color: #171A1C;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-sizing: border-box;
+                }
+            }
+        }
+    }
+
+    .setting-tab-content{
+        flex: 1;
+        background-color: #F9FAFA;
+    }
+}
+
+.setting-tab-dark{
+    .setting-tab-menu{
+        background-color: #2F3437;
+        border-right: 1px solid #464E53;
+
+        .setting-tab-menu-header{
+            color: #F9FAFA
+        }
+    }
+
+    .setting-tab-content{
+        flex: 1;
+        background-color: #171A1C;
+    }
+    .setting-tab-group{
+        .setting-menu-item{
+            background-color: #2F3437;
+            
+            .setting-menu-item-name{
+                color: #F9FAFA;
+                border-bottom: 1px solid #464E53;
+            }
+        }
+    }
+    
+}
+

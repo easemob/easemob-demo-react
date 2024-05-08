@@ -1,0 +1,77 @@
+.setting-personal{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    &-header{
+        height: 60px;
+        color: #171A1C;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        font-weight: 500;
+        font-size: 18px;
+        border-bottom: 1px solid #E3E6E8;
+    }
+
+    &-main{
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        overflow-y: auto;
+        .setting-personal-content{
+            width: 360px;
+            // border: 1px solid #E3E6E8;
+            padding-top: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 36px;
+        }
+        scrollbar-color: hsl(203deg, 8%, 80%) transparent;
+    }
+}
+
+.setting-tab-dark{
+    .setting-tab-content{
+        .setting-personal-dark{
+            .setting-personal-header{
+                color: #F9FAFA;
+                border-bottom: 1px solid #464E53;
+                
+            }
+    
+            .setting-personal-main{
+                .setting-personal-content{
+                    .user-info-header{
+                        .user-info-header-name{
+                            color: #F9FAFA;
+                        }
+
+                        .user-info-header-id{
+                            color: #75828A;
+                        }
+                        
+                    }
+                    .user-info-content{
+                        background-color: #171A1C;
+                        .user-info-content-item{
+                            background-color: #171A1C;
+                            .user-info-content-item-box{
+                                border-bottom: 1px solid #2F3437;
+                            }
+                            .user-info-content-item-box span{
+                                color: #F9FAFA;
+                            }
+                            .user-info-content-item-box div{
+                                color: #919BA1
+                            }
+                        }
+                    }
+                }
+                scrollbar-color: hsl(203deg, 8%, 40%) transparent;
+            }
+        }
+    }
+}

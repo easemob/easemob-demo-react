@@ -1,0 +1,13 @@
+.crop-container{
+    max-width: 472px;
+    max-height: 472px;
+    min-width: 150px;
+    min-height: 150px;
+    position: relative;
+
+    .crop-toolBox{
+        position: absolute;
+        bottom: -30px;
+        right: 0;
+    }
+}
