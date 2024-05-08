@@ -1,113 +1,48 @@
-# React Demo（WebIM）介绍
+## 产品介绍
 
+环信 IM 产品展示了怎么使用环信 `easemob-chat-uikit` 创建一个完整的聊天 APP。展示的功能包括：用户登录注册，添加好友，单聊，群聊，发送文字，表情，语音，图片，文件等消息，以及实时音视频通话等。
 
-更新时间：2023-04-10
+其中音视频通话使用声网 `chat-callkit` 实现。
 
------
-## 新增群组Mentions 功能, 使用Antd Mentions组件
+## 产品体验
 
-实现方案: 
+![demo](./demo.png)
 
-文本消息新增扩展字段`em_at_list`, 表示被@的用户ID,
+[项目线上地址](https://uikit-demo.oss-cn-beijing.aliyuncs.com/login)
 
-- 'ALL' 表示@所有人
-- ['userId', 'userId2'] 表示@指定用户
+## 前置依赖
 
-```javascript
-const MENTION_ALL = 'ALL';
-let mentionList = ['userId', 'userId1'];
-let isMentionALl = true
+1. [注册环信应用](https://doc.easemob.com/product/enable_and_configure_IM.html)
 
-let txt = {
-	to: 'groupId',
-	chatType: 'groupChat',
-	msg: '@user 你好',
-	type: 'txt',
-	ext: {
-		em_at_list: isMentionALl ? MENTION_ALL : atList
-	}
-}
-```
-收到文本消息, 如扩展字段包含`em_at_list`则表示为@消息，
-如果`em_at_list`包含当前用户,则进行UI更新
+2. 示例项目中登录，上传头像，获取群组头像，音视频功能依赖的 app server 来实现，所以你需要参考 app server 示例代码来实现自己的 app server，需要确保 app server 中使用的 appKey 和本项目中配置的是相同的。
+   // TODO 链接
 
-```javascript
-// onTextMessage回调中
-let mentionList = message?.ext?.em_at_list
-// 如果存在mentionList, 并且不是当前用户多端同步的消息
-if(mentionList && message.from !== WebIM.conn.user){
-	// 如果是@所有人或者mentionList包含当前用户ID
-	if(mentionList === MENTION_ALL || mentionList.includes(WebIM.conn.user)){
-		// 则进行UI更新
-	}
-}
+## 跑通项目
+
+1. 配置项目
+
+创建 .env.config.ts 文件放入 src 目录下，配置自己的 AppKey, AppId, AppServer
+
+```typescript
+export AppKey = 'you AppKey';
+export AppId = 'your AppId'
+export AppServer = 'https://example.com/'
 ```
 
+2. 安装依赖
 
-更新时间：2022-07-15
+```
+npm install
+```
 
------
+3. 启动项目
 
-环信即时通讯 WEB 端提供示例应用可供体验。为方便体验，建议使用你自己的 Demo 应用，具体步骤如下：
+```
+npm start
+```
 
-1. 在 [环信即时通讯云 IM 管理后台](https://console.easemob.com/user/login) 通过邮箱注册，可以看到默认的 Demo 应用（默认应用是全功能开通的应用）；
+## 项目结构
 
-2. 在上图页面 Demo 应用右侧点击 **查看**，选择 **开放注册**；
+## Q&A
 
-[![img](https://docs-im.easemob.com/_media/ccim/android/quickstart/3.png?w=600&tok=83515c)](https://docs-im.easemob.com/_detail/ccim/android/quickstart/3.png?id=ccim%3Aandroid%3Aquickstart%3Ademo)
-
-3. 打开 Demo，点击 **服务器配置**；
-
-
-4. 将 Demo 的 App Key 填入，点击 **保存配置**；
-
-5. 然后点击 **注册用户** 进行体验。
-
-**注意**
-
-注册模式分两种，开放注册和授权注册。只有开放注册时，才可以客户端注册。
-
-- 开放注册是为了测试使用，正式环境中不推荐使用该方式注册环信账号；
-- 授权注册的流程应该是你的应用服务器通过环信提供的 REST API 注册，之后将 token 保存到你的应用服务器或返回给客户端。
-
-## 代码下载
-
-- 下载源代码：[github 源码地址](https://github.com/easemob/webim)
-
-欢迎大家提交 PR 改进和修复 WebIM 中的问题。
-
-## 运行 WebIM 工程
-
-从[IM SDK 及 Demo 下载](https://www.easemob.com/download/im) 下载 WEB SDK 压缩包，然后解压。解压后在 `demo` 文件夹下，即为 WebIM 的工程目录。
-
-1. 初始化安装
-	- 在/demo下执行 `npm install` 
-
-2. 运行demo
-	- `cd demo && npm start`
-	
-	   http://localhost:3001
-	- `cd demo && HTTPS=true npm start` (webrtc supports HTTPS only)
-	
-	   https://localhost:3001
-
-## 主要模块介绍
-
-
-Demo 中有几大模块
-
-- components —— 项目中定义的组件
-- config —— SDK 初始化配置
-- containers —— 容器组件，包含 contact, chat, login/regester
-- layout —— chat 部分的布局
-- selectors —— 缓存数据，优化性能
-- utils —— 数据库和工具方法
-
-
-
-
-
-
-
-
-
+如有问题请联系环信技术支持或者提 issues

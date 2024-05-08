@@ -1,0 +1,185 @@
+.user-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F9FAFA;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 20px 0;
+    position: relative;
+    &-header{
+        display: flex;
+        flex-direction: column;
+        padding-top: 16px;
+        align-items: center;
+        // background-color: #F9FAFA;
+        width: 100%;
+        &-name{
+            font-size: 18px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: 26px;
+            padding: 0 12px;
+        }
+        &-id{
+            margin-top: 2px;
+            display: flex;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 400;
+            line-height: 20px;
+            color: #ACB4B9;
+            align-items: center;
+            gap: 4px;
+        }
+        &-description{
+            font-size: 14px;
+            line-height: 20px;
+            margin-top: 4px;
+            padding: 0 12px;
+            max-height: 60px;
+            overflow-y: auto;
+        }
+    }
+    &-header>div{
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    &-content{
+        width: 100%;
+        background-color: #F1F2F3;
+        &-item{
+            background-color: #F9FAFA;
+            display: flex;
+            justify-content: space-between;
+            height: 54px;
+            box-sizing: border-box;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            position: relative;
+            &-box{
+                cursor: pointer;
+                height: 100%;
+                align-items: center;
+                display: flex;
+                justify-content: space-between;
+                flex: 1;
+                border-bottom: 1px solid #E3E6E8;
+                box-sizing: border-box;
+                &>div{
+                    display: flex;
+                    align-items: center;
+                    font-size: 14px;
+                    color: #75828A;
+
+                    &>a{
+                        font-size: 14px;
+                        color: #009EFF;
+                        text-decoration: none;
+                    }
+                }
+                &>span{
+                    font-size: 14px;
+                    font-weight: 500;
+                    line-height: 20px;
+                    color: #171A1C;
+                }
+            }
+            &-explain{
+                position: absolute;
+                bottom: -22px;
+                font-size: 12px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 16px; 
+                color: #75828A;
+                height: 16px;
+                text-align: right;
+                right: 12px;
+            }
+        }
+
+        &-section{
+            margin-top: 12px;
+        }
+    }
+
+    // member list container
+    &-member-box{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #F9FAFA;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+
+    &-select{
+        color: #009EFF;
+        text-align: center;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 20px; /* 142.857% */
+        cursor: pointer;
+    }
+
+    // &-dark{
+    //     background-color: #171A1C;
+    //     .#{$groupSetting-prefix-cls}-header{
+    //         background-color: #171A1C;
+    //         color: #F9FAFA;
+    //     }
+    //     .#{$groupSetting-prefix-cls}-content{
+    //         background-color: #000;
+    //         &-item{
+    //             background-color: #171A1C;
+    //             &-box{
+                    
+    //                 border-bottom: 1px solid $gray-2;
+    //                 &>div{
+    //                     color: $gray-6;
+    //                 }
+    //                 &>span{
+    //                     color: #F9FAFA;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+}
+
+.user-info-dark{
+    background-color: #171A1C;
+    .user-info-header{
+        .user-info-header-name{
+            color: #F9FAFA;
+        }
+
+        .user-info-header-id{
+            color: #75828A;
+        }
+        
+    }
+    .user-info-content{
+        background-color: #000;
+
+        &-item{
+            background-color: #171A1C;
+            &-box{
+                border-bottom: 1px solid #464E53;
+                &>div{
+                    color: #75828A;
+                }
+                &>span{
+                    color: #F9FAFA;
+                }
+            }
+        }
+    }
+}

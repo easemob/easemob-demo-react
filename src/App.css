@@ -1,0 +1,95 @@
+.App {
+  text-align: center;
+  overflow: hidden;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.conversation{
+  background-color: #eee;
+}
+
+.tab-box{
+  width: 50px;
+  border: 1px solid transparent;
+  background: #607D8B;
+  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 4px;
+}
+
+.tab-btn{
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 50px;
+  background: #2196F3;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 25px;
+  font-size: 12px;
+}
+
+body{
+  background-color: #d8dee5;
+}
+.add-contact{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.add-contact-input input{
+  background: #eee;
+}
+
+.cui-conversationItem-content{
+  width: 100%;
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  /* 隐藏滚动条轨道 */
+  ::-webkit-scrollbar-track {
+    border: none;
+    background-color: transparent;
+  }
+  
+  /* 略微调整滚动条宽度 */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+}
