@@ -127,6 +127,7 @@
         "HasAccount": "Already have an account?",
         "ComnfirmPassword": "Confirm password",
         "BacktoLogin": "Back to Login",
-        "Register": "Sign Up"
+        "Register": "Sign Up",
+        "translationLanguage": "Target Language"
     }
 }

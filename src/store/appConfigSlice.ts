@@ -12,6 +12,8 @@ const initialState: GeneralConfig & { notification: boolean } = {
   thread: true,
   reaction: true,
   notification: false,
+  translationSupportedLanguages: [],
+  translationTargetLanguage: window.navigator.language,
 };
 
 export const appConfigSlice = createSlice({

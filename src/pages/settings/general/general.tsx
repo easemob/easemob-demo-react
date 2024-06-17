@@ -22,6 +22,12 @@ export interface GeneralConfig {
   thread: boolean;
   reaction: boolean;
   language: string;
+  translationSupportedLanguages: {
+    code: string;
+    nativeName: string;
+    name: string;
+  }[];
+  translationTargetLanguage: string;
 }
 const Pointer = () => {
   return <div className="color-picker-pointer"></div>;
@@ -33,7 +39,7 @@ const General = () => {
 
   const prefixCls = "user-info";
   const context = useContext(RootContext);
-  const { theme } = context;
+  const { theme, client } = context;
   const appThemeMode = theme?.mode;
   const [generalConfig, setGeneralConfig] = useState<GeneralConfig>({
     typing: state.typing,
@@ -44,6 +50,8 @@ const General = () => {
     thread: state.thread,
     reaction: state.reaction,
     language: state.language,
+    translationSupportedLanguages: state.translationSupportedLanguages,
+    translationTargetLanguage: state.translationTargetLanguage,
   });
 
   useEffect(() => {
@@ -137,7 +145,7 @@ const General = () => {
     setFeatureSettingVisible((featureSettingVisible) => !featureSettingVisible);
   };
 
-  // --- 语言设置 ---
+  // --- 国际化语言设置 ---
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const langs = ["zh", "en"];
   const setLanguage = (lang: string) => {
@@ -176,6 +184,80 @@ const General = () => {
     </ul>
   );
 
+  // --- 翻译目标语言设置 ---
+  const [translationLangMenuOpen, setTranslationLangMenuOpen] = useState(false);
+
+  const [translationTargetLang, setTranslationTargetLang] = useState<{
+    code: "";
+    nativeName: "";
+    name: "";
+  }>({ code: "", nativeName: "", name: "" });
+  useEffect(() => {
+    let targetLang = generalConfig.translationSupportedLanguages.find(
+      (lang) => lang.code === generalConfig.translationTargetLanguage
+    ) as { code: ""; nativeName: ""; name: "" };
+    setTranslationTargetLang(targetLang);
+  }, [generalConfig.translationTargetLanguage]);
+
+  const supportedLangsMenu = (
+    <ul
+      className={`cui-header-more`}
+      style={{ maxHeight: "400px", overflowY: "auto" }}
+    >
+      {generalConfig.translationSupportedLanguages.map((lang, index) => (
+        <li
+          className={appThemeMode == "dark" ? "cui-li-dark" : ""}
+          style={{
+            width: "212px",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+          key={index}
+          onClick={() => {
+            setGeneralConfig({
+              ...generalConfig,
+              translationTargetLanguage: lang.code,
+            });
+            localStorage.setItem(
+              "generalConfig",
+              JSON.stringify({
+                ...generalConfig,
+                translationTargetLanguage: lang.code,
+              })
+            );
+          }}
+        >
+          {lang.nativeName}
+          {generalConfig.translationTargetLanguage == lang.code && (
+            <Icon type="CHECK" width={14} height={14}></Icon>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+
+  useEffect(() => {
+    if (state.translationSupportedLanguages.length > 0) {
+      return;
+    }
+    client.getSupportedLanguages().then((res: any) => {
+      console.log("getSupportedLanguages", res);
+      const languages: { code: string; nativeName: string; name: string }[] =
+        res.data;
+      dispatch(
+        updateAppConfig({
+          ...generalConfig,
+          translationSupportedLanguages: languages,
+        })
+      );
+
+      setGeneralConfig({
+        ...generalConfig,
+        translationSupportedLanguages: languages,
+      });
+    });
+  }, []);
+
   return (
     <div
       className={classNames("setting-personal", {
@@ -212,7 +294,6 @@ const General = () => {
                 )}
               </div>
             </div>
-
             <div
               className={`${prefixCls}-content-item`}
               style={{ marginTop: "28px" }}
@@ -230,7 +311,6 @@ const General = () => {
                 </div>
               </div>
             </div>
-
             <div className={`${prefixCls}-content-item`}>
               <div
                 className={`${prefixCls}-content-item-box`}
@@ -260,7 +340,6 @@ const General = () => {
                 </div>
               </div>
             </div>
-
             <div className={`${prefixCls}-content-item`}>
               <div
                 className={`${prefixCls}-content-item-box`}
@@ -403,6 +482,39 @@ const General = () => {
                       <Icon
                         style={{ cursor: "pointer" }}
                         type={langMenuOpen ? "ARROW_UP" : "ARROW_DOWN"}
+                        color={appThemeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                        width={24}
+                        height={24}
+                      ></Icon>
+                    </div>
+                  </Tooltip>
+                </div>
+              </div>
+            </div>
+
+            <div className={`${prefixCls}-content-item`}>
+              <div
+                className={`${prefixCls}-content-item-box`}
+                style={{ cursor: "default" }}
+              >
+                <span>{i18next.t("translationLanguage")}</span>
+                <div>
+                  <Tooltip
+                    title={supportedLangsMenu}
+                    trigger="click"
+                    placement="bottomLeft"
+                    open={translationLangMenuOpen}
+                    onOpenChange={(value: boolean) => {
+                      setTranslationLangMenuOpen(value);
+                    }}
+                  >
+                    <div className={`${prefixCls}-content-item-dropdown`}>
+                      <div>{translationTargetLang.nativeName}</div>
+                      <Icon
+                        style={{ cursor: "pointer" }}
+                        type={
+                          translationLangMenuOpen ? "ARROW_UP" : "ARROW_DOWN"
+                        }
                         color={appThemeMode == "dark" ? "#C8CDD0" : "#464E53"}
                         width={24}
                         height={24}

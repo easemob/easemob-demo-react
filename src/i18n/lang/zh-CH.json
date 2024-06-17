@@ -126,6 +126,7 @@
         "LimitAccount": "您的App用户注册数量已达上限,请升级至企业版！",
         "HasAccount": "已有账号?",
         "ComnfirmPassword": "确认密码",
-        "BacktoLogin": "去登录"
+        "BacktoLogin": "去登录",
+        "translationLanguage": "翻译目标语言"
     }
 }
