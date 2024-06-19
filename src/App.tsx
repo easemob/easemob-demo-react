@@ -30,7 +30,7 @@ const ChatApp: FC<any> = () => {
       item: {
         moreAction: true,
         deleteConversation: true,
-        presence: false,
+        presence: true,
       },
     },
     chat: {
@@ -72,7 +72,7 @@ const ChatApp: FC<any> = () => {
         item: {
           moreAction: true,
           deleteConversation: true,
-          presence: false,
+          presence: true,
         },
       },
 

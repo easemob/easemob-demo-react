@@ -68,6 +68,7 @@
                     font-size: 14px;
                     font-weight: 500;
                     box-sizing: border-box;
+                    justify-content: space-between;
                 }
             }
         }
@@ -106,3 +107,18 @@
     
 }
 
+.setting-menu-item-name-dropdown{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+    justify-content: end;
+    &-value{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        margin-left: 10px;
+        text-align: right;
+    }
+}

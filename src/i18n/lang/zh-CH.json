@@ -127,6 +127,14 @@
         "HasAccount": "已有账号?",
         "ComnfirmPassword": "确认密码",
         "BacktoLogin": "去登录",
-        "translationLanguage": "翻译目标语言"
+        "translationLanguage": "翻译目标语言",
+        "customStatus": "在线状态",
+        "Online": "在线",
+        "Busy": "忙碌",
+        "Away": "离开",
+        "Offline": "离线",
+        "Do Not Disturb": "请勿打扰",
+        "Custom": "自定义",
+        "customPresenceTitle": "自定义状态"
     }
 }

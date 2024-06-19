@@ -128,6 +128,14 @@
         "ComnfirmPassword": "Confirm password",
         "BacktoLogin": "Back to Login",
         "Register": "Sign Up",
-        "translationLanguage": "Target Language"
+        "translationLanguage": "Target Language",
+        "customStatus": "Custom Status",
+        "Online": "Online",
+        "Busy": "Busy",
+        "Away": "Away",
+        "Offline": "Offline",
+        "Do Not Disturb": "Do Not Disturb",
+        "Custom": "Custom Status",
+        "customPresenceTitle": "Custom Status"
     }
 }

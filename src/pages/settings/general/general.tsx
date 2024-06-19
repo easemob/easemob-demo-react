@@ -196,7 +196,8 @@ const General = () => {
     let targetLang = generalConfig.translationSupportedLanguages.find(
       (lang) => lang.code === generalConfig.translationTargetLanguage
     ) as { code: ""; nativeName: ""; name: "" };
-    setTranslationTargetLang(targetLang);
+
+    targetLang && setTranslationTargetLang(targetLang);
   }, [generalConfig.translationTargetLanguage]);
 
   const supportedLangsMenu = (
