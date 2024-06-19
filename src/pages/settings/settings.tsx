@@ -5,6 +5,7 @@ import PersonalInfo from "./personalInfo/personalInfo";
 import Notification from "./notification/notification";
 import About from "./about/about";
 import General from "./general/general";
+import Blocklist from "./blocklist/blocklist";
 import i18next from "../../i18n";
 import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "../../hooks";
@@ -60,6 +61,13 @@ const Settings = () => {
                 title: i18next.t("pushNotifications"),
                 key: "notification",
                 content: <Notification />,
+                type: "button",
+              },
+              {
+                icon: <Icon type="BELL" width={24} height={24}></Icon>,
+                title: i18next.t("privacy"),
+                key: "privacy",
+                content: <Blocklist />,
                 type: "button",
               },
               {

@@ -136,6 +136,10 @@
         "Offline": "Offline",
         "Do Not Disturb": "Do Not Disturb",
         "Custom": "Custom Status",
-        "customPresenceTitle": "Custom Status"
+        "customPresenceTitle": "Custom Status",
+        "blocklist": "Block List",
+        "contactBlocked": "Contact Blocked",
+        "blockContact": "Block Contact",
+        "Confirm blocking user": "Confirm blocking user"
     }
 }

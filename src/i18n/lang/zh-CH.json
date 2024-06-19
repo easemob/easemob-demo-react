@@ -135,6 +135,10 @@
         "Offline": "离线",
         "Do Not Disturb": "请勿打扰",
         "Custom": "自定义",
-        "customPresenceTitle": "自定义状态"
+        "customPresenceTitle": "自定义状态",
+        "blocklist": "黑名单",
+        "contactBlocked": "联系人黑名单",
+        "blockContact": "拉黑联系人",
+        "Confirm blocking user": "确认拉黑联系人"
     }
 }
