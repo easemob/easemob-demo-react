@@ -28,6 +28,8 @@ import {
   Input,
   eventHandler,
   Thread,
+  PinnedMessage,
+  usePinnedMessage,
   RootContext,
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
@@ -42,6 +44,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
+import { use } from "i18next";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -184,6 +187,20 @@ const ChatContainer = forwardRef((props, ref) => {
 
   console.log("appConfig ---", appConfig);
 
+  // ---- pin message ----
+  const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
+
+  useEffect(() => {
+    if (pinMsgVisible && thread.showThreadPanel) {
+      thread.setThreadVisible(false);
+    }
+  }, [pinMsgVisible]);
+
+  useEffect(() => {
+    if (thread.showThreadPanel && pinMsgVisible) {
+      hidePinMsg();
+    }
+  }, [thread.showThreadPanel]);
   return (
     <div
       className={classNames("chat-container", {
@@ -451,7 +468,7 @@ const ChatContainer = forwardRef((props, ref) => {
           )}
         </div>
         {/** 是否显示子区 */}
-        {thread.showThreadPanel && (
+        {thread.showThreadPanel && !pinMsgVisible && (
           <div className="chat-container-chat-right">
             <Thread
               messageListProps={{
@@ -527,6 +544,13 @@ const ChatContainer = forwardRef((props, ref) => {
                 // enabledTyping: state?.typingSwitch,
               }}
             ></Thread>
+          </div>
+        )}
+
+        {/** 是否显示 pin message*/}
+        {pinMsgVisible && !thread.showThreadPanel && (
+          <div className="chat-container-chat-right">
+            <PinnedMessage />
           </div>
         )}
       </div>
