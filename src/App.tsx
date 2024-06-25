@@ -48,6 +48,8 @@ const ChatApp: FC<any> = () => {
         edit: true,
         delete: true,
         report: true,
+        //@ts-ignore
+        pin: true,
       },
       messageInput: {
         typing: state.typing,
@@ -91,6 +93,8 @@ const ChatApp: FC<any> = () => {
           edit: true,
           delete: true,
           report: true,
+          //@ts-ignore
+          pin: true,
         },
         messageInput: {
           typing: state.typing,
