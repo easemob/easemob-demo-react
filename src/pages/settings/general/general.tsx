@@ -202,7 +202,7 @@ const General = () => {
 
   const supportedLangsMenu = (
     <ul
-      className={`cui-header-more`}
+      className={`cui-scrollList cui-header-more`}
       style={{ maxHeight: "400px", overflowY: "auto" }}
     >
       {generalConfig.translationSupportedLanguages.map((lang, index) => (

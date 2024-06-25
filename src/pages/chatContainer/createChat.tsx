@@ -128,8 +128,8 @@ const CreateChat = (props: CreateChatProps) => {
                       rootStore.addressStore.appUsersInfo[contact.userId]
                         ?.avatarurl
                     }
+                    size={24}
                   >
-                    {" "}
                     {contact.remark || contact.nickname || contact.userId}
                   </Avatar>
                   <div className={classNames("search-content-item-name")}>

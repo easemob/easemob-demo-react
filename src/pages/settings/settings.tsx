@@ -34,9 +34,8 @@ const Settings = () => {
                 type: "button",
               },
               {
-                icon: (
-                  <Icon type="PERSON_SINGLE_FILL" width={24} height={24}></Icon>
-                ),
+                //@ts-ignore
+                icon: <Icon type="CIRCLE_N_DOT" width={24} height={24}></Icon>,
                 title: i18next.t("customStatus"),
                 key: "presence",
                 content: [
@@ -64,7 +63,8 @@ const Settings = () => {
                 type: "button",
               },
               {
-                icon: <Icon type="BELL" width={24} height={24}></Icon>,
+                //@ts-ignore
+                icon: <Icon type="LOCK" width={24} height={24}></Icon>,
                 title: i18next.t("privacy"),
                 key: "privacy",
                 content: <Blocklist />,

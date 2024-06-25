@@ -17,7 +17,7 @@ interface Tab {
   title: React.ReactNode;
   icon: React.ReactNode;
   key: string;
-  content: React.ReactNode;
+  content: React.ReactNode | string[];
   type: "button" | "menu";
   onClick?: (data?: any) => void;
 }
@@ -145,40 +145,52 @@ const SettingTab = (props: SettingMenuProps) => {
                           <Tooltip
                             title={
                               <ul className="cui-header-more">
-                                {(item.content as React.ReactNode[]).map(
-                                  (menuItem) => (
-                                    <li
-                                      style={{
-                                        width: "212px",
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        boxSizing: "border-box",
-                                      }}
-                                      data-name={menuItem}
-                                      onClick={() => {
-                                        item.onClick?.();
-                                        if (menuItem === "Custom") {
-                                          setPresenceModalOpen(true);
-                                          return;
-                                        }
-                                        setMenuTab((prev) => {
-                                          let newMenuTab = new Map(prev);
-                                          newMenuTab.set(item.key, {
-                                            ...(prev.get(item.key) as Tab),
-                                            value: menuItem as string,
-                                          });
-                                          return newMenuTab;
+                                {(item.content as string[]).map((menuItem) => (
+                                  <li
+                                    className={
+                                      themeMode == "dark" ? "cui-li-dark" : ""
+                                    }
+                                    style={{
+                                      width: "212px",
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      boxSizing: "border-box",
+                                    }}
+                                    data-name={menuItem}
+                                    onClick={() => {
+                                      item.onClick?.();
+                                      if (menuItem === "Custom") {
+                                        setPresenceModalOpen(true);
+                                        return;
+                                      }
+                                      setMenuTab((prev) => {
+                                        let newMenuTab = new Map(prev);
+                                        newMenuTab.set(item.key, {
+                                          ...(prev.get(item.key) as Tab),
+                                          value: menuItem as string,
                                         });
-                                        // @ts-ignore
-                                        rootStore.addressStore.publishPresence(
-                                          menuItem
-                                        );
-                                      }}
-                                    >
-                                      {i18next.t((menuItem || "") as string)}
-                                    </li>
-                                  )
-                                )}
+                                        return newMenuTab;
+                                      });
+                                      rootStore.addressStore.publishPresence(
+                                        menuItem
+                                      );
+                                    }}
+                                  >
+                                    {i18next.t((menuItem || "") as string)}
+                                    {(menuItem ===
+                                      menuTab.get(item.key)?.value ||
+                                      (!(item.content as string[])?.includes(
+                                        menuTab.get(item.key)?.value ?? ""
+                                      ) &&
+                                        menuItem === "Custom")) && (
+                                      <Icon
+                                        type="CHECK"
+                                        width={14}
+                                        height={14}
+                                      ></Icon>
+                                    )}
+                                  </li>
+                                ))}
                               </ul>
                             }
                             trigger="click"
@@ -263,6 +275,7 @@ const SettingTab = (props: SettingMenuProps) => {
         wrapClassName="modify-message-modal"
       >
         <Input
+          className="add-contact-input"
           maxLength={20}
           value={customPresenceExt}
           onChange={handlePresenceChange}
