@@ -262,6 +262,27 @@ const UserInfo = (props: UserInfoProps) => {
             </div>
           </div>
         )}
+
+        {itemConfig?.deleteContact && (
+          <div className={`${prefixCls}-content-section`}>
+            <div className={`${prefixCls}-content-item`}>
+              <Icon
+                type={"PERSON_ADD_FILL"}
+                width={24}
+                height={24}
+                style={{ fill: "#FF002B", width: "24px", height: "24px" }}
+              ></Icon>
+              <div
+                className={`${prefixCls}-content-item-box`}
+                onClick={() => {
+                  setDeleteContactModalVisible(true);
+                }}
+              >
+                <span>{t("addContactTitle")}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <Modal
