@@ -24,7 +24,7 @@ const About = () => {
                 style={{ cursor: "default" }}
               >
                 <span>{i18next.t("demoVersion")}</span>
-                <div>1.0.0</div>
+                <div>1.1.0</div>
               </div>
             </div>
             <div className={`${prefixCls}-content-item`}>
@@ -33,7 +33,7 @@ const About = () => {
                 style={{ cursor: "default" }}
               >
                 <span>{i18next.t("uikitVersion")}</span>
-                <div>1.0.0</div>
+                <div>1.1.0</div>
               </div>
             </div>
             <div className={`${prefixCls}-content-item`}>

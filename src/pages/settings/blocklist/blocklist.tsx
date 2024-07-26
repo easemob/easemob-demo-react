@@ -42,7 +42,14 @@ const Blocklist = () => {
         ></BlocklistUIKit>
 
         {selectedUser && (
-          <div style={{ width: "360px", borderLeft: "1px solid #E3E6E8" }}>
+          <div
+            style={{
+              width: "360px",
+              borderLeft: `1px solid ${
+                themeMode == "dark" ? "#464E53" : "#E3E6E8"
+              }`,
+            }}
+          >
             <UserInfo
               itemConfig={{
                 remark: false,

@@ -104,7 +104,7 @@ const PersonalInfo = () => {
   const themeMode = theme?.mode;
   const myInfo = rootStore.addressStore.appUsersInfo[rootStore.client.user];
   const presence = myInfo.isOnline
-    ? presenceMap?.[myInfo.presenceExt ?? ""] ?? presenceMap?.["Online"]
+    ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];
   const handleCopy = () => {
     var textArea = document.createElement("textarea");

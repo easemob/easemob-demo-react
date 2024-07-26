@@ -38,8 +38,8 @@
         "general": "General",
         "classic": "Classic",
         "voyage": "Modern",
-        "showTyping": "Show Typing",
-        "Turning it on will show you the status of your input": "Turning it on will show you the status of your input",
+        "showTyping": "Typing Indicator",
+        "Turning it on will show you the status of your input": "Show the other person that you are typing",
         "darkMode": "Dark Mode",
         "changeTheme": "Theme",
         "themeColor": "Theme Color",
@@ -130,6 +130,7 @@
         "Register": "Sign Up",
         "translationLanguage": "Target Language",
         "customStatus": "Custom Status",
+        "status": "Status",
         "Online": "Online",
         "Busy": "Busy",
         "Away": "Away",
@@ -138,8 +139,10 @@
         "Custom": "Custom Status",
         "customPresenceTitle": "Custom Status",
         "blocklist": "Block List",
+        "Block": "Block",
         "contactBlocked": "Contact Blocked",
         "blockContact": "Block Contact",
-        "Confirm blocking user": "Confirm blocking user"
+        "Confirm blocking user": "Confirm blocking user",
+        "Translate message to specified language": "Translate messages to your preferred language."
     }
 }

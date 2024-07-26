@@ -14,7 +14,7 @@ function AuthCheck({ children }: { children: ReactElement<any, any> }) {
       const isAuthenticated: boolean = !!sessionStorage.getItem("webImAuth");
       setIsAuthenticated(isAuthenticated);
       if (!isAuthenticated) {
-        navigate("/login"); //跳转到登陆页面
+        navigate("webim-hsb/login"); //跳转到登陆页面
       }
     };
 

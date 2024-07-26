@@ -23,16 +23,21 @@ const options = {
   //     }
   // ]
 };
+let hasRequestPermission = false;
 export const checkBrowerNotifyStatus = (
   showFlag: boolean,
   params: any,
   iconTitle: string,
   store: any
 ) => {
+  if (hasRequestPermission) {
+    return;
+  }
   if (!("Notification" in window)) {
     alert("This browser does not support desktop notification");
   } else if (Notification.permission !== "denied") {
     Notification.requestPermission().then((e) => {
+      hasRequestPermission = true;
       if (e === "granted" && showFlag) {
         notification(params, iconTitle, store);
       } else if (e !== "granted") {

@@ -13,10 +13,14 @@ import {
   Icon,
   rootStore,
   RootContext,
+  Modal,
+  Input,
 } from "easemob-chat-uikit";
 import { observer } from "mobx-react-lite";
 import classNames from "classnames";
 import { useAppSelector } from "../../hooks";
+import i18next from "i18next";
+import { PRESENCE_CONFIG } from "../../config";
 interface NavigationBarProps {
   tabs: {
     title: string;
@@ -48,10 +52,31 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
 
   const myInfo =
     rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+
   const presence = myInfo.isOnline
-    ? presenceMap?.[myInfo.presenceExt ?? ""] ?? presenceMap?.["Online"]
+    ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];
 
+  const [presenceModalOpen, setPresenceModalOpen] = useState(false);
+  const [currentPresence, setCurrentPresence] = useState("");
+  const [customPresenceExt, setCustomPresenceExt] = useState("");
+  const userInfo =
+    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+  useEffect(() => {
+    setCustomPresenceExt(() => {
+      return PRESENCE_CONFIG.includes(userInfo.presenceExt || "")
+        ? ""
+        : userInfo.presenceExt ?? "";
+    });
+    setCurrentPresence(() => {
+      return userInfo.isOnline
+        ? (userInfo.presenceExt &&
+          PRESENCE_CONFIG.includes(userInfo.presenceExt || "")
+            ? userInfo.presenceExt
+            : "Custom") ?? "Online"
+        : "Offline";
+    });
+  }, [userInfo.isOnline, userInfo.presenceExt]);
   return (
     <div
       className={classNames("navigation-container", {
@@ -61,15 +86,50 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
     >
       <div className="tab-header">
         <div className="tab-header-avatar">
-          <Avatar
-            shape={state.theme == "voyage" ? "circle" : "square"}
-            size={40}
-            src={avatarUrl}
-            presence={{ visible: true, icon: presence }}
+          <Tooltip
+            title={
+              <ul className="cui-header-more">
+                {PRESENCE_CONFIG.map((menuItem) => (
+                  <li
+                    className={themeMode == "dark" ? "cui-li-dark" : ""}
+                    style={{
+                      width: "212px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      boxSizing: "border-box",
+                    }}
+                    data-name={menuItem}
+                    onClick={() => {
+                      setCurrentPresence(menuItem);
+                      if (menuItem === "Custom") {
+                        setPresenceModalOpen(true);
+                        return;
+                      }
+                      rootStore.addressStore.publishPresence(menuItem);
+                    }}
+                  >
+                    {i18next.t((menuItem || "") as string)}
+                    {menuItem === currentPresence && (
+                      <Icon type="CHECK" width={14} height={14}></Icon>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            }
+            trigger="click"
+            placement="rightTop"
           >
-            {rootStore.addressStore.appUsersInfo[rootStore.client.user]
-              ?.nickname || rootStore.client.user}
-          </Avatar>
+            <Avatar
+              style={{ cursor: "pointer" }}
+              shape={state.theme == "voyage" ? "circle" : "square"}
+              size={40}
+              src={avatarUrl}
+              presence={{ visible: true, icon: presence }}
+            >
+              {rootStore.addressStore.appUsersInfo[rootStore.client.user]
+                ?.nickname || rootStore.client.user}
+            </Avatar>
+          </Tooltip>
         </div>
         {tabs.map((tab, index) => (
           <div
@@ -114,6 +174,29 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
           );
         })
       }
+
+      <Modal
+        open={presenceModalOpen}
+        onCancel={() => {
+          setPresenceModalOpen(false);
+        }}
+        onOk={() => {
+          setPresenceModalOpen(false);
+          // @ts-ignore
+          rootStore.addressStore.publishPresence(customPresenceExt);
+        }}
+        title={i18next.t("customPresenceTitle")}
+        wrapClassName="modify-message-modal"
+      >
+        <Input
+          className="add-contact-input"
+          maxLength={20}
+          value={customPresenceExt}
+          onChange={(e) => {
+            setCustomPresenceExt(e.target.value);
+          }}
+        />
+      </Modal>
     </div>
   );
 });

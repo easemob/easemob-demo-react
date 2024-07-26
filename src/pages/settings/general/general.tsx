@@ -524,6 +524,9 @@ const General = () => {
                   </Tooltip>
                 </div>
               </div>
+              <div className={`${prefixCls}-content-item-explain`}>
+                {i18next.t("Translate message to specified language")}
+              </div>
             </div>
           </div>
         </section>

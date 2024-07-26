@@ -36,6 +36,18 @@ const listener = (store: any) => {
     onCustomMessage: (message: any) => {
       notification("新消息", message, store);
     },
+    onContactAgreed: (data: any) => {
+      console.log("data", data);
+      const from =
+        rootStore.addressStore.appUsersInfo[data.from]?.nickname ?? data.from;
+      toast.success(`你已经添加 ${from} 为好友。`);
+    },
+    onContactAdded: (data: any) => {
+      console.log("data", data);
+      const from =
+        rootStore.addressStore.appUsersInfo[data.from]?.nickname ?? data.from;
+      toast.success(`你已经添加 ${from} 为好友。`);
+    },
   });
 
   eventHandler.addEventHandler("uikit", {

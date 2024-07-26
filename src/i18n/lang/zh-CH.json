@@ -129,6 +129,7 @@
         "BacktoLogin": "去登录",
         "translationLanguage": "翻译目标语言",
         "customStatus": "在线状态",
+        "status": "在线状态",
         "Online": "在线",
         "Busy": "忙碌",
         "Away": "离开",
@@ -137,8 +138,10 @@
         "Custom": "自定义",
         "customPresenceTitle": "自定义状态",
         "blocklist": "黑名单",
+        "Block": "拉黑",
         "contactBlocked": "联系人黑名单",
         "blockContact": "拉黑联系人",
-        "Confirm blocking user": "确认拉黑联系人"
+        "Confirm blocking user": "确认拉黑联系人",
+        "Translate message to specified language": "将消息翻译为指定语言"
     }
 }

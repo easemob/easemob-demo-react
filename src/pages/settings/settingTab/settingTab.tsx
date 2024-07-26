@@ -12,7 +12,7 @@ import {
 } from "easemob-chat-uikit";
 import { use } from "i18next";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
-import { on } from "events";
+import { observer } from "mobx-react-lite";
 interface Tab {
   title: React.ReactNode;
   icon: React.ReactNode;
@@ -58,7 +58,8 @@ const SettingTab = (props: SettingMenuProps) => {
 
   const [menuTab, setMenuTab] = useState(menuTabsMap);
   console.log("menuTabKeys", menuTabsMap);
-
+  const userInfo =
+    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
   const [presenceModalOpen, setPresenceModalOpen] = useState(false);
   const [customPresenceExt, setCustomPresenceExt] = useState("");
   useEffect(() => {
@@ -75,8 +76,6 @@ const SettingTab = (props: SettingMenuProps) => {
       );
     }
 
-    const userInfo =
-      rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
     setMenuTab((prev) => {
       let newMenuTab = new Map(prev);
       newMenuTab.set("presence", {
@@ -85,7 +84,7 @@ const SettingTab = (props: SettingMenuProps) => {
       });
       return newMenuTab;
     });
-  }, []);
+  }, [userInfo.presenceExt, userInfo.isOnline]);
   const setCustomPresence = () => {
     setPresenceModalOpen(false);
     setMenuTab((prev) => {
@@ -210,7 +209,8 @@ const SettingTab = (props: SettingMenuProps) => {
                           >
                             <div className={`setting-menu-item-name-dropdown`}>
                               <div className="setting-menu-item-name-dropdown-value">
-                                {i18next.t(menuTab.get(item.key)?.value ?? "")}
+                                {menuTab &&
+                                  i18next.t(menuTab.get(item.key)?.value ?? "")}
                               </div>
                               <Icon
                                 style={{ cursor: "pointer" }}
@@ -284,4 +284,4 @@ const SettingTab = (props: SettingMenuProps) => {
     </div>
   );
 };
-export default SettingTab;
+export default observer(SettingTab);

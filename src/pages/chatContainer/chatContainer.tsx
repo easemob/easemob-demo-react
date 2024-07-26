@@ -44,8 +44,6 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
-import { use } from "i18next";
-import { set } from "mobx";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -276,7 +274,9 @@ const ChatContainer = forwardRef((props, ref) => {
                   placement: "bottomRight",
                 },
               }}
-              content={<div className="header-content">Chats</div>}
+              content={
+                <div className={`header-content ${themeMode}`}>Chats</div>
+              }
               avatar={<></>}
             ></Header>
           )}
@@ -344,6 +344,7 @@ const ChatContainer = forwardRef((props, ref) => {
                   forwardMsg.isChatThread = false;
                   forwardMsg.chatThreadOverview = undefined;
                   forwardMsg.chatThread = undefined;
+                  forwardMsg.time = Date.now();
                   // 复用合并转发的逻辑
                   setForwardedMessages(forwardMsg);
                   setContactListVisible(true);
@@ -355,20 +356,15 @@ const ChatContainer = forwardRef((props, ref) => {
                   icon: null,
                   actions: [
                     {
+                      content: "FORWARD",
+                      onClick: () => {},
+                    },
+                    {
                       content: "REPLY",
                       onClick: () => {},
                     },
                     {
-                      content: "DELETE",
-                      onClick: () => {},
-                    },
-                    {
                       content: "UNSEND",
-                      onClick: () => {},
-                    },
-                    {
-                      visible: appConfig.translation,
-                      content: "TRANSLATE",
                       onClick: () => {},
                     },
                     {
@@ -380,7 +376,12 @@ const ChatContainer = forwardRef((props, ref) => {
                       onClick: () => {},
                     },
                     {
-                      content: "FORWARD",
+                      content: "PIN",
+                      onClick: () => {},
+                    },
+                    {
+                      visible: appConfig.translation,
+                      content: "TRANSLATE",
                       onClick: () => {},
                     },
                     {
@@ -388,7 +389,7 @@ const ChatContainer = forwardRef((props, ref) => {
                       onClick: () => {},
                     },
                     {
-                      content: "PIN",
+                      content: "DELETE",
                       onClick: () => {},
                     },
                   ],
@@ -580,7 +581,7 @@ const ChatContainer = forwardRef((props, ref) => {
         onCancel={() => {
           setUserSelectVisible(false);
         }}
-        onOk={() => {
+        onConfirm={() => {
           rootStore.addressStore.createGroup(
             selectedUsers.map((user) => user.userId)
           );
@@ -625,6 +626,7 @@ const ChatContainer = forwardRef((props, ref) => {
                 conversationId: data.id,
                 //@ts-ignore
                 lastMessage: forwardedMessages,
+                name: data.name,
               });
             }}
           ></ContactList>

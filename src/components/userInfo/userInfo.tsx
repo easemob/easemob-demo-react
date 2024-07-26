@@ -27,6 +27,7 @@ interface UserInfoProps {
     block?: boolean;
     clearMsg?: boolean;
     deleteContact?: boolean;
+    addContact?: boolean;
     onBlockedChange?: (e: { target: { checked: boolean } }) => void;
     onDeleteContact?: () => void;
   };
@@ -42,6 +43,7 @@ const UserInfo = (props: UserInfoProps) => {
       block: true,
       clearMsg: true,
       deleteContact: true,
+      addContact: true,
     },
   } = props;
   const context = useContext(RootContext);
@@ -64,6 +66,10 @@ const UserInfo = (props: UserInfoProps) => {
 
   const isInBlocklist = addressStore.blockList.some((item) => {
     return item === conversation.conversationId;
+  });
+
+  const isContact = addressStore.contacts.some((item) => {
+    return item.userId === conversation.conversationId;
   });
 
   const [remarkModalVisible, setRemarkModalVisible] = useState(false);
@@ -180,7 +186,7 @@ const UserInfo = (props: UserInfoProps) => {
         </div>
       </div>
       <div className={`${prefixCls}-content`}>
-        {itemConfig?.remark && (
+        {itemConfig?.remark && isContact && (
           <div className={`${prefixCls}-content-item`}>
             <Icon type="PERSON_SINGLE_LINE_FILL" width={24} height={24}></Icon>
             <div
@@ -213,9 +219,9 @@ const UserInfo = (props: UserInfoProps) => {
         )}
         {itemConfig?.block && (
           <div className={`${prefixCls}-content-item`}>
-            <Icon type="BELL" width={24} height={24}></Icon>
+            <Icon type="PERSON_SLASH_FILL" width={24} height={24}></Icon>
             <div className={`${prefixCls}-content-item-box`}>
-              <span>{t("contactBlocked")}</span>
+              <span>{t("Block")}</span>
               <div>
                 <Switch
                   checked={isInBlocklist}
@@ -240,45 +246,48 @@ const UserInfo = (props: UserInfoProps) => {
           </div>
         )}
 
-        {itemConfig?.deleteContact && (
-          <div className={`${prefixCls}-content-section`}>
-            <div className={`${prefixCls}-content-item`}>
-              <Icon
-                type={"PERSON_MINUS_FILL"}
-                width={24}
-                height={24}
-                style={{ fill: "#FF002B", width: "24px", height: "24px" }}
-              ></Icon>
-              <div
-                className={`${prefixCls}-content-item-box`}
-                onClick={() => {
-                  setDeleteContactModalVisible(true);
-                }}
-              >
-                <span style={{ color: "#FF002B" }}>
-                  {t("deleteContactTitle")}
-                </span>
+        {itemConfig?.deleteContact &&
+          conversation?.conversationId?.indexOf("chatbot_") === -1 &&
+          isContact && (
+            <div className={`${prefixCls}-content-section`}>
+              <div className={`${prefixCls}-content-item`}>
+                <Icon
+                  type={"PERSON_MINUS_FILL"}
+                  width={24}
+                  height={24}
+                  style={{ fill: "#FF002B", width: "24px", height: "24px" }}
+                ></Icon>
+                <div
+                  className={`${prefixCls}-content-item-box`}
+                  onClick={() => {
+                    setDeleteContactModalVisible(true);
+                  }}
+                >
+                  <span style={{ color: "#FF002B" }}>
+                    {t("deleteContactTitle")}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {itemConfig?.deleteContact && (
+          )}
+        {!isContact && itemConfig?.addContact && (
           <div className={`${prefixCls}-content-section`}>
             <div className={`${prefixCls}-content-item`}>
               <Icon
                 type={"PERSON_ADD_FILL"}
                 width={24}
                 height={24}
-                style={{ fill: "#FF002B", width: "24px", height: "24px" }}
+                style={{ width: "24px", height: "24px" }}
               ></Icon>
               <div
                 className={`${prefixCls}-content-item-box`}
                 onClick={() => {
-                  setDeleteContactModalVisible(true);
+                  rootStore.addressStore.addContact(
+                    conversation?.conversationId
+                  );
                 }}
               >
-                <span>{t("addContactTitle")}</span>
+                <span>{t("addContact")}</span>
               </div>
             </div>
           </div>
