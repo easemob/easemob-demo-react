@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import i18next from "../../../i18n";
 import { Icon, Switch, RootContext } from "easemob-chat-uikit";
 import classNames from "classnames";
+import { DEMO_VERSION, UIKIT_VERSION } from "../../../config";
 const About = () => {
   const prefixCls = "user-info";
 
@@ -24,7 +25,7 @@ const About = () => {
                 style={{ cursor: "default" }}
               >
                 <span>{i18next.t("demoVersion")}</span>
-                <div>1.1.0</div>
+                <div>{DEMO_VERSION}</div>
               </div>
             </div>
             <div className={`${prefixCls}-content-item`}>
@@ -33,7 +34,7 @@ const About = () => {
                 style={{ cursor: "default" }}
               >
                 <span>{i18next.t("uikitVersion")}</span>
-                <div>1.1.0</div>
+                <div>{UIKIT_VERSION}</div>
               </div>
             </div>
             <div className={`${prefixCls}-content-item`}>

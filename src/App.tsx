@@ -104,7 +104,6 @@ const ChatApp: FC<any> = () => {
   }, [state]);
 
   const serverConfig = JSON.parse(localStorage.getItem("serverConfig") || "{}");
-  console.log("app", loginState.useDNS, serverConfig);
   return (
     <Provider
       initConfig={{

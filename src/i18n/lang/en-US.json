@@ -143,6 +143,7 @@
         "contactBlocked": "Contact Blocked",
         "blockContact": "Block Contact",
         "Confirm blocking user": "Confirm blocking user",
-        "Translate message to specified language": "Translate messages to your preferred language."
+        "Translate message to specified language": "Translate messages to your preferred language.",
+        "Please set browser support notification": "Please set browser support notification"
     }
 }
