@@ -6,7 +6,9 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "easemob-chat-uikit";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./store/store";
-
+import register, { unregister } from "./serviceWorker";
+register();
+unregister();
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <div>
     <ReduxProvider store={store}>
