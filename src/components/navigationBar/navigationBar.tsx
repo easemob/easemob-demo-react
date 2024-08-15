@@ -134,9 +134,7 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
         {tabs.map((tab, index) => (
           <div
             key={index}
-            className={`tab-item ${activeTab === index ? "active" : ""} ${
-              index === tabs.length - 1 ? "last" : ""
-            }`}
+            className={`tab-item ${activeTab === index ? "active" : ""}`}
             onClick={() => handleTabClick(index)}
             title={tab.title}
           >

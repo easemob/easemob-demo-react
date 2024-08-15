@@ -36,11 +36,21 @@ import Settings from "../settings/settings";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import i18n from "../../i18n";
+import { getToken } from "../../service/login";
 // @ts-ignore
 window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
   const client = useClient();
   useEffect(() => {
+    // 登录
+    getToken().then((res) => {
+      console.log("获取token 成功", res);
+      client.open({
+        user: res.data.chatUserName,
+        accessToken: res.data.token,
+      });
+    });
+
     const webImAuth = sessionStorage.getItem("webImAuth");
 
     console.log("webImAuth", webImAuth);
@@ -68,9 +78,7 @@ const ChatApp: FC<any> = () => {
   const state = useAppSelector((state) => state.login);
   const navigate = useNavigate();
   useEffect(() => {
-    if (!state.loggedIn) {
-      navigate("/login");
-    }
+    //
   }, [state.loggedIn]);
 
   useEffect(() => {

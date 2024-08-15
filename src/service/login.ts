@@ -27,3 +27,8 @@ export const getChatToken = (phoneNumber: string, VCode: string) => {
   //     dispatch(Creators.loginByToken(chatUserName, token))
   // })
 };
+
+export const getToken = () => {
+  // http://a1-appserver.easemob.com/inside/app/user/special/login
+  return axios.post(domain + "/inside/app/user/special/login");
+};

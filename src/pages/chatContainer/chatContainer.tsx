@@ -405,8 +405,7 @@ const ChatContainer = forwardRef((props, ref) => {
                       onClick: () => {},
                     },
                     {
-                      visible: appConfig.translation,
-                      content: "TRANSLATE",
+                      content: "FORWARD",
                       onClick: () => {},
                     },
                     {
