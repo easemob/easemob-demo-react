@@ -40,28 +40,7 @@ const Contacts = ({
       <div className="contacts-container-list">
         <ContactList
           header={
-            <Header
-              avatar={<></>}
-              content={i18next.t("contacts")}
-              suffixIcon={
-                <div
-                  className="cui-header-iconBox"
-                  title={i18next.t("addContact")}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Button type="text" shape="circle">
-                    <Icon
-                      type="PERSON_ADD"
-                      width={24}
-                      height={24}
-                      onClick={() => {
-                        setAddContactVisible(true);
-                      }}
-                    ></Icon>
-                  </Button>
-                </div>
-              }
-            ></Header>
+            <Header avatar={<></>} content={i18next.t("contacts")}></Header>
           }
           // className="conversation"
           onItemClick={(data) => {

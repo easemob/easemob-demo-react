@@ -7,7 +7,6 @@ import {
   GroupDetail,
   ContactList,
   ContactDetail,
-  Header,
   rootStore,
   ConversationList,
   Provider,
@@ -37,6 +36,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import i18n from "../../i18n";
 import { getToken } from "../../service/login";
+import Header from "../../components/header/header";
 // @ts-ignore
 window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
@@ -125,6 +125,7 @@ const ChatApp: FC<any> = () => {
   const chatContainerRef = useRef<any>(null);
   return (
     <div className="main-container">
+      <Header></Header>
       <NavigationBar
         ref={navRef}
         tabs={[
@@ -132,7 +133,7 @@ const ChatApp: FC<any> = () => {
             title: "Message",
             icon: <Icon type="BUBBLE_FILL" width={28} height={28}></Icon>,
             content: <ChatContainer ref={chatContainerRef} />,
-            unmountOnExit: false, // 当有音视频通话时切换后能保持音视频窗口不消失
+            unmountOnExit: true, // 当有音视频通话时切换后能保持音视频窗口不消失
           },
           {
             title: "Contacts",
@@ -156,12 +157,12 @@ const ChatApp: FC<any> = () => {
             ),
             unmountOnExit: true,
           },
-          {
-            title: "Settings",
-            icon: <Icon type="HAMBURGER" width={28} height={28}></Icon>,
-            content: <Settings></Settings>,
-            unmountOnExit: true,
-          },
+          // {
+          //   title: "Settings",
+          //   icon: <Icon type="HAMBURGER" width={28} height={28}></Icon>,
+          //   content: <Settings></Settings>,
+          //   unmountOnExit: true,
+          // },
         ]}
       ></NavigationBar>
     </div>

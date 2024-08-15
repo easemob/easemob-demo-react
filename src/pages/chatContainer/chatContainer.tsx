@@ -188,7 +188,6 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }, [rootStore.conversationStore.currentCvs]);
 
-
   // ---- pin message ----
   const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
 
@@ -240,21 +239,21 @@ const ChatContainer = forwardRef((props, ref) => {
                       setCreateChatVisible(true);
                     },
                   },
-                  {
-                    icon: (
-                      <Icon
-                        type="PERSON_ADD_FILL"
-                        width={24}
-                        height={24}
-                        color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
-                      />
-                    ),
-                    content: i18next.t("addContact"),
-                    onClick: () => {
-                      setAddContactVisible(true);
-                      // setUserSelectVisible(true);
-                    },
-                  },
+                  // {
+                  //   icon: (
+                  //     <Icon
+                  //       type="PERSON_ADD_FILL"
+                  //       width={24}
+                  //       height={24}
+                  //       color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                  //     />
+                  //   ),
+                  //   content: i18next.t("addContact"),
+                  //   onClick: () => {
+                  //     setAddContactVisible(true);
+                  //     // setUserSelectVisible(true);
+                  //   },
+                  // },
                   {
                     icon: (
                       <Icon
@@ -405,7 +404,7 @@ const ChatContainer = forwardRef((props, ref) => {
                       onClick: () => {},
                     },
                     {
-                      content: "FORWARD",
+                      content: "TRANSLATE",
                       onClick: () => {},
                     },
                     {

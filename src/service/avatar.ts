@@ -40,10 +40,23 @@ async function sendRequest(groupId: string) {
     });
 }
 
+async function getGroupDetail(groupId: string) {
+  let avatarUrl = "";
+  try {
+    const data = await rootStore.client.getGroupInfo({ groupId });
+    console.log("getGroupDetail", data);
+    avatarUrl = data.data[0].avatar;
+  } catch (e) {
+    console.error("getGroupDetail fail", e);
+  }
+  return avatarUrl;
+}
+
 export const getGroupAvatar = async (groupIds: string[]) => {
   let result: { [key: string]: string } = {};
   for (let groupId of groupIds) {
-    result[groupId] = await sendRequest(groupId);
+    result[groupId] = await getGroupDetail(groupId);
   }
+  console.log("getGroupAvatar", result);
   return result;
 };

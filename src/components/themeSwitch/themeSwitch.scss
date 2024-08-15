@@ -1,0 +1,19 @@
+.themeSwitch-box, .header-icon-box{
+    display: flex;
+    align-items: center;
+}
+
+.themeSwitch-box{
+    width: 54px;
+    height: 28px;
+    background-color: #E3E6E8;
+    border-radius: 14px;
+    padding: 2px;
+    box-sizing: border-box;
+    gap: 2px;
+    cursor: pointer;
+    user-select: none;
+}
+.theme-dark.themeSwitch-box{
+    background-color: #464E53;
+}
