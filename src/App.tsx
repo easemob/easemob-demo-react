@@ -118,9 +118,9 @@ const ChatApp: FC<any> = () => {
       theme={{
         primaryColor: state.color.h,
         mode: state.dark ? "dark" : "light",
-        bubbleShape: state.theme == "classic" ? "square" : "ground",
+        bubbleShape: state.theme == "classic" ? "square" : "round",
         avatarShape: state.theme == "classic" ? "square" : "circle",
-        componentsShape: state.theme == "classic" ? "square" : "ground",
+        componentsShape: state.theme == "classic" ? "square" : "round",
       }}
       local={{
         lng: state.language || "zh",
