@@ -65,6 +65,7 @@
     "redux": "^5.0.1",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",
+    "sass": "^1.77.8",
     "sass-loader": "^12.3.0",
     "semver": "^7.3.5",
     "source-map-loader": "^3.0.0",
@@ -158,6 +159,6 @@
     ]
   },
   "devDependencies": {
-    "node-sass": "^9.0.0"
+    "node-sass": "^7.0.3"
   }
 }

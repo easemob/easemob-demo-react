@@ -57,6 +57,9 @@
                     width: 24px;
                     height: 24px;
                 }
+                &:hover{
+                    background: var(--cui-primary-color95);
+                }
 
                 &-name{
                     border-bottom: 1px solid #E3E6E8;
@@ -68,6 +71,7 @@
                     font-size: 14px;
                     font-weight: 500;
                     box-sizing: border-box;
+                    justify-content: space-between;
                 }
             }
         }
@@ -96,13 +100,43 @@
     .setting-tab-group{
         .setting-menu-item{
             background-color: #2F3437;
-            
+            &:hover{
+                background-color: var(--cui-primary-color2);
+            }
             .setting-menu-item-name{
                 color: #F9FAFA;
                 border-bottom: 1px solid #464E53;
+            }
+        }
+
+        .setting-menu-item.active{
+            background-color: var(--cui-primary-color2);
+            & > div {
+                color: var(--cui-primary-color6);
+            }
+            & svg{
+                fill: var(--cui-primary-color6);
+            }
+            .setting-menu-item-name{
+                border: none;
             }
         }
     }
     
 }
 
+.setting-menu-item-name-dropdown{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+    justify-content: end;
+    &-value{
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        margin-left: 10px;
+        text-align: right;
+    }
+}
