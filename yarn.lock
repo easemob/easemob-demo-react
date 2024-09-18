@@ -4241,10 +4241,10 @@
   "resolved" "https://registry.npmjs.org/duplexer/-/duplexer-0.1.2.tgz"
   "version" "0.1.2"
 
-"easemob-chat-uikit@1.2.0":
-  "integrity" "sha512-cA4259XditbqbEVYFcM+17VyrPTYQ7bzZQ0nB+tFILgv7XVxFSPI8MM7RwOlyB2DAMzntPwT1uYhGp+GTdJOcw=="
-  "resolved" "https://registry.npmjs.org/easemob-chat-uikit/-/easemob-chat-uikit-1.2.0.tgz"
-  "version" "1.2.0"
+"easemob-chat-uikit@^1.3.0":
+  "integrity" "sha512-P+A9X/gqZFNa8rWWmQ2yxiM38LHv6qOEa0oLzTajEKjAN7CSuFkfrR5h7WtmCMLYdXaxzz9kPTQPMU6xXHUyeg=="
+  "resolved" "https://registry.npmjs.org/easemob-chat-uikit/-/easemob-chat-uikit-1.3.0.tgz"
+  "version" "1.3.0"
 
 "ecc-jsbn@~0.1.1":
   "integrity" "sha512-eh9O+hwRHNbG4BLTjEl3nw044CkGm5X6LoaCf7LPp7UU8Qrt47JYNi6nPX8xjW97TKGKm1ouctg0QSpZe9qrnw=="
