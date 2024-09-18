@@ -30,7 +30,7 @@ const ChatApp: FC<any> = () => {
       item: {
         moreAction: true,
         deleteConversation: true,
-        presence: false,
+        presence: true,
       },
     },
     chat: {
@@ -48,6 +48,8 @@ const ChatApp: FC<any> = () => {
         edit: true,
         delete: true,
         report: true,
+        //@ts-ignore
+        pin: true,
       },
       messageInput: {
         typing: state.typing,
@@ -72,7 +74,7 @@ const ChatApp: FC<any> = () => {
         item: {
           moreAction: true,
           deleteConversation: true,
-          presence: false,
+          presence: true,
         },
       },
 
@@ -91,6 +93,8 @@ const ChatApp: FC<any> = () => {
           edit: true,
           delete: true,
           report: true,
+          //@ts-ignore
+          pin: true,
         },
         messageInput: {
           typing: state.typing,
@@ -100,7 +104,6 @@ const ChatApp: FC<any> = () => {
   }, [state]);
 
   const serverConfig = JSON.parse(localStorage.getItem("serverConfig") || "{}");
-  console.log("app", loginState.useDNS, serverConfig);
   return (
     <Provider
       initConfig={{
@@ -109,7 +112,7 @@ const ChatApp: FC<any> = () => {
         restUrl: serverConfig.rest,
         msyncUrl: serverConfig.msync,
         useUserInfo: true,
-        translationTargetLanguage: window.navigator.language,
+        translationTargetLanguage: state.translationTargetLanguage,
       }}
       features={config}
       theme={{

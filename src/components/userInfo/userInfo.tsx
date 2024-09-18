@@ -17,13 +17,35 @@ import { observer } from "mobx-react-lite";
 interface UserInfoProps {
   className?: string;
   conversation: {
-    chatType: "groupChat";
+    chatType: "singleChat";
     conversationId: string;
+  };
+  // 配置都显示哪些功能   1.备注  2.消息免打扰  3.加入黑名单  4.清空聊天记录  5.删除联系人
+  itemConfig?: {
+    remark?: boolean;
+    silent?: boolean;
+    block?: boolean;
+    clearMsg?: boolean;
+    deleteContact?: boolean;
+    addContact?: boolean;
+    onBlockedChange?: (e: { target: { checked: boolean } }) => void;
+    onDeleteContact?: () => void;
   };
   // themeMode?: string;
 }
 const UserInfo = (props: UserInfoProps) => {
-  const { className, conversation } = props;
+  const {
+    className,
+    conversation,
+    itemConfig = {
+      remark: true,
+      silent: true,
+      block: true,
+      clearMsg: true,
+      deleteContact: true,
+      addContact: true,
+    },
+  } = props;
   const context = useContext(RootContext);
   console.log("context", context);
   const { theme } = context;
@@ -41,6 +63,14 @@ const UserInfo = (props: UserInfoProps) => {
   });
 
   const silent = currentCvs[0]?.silent;
+
+  const isInBlocklist = addressStore.blockList.some((item) => {
+    return item === conversation.conversationId;
+  });
+
+  const isContact = addressStore.contacts.some((item) => {
+    return item.userId === conversation.conversationId;
+  });
 
   const [remarkModalVisible, setRemarkModalVisible] = useState(false);
   const [remarkValue, setRemarkValue] = useState(userInfo.remark || "");
@@ -95,6 +125,20 @@ const UserInfo = (props: UserInfoProps) => {
     );
   };
 
+  // ---------- block --------
+  const handleBlockChange = (e: { target: { checked: boolean } }) => {
+    const result = e.target.checked;
+    itemConfig?.onBlockedChange?.(e);
+    result
+      ? setBlockContactModalVisible(true)
+      : rootStore.addressStore.removeUserFromBlocklist([
+          conversation.conversationId,
+        ]);
+  };
+
+  const [blockContactModalVisible, setBlockContactModalVisible] =
+    useState(false);
+
   // -------  clear message ---------
   const [clearMsgModalVisible, setClearMsgModalVisible] = useState(false);
   const clearMessages = () => {
@@ -110,6 +154,7 @@ const UserInfo = (props: UserInfoProps) => {
     rootStore.conversationStore.deleteConversation(conversation);
     rootStore.messageStore.clearMessage(conversation);
     setDeleteContactModalVisible(false);
+    itemConfig?.onDeleteContact?.();
   };
 
   return (
@@ -140,69 +185,113 @@ const UserInfo = (props: UserInfoProps) => {
           </div>
         </div>
       </div>
-
       <div className={`${prefixCls}-content`}>
-        <div className={`${prefixCls}-content-item`}>
-          <Icon type="PERSON_SINGLE_LINE_FILL" width={24} height={24}></Icon>
-          <div
-            className={`${prefixCls}-content-item-box`}
-            onClick={() => {
-              setRemarkModalVisible(true);
-            }}
-          >
-            <span>{t("contactRemark")}</span>
-            <div>
-              {userInfo.remark}
-              <Icon type="SLASH_IN_BOX" width={24} height={24}></Icon>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${prefixCls}-content-item`}>
-          <Icon type="BELL" width={24} height={24}></Icon>
-          <div className={`${prefixCls}-content-item-box`}>
-            <span>{t("muteNotifications")}</span>
-            <div>
-              <Switch
-                checked={!!silent}
-                onChange={handleNotificationChange}
-              ></Switch>
-            </div>
-          </div>
-        </div>
-
-        <div className={`${prefixCls}-content-item`}>
-          <Icon type="ERASER" width={24} height={24}></Icon>
-          <div
-            className={`${prefixCls}-content-item-box`}
-            onClick={() => {
-              setClearMsgModalVisible(true);
-            }}
-          >
-            <span>{t("clearChatHistory")}</span>
-          </div>
-        </div>
-
-        <div className={`${prefixCls}-content-section`}>
+        {itemConfig?.remark && isContact && (
           <div className={`${prefixCls}-content-item`}>
-            <Icon
-              type={"PERSON_MINUS_FILL"}
-              width={24}
-              height={24}
-              style={{ fill: "#FF002B", width: "24px", height: "24px" }}
-            ></Icon>
+            <Icon type="PERSON_SINGLE_LINE_FILL" width={24} height={24}></Icon>
             <div
               className={`${prefixCls}-content-item-box`}
               onClick={() => {
-                setDeleteContactModalVisible(true);
+                setRemarkModalVisible(true);
               }}
             >
-              <span style={{ color: "#FF002B" }}>
-                {t("deleteContactTitle")}
-              </span>
+              <span>{t("contactRemark")}</span>
+              <div>
+                {userInfo.remark}
+                <Icon type="SLASH_IN_BOX" width={24} height={24}></Icon>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+        {itemConfig?.silent && (
+          <div className={`${prefixCls}-content-item`}>
+            <Icon type="BELL" width={24} height={24}></Icon>
+            <div className={`${prefixCls}-content-item-box`}>
+              <span>{t("muteNotifications")}</span>
+              <div>
+                <Switch
+                  checked={!!silent}
+                  onChange={handleNotificationChange}
+                ></Switch>
+              </div>
+            </div>
+          </div>
+        )}
+        {itemConfig?.block && (
+          <div className={`${prefixCls}-content-item`}>
+            <Icon type="PERSON_SLASH_FILL" width={24} height={24}></Icon>
+            <div className={`${prefixCls}-content-item-box`}>
+              <span>{t("Block")}</span>
+              <div>
+                <Switch
+                  checked={isInBlocklist}
+                  onChange={handleBlockChange}
+                ></Switch>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {itemConfig?.clearMsg && (
+          <div className={`${prefixCls}-content-item`}>
+            <Icon type="ERASER" width={24} height={24}></Icon>
+            <div
+              className={`${prefixCls}-content-item-box`}
+              onClick={() => {
+                setClearMsgModalVisible(true);
+              }}
+            >
+              <span>{t("clearChatHistory")}</span>
+            </div>
+          </div>
+        )}
+
+        {itemConfig?.deleteContact &&
+          conversation?.conversationId?.indexOf("chatbot_") === -1 &&
+          isContact && (
+            <div className={`${prefixCls}-content-section`}>
+              <div className={`${prefixCls}-content-item`}>
+                <Icon
+                  type={"PERSON_MINUS_FILL"}
+                  width={24}
+                  height={24}
+                  style={{ fill: "#FF002B", width: "24px", height: "24px" }}
+                ></Icon>
+                <div
+                  className={`${prefixCls}-content-item-box`}
+                  onClick={() => {
+                    setDeleteContactModalVisible(true);
+                  }}
+                >
+                  <span style={{ color: "#FF002B" }}>
+                    {t("deleteContactTitle")}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        {!isContact && itemConfig?.addContact && (
+          <div className={`${prefixCls}-content-section`}>
+            <div className={`${prefixCls}-content-item`}>
+              <Icon
+                type={"PERSON_ADD_FILL"}
+                width={24}
+                height={24}
+                style={{ width: "24px", height: "24px" }}
+              ></Icon>
+              <div
+                className={`${prefixCls}-content-item-box`}
+                onClick={() => {
+                  rootStore.addressStore.addContact(
+                    conversation?.conversationId
+                  );
+                }}
+              >
+                <span>{t("addContact")}</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <Modal
@@ -246,6 +335,25 @@ const UserInfo = (props: UserInfoProps) => {
           remarkValue ||
           addressStore.appUsersInfo[conversation.conversationId]?.nickname
         }” ${t("and delete all chat history")}?`}</div>
+      </Modal>
+
+      <Modal
+        title={t("blockContact")}
+        open={blockContactModalVisible}
+        onCancel={() => {
+          setBlockContactModalVisible(false);
+        }}
+        onOk={() => {
+          rootStore.addressStore.addUsersToBlocklist([
+            conversation.conversationId,
+          ]);
+          setBlockContactModalVisible(false);
+        }}
+      >
+        <div>{`${t("Confirm blocking user")} ${
+          remarkValue ||
+          addressStore.appUsersInfo[conversation.conversationId]?.nickname
+        }?`}</div>
       </Modal>
     </div>
   );

@@ -7,6 +7,7 @@ import {
   Modal,
   Input,
   rootStore,
+  Button,
 } from "easemob-chat-uikit";
 import "./contacts.scss";
 import toast from "../../components/toast/toast";
@@ -44,17 +45,20 @@ const Contacts = ({
               content={i18next.t("contacts")}
               suffixIcon={
                 <div
+                  className="cui-header-iconBox"
                   title={i18next.t("addContact")}
                   style={{ cursor: "pointer" }}
                 >
-                  <Icon
-                    type="PERSON_ADD"
-                    width={24}
-                    height={24}
-                    onClick={() => {
-                      setAddContactVisible(true);
-                    }}
-                  ></Icon>
+                  <Button type="text" shape="circle">
+                    <Icon
+                      type="PERSON_ADD"
+                      width={24}
+                      height={24}
+                      onClick={() => {
+                        setAddContactVisible(true);
+                      }}
+                    ></Icon>
+                  </Button>
                 </div>
               }
             ></Header>

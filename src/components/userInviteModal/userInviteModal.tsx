@@ -92,7 +92,7 @@ const UserInviteModal = (props: UserInviteModalProps) => {
       onCancel={() => {
         onClose?.();
       }}
-      onOk={() => {
+      onConfirm={() => {
         let contacts =
           selectedUsers.length > 0
             ? selectedUsers.map((item) => {

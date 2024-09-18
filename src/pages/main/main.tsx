@@ -121,20 +121,19 @@ const ChatApp: FC<any> = () => {
         ref={navRef}
         tabs={[
           {
-            title: "消息",
+            title: "Message",
             icon: <Icon type="BUBBLE_FILL" width={28} height={28}></Icon>,
             content: <ChatContainer ref={chatContainerRef} />,
             unmountOnExit: false, // 当有音视频通话时切换后能保持音视频窗口不消失
           },
           {
-            title: "通讯录",
+            title: "Contacts",
             icon: (
               <Icon type="PERSON_DOUBLE_FILL" width={28} height={28}></Icon>
             ),
             content: (
               <Contacts
                 onMessageClick={() => {
-                  console.log("发消息");
                   navRef.current?.changeTab(0);
                 }}
                 onAudioCall={() => {
@@ -150,7 +149,7 @@ const ChatApp: FC<any> = () => {
             unmountOnExit: true,
           },
           {
-            title: "设置",
+            title: "Settings",
             icon: <Icon type="HAMBURGER" width={28} height={28}></Icon>,
             content: <Settings></Settings>,
             unmountOnExit: true,

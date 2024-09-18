@@ -1,4 +1,5 @@
 import { rootStore } from "easemob-chat-uikit";
+import i18next from "../i18n";
 const options = {
   requireInteraction: false, // 是否自动消失
   body: "new message", // 展示的具体内容
@@ -23,58 +24,64 @@ const options = {
   //     }
   // ]
 };
+let hasRequestPermission = false;
 export const checkBrowerNotifyStatus = (
   showFlag: boolean,
   params: any,
   iconTitle: string,
   store: any
 ) => {
+  if (hasRequestPermission) {
+    return;
+  }
   if (!("Notification" in window)) {
     alert("This browser does not support desktop notification");
   } else if (Notification.permission !== "denied") {
     Notification.requestPermission().then((e) => {
+      hasRequestPermission = true;
       if (e === "granted" && showFlag) {
         notification(params, iconTitle, store);
       } else if (e !== "granted") {
-        alert("Please set browser support notification");
+        alert(i18next.t("Please set browser support notification"));
       }
     });
   } else if (Notification.permission === "denied") {
-    alert("Please set browser support notification");
+    alert(i18next.t("Please set browser support notification"));
   }
 };
 export const notification = (iconTitle: string, params: any, store: any) => {
   const config = { ...options, ...params };
-  if (Notification?.permission === "granted") {
-    const state = store.getState();
-    const appConfig = state.appConfig;
-    if (!appConfig.notification) return;
-    const { chatType, from, to, ext } = params;
-    let conversationId = "";
-    if (chatType == "singleChat") {
-      conversationId = from;
-    } else {
-      conversationId = to;
-    }
-    const conversationList = rootStore.conversationStore.conversationList;
-    const conversation = conversationList.find(
-      (item: any) => item.conversationId === conversationId
-    );
-    if (conversation?.chatType == "singleChat" && conversation?.silent) {
+
+  const state = store.getState();
+  const appConfig = state.appConfig;
+  if (!appConfig.notification) return;
+  const { chatType, from, to, ext } = params;
+  let conversationId = "";
+  if (chatType == "singleChat") {
+    conversationId = from;
+  } else {
+    conversationId = to;
+  }
+  const conversationList = rootStore.conversationStore.conversationList;
+  const conversation = conversationList.find(
+    (item: any) => item.conversationId === conversationId
+  );
+  if (conversation?.chatType == "singleChat" && conversation?.silent) {
+    return;
+  }
+  if (conversation?.chatType == "groupChat" && conversation?.silent) {
+    if (
+      !(
+        ext.em_at_list.includes(rootStore.client.user) ||
+        ext.em_at_list == "ALL"
+      )
+    ) {
       return;
     }
-    if (conversation?.chatType == "groupChat" && conversation?.silent) {
-      if (
-        !(
-          ext.em_at_list.includes(rootStore.client.user) ||
-          ext.em_at_list == "ALL"
-        )
-      ) {
-        return;
-      }
-    }
-    const bodyList = config.body.split("?");
-    config.body = bodyList[0];
+  }
+  const bodyList = config.body.split("?");
+  config.body = bodyList[0];
+  if (Notification?.permission === "granted") {
     var notification = new Notification(config.title || "New Message", config);
     const session = {};
     notification.onclick = (res: any) => {

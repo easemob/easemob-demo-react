@@ -43,6 +43,48 @@ npm start
 
 ## 项目结构
 
+```
+uikit-demo-easemob
+├── build
+|  └── static
+|     ├── css
+|     ├── js
+|     └── media
+├── config
+|  ├── jest
+|  └── webpack
+|     └── persistentCache
+├── public
+├── scripts
+└── src // 源码
+   ├── UIKit // UIKit 中的事件监听
+   ├── assets // 资源文件
+   ├── components
+   |  ├── imageCrop // 图片裁剪组件
+   |  ├── navigationBar // 导航组件
+   |  ├── toast // 提示组件
+   |  ├── userInfo // 用户个人信息组件
+   |  └── userInviteModal // 多人音视频邀请人组件
+   ├── hooks
+   ├── i18n // 国际化文案
+   |  └── lang
+   ├── pages
+   |  ├── chatContainer // 聊天页面
+   |  ├── contacts // 通讯录页面
+   |  ├── login // 登录页面
+   |  ├── main // 应用布局
+   |  └── settings // 设置页面
+   |     └── about // 关于
+   |     ├── general // 通用
+   |     ├── notification // 消息通知
+   |     ├── personalInfo // 个人信息
+   |     └── settingTab // tab 切换组件
+   ├── routes // 路由
+   ├── service // 应用所需要的服务
+   ├── store // 全局 state
+   └── utils // 工具方法
+```
+
 ## Q&A
 
 如有问题请联系环信技术支持或者提 issues

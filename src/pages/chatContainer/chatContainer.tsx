@@ -28,6 +28,8 @@ import {
   Input,
   eventHandler,
   Thread,
+  PinnedMessage,
+  usePinnedMessage,
   RootContext,
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
@@ -42,6 +44,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
+import { url } from "inspector";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -77,6 +80,9 @@ const ChatContainer = forwardRef((props, ref) => {
     if (cvsItem.chatType == "groupChat") {
       if (thread.showThreadPanel) {
         rootStore.threadStore.setThreadVisible(false);
+      }
+      if (pinMsgVisible) {
+        hidePinMsg();
       }
       isInGroup && setConversationDetailVisible((value) => !value);
     } else {
@@ -182,8 +188,23 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }, [rootStore.conversationStore.currentCvs]);
 
-  console.log("appConfig ---", appConfig);
 
+  // ---- pin message ----
+  const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
+
+  useEffect(() => {
+    if (pinMsgVisible) {
+      thread.setThreadVisible(false);
+      setConversationDetailVisible(false);
+    }
+  }, [pinMsgVisible]);
+
+  useEffect(() => {
+    if (thread.showThreadPanel) {
+      hidePinMsg();
+      setConversationDetailVisible(false);
+    }
+  }, [thread.showThreadPanel]);
   return (
     <div
       className={classNames("chat-container", {
@@ -253,7 +274,9 @@ const ChatContainer = forwardRef((props, ref) => {
                   placement: "bottomRight",
                 },
               }}
-              content={<div className="header-content">Chats</div>}
+              content={
+                <div className={`header-content ${themeMode}`}>Chats</div>
+              }
               avatar={<></>}
             ></Header>
           )}
@@ -303,6 +326,31 @@ const ChatContainer = forwardRef((props, ref) => {
                 // 单条转发
                 onForwardMessage: (msg: any) => {
                   let forwardMsg = { ...msg };
+                  if (forwardMsg.type === "video") {
+                    forwardMsg.body = {
+                      url: forwardMsg.url.split("?")[0],
+                      filename: forwardMsg.filename,
+                      secret: forwardMsg.secret,
+                      file_length: forwardMsg.file_length,
+                    };
+                    forwardMsg.thumb = "";
+                  } else if (forwardMsg.type === "audio") {
+                    forwardMsg.body = {
+                      url: forwardMsg.url,
+                      filename: forwardMsg.filename,
+                      secret: forwardMsg.secret,
+                      file_length: forwardMsg.file_length,
+                      length: forwardMsg.length,
+                    };
+                  } else if (forwardMsg.type === "file") {
+                    forwardMsg.body = {
+                      url: forwardMsg.url,
+                      filename: forwardMsg.filename,
+                      secret: forwardMsg.secret,
+                      file_length: forwardMsg.file_length,
+                    };
+                  }
+                  forwardMsg.file && delete forwardMsg.file;
                   forwardMsg.id = Date.now() + "";
                   forwardMsg.from = rootStore.client.user;
                   forwardMsg.ext = {
@@ -321,6 +369,7 @@ const ChatContainer = forwardRef((props, ref) => {
                   forwardMsg.isChatThread = false;
                   forwardMsg.chatThreadOverview = undefined;
                   forwardMsg.chatThread = undefined;
+                  forwardMsg.time = Date.now();
                   // 复用合并转发的逻辑
                   setForwardedMessages(forwardMsg);
                   setContactListVisible(true);
@@ -332,20 +381,15 @@ const ChatContainer = forwardRef((props, ref) => {
                   icon: null,
                   actions: [
                     {
+                      content: "FORWARD",
+                      onClick: () => {},
+                    },
+                    {
                       content: "REPLY",
                       onClick: () => {},
                     },
                     {
-                      content: "DELETE",
-                      onClick: () => {},
-                    },
-                    {
                       content: "UNSEND",
-                      onClick: () => {},
-                    },
-                    {
-                      visible: appConfig.translation,
-                      content: "TRANSLATE",
                       onClick: () => {},
                     },
                     {
@@ -357,11 +401,20 @@ const ChatContainer = forwardRef((props, ref) => {
                       onClick: () => {},
                     },
                     {
-                      content: "FORWARD",
+                      content: "PIN",
+                      onClick: () => {},
+                    },
+                    {
+                      visible: appConfig.translation,
+                      content: "TRANSLATE",
                       onClick: () => {},
                     },
                     {
                       content: "REPORT",
+                      onClick: () => {},
+                    },
+                    {
+                      content: "DELETE",
                       onClick: () => {},
                     },
                   ],
@@ -372,6 +425,7 @@ const ChatContainer = forwardRef((props, ref) => {
               enabledTyping: true,
               onSendMessage: (msg) => {
                 // 发送消息回调，如果是合并转发的消息，显示转发弹窗
+                // @ts-ignore
                 if (msg.type == "combine") {
                   setForwardedMessages(msg);
                   setContactListVisible(true);
@@ -384,6 +438,8 @@ const ChatContainer = forwardRef((props, ref) => {
                 visible: true,
                 actions: [],
               },
+              style: { cursor: "pointer" },
+              onClickAvatar: handleEllipsisClick,
               onClickEllipsis: handleEllipsisClick,
             }}
             rtcConfig={{
@@ -398,7 +454,7 @@ const ChatContainer = forwardRef((props, ref) => {
               getRTCToken: getRtcToken2,
               //@ts-ignore
               onAddPerson: (data: any) => {
-                console.log("onAddPerson", data);
+                // console.log("onAddPerson", data);
                 setMediaType(data.type === 2 ? "video" : "audio");
                 setRtcGroupId(data.groupId);
                 setUserInviteModalVisible(true);
@@ -451,91 +507,129 @@ const ChatContainer = forwardRef((props, ref) => {
           )}
         </div>
         {/** 是否显示子区 */}
-        {thread.showThreadPanel && (
-          <div className="chat-container-chat-right">
-            <Thread
-              messageListProps={{
-                renderUserProfile: () => null,
-                messageProps: {
-                  // @ts-ignore
-                  onForwardMessage: (msg: { [key: string]: any }) => {
-                    console.log("onForwardMessage --", msg);
-                    let forwardMsg = { ...msg };
+        {thread.showThreadPanel &&
+          !pinMsgVisible &&
+          !conversationDetailVisible && (
+            <div className="chat-container-chat-right">
+              <Thread
+                messageListProps={{
+                  renderUserProfile: () => null,
+                  messageProps: {
                     // @ts-ignore
-                    forwardMsg.id = Date.now() + "";
-                    // @ts-ignore
-                    forwardMsg.from = rootStore.client.user;
-                    // @ts-ignore
-                    forwardMsg.ext = {
-                      ease_chat_uikit_user_info: {
-                        nickname:
-                          rootStore.addressStore.appUsersInfo[
-                            rootStore.client.user
-                          ].nickname,
-                        avatarURL:
-                          rootStore.addressStore.appUsersInfo[
-                            rootStore.client.user
-                          ].avatarurl,
-                      },
-                    };
-                    // @ts-ignore
-                    forwardMsg.reactions = undefined;
-                    // @ts-ignore
-                    forwardMsg.isChatThread = false;
-                    forwardMsg.chatThreadOverview = undefined;
-                    forwardMsg.chatThread = undefined;
-                    setForwardedMessages(forwardMsg);
-                    setContactListVisible(true);
-                  },
-                  customAction: {
-                    visible: true,
-                    icon: null,
-                    actions: [
-                      {
-                        content: "REPLY",
-                        onClick: () => {},
-                      },
+                    onForwardMessage: (msg: { [key: string]: any }) => {
+                      let forwardMsg = { ...msg };
+                      if (forwardMsg.type === "video") {
+                        forwardMsg.body = {
+                          url: forwardMsg.url.split("?")[0],
+                          filename: forwardMsg.filename,
+                          secret: forwardMsg.secret,
+                          file_length: forwardMsg.file_length,
+                        };
+                        forwardMsg.thumb = "";
+                      } else if (forwardMsg.type === "audio") {
+                        forwardMsg.body = {
+                          url: forwardMsg.url,
+                          filename: forwardMsg.filename,
+                          secret: forwardMsg.secret,
+                          file_length: forwardMsg.file_length,
+                          length: forwardMsg.length,
+                        };
+                      } else if (forwardMsg.type === "file") {
+                        forwardMsg.body = {
+                          url: forwardMsg.url,
+                          filename: forwardMsg.filename,
+                          secret: forwardMsg.secret,
+                          file_length: forwardMsg.file_length,
+                        };
+                      }
+                      forwardMsg.file && delete forwardMsg.file;
+                      // @ts-ignore
+                      forwardMsg.id = Date.now() + "";
+                      // @ts-ignore
+                      forwardMsg.from = rootStore.client.user;
+                      // @ts-ignore
+                      forwardMsg.ext = {
+                        ease_chat_uikit_user_info: {
+                          nickname:
+                            rootStore.addressStore.appUsersInfo[
+                              rootStore.client.user
+                            ].nickname,
+                          avatarURL:
+                            rootStore.addressStore.appUsersInfo[
+                              rootStore.client.user
+                            ].avatarurl,
+                        },
+                      };
+                      // @ts-ignore
+                      forwardMsg.reactions = undefined;
+                      // @ts-ignore
+                      forwardMsg.isChatThread = false;
+                      forwardMsg.chatThreadOverview = undefined;
+                      forwardMsg.chatThread = undefined;
+                      setForwardedMessages(forwardMsg);
+                      setContactListVisible(true);
+                    },
+                    customAction: {
+                      visible: true,
+                      icon: null,
+                      actions: [
+                        {
+                          content: "REPLY",
+                          onClick: () => {},
+                        },
 
-                      {
-                        content: "TRANSLATE",
-                        onClick: () => {},
-                      },
-                      {
-                        content: "Modify",
-                        onClick: () => {},
-                      },
-                      {
-                        content: "SELECT",
-                        onClick: () => {},
-                      },
-                      {
-                        content: "FORWARD",
-                        onClick: () => {},
-                      },
-                    ],
+                        {
+                          content: "TRANSLATE",
+                          onClick: () => {},
+                        },
+                        {
+                          content: "Modify",
+                          onClick: () => {},
+                        },
+                        {
+                          content: "SELECT",
+                          onClick: () => {},
+                        },
+                        {
+                          content: "FORWARD",
+                          onClick: () => {},
+                        },
+                        {
+                          content: "PIN",
+                          onClick: () => {},
+                        },
+                      ],
+                    },
                   },
-                },
-              }}
-              messageInputProps={{
-                onSendMessage: (msg: any) => {
-                  console.log("message", msg);
-                  if (msg.type == "combine") {
-                    setForwardedMessages(msg);
-                    setContactListVisible(true);
-                  }
-                },
-                // enabledTyping: state?.typingSwitch,
-              }}
-            ></Thread>
-          </div>
-        )}
+                }}
+                messageInputProps={{
+                  onSendMessage: (msg: any) => {
+                    if (msg.type == "combine") {
+                      setForwardedMessages(msg);
+                      setContactListVisible(true);
+                    }
+                  },
+                  // enabledTyping: state?.typingSwitch,
+                }}
+              ></Thread>
+            </div>
+          )}
+
+        {/** 是否显示 pin message*/}
+        {pinMsgVisible &&
+          !thread.showThreadPanel &&
+          !conversationDetailVisible && (
+            <div className="chat-container-chat-right">
+              <PinnedMessage />
+            </div>
+          )}
       </div>
       {/** 创建群组的联系人弹窗 */}
       <UserSelect
         onCancel={() => {
           setUserSelectVisible(false);
         }}
-        onOk={() => {
+        onConfirm={() => {
           rootStore.addressStore.createGroup(
             selectedUsers.map((user) => user.userId)
           );
@@ -567,6 +661,7 @@ const ChatContainer = forwardRef((props, ref) => {
               forwardedMessages.to = data.id;
               forwardedMessages.chatType =
                 data.type == "contact" ? "singleChat" : "groupChat";
+              //@ts-ignore
               rootStore.messageStore.sendMessage(forwardedMessages);
               setContactListVisible(false);
 
@@ -579,6 +674,7 @@ const ChatContainer = forwardRef((props, ref) => {
                 conversationId: data.id,
                 //@ts-ignore
                 lastMessage: forwardedMessages,
+                name: data.name,
               });
             }}
           ></ContactList>
