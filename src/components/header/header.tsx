@@ -7,7 +7,6 @@ import classNames from "classnames";
 const Header = () => {
   const dispatch = useAppDispatch();
   const handleChangeTheme = (type: "sun" | "moon") => {
-    console.log(type);
     dispatch(updateAppConfig({ dark: type === "moon" }));
   };
   const state = useAppSelector((state) => state.appConfig);

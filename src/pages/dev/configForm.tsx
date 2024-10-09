@@ -42,7 +42,6 @@ const ConfigForm = () => {
 
   const handleSwitchChange =
     (type: string) => (event: ChangeEvent<HTMLInputElement>) => {
-      console.log(type, event.target.checked);
       setConfig({
         ...config,
         [type]: event.target.checked,
@@ -51,7 +50,6 @@ const ConfigForm = () => {
 
   const handleInputChange =
     (type: string) => (event: ChangeEvent<HTMLInputElement>) => {
-      console.log(type, event.target.value);
       setConfig({
         ...config,
         [type]: event.target.value,

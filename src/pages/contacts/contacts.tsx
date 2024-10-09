@@ -8,6 +8,7 @@ import {
   Input,
   rootStore,
   Button,
+  Empty,
 } from "easemob-chat-uikit";
 import "./contacts.scss";
 import toast from "../../components/toast/toast";
@@ -32,7 +33,6 @@ const Contacts = ({
 
   const [userId, setUserId] = useState("");
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setUserId(e.target.value);
   };
   return (
@@ -48,7 +48,6 @@ const Contacts = ({
             // if (data.type == "request") {
             //   type = "contact";
             // }
-            console.log("点击联系人", data);
             setContactData({
               id: data.id,
               name: data.name,
@@ -59,17 +58,23 @@ const Contacts = ({
       </div>
       <div className="contacts-container-detail">
         <ContactDetail
+          renderEmpty={() => {
+            return (
+              <Empty
+                text=""
+                icon={<Icon type="EMPTY" width={120} height={120}></Icon>}
+              />
+            );
+          }}
           // @ts-ignore
           data={contactData}
           onMessageBtnClick={() => {
             onMessageClick?.();
           }}
           onVideoCall={() => {
-            console.log("onVideoCall");
             onVideoCall?.();
           }}
           onAudioCall={() => {
-            console.log("onAudioCall");
             onAudioCall?.();
           }}
           onUserIdCopied={(userId) => {

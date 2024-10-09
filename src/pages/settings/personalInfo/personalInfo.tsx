@@ -35,7 +35,6 @@ const PersonalInfo = () => {
   };
 
   const handleNicknameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     if (e.target.value.length > 20) return;
 
     rootStore.client
@@ -81,10 +80,8 @@ const PersonalInfo = () => {
   const handleUploadImage = (url: string) => {
     fetch(url).then((res) => {
       res.blob().then((blob) => {
-        console.log("blob", blob);
         const formData = new FormData();
         formData.append("file", blob);
-        console.log("formData", formData);
         uploadImage(formData).then((url) => {
           rootStore.addressStore.setAppUserInfo({
             ...addressStore.appUsersInfo,

@@ -3,8 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import { GeneralConfig } from "../pages/settings/general/general";
 const initialState: GeneralConfig & { notification: boolean } = {
-  language: window.navigator.language,
-  theme: "classic",
+  language: "zh",
+  theme: "voyage",
   typing: true,
   dark: false,
   color: { h: 203, s: 1, l: 0.5, a: 1 },

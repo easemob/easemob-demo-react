@@ -2,7 +2,7 @@ import { useEffect, useState, FC } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { Toaster } from "react-hot-toast";
-import { rootStore, Provider } from "easemob-chat-uikit";
+import { rootStore, Provider, useSDK } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./App.css";
 import AppRoutes from "./routes/routes";
@@ -13,13 +13,16 @@ import { useSelector } from "react-redux";
 import i18next from "./i18n";
 import { useAppSelector, useAppDispatch } from "./hooks";
 import { updateAppConfig } from "./store/appConfigSlice";
+import Chat from "./pages/main/main";
 // @ts-ignore
 window.rootStore = rootStore;
 
 const ChatApp: FC<any> = () => {
   const state = useAppSelector((state) => state.appConfig);
   const loginState = useAppSelector((state) => state.login);
-
+  const { AgoraRTC, ChatSDK } = useSDK();
+  ChatSDK.logger.disableAll();
+  AgoraRTC.setLogLevel(4);
   useEffect(() => {
     listener(store);
   }, [loginState.appKey, loginState.useDNS]);
@@ -118,15 +121,15 @@ const ChatApp: FC<any> = () => {
       theme={{
         primaryColor: state.color.h,
         mode: state.dark ? "dark" : "light",
-        bubbleShape: state.theme == "classic" ? "square" : "ground",
+        bubbleShape: state.theme == "classic" ? "square" : "round",
         avatarShape: state.theme == "classic" ? "square" : "circle",
-        componentsShape: state.theme == "classic" ? "square" : "ground",
+        componentsShape: state.theme == "classic" ? "square" : "round",
       }}
       local={{
         lng: state.language || "zh",
       }}
     >
-      <AppRoutes></AppRoutes>
+      <Chat></Chat>
       <Toaster></Toaster>
     </Provider>
   );

@@ -31,6 +31,7 @@ import {
   PinnedMessage,
   usePinnedMessage,
   RootContext,
+  Empty,
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { APP_ID, appKey } from "../../config";
@@ -44,7 +45,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
-import { url } from "inspector";
+import HeaderImg from "../../assets/chats@2x.png";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -101,7 +102,7 @@ const ChatContainer = forwardRef((props, ref) => {
   };
 
   const handleRtcStateChange = (state: any) => {
-    console.log("handleRtcStateChange", state);
+    // console.log("handleRtcStateChange", state);
   };
 
   const getRtcToken2 = (data: {
@@ -187,6 +188,18 @@ const ChatContainer = forwardRef((props, ref) => {
       setGroupAvatar(groupAvatarUrl || "");
     }
   }, [rootStore.conversationStore.currentCvs]);
+
+  useEffect(() => {
+    rootStore.conversationStore.setCurrentCvs({
+      chatType: "singleChat",
+      conversationId: `livedemoanne`,
+      // lastMessage: {
+      //   type: "txt",
+      //   msg: "hello",
+      // },
+      name: "安妮",
+    });
+  }, []);
 
   // ---- pin message ----
   const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
@@ -274,7 +287,9 @@ const ChatContainer = forwardRef((props, ref) => {
                 },
               }}
               content={
-                <div className={`header-content ${themeMode}`}>Chats</div>
+                <div className={`header-content ${themeMode}`}>
+                  <img src={HeaderImg} alt="" height={"26px"} />
+                </div>
               }
               avatar={<></>}
             ></Header>
@@ -467,6 +482,14 @@ const ChatContainer = forwardRef((props, ref) => {
                 });
               },
               groupAvatar: groupAvatar,
+            }}
+            renderEmpty={() => {
+              return (
+                <Empty
+                  text=""
+                  icon={<Icon type="EMPTY" width={120} height={120}></Icon>}
+                ></Empty>
+              );
             }}
           ></Chat>
 

@@ -22,7 +22,6 @@ const Blocklist = () => {
     nickname?: string;
     userId: string;
   }) => {
-    console.log(item);
     setSelectedUser(item.userId);
   };
   return (

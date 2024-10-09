@@ -20,7 +20,6 @@ const ImageCrop = (props: ImageCropProps) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
   const onCropComplete = useCallback(
     (croppedArea: any, croppedAreaPixels: any) => {
-      console.log(croppedArea, croppedAreaPixels);
       setCroppedAreaPixels(croppedAreaPixels);
     },
     []
@@ -28,7 +27,6 @@ const ImageCrop = (props: ImageCropProps) => {
 
   const getImage = async () => {
     const imgUrl = await getCroppedImg(img, croppedAreaPixels, 0);
-    console.log("getImage", imgUrl);
     onUpload?.(imgUrl as string);
     others?.onOk?.(imgUrl as any);
   };

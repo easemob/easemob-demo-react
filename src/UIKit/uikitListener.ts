@@ -11,11 +11,9 @@ const listener = (store: any) => {
 
   client.addEventHandler("chatdemo", {
     onConnected: () => {
-      console.log("登录成功");
       dispatch(setLoggedIn(true));
     },
     onDisconnected: () => {
-      console.log("退出登录");
       dispatch(setLoggedIn(false));
     },
     onTextMessage: (message: any) => {
@@ -37,13 +35,11 @@ const listener = (store: any) => {
       notification("新消息", message, store);
     },
     onContactAgreed: (data: any) => {
-      console.log("data", data);
       const from =
         rootStore.addressStore.appUsersInfo[data.from]?.nickname ?? data.from;
       toast.success(`你已经添加 ${from} 为好友。`);
     },
     onContactAdded: (data: any) => {
-      console.log("data", data);
       const from =
         rootStore.addressStore.appUsersInfo[data.from]?.nickname ?? data.from;
       toast.success(`你已经添加 ${from} 为好友。`);
@@ -56,7 +52,6 @@ const listener = (store: any) => {
     },
     addReaction: {
       error: (error) => {
-        console.log("addReaction error", error);
         if (error.type == 50) {
           toast.error(`Reaction ${i18next.t("Exceeded maximum number")}`);
         }

@@ -58,7 +58,6 @@ const LoginForm = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const switchPasswordVisible = () => {
-    console.log("switchPasswordVisible");
     setPasswordVisible((value) => !value);
   };
   return (

@@ -76,7 +76,6 @@ const General = () => {
   const themes: ["classic", "voyage"] = ["classic", "voyage"];
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const setTheme = (theme: "classic" | "voyage") => {
-    console.log("setTheme", theme);
     setGeneralConfig({
       ...generalConfig,
       theme,
@@ -117,7 +116,6 @@ const General = () => {
     setColorSettingVisible((colorSettingVisible) => !colorSettingVisible);
   };
   const setColor = (color: any) => {
-    console.log("color", color);
     setGeneralConfig({
       ...generalConfig,
       color: color.hsl,
@@ -242,7 +240,6 @@ const General = () => {
       return;
     }
     client.getSupportedLanguages().then((res: any) => {
-      console.log("getSupportedLanguages", res);
       const languages: { code: string; nativeName: string; name: string }[] =
         res.data;
       dispatch(

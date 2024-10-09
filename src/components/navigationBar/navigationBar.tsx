@@ -54,9 +54,8 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
     rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
 
   const presence = myInfo.isOnline
-    ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
+    ? presenceMap?.[myInfo.presenceExt || "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];
-
   const [presenceModalOpen, setPresenceModalOpen] = useState(false);
   const [currentPresence, setCurrentPresence] = useState("");
   const [customPresenceExt, setCustomPresenceExt] = useState("");

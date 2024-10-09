@@ -47,7 +47,6 @@ const UserInfo = (props: UserInfoProps) => {
     },
   } = props;
   const context = useContext(RootContext);
-  console.log("context", context);
   const { theme } = context;
   const themeMode = theme?.mode || "light";
 
@@ -108,7 +107,6 @@ const UserInfo = (props: UserInfoProps) => {
   };
 
   const handleRemarkInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     if (e.target.value.length > 20) return;
     setRemarkValue(e.target.value);
   };

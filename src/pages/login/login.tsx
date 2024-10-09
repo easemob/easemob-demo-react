@@ -93,7 +93,6 @@ const Login = () => {
         }, 1000);
       })
       .catch(function (error) {
-        console.log("error", error.response);
         if (error.response.status == "400") {
           if (error.response.data?.errorInfo == "phone number illegal") {
             i18next.t("Please enter the correct phone number");
@@ -138,7 +137,6 @@ const Login = () => {
 
     getChatToken(values.phoneNumber, values.vCode)
       .then((res) => {
-        console.log("res", res);
         const { token, chatUserName } = res.data;
 
         dispatch(loginWithToken({ userId: chatUserName, chatToken: token }));
@@ -178,7 +176,6 @@ const Login = () => {
   };
 
   const changeLang = () => {
-    console.log("i18next.language", i18next.language);
     const lang = i18next.language === "zh" ? "en" : "zh";
     dispatch(updateAppConfig({ language: lang }));
     i18next.changeLanguage(lang);

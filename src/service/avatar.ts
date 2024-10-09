@@ -1,5 +1,6 @@
 import axios from "axios";
 import { rootStore } from "easemob-chat-uikit";
+import defaultAvatar from "../assets/2members_group.png";
 export const uploadImage = (formData: FormData) => {
   axios.defaults.headers.common["Authorization"] =
     "Bearer " + rootStore.client.context.accessToken;
@@ -44,10 +45,12 @@ async function getGroupDetail(groupId: string) {
   let avatarUrl = "";
   try {
     const data = await rootStore.client.getGroupInfo({ groupId });
-    console.log("getGroupDetail", data);
     avatarUrl = data.data[0].avatar;
   } catch (e) {
     console.error("getGroupDetail fail", e);
+  }
+  if (!avatarUrl) {
+    avatarUrl = defaultAvatar;
   }
   return avatarUrl;
 }
@@ -57,6 +60,5 @@ export const getGroupAvatar = async (groupIds: string[]) => {
   for (let groupId of groupIds) {
     result[groupId] = await getGroupDetail(groupId);
   }
-  console.log("getGroupAvatar", result);
   return result;
 };

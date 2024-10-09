@@ -33,7 +33,7 @@ import ChatContainer from "../chatContainer/chatContainer";
 import Contacts from "../contacts/contacts";
 import Settings from "../settings/settings";
 import { useAppSelector, useAppDispatch } from "../../hooks";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import i18n from "../../i18n";
 import { getToken } from "../../service/login";
 import Header from "../../components/header/header";
@@ -44,7 +44,6 @@ const ChatApp: FC<any> = () => {
   useEffect(() => {
     // 登录
     getToken().then((res) => {
-      console.log("获取token 成功", res);
       client.open({
         user: res.data.chatUserName,
         accessToken: res.data.token,
@@ -53,7 +52,6 @@ const ChatApp: FC<any> = () => {
 
     const webImAuth = sessionStorage.getItem("webImAuth");
 
-    console.log("webImAuth", webImAuth);
     let webImAuthObj = {
       userId: "",
       password: "",
@@ -67,7 +65,6 @@ const ChatApp: FC<any> = () => {
           pwd: webImAuthObj.password,
         });
       } else {
-        console.log("webimAuthObj", webImAuthObj);
         client.open({
           user: webImAuthObj.userId,
           accessToken: webImAuthObj.chatToken,
@@ -76,7 +73,7 @@ const ChatApp: FC<any> = () => {
     }
   }, [client]);
   const state = useAppSelector((state) => state.login);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   useEffect(() => {
     //
   }, [state.loggedIn]);
@@ -96,7 +93,7 @@ const ChatApp: FC<any> = () => {
       },
       reportMessage: {
         success: () => {
-          toast.success(i18n.t("Reported successfully"));
+          toast.success(i18n.t("Report successfully"));
         },
         error: (error) => {
           toast.error(i18n.t("Report failed"));
@@ -130,13 +127,13 @@ const ChatApp: FC<any> = () => {
         ref={navRef}
         tabs={[
           {
-            title: "Message",
+            title: "消息",
             icon: <Icon type="BUBBLE_FILL" width={28} height={28}></Icon>,
             content: <ChatContainer ref={chatContainerRef} />,
             unmountOnExit: true, // 当有音视频通话时切换后能保持音视频窗口不消失
           },
           {
-            title: "Contacts",
+            title: "联系人",
             icon: (
               <Icon type="PERSON_DOUBLE_FILL" width={28} height={28}></Icon>
             ),
