@@ -291,15 +291,12 @@ const ChatContainer = forwardRef((props, ref) => {
                   placement: "bottomRight",
                 },
               }}
-              // content={
-              //   <div className={`header-content ${themeMode}`}>
-              //     <img src={HeaderImg} alt="" height={"26px"} />
-              //   </div>
-              // }
+              content={
+                <div className={`header-content ${themeMode}`}>
+                  <img className="header-img" src={chats} alt="" />
+                </div>
+              }
               avatar={<></>}
-              renderContent={() => (
-                <img className="header-img" src={chats} alt="" />
-              )}
             ></Header>
           )}
           onItemClick={(item) => {
