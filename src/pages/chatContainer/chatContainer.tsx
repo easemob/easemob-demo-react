@@ -46,6 +46,9 @@ import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
 import HeaderImg from "../../assets/chats@2x.png";
+import { url } from "inspector";
+import pop from "../../assets/pop5.png";
+import chats from "../../assets/chats@2x.png";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -189,18 +192,6 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }, [rootStore.conversationStore.currentCvs]);
 
-  useEffect(() => {
-    rootStore.conversationStore.setCurrentCvs({
-      chatType: "singleChat",
-      conversationId: `livedemoanne`,
-      // lastMessage: {
-      //   type: "txt",
-      //   msg: "hello",
-      // },
-      name: "安妮",
-    });
-  }, []);
-
   // ---- pin message ----
   const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
 
@@ -217,6 +208,20 @@ const ChatContainer = forwardRef((props, ref) => {
       setConversationDetailVisible(false);
     }
   }, [thread.showThreadPanel]);
+
+  const [showPop, setShowPop] = useState(false);
+
+  useEffect(() => {
+    const showPop =
+      sessionStorage.getItem("showPop") === "false" ? false : true;
+    setShowPop(showPop);
+    // 默认选中和livedemoanne的会话
+    rootStore.conversationStore.setCurrentCvs({
+      chatType: "singleChat",
+      conversationId: `livedemoanne`,
+      name: "安妮",
+    });
+  }, []);
   return (
     <div
       className={classNames("chat-container", {
@@ -286,12 +291,15 @@ const ChatContainer = forwardRef((props, ref) => {
                   placement: "bottomRight",
                 },
               }}
-              content={
-                <div className={`header-content ${themeMode}`}>
-                  <img src={HeaderImg} alt="" height={"26px"} />
-                </div>
-              }
+              // content={
+              //   <div className={`header-content ${themeMode}`}>
+              //     <img src={HeaderImg} alt="" height={"26px"} />
+              //   </div>
+              // }
               avatar={<></>}
+              renderContent={() => (
+                <img className="header-img" src={chats} alt="" />
+              )}
             ></Header>
           )}
           onItemClick={(item) => {
@@ -436,6 +444,11 @@ const ChatContainer = forwardRef((props, ref) => {
             }}
             messageInputProps={{
               enabledTyping: true,
+              placeHolder: "Let's Chat! ",
+              onFocus: () => {
+                setShowPop(false);
+                sessionStorage.setItem("showPop", "false");
+              },
               onSendMessage: (msg) => {
                 // 发送消息回调，如果是合并转发的消息，显示转发弹窗
                 // @ts-ignore
@@ -492,7 +505,7 @@ const ChatContainer = forwardRef((props, ref) => {
               );
             }}
           ></Chat>
-
+          {showPop && <img className="pop" src={pop}></img>}
           {/** 是否显示群组设置 */}
           {conversationDetailVisible && (
             <div className="chat-container-chat-right">

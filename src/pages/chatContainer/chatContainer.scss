@@ -18,6 +18,11 @@
     }
     &-conversation{
         width: 350px;
+
+        .header-img{
+            width: 63px;
+            margin-left: 4px;
+        }
     }
 
     &-chat{
@@ -26,10 +31,18 @@
         display: flex;
         position: relative;
         background-color: #F9FAFA;
+
         &-right{
             width: 350px;
             border-left: 1px solid #E3E6E8;
             background-color: #F9FAFA;
+        }
+
+        .pop{
+            position: absolute;
+            bottom: 50px;
+            left: 80px;
+            width: 186px;
         }
     }
 }
