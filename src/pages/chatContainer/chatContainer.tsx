@@ -47,7 +47,7 @@ import classNames from "classnames";
 import i18next from "../../i18n";
 import HeaderImg from "../../assets/chats@2x.png";
 import { url } from "inspector";
-import pop from "../../assets/pop5.png";
+import pop from "../../assets/pop6.png";
 import chats from "../../assets/chats@2x.png";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
