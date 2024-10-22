@@ -222,6 +222,24 @@ const ChatContainer = forwardRef((props, ref) => {
       name: "安妮",
     });
   }, []);
+
+  const detailsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (detailsRef.current && !detailsRef.current.contains(event.target)) {
+        setConversationDetailVisible(false);
+      }
+    };
+
+    // 监听全局点击事件
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      // 清理事件监听器
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [detailsRef]);
+
   return (
     <div
       className={classNames("chat-container", {
@@ -505,7 +523,7 @@ const ChatContainer = forwardRef((props, ref) => {
           {showPop && <img className="pop" src={pop}></img>}
           {/** 是否显示群组设置 */}
           {conversationDetailVisible && (
-            <div className="chat-container-chat-right">
+            <div className="chat-container-chat-right" ref={detailsRef}>
               {cvsItem.chatType == "groupChat" ? (
                 <GroupDetail
                   conversation={{
