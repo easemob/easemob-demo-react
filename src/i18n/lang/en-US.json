@@ -106,7 +106,7 @@
         "me": "Me",
         "account": "Account",
         "contacts": "Contacts",
-        "enterUserID": "User ID",
+        "enterUserIDOrPhoneNum": "Phone number or ID",
         "add": "Add",
         "cancel": "Cancel",
         "done": "Done",
@@ -144,6 +144,9 @@
         "blockContact": "Block Contact",
         "Confirm blocking user": "Confirm blocking user",
         "Translate message to specified language": "Translate messages to your preferred language.",
-        "Please set browser support notification": "Please set browser support notification"
+        "Please set browser support notification": "Please set browser support notification",
+        "userNotExist": "The user does not exist",
+        "alreadyFriend": "You have already added this contact",
+        "addContactByUserIdOrPhone": "Search contacts by phone number or ID"
     }
 }

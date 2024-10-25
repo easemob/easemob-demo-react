@@ -36,6 +36,7 @@ import toast from "../../components/toast/toast";
 import { APP_ID, appKey } from "../../config";
 import { getRtcToken, getRtcChannelMembers } from "../../service/rtc";
 import { getGroupAvatar } from "../../service/avatar";
+import { getUserIdWithPhoneNumber } from "../../service/login";
 import UserInviteModal from "../../components/userInviteModal/userInviteModal";
 import "./chatContainer.scss";
 import UserInfo from "../../components/userInfo/userInfo";
@@ -45,6 +46,7 @@ import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
 import { url } from "inspector";
+import { rotateSize } from "react-easy-crop/helpers";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -187,7 +189,6 @@ const ChatContainer = forwardRef((props, ref) => {
       setGroupAvatar(groupAvatarUrl || "");
     }
   }, [rootStore.conversationStore.currentCvs]);
-
 
   // ---- pin message ----
   const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
@@ -687,17 +688,45 @@ const ChatContainer = forwardRef((props, ref) => {
           setAddContactVisible(false);
         }}
         onOk={() => {
-          rootStore.addressStore.addContact(userId);
-          setAddContactVisible(false);
+          // userId 可能是手机号也可能是环信id， 如果是手机号根据手机号获取环信id
+          if (!/^\d{11}$/.test(userId)) {
+            rootStore.addressStore.addContact(userId);
+            setAddContactVisible(false);
+          } else {
+            // 根据手机号获取环信id
+            getUserIdWithPhoneNumber(userId, rootStore.client.user)
+              .then((res) => {
+                if (res.status === 200) {
+                  const chatUserId = res.data.chatUserName;
+                  // 判断是不是好友
+                  if (
+                    rootStore.addressStore.contacts.some(
+                      (item) => item.userId === chatUserId
+                    )
+                  ) {
+                    toast.error(i18next.t("alreadyFriend"));
+                    return;
+                  }
+
+                  rootStore.addressStore.addContact(chatUserId);
+                  setAddContactVisible(false);
+                } else {
+                  toast.error(i18next.t("userNotExist"));
+                }
+              })
+              .catch(() => {
+                toast.error(i18next.t("userNotExist"));
+              });
+          }
         }}
         okText={i18next.t("add")}
         closable={false}
-        title={i18next.t("addContact")}
+        title={i18next.t("addContactByUserIdOrPhone")}
       >
         <>
           <div className="add-contact">
             <Input
-              placeholder={i18next.t("enterUserID")}
+              placeholder={i18next.t("enterUserIDOrPhoneNum")}
               className="add-contact-input"
               onChange={handleUserIdChange}
             ></Input>

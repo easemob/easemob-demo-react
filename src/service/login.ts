@@ -27,3 +27,12 @@ export const getChatToken = (phoneNumber: string, VCode: string) => {
   //     dispatch(Creators.loginByToken(chatUserName, token))
   // })
 };
+
+export const getUserIdWithPhoneNumber = (
+  phoneNumber: string,
+  userId: string
+) => {
+  return axios.get(
+    domain + `/inside/app/user/${phoneNumber}?operator=${userId}`
+  );
+};

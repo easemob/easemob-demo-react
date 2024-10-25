@@ -12,6 +12,7 @@ import {
 import "./contacts.scss";
 import toast from "../../components/toast/toast";
 import i18next from "../../i18n";
+import { getUserIdWithPhoneNumber } from "../../service/login";
 interface ContactsProps {
   onMessageClick?: () => void;
   onVideoCall?: () => void;
@@ -106,17 +107,44 @@ const Contacts = ({
           setAddContactVisible(false);
         }}
         onOk={() => {
-          rootStore.addressStore.addContact(userId);
-          setAddContactVisible(false);
+          if (!/^\d{11}$/.test(userId)) {
+            rootStore.addressStore.addContact(userId);
+            setAddContactVisible(false);
+          } else {
+            // 根据手机号获取环信id
+            getUserIdWithPhoneNumber(userId, rootStore.client.user)
+              .then((res) => {
+                if (res.status === 200) {
+                  const chatUserId = res.data.chatUserName;
+                  // 判断是不是好友
+                  if (
+                    rootStore.addressStore.contacts.some(
+                      (item) => item.userId === chatUserId
+                    )
+                  ) {
+                    toast.error(i18next.t("alreadyFriend"));
+                    return;
+                  }
+
+                  rootStore.addressStore.addContact(chatUserId);
+                  setAddContactVisible(false);
+                } else {
+                  toast.error(i18next.t("userNotExist"));
+                }
+              })
+              .catch(() => {
+                toast.error(i18next.t("userNotExist"));
+              });
+          }
         }}
         okText={i18next.t("add")}
         closable={false}
-        title={i18next.t("addContact")}
+        title={i18next.t("addContactByUserIdOrPhone")}
       >
         <>
           <div className="add-contact">
             <Input
-              placeholder={i18next.t("enterUserID")}
+              placeholder={i18next.t("enterUserIDOrPhoneNum")}
               className="add-contact-input"
               onChange={handleUserIdChange}
             ></Input>
