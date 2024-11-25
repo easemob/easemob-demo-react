@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  UserSelect,
-  rootStore,
-  useAddressContext,
-} from "easemob-chat-uikit";
-import toast from "react-hot-toast";
+import { UserSelect, rootStore, useAddressContext } from "easemob-chat-uikit";
 const ALLOW_MAX_USER = 16;
 interface UserInviteModalProps {
   onClose?: () => void;
@@ -74,7 +68,6 @@ const UserInviteModal = (props: UserInviteModalProps) => {
           rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl;
         return member;
       });
-      console.log("members >>>", members);
       setUsers(members as any as UserInfo[]);
     }
   };
@@ -85,7 +78,6 @@ const UserInviteModal = (props: UserInviteModalProps) => {
     }
   }, [groupId, visible, rtcGroup?.[0]?.members?.length]);
 
-  console.log("checkedUsers", checkedUsers);
   return (
     <UserSelect
       title={title}
@@ -103,7 +95,6 @@ const UserInviteModal = (props: UserInviteModalProps) => {
                 };
               })
             : [];
-        console.log("contacts", contacts);
         onInvite?.(contacts);
       }}
       enableMultipleSelection

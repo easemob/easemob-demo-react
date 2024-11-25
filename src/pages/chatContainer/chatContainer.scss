@@ -18,6 +18,11 @@
     }
     &-conversation{
         width: 350px;
+
+        .header-img{
+            width: 63px;
+            margin-left: 4px;
+        }
     }
 
     &-chat{

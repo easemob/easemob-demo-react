@@ -107,6 +107,7 @@
         "account": "Account",
         "contacts": "Contacts",
         "enterUserIDOrPhoneNum": "Phone number or ID",
+        "UserID": "User ID",
         "add": "Add",
         "cancel": "Cancel",
         "done": "Done",

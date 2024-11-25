@@ -47,7 +47,6 @@ const UserInfo = (props: UserInfoProps) => {
     },
   } = props;
   const context = useContext(RootContext);
-  console.log("context", context);
   const { theme } = context;
   const themeMode = theme?.mode || "light";
 
@@ -108,11 +107,9 @@ const UserInfo = (props: UserInfoProps) => {
   };
 
   const handleRemarkInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     if (e.target.value.length > 20) return;
     setRemarkValue(e.target.value);
   };
-
   // ---------- notification --------
   const handleNotificationChange = (e: { target: { checked: boolean } }) => {
     const result = e.target.checked;
@@ -175,7 +172,7 @@ const UserInfo = (props: UserInfoProps) => {
             {addressStore.appUsersInfo[conversation.conversationId]?.nickname}
           </div>
           <div className={`${prefixCls}-header-id`}>
-            <div>{t("enterUserID")}:</div>
+            <div>{t("UserID")}:</div>
             {conversation?.conversationId}
             <Icon
               type="DOC_ON_DOC"

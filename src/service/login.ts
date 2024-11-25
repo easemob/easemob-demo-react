@@ -15,24 +15,4 @@ export const getChatToken = (phoneNumber: string, VCode: string) => {
     phoneNumber: phoneNumber,
     smsCode: VCode,
   });
-  // .then(function (response) {
-  //     console.log(response);
-  //     const { token, chatUserName } = response.data
-  //     let I18N = store.getState().i18n.translations[store.getState().i18n.locale]
-  //     message.success(I18N.loginSuccessfully, 1)
-  //     dispatch(Creators.setLoginToken(chatUserName, token))
-  //     dispatch(Creators.setLoginSuccess(chatUserName))
-  //     window.localStorage.setItem('webImLogout', true)
-
-  //     dispatch(Creators.loginByToken(chatUserName, token))
-  // })
-};
-
-export const getUserIdWithPhoneNumber = (
-  phoneNumber: string,
-  userId: string
-) => {
-  return axios.get(
-    domain + `/inside/app/user/${phoneNumber}?operator=${userId}`
-  );
 };

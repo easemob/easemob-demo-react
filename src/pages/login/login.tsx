@@ -138,7 +138,6 @@ const Login = () => {
 
     getChatToken(values.phoneNumber, values.vCode)
       .then((res) => {
-        console.log("res", res);
         const { token, chatUserName } = res.data;
 
         dispatch(loginWithToken({ userId: chatUserName, chatToken: token }));
@@ -178,7 +177,6 @@ const Login = () => {
   };
 
   const changeLang = () => {
-    console.log("i18next.language", i18next.language);
     const lang = i18next.language === "zh" ? "en" : "zh";
     dispatch(updateAppConfig({ language: lang }));
     i18next.changeLanguage(lang);
@@ -288,14 +286,12 @@ const Login = () => {
       </div>
       <div className="login-copyright">
         {appConfigState.language == "zh"
-          ? `© 2024 环信，SDK版本：${SDK_VERSION} UIkit版本：${UIKIT_VERSION} Demo版本：${DEMO_VERSION}`
-          : `2024 Easemob Inc, SDK Version: ${SDK_VERSION}  UIkit Version: ${UIKIT_VERSION}  Demo Version: ${DEMO_VERSION}`}
+          ? `© ${new Date().getFullYear()} 环信，SDK版本：${SDK_VERSION} UIkit版本：${UIKIT_VERSION} Demo版本：${DEMO_VERSION}`
+          : `${new Date().getFullYear()} Easemob Inc, SDK Version: ${SDK_VERSION}  UIkit Version: ${UIKIT_VERSION}  Demo Version: ${DEMO_VERSION}`}
         <span onDoubleClick={goDev}>{"</>"}</span>
       </div>
     </div>
   );
 };
-// console.log(i18n.t(`I have ${count} ${fruit}`));
-// 2024 Easemob Inc, SDK Version: 4.1.1  UIkit Version: Beta0.1.1  Demo Version: 2.0.0
-// Privacy and Policy
+
 export default Login;

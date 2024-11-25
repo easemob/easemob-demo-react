@@ -49,7 +49,7 @@ const ChatApp: FC<any> = () => {
       password: "",
       chatToken: "",
     };
-    if (webImAuth) {
+    if (webImAuth && !client.token) {
       webImAuthObj = JSON.parse(webImAuth);
       if (webImAuthObj.password) {
         client.open({

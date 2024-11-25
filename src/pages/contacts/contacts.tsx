@@ -12,7 +12,7 @@ import {
 import "./contacts.scss";
 import toast from "../../components/toast/toast";
 import i18next from "../../i18n";
-import { getUserIdWithPhoneNumber } from "../../service/login";
+import { getUserIdWithPhoneNumber } from "../../service/user";
 interface ContactsProps {
   onMessageClick?: () => void;
   onVideoCall?: () => void;
@@ -33,7 +33,6 @@ const Contacts = ({
 
   const [userId, setUserId] = useState("");
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     setUserId(e.target.value);
   };
   return (
@@ -50,15 +49,14 @@ const Contacts = ({
                   title={i18next.t("addContact")}
                   style={{ cursor: "pointer" }}
                 >
-                  <Button type="text" shape="circle">
-                    <Icon
-                      type="PERSON_ADD"
-                      width={24}
-                      height={24}
-                      onClick={() => {
-                        setAddContactVisible(true);
-                      }}
-                    ></Icon>
+                  <Button
+                    type="text"
+                    shape="circle"
+                    onClick={() => {
+                      setAddContactVisible(true);
+                    }}
+                  >
+                    <Icon type="PERSON_ADD" width={24} height={24}></Icon>
                   </Button>
                 </div>
               }
@@ -70,7 +68,6 @@ const Contacts = ({
             // if (data.type == "request") {
             //   type = "contact";
             // }
-            console.log("点击联系人", data);
             setContactData({
               id: data.id,
               name: data.name,
@@ -87,11 +84,9 @@ const Contacts = ({
             onMessageClick?.();
           }}
           onVideoCall={() => {
-            console.log("onVideoCall");
             onVideoCall?.();
           }}
           onAudioCall={() => {
-            console.log("onAudioCall");
             onAudioCall?.();
           }}
           onUserIdCopied={(userId) => {

@@ -36,7 +36,7 @@ import toast from "../../components/toast/toast";
 import { APP_ID, appKey } from "../../config";
 import { getRtcToken, getRtcChannelMembers } from "../../service/rtc";
 import { getGroupAvatar } from "../../service/avatar";
-import { getUserIdWithPhoneNumber } from "../../service/login";
+import { getUserIdWithPhoneNumber } from "../../service/user";
 import UserInviteModal from "../../components/userInviteModal/userInviteModal";
 import "./chatContainer.scss";
 import UserInfo from "../../components/userInfo/userInfo";
@@ -47,6 +47,7 @@ import classNames from "classnames";
 import i18next from "../../i18n";
 import { url } from "inspector";
 import { rotateSize } from "react-easy-crop/helpers";
+import chats from "../../assets/chats@2x.png";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -206,6 +207,24 @@ const ChatContainer = forwardRef((props, ref) => {
       setConversationDetailVisible(false);
     }
   }, [thread.showThreadPanel]);
+
+  const detailsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (detailsRef.current && !detailsRef.current.contains(event.target)) {
+        setConversationDetailVisible(false);
+      }
+    };
+
+    // 监听全局点击事件
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      // 清理事件监听器
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [detailsRef]);
+
   return (
     <div
       className={classNames("chat-container", {
@@ -276,7 +295,10 @@ const ChatContainer = forwardRef((props, ref) => {
                 },
               }}
               content={
-                <div className={`header-content ${themeMode}`}>Chats</div>
+                // <div className={`header-content ${themeMode}`}>Chats</div>
+                <div className={`header-content ${themeMode}`}>
+                  <img className="header-img" src={chats} alt="" />
+                </div>
               }
               avatar={<></>}
             ></Header>
@@ -433,6 +455,7 @@ const ChatContainer = forwardRef((props, ref) => {
                 }
               },
             }}
+            //@ts-ignore
             headerProps={{
               moreAction: {
                 // 关闭默认行为，自定义更多操作
@@ -475,7 +498,7 @@ const ChatContainer = forwardRef((props, ref) => {
 
           {/** 是否显示群组设置 */}
           {conversationDetailVisible && (
-            <div className="chat-container-chat-right">
+            <div className="chat-container-chat-right" ref={detailsRef}>
               {cvsItem.chatType == "groupChat" ? (
                 <GroupDetail
                   conversation={{
