@@ -23,7 +23,7 @@
     "less-vars-to-js": "^1.1.2",
     "lodash": "^4.17.4",
     "node-notifier": "^8.0.0",
-    "react-dev-utils": "10.0.0",
+    "react-dev-utils": "11.0.4",
     "react-draggable": "^3.0.3",
     "react-redux-i18n": "^1.9.0",
     "react-scripts": "^4.0.0",
