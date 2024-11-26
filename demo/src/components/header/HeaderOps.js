@@ -87,15 +87,18 @@ class HeaderOps extends Component {
         }
     }
 
-    showUserInfo = async () =>{
-        let info = await this.props.getUserInfo(WebIM.conn.context.userId)
+    componentWillMount = () => {
+        let info = this.props.getUserInfo(WebIM.conn.context.userId)
         this.userInfo = info.data[WebIM.conn.context.userId]
         this.props.setOwnInfo(this.userInfo)
-        this.userInfo.userId = WebIM.conn.context.userId
+    }
+
+    showUserInfo = () => {
         this.setState({
             modal: 'showUserInfo'
         })
     }
+
 
     handleModalClose(e) {
         this.setState({ modal: '' })
