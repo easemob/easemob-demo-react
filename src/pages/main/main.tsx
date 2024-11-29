@@ -44,10 +44,14 @@ const ChatApp: FC<any> = () => {
   useEffect(() => {
     // 登录
     getToken().then((res) => {
-      client.open({
-        user: res.data.chatUserName,
-        accessToken: res.data.token,
-      });
+      client
+        .open({
+          user: res.data.chatUserName,
+          accessToken: res.data.token,
+        })
+        .catch((err: any) => {
+          console.log("登录失败", err);
+        });
     });
 
     const webImAuth = sessionStorage.getItem("webImAuth");
@@ -57,18 +61,26 @@ const ChatApp: FC<any> = () => {
       password: "",
       chatToken: "",
     };
-    if (webImAuth) {
+    if (webImAuth && !client.token) {
       webImAuthObj = JSON.parse(webImAuth);
       if (webImAuthObj.password) {
-        client.open({
-          user: webImAuthObj.userId,
-          pwd: webImAuthObj.password,
-        });
+        client
+          .open({
+            user: webImAuthObj.userId,
+            pwd: webImAuthObj.password,
+          })
+          .catch((err: any) => {
+            console.log("登录失败2", err);
+          });
       } else {
-        client.open({
-          user: webImAuthObj.userId,
-          accessToken: webImAuthObj.chatToken,
-        });
+        client
+          .open({
+            user: webImAuthObj.userId,
+            accessToken: webImAuthObj.chatToken,
+          })
+          .catch((err: any) => {
+            console.log("登录失败3", err);
+          });
       }
     }
   }, [client]);
