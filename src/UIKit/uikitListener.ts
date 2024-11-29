@@ -11,11 +11,9 @@ const listener = (store: any) => {
 
   client.addEventHandler("chatdemo", {
     onConnected: () => {
-      console.log("登录成功");
       dispatch(setLoggedIn(true));
     },
     onDisconnected: () => {
-      console.log("退出登录");
       dispatch(setLoggedIn(false));
     },
     onTextMessage: (message: any) => {

@@ -209,6 +209,7 @@ const ChatContainer = forwardRef((props, ref) => {
   }, [thread.showThreadPanel]);
 
   const detailsRef = useRef<HTMLDivElement>(null);
+  const [groupMemberVisible, setGroupMemberVisible] = useState(false);
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (detailsRef.current && !detailsRef.current.contains(event.target)) {
@@ -217,13 +218,15 @@ const ChatContainer = forwardRef((props, ref) => {
     };
 
     // 监听全局点击事件
-    document.addEventListener("mousedown", handleClickOutside);
+    if (!groupMemberVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
 
     return () => {
       // 清理事件监听器
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [detailsRef]);
+  }, [detailsRef, groupMemberVisible]);
 
   return (
     <div
@@ -515,10 +518,16 @@ const ChatContainer = forwardRef((props, ref) => {
                   groupMemberProps={{
                     onPrivateChat: () => {
                       setConversationDetailVisible(false);
+                      setGroupMemberVisible(false);
                     },
-                    // onAddContact: () => {
-                    //   toast.success("Friend request sent");
-                    // },
+                    onAddContact: () => {
+                      toast.success("Friend request sent");
+                      setGroupMemberVisible(false);
+                    },
+                  }}
+                  onGroupMemberVisibleChange={(visible: boolean) => {
+                    console.log("onGroupMemberVisibleChange", visible);
+                    setGroupMemberVisible(visible);
                   }}
                   onUserIdCopied={() => {
                     toast.success(i18next.t("copied"));

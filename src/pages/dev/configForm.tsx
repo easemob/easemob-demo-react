@@ -28,9 +28,8 @@ const ConfigForm = () => {
 
   useEffect(() => {
     const config = JSON.parse(localStorage.getItem("serverConfig") || "{}");
-    if (config) {
+    if (config.appkey) {
       setConfig(config);
-
       dispatch(
         setSDKConfig({
           appKey: config.appkey,
