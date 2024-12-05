@@ -17,7 +17,7 @@ window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
   // close Chat and RTC log
   const { AgoraRTC, ChatSDK } = useSDK();
-  ChatSDK.logger.disableAll();
+  // ChatSDK.logger.disableAll();
   AgoraRTC.setLogLevel(4);
 
   const state = useAppSelector((state) => state.appConfig);
@@ -41,7 +41,9 @@ const ChatApp: FC<any> = () => {
   return (
     <UIKitProvider
       initConfig={{
-        appKey: loginState.appKey,
+        // appKey: loginState.appKey,
+        // @ts-ignore
+        appId: "2e597744c44e4eed9b7c7c64e2ba2874",
         isHttpDNS: loginState.useDNS,
         restUrl: serverConfig.rest,
         msyncUrl: serverConfig.msync,

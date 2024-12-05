@@ -1,45 +1,58 @@
 ## 产品介绍
 
-环信 IM 产品展示了怎么使用环信 `easemob-chat-uikit` 创建一个完整的聊天 APP。展示的功能包括：用户登录注册，添加好友，单聊，群聊，发送文字，表情，语音，图片，文件等消息，以及实时音视频通话等。
+环信新版本 UIKit Demo：打造卓越聊天体验的强大工具
 
-其中音视频通话使用声网 `chat-callkit` 实现。
+全面功能，产品化体验
+
+环信 UIKit Demo 为您提供全面的聊天功能，助力您轻松构建功能强大、产品化的聊天体验。从基本的文字消息到高级的群组互动，我们的 Demo 涵盖了所有市场通用能力，让您能够满足用户的各种聊天需求。
+
+开箱即用，快速集成
+
+我们的 Demo 经过精心设计，可轻松集成到您的现有应用程序中。清晰的代码结构和详尽的文档让您能够快速上手，无需繁琐的配置和开发工作。
+
+应用服务器示例代码，简化集成
+
+为了进一步简化集成过程，我们提供了完整的应用服务器示例代码，展示了如何使用环信 `easemob-chat-uikit` 创建一个完整的聊天 APP。展示的功能包括：用户登录注册，添加好友，单聊，群聊，发送文字，表情，语音，图片，文件等消息，以及实时音视频通话等。这将帮助您轻松实现聊天功能的部署和运行。
+
+功能亮点:
+
+流畅的实时消息传递 语音和视频通话 文件共享 群组聊天 线程讨论 群组成员管理 消息提醒 可定制界面 预配置的聊天功能 应用服务器示例代码
+
+立即体验环信新版本 UIKit Demo，开始构建您的梦想聊天应用程序吧！
 
 ## 产品体验
 
 ![demo](./demo.png)
 
-[项目线上地址](https://uikit-demo.oss-cn-beijing.aliyuncs.com/login)
+[项目线上地址](https://webim-h5.easemob.com/login)
 
 ## 前置依赖
 
 1. [注册环信应用](https://doc.easemob.com/product/enable_and_configure_IM.html)
 
-2. 示例项目中登录，上传头像，获取群组头像，音视频功能依赖的 app server 来实现，所以你需要参考 app server 示例代码来实现自己的 app server，需要确保 app server 中使用的 appKey 和本项目中配置的是相同的。
-   // TODO 链接
+2. 示例项目中登录，上传头像，获取群组头像，音视频功能依赖的 app server 来实现，所以你需要参考 app server [示例代码](https://github.com/easemob/easemob-demo-appserver/tree/dev-demo)来实现自己的 app server，需要确保 app server 中使用的 appKey 和本项目中配置的是相同的。
 
 ## 跑通项目
 
-1. 配置项目
+示例项目中依赖了 appServer 来实现部分功能，所以要体验全部功能需要先实现 appServer，为了方便运行起来，项目支持使用开发者模式运行。
 
-创建 .env.config.ts 文件放入 src 目录下，配置自己的 AppKey, AppId, AppServer
+### 开发者模式运行
 
-```typescript
-export AppKey = 'you AppKey';
-export AppId = 'your AppId'
-export AppServer = 'https://example.com/'
-```
-
-2. 安装依赖
+1. 安装依赖
 
 ```
 npm install
 ```
 
-3. 启动项目
+2. 启动项目
 
 ```
 npm start
 ```
+
+3. 配置 appKey
+   在浏览器打开：http://localhost:3000/dev 按照如下配置好 appKey，在这个页面可以使用 userId, password 进行登录。
+   ![demo](./dev.png)
 
 ## 项目结构
 
