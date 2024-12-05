@@ -54,6 +54,22 @@ npm start
    在浏览器打开：http://localhost:3000/dev 按照如下配置好 appKey，在这个页面可以使用 userId, password 进行登录。
    ![demo](./dev.png)
 
+### 正式模式运行
+
+1. 首先需要实现 appServer, 然后将 src/service 里面用到的服务替换成你自己的服务，然后把 src/config 里面的 appKey 和 appId 替换成和 appServer 里一样的。
+
+2. 安装依赖
+
+```
+npm install
+```
+
+3. 启动项目
+
+```
+npm start
+```
+
 ## 项目结构
 
 ```
