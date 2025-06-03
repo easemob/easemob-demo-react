@@ -4,10 +4,15 @@ const domain =
   (window.location.protocol === "https:" ? "https:" : "http:") +
   (isSandBox ? "//a1-hsb.easemob.com" : "//a1-appserver.easemob.com");
 
-export const sendSms = (phoneNumber: string) => {
-  return axios.post(domain + `/inside/app/sms/send/${phoneNumber}`, {
-    phoneNumber,
-  });
+export const sendSms = (param: {
+  phoneNumber: string;
+  // sceneId: string;
+  captchaVerifyParam: string;
+}) => {
+  // return axios.post(domain + `/inside/app/sms/send/${phoneNumber}`, {
+  //   phoneNumber,
+  // });
+  return axios.post(domain + "/inside/app/sms/send/v2", param);
 };
 
 export const getChatToken = (phoneNumber: string, VCode: string) => {

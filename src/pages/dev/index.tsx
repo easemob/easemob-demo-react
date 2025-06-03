@@ -14,7 +14,7 @@ const Dev = () => {
       <LoginForm></LoginForm>
       <ConfigForm></ConfigForm>
       <div className="dev-copyright">
-        {`© 2024 环信，SDK版本：${SDK_VERSION} UIkit版本：${UIKIT_VERSION} Demo版本：${DEMO_VERSION}`}
+        {`© ${new Date().getFullYear()} 环信，SDK版本：${SDK_VERSION} UIkit版本：${UIKIT_VERSION} Demo版本：${DEMO_VERSION}`}
         <span onDoubleClick={goLogin}>{"</>"}</span>
       </div>
     </div>

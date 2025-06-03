@@ -1,22 +1,17 @@
 import "./login.scss";
-import React, {
-  ChangeEvent,
-  ChangeEventHandler,
-  useEffect,
-  useState,
-} from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import i18next from "../../i18n";
 import loading from "../../assets/loading.png";
 import closeIcon from "../../assets/Xmark@2x.png";
 import { Icon, Checkbox } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { useNavigate } from "react-router-dom";
-import { sendSms, getChatToken } from "../../service/login";
-import { loginWithToken, setSDKConfig } from "../../store/loginSlice";
+import { getChatToken } from "../../service/login";
+import { setSDKConfig, setIsLogging, loginAsync } from "../../store/loginSlice";
 import { useAppSelector, useAppDispatch } from "../../hooks";
-import { useDispatch } from "react-redux";
 import { updateAppConfig } from "../../store/appConfigSlice";
 import { DEMO_VERSION, SDK_VERSION, UIKIT_VERSION, appKey } from "../../config";
+import SMS from "../../components/SMS";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -40,7 +35,7 @@ const Login = () => {
     phoneNumber: "",
     vCode: "",
   });
-  const [isLogging, setIsLogging] = useState(false);
+  // const [isLogging, setIsLogging] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const [isCounting, setIsCounting] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -69,6 +64,26 @@ const Login = () => {
       phoneNumber: "",
     });
   };
+  const isPhoneNumberValid = (phoneNumber: string) => {
+    // 手机号合法性校验规则，这里简化为必须为11位数字
+    return /^\d{11}$/.test(phoneNumber);
+  };
+
+  const handleVerify = () => {
+    setIsCounting(true);
+    const timer = setInterval(() => {
+      setCountdown((countdown) => {
+        if (countdown === 0) {
+          clearInterval(timer);
+          setIsCounting(false);
+          return 60;
+        } else {
+          return countdown - 1;
+        }
+      });
+    }, 1000);
+  };
+
   const getVCode = () => {
     if (isCounting) {
       return;
@@ -77,46 +92,6 @@ const Login = () => {
       toast.error(i18next.t("Please enter the correct phone number"));
       return;
     }
-    sendSms(values.phoneNumber)
-      .then((res) => {
-        setIsCounting(true);
-        const timer = setInterval(() => {
-          setCountdown((countdown) => {
-            if (countdown === 0) {
-              clearInterval(timer);
-              setIsCounting(false);
-              return 60;
-            } else {
-              return countdown - 1;
-            }
-          });
-        }, 1000);
-      })
-      .catch(function (error) {
-        console.log("error", error.response);
-        if (error.response.status == "400") {
-          if (error.response.data?.errorInfo == "phone number illegal") {
-            i18next.t("Please enter the correct phone number");
-          } else if (
-            error.response.data?.errorInfo ==
-            "Please wait a moment while trying to send."
-          ) {
-            toast.error(
-              `${i18next.t(
-                "Your operation is too frequent, please try again later"
-              )}!`
-            );
-          } else if (
-            error.response.data?.errorInfo.includes("exceed the limit")
-          ) {
-            toast.error(i18next.t("Obtaining has reached the maximum limit"));
-          } else {
-            toast.error(error.response.data?.errorInfo);
-          }
-        } else {
-          toast.error(i18next.t("Failed to obtain verification code"));
-        }
-      });
   };
 
   const handleAgreeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -134,15 +109,15 @@ const Login = () => {
       return;
     }
 
-    setIsLogging(true);
+    dispatch(setIsLogging(true));
 
     getChatToken(values.phoneNumber, values.vCode)
       .then((res) => {
         const { token, chatUserName } = res.data;
-
-        dispatch(loginWithToken({ userId: chatUserName, chatToken: token }));
+        dispatch(loginAsync({ userId: chatUserName, chatToken: token }));
       })
       .catch(function (error) {
+        console.log("error", error);
         switch (error.response?.data?.errorInfo) {
           case "UserId password error.":
             toast.error(i18next.t("Incorrect username or password"));
@@ -168,7 +143,7 @@ const Login = () => {
             toast.error(i18next.t("Login failed, please try again"));
             break;
         }
-        setIsLogging(false);
+        dispatch(setIsLogging(false));
       });
   };
   const navigate = useNavigate();
@@ -198,7 +173,7 @@ const Login = () => {
         <div className="login-form-AC">{i18next.t("easemob")} IM</div>
         <div className="input-box">
           <input
-            disabled={isLogging}
+            disabled={state.isLogging}
             className="login-form-input"
             placeholder={i18next.t("yourPhoneNumber")}
             onChange={handleChange("phoneNumber")}
@@ -214,9 +189,10 @@ const Login = () => {
             />
           )}
         </div>
+        <SMS phoneNumber={values.phoneNumber} onVerified={handleVerify}></SMS>
         <div className="input-box">
           <input
-            disabled={isLogging}
+            disabled={state.isLogging}
             type={"text"}
             maxLength={6}
             className="login-form-input"
@@ -225,17 +201,34 @@ const Login = () => {
             onChange={handleChange("vCode")}
           ></input>
           <div className="login-form-getCode" onClick={getVCode}>
-            {isCounting ? (
-              <span style={{ color: "#ACB4B9" }}>
-                {appConfigState.language == "zh"
-                  ? `${countdown}秒后重新获取`
-                  : `Retrieve after ${countdown}s`}
-              </span>
-            ) : (
-              <span style={{ color: isLogging ? "#ACB4B9" : "#009EFF" }}>
-                {i18next.t("getCode")}
-              </span>
-            )}
+            <span
+              style={{
+                color: "#ACB4B9",
+                display: isCounting ? "block" : "none",
+              }}
+            >
+              {appConfigState.language == "zh"
+                ? `${countdown}秒后重新获取`
+                : `Retrieve after ${countdown}s`}
+            </span>
+
+            <button
+              disabled={
+                state.isLogging || !isPhoneNumberValid(values.phoneNumber)
+              }
+              style={{
+                color: state.isLogging ? "#ACB4B9" : "#009EFF",
+                border: "none",
+                background: "#F1F2F3",
+                pointerEvents: isPhoneNumberValid(values.phoneNumber)
+                  ? "auto"
+                  : "none",
+                display: isCounting ? "none" : "block",
+              }}
+              id="captcha-button"
+            >
+              {i18next.t("getCode")}
+            </button>
           </div>
         </div>
         <div className="loading-box">
@@ -243,10 +236,10 @@ const Login = () => {
             disabled={false}
             type="button"
             className="login-form-input login-button"
-            value={isLogging ? "" : i18next.t("login")}
+            value={state.isLogging ? "" : i18next.t("login")}
             onClick={login}
           ></input>
-          {isLogging && (
+          {state.isLogging && (
             <img className="loading-img" src={loading} alt="loading" />
           )}
         </div>
@@ -260,7 +253,7 @@ const Login = () => {
           ></input> */}
           <Checkbox
             className="login-form-checkbox"
-            disabled={isLogging}
+            disabled={state.isLogging}
             checked={agree}
             onChange={handleAgreeChange}
             shape="square"
@@ -268,7 +261,7 @@ const Login = () => {
           <div>
             {i18next.t("agree")}{" "}
             <span
-              style={{ color: isLogging ? "#ACB4B9" : "#009EFF" }}
+              style={{ color: state.isLogging ? "#ACB4B9" : "#009EFF" }}
               className="login-form-protocol"
             >
               《

@@ -1,6 +1,6 @@
 import { rootStore, eventHandler } from "easemob-chat-uikit";
 import { useSelector, useDispatch } from "react-redux";
-import { setLoggedIn } from "../store/loginSlice";
+import { setLoggedIn, setIsLogging } from "../store/loginSlice";
 import { store } from "../store/store";
 import { notification } from "../utils/notification";
 import toast from "react-hot-toast";
@@ -12,9 +12,11 @@ const listener = (store: any) => {
   client.addEventHandler("chatdemo", {
     onConnected: () => {
       dispatch(setLoggedIn(true));
+      // dispatch(setIsLogging(false));
     },
     onDisconnected: () => {
       dispatch(setLoggedIn(false));
+      // dispatch(setIsLogging(false));
     },
     onTextMessage: (message: any) => {
       notification("新消息", message, store);
