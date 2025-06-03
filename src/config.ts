@@ -1,8 +1,11 @@
-export const appKey = "orgName#appName"; // 环信AppKey，IM功能使用
-export const APP_ID = "your appId"; // 声网AppId，音视频功能使用
-export const UIKIT_VERSION = "1.4.0";
-export const SDK_VERSION = "4.11.0";
+export const appKey = "appName#orgName"; // 环信AppKey
+export const APP_ID = "yourAppId"; // 声网appId
+export const UIKIT_VERSION = "1.5.0";
+export const SDK_VERSION = "4.15.0";
 export const DEMO_VERSION = "2.2.0";
+export const SCENE_ID = "sceneId"; // 验证码场景ID
+export const PREFIX = "prefix"; // 本地存储前缀
+export const secret = "secret"; // 验证码加密密钥
 
 export const PRESENCE_CONFIG = [
   "Online",

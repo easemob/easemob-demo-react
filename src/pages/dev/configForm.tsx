@@ -9,12 +9,14 @@ const ConfigForm = () => {
   const dispatch = useAppDispatch();
   const saveConfig = () => {
     localStorage.setItem("serverConfig", JSON.stringify(config));
-    dispatch(
-      setSDKConfig({
-        appKey: config.appkey,
-        useDNS: !config.useCustomServer,
-      })
-    );
+    if (config.appkey) {
+      dispatch(
+        setSDKConfig({
+          appKey: config.appkey,
+          useDNS: !config.useCustomServer,
+        })
+      );
+    }
     toast.success("保存成功");
   };
 

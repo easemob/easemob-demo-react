@@ -102,7 +102,7 @@ const PersonalInfo = () => {
   const context = useContext(RootContext);
   const { theme, presenceMap } = context;
   const themeMode = theme?.mode;
-  const myInfo = rootStore.addressStore.appUsersInfo[rootStore.client.user];
+  const myInfo = rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
   const presence = myInfo.isOnline
     ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];

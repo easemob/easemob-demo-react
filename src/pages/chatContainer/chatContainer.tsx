@@ -48,6 +48,7 @@ import i18next from "../../i18n";
 import { url } from "inspector";
 import { rotateSize } from "react-easy-crop/helpers";
 import chats from "../../assets/chats@2x.png";
+import { serverConfig } from "../../utils";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -111,6 +112,13 @@ const ChatContainer = forwardRef((props, ref) => {
     channel: string | number;
     chatUserId: string;
   }) => {
+    if (serverConfig.useAppkey) {
+      toast.error("如果要体验音视频通话功能，请实现app server。");
+      return Promise.resolve({
+        accessToken: "",
+        agoraUid: 0,
+      });
+    }
     return getRtcToken({
       channelName: data.channel,
       username: data.chatUserId,

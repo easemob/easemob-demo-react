@@ -1,5 +1,7 @@
 import axios from "axios";
 import { rootStore } from "easemob-chat-uikit";
+import { serverConfig } from "../utils";
+import toast from "../components/toast/toast";
 export const uploadImage = (formData: FormData) => {
   axios.defaults.headers.common["Authorization"] =
     "Bearer " + rootStore.client.context.accessToken;
@@ -22,6 +24,9 @@ export const uploadImage = (formData: FormData) => {
     })
     .catch((error) => {
       console.error("uploadImage fail", error);
+      if (serverConfig.useAppkey) {
+        toast.error("如果要体验头像功能，请实现app server。");
+      }
     });
 };
 
