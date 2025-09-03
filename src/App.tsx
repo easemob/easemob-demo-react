@@ -41,7 +41,7 @@ const ChatApp: FC<any> = () => {
   return (
     <UIKitProvider
       initConfig={{
-        appKey: loginState.appKey as string,
+        appKey: loginState.appKey,
         isHttpDNS: loginState.useDNS,
         restUrl: serverConfig.rest,
         msyncUrl: serverConfig.msync,

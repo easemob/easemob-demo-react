@@ -7,7 +7,7 @@ export const uploadImage = (formData: FormData) => {
     "Bearer " + rootStore.client.context.accessToken;
   return axios
     .post(
-      `https://appserver.easesdk.com/inside/app/user/${rootStore.client.user}/avatar/upload`,
+      `https://a1-appserver.easemob.com/inside/app/user/${rootStore.client.user}/avatar/upload`,
       formData,
       {
         headers: {
@@ -34,7 +34,9 @@ async function sendRequest(groupId: string) {
   axios.defaults.headers.common["Authorization"] =
     "Bearer " + rootStore.client.context.accessToken;
   return await axios
-    .get(`https://appserver.easesdk.com/inside/app/group/${groupId}/avatarurl`)
+    .get(
+      `https://a1-appserver.easemob.com/inside/app/group/${groupId}/avatarurl`
+    )
     .then((response) => {
       return response.data.avatarUrl;
     })

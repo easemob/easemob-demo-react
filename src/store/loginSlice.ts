@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { rootStore } from "../UIKit/uikitListener";
 import type { RootState } from "./store";
+import { appKey } from "../config";
 import toast from "../components/toast/toast";
 
 export const loginAsync = createAsyncThunk(
@@ -31,7 +32,7 @@ export const loginSlice = createSlice({
     password: "",
     userId: "",
     loggedIn: false,
-    appKey: process.env.REACT_APP_APP_KEY || "org#app",
+    appKey: appKey,
     useDNS: true,
     isLogging: false,
   },
