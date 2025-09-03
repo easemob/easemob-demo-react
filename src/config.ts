@@ -1,11 +1,6 @@
-export const appKey = "appName#orgName"; // 环信AppKey
-export const APP_ID = "yourAppId"; // 声网appId
-export const UIKIT_VERSION = "1.5.0";
-export const SDK_VERSION = "4.15.0";
-export const DEMO_VERSION = "2.2.0";
-export const SCENE_ID = "sceneId"; // 验证码场景ID
-export const PREFIX = "prefix"; // 本地存储前缀
-export const secret = "secret"; // 验证码加密密钥
+export const UIKIT_VERSION = "1.7.1";
+export const SDK_VERSION = "4.15.1";
+export const DEMO_VERSION = "2.4.0";
 
 export const PRESENCE_CONFIG = [
   "Online",
@@ -15,3 +10,7 @@ export const PRESENCE_CONFIG = [
   "Do Not Disturb",
   "Custom",
 ];
+
+// 默认路由配置，可通过环境变量 REACT_APP_DEFAULT_ROUTE 控制
+// 本地开发可设置为 "/login"，生产环境可设置为 "/dev"
+export const DEFAULT_ROUTE = process.env.REACT_APP_DEFAULT_ROUTE || "/dev";

@@ -10,7 +10,7 @@ import { getChatToken } from "../../service/login";
 import { setSDKConfig, setIsLogging, loginAsync } from "../../store/loginSlice";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { updateAppConfig } from "../../store/appConfigSlice";
-import { DEMO_VERSION, SDK_VERSION, UIKIT_VERSION, appKey } from "../../config";
+import { DEMO_VERSION, SDK_VERSION, UIKIT_VERSION } from "../../config";
 import SMS from "../../components/SMS";
 
 const Login = () => {
@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     dispatch(
       setSDKConfig({
-        appKey: appKey,
+        appKey: process.env.REACT_APP_APP_KEY || "org#app",
         useDNS: true,
       })
     );
@@ -189,7 +189,9 @@ const Login = () => {
             />
           )}
         </div>
-        <SMS phoneNumber={values.phoneNumber} onVerified={handleVerify}></SMS>
+        {values.phoneNumber && (
+          <SMS phoneNumber={values.phoneNumber} onVerified={handleVerify}></SMS>
+        )}
         <div className="input-box">
           <input
             disabled={state.isLogging}

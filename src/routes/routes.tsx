@@ -7,17 +7,19 @@ import {
   Navigate,
 } from "react-router-dom";
 // import Login from "../pages/login/login";
-import Dev from "../pages/dev";
+// import Dev from "../pages/dev";
 import ChatApp from "../pages/main/main";
 import AuthCheck from "./authCheck";
-// const Dev = React.lazy(() => import("../pages/dev"));
+import { DEFAULT_ROUTE } from "../config";
+
+const Dev = React.lazy(() => import("../pages/dev"));
 const Login = React.lazy(() => import("../pages/login/login"));
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/dev" />} />
+        <Route path="/" element={<Navigate to={DEFAULT_ROUTE} />} />
         <Route
           path="/login"
           element={
