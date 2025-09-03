@@ -10,23 +10,13 @@ import {
   Chat,
   GroupDetail,
   ContactList,
-  ContactDetail,
   Header,
   rootStore,
   ConversationList,
-  Provider,
-  useClient,
   Icon,
-  Avatar,
-  MessageList,
-  useConversationContext,
-  useChatContext,
   UserSelect,
-  TextMessage,
-  GroupMember,
   Modal,
   Input,
-  eventHandler,
   Thread,
   PinnedMessage,
   usePinnedMessage,
@@ -38,7 +28,7 @@ import { getUserIdWithPhoneNumber } from "../../service/user";
 import "./chatContainer.scss";
 import UserInfo from "../../components/userInfo/userInfo";
 import { observer } from "mobx-react-lite";
-import { useAppSelector, useAppDispatch } from "../../hooks";
+import { useAppSelector, useAppDispatch, useForwardMessage } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
@@ -61,6 +51,12 @@ const ChatContainer = forwardRef((props, ref) => {
   const context = useContext(RootContext);
   const { theme } = context;
   const themeMode = theme?.mode;
+
+  // 使用转发消息 hook
+  const handleForwardMessage = useForwardMessage(
+    setForwardedMessages,
+    setContactListVisible
+  );
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserId(e.target.value);
   };
@@ -328,72 +324,7 @@ const ChatContainer = forwardRef((props, ref) => {
               },
               messageProps: {
                 // 单条转发
-                onForwardMessage: async (msg: any) => {
-                  console.log("要转发的消息", msg);
-                  let forwardMsg = { ...msg };
-                  if (forwardMsg.type === "video") {
-                    forwardMsg.body = {
-                      url: forwardMsg.url.split("?")[0],
-                      filename: forwardMsg.filename,
-                      secret: forwardMsg.secret,
-                      file_length: forwardMsg.file_length,
-                    };
-                    forwardMsg.thumb = "";
-                  } else if (forwardMsg.type === "audio") {
-                    forwardMsg.body = {
-                      url: forwardMsg.url,
-                      filename: forwardMsg.filename,
-                      secret: forwardMsg.secret,
-                      file_length: forwardMsg.file_length,
-                      length: forwardMsg.length,
-                    };
-                  } else if (forwardMsg.type === "file") {
-                    forwardMsg.body = {
-                      url: forwardMsg.url,
-                      filename: forwardMsg.filename,
-                      secret: forwardMsg.secret,
-                      file_length: forwardMsg.file_length,
-                    };
-                  } else if (
-                    forwardMsg.type === "combine" &&
-                    !forwardMsg.messageList
-                  ) {
-                    try {
-                      const messageList =
-                        await rootStore.client.downloadAndParseCombineMessage({
-                          url: forwardMsg.url,
-                          secret: forwardMsg.secret,
-                        });
-                      forwardMsg.messageList = messageList;
-                    } catch (err) {
-                      toast.error("解析合并消息失败，无法转发");
-                      return;
-                    }
-                  }
-                  forwardMsg.file && delete forwardMsg.file;
-                  forwardMsg.id = Date.now() + "";
-                  forwardMsg.from = rootStore.client.user;
-                  forwardMsg.ext = {
-                    ease_chat_uikit_user_info: {
-                      nickname:
-                        rootStore.addressStore.appUsersInfo[
-                          rootStore.client.user
-                        ].nickname,
-                      avatarURL:
-                        rootStore.addressStore.appUsersInfo[
-                          rootStore.client.user
-                        ].avatarurl,
-                    },
-                  };
-                  forwardMsg.reactions = undefined;
-                  forwardMsg.isChatThread = false;
-                  forwardMsg.chatThreadOverview = undefined;
-                  forwardMsg.chatThread = undefined;
-                  forwardMsg.time = Date.now();
-                  // 复用合并转发的逻辑
-                  setForwardedMessages(forwardMsg);
-                  setContactListVisible(true);
-                },
+                onForwardMessage: handleForwardMessage,
                 reaction: appConfig.reaction,
                 thread: appConfig.thread,
                 customAction: {
@@ -519,60 +450,7 @@ const ChatContainer = forwardRef((props, ref) => {
                 messageListProps={{
                   renderUserProfile: () => null,
                   messageProps: {
-                    // @ts-ignore
-                    onForwardMessage: (msg: { [key: string]: any }) => {
-                      let forwardMsg = { ...msg };
-                      if (forwardMsg.type === "video") {
-                        forwardMsg.body = {
-                          url: forwardMsg.url.split("?")[0],
-                          filename: forwardMsg.filename,
-                          secret: forwardMsg.secret,
-                          file_length: forwardMsg.file_length,
-                        };
-                        forwardMsg.thumb = "";
-                      } else if (forwardMsg.type === "audio") {
-                        forwardMsg.body = {
-                          url: forwardMsg.url,
-                          filename: forwardMsg.filename,
-                          secret: forwardMsg.secret,
-                          file_length: forwardMsg.file_length,
-                          length: forwardMsg.length,
-                        };
-                      } else if (forwardMsg.type === "file") {
-                        forwardMsg.body = {
-                          url: forwardMsg.url,
-                          filename: forwardMsg.filename,
-                          secret: forwardMsg.secret,
-                          file_length: forwardMsg.file_length,
-                        };
-                      }
-                      forwardMsg.file && delete forwardMsg.file;
-                      // @ts-ignore
-                      forwardMsg.id = Date.now() + "";
-                      // @ts-ignore
-                      forwardMsg.from = rootStore.client.user;
-                      // @ts-ignore
-                      forwardMsg.ext = {
-                        ease_chat_uikit_user_info: {
-                          nickname:
-                            rootStore.addressStore.appUsersInfo[
-                              rootStore.client.user
-                            ].nickname,
-                          avatarURL:
-                            rootStore.addressStore.appUsersInfo[
-                              rootStore.client.user
-                            ].avatarurl,
-                        },
-                      };
-                      // @ts-ignore
-                      forwardMsg.reactions = undefined;
-                      // @ts-ignore
-                      forwardMsg.isChatThread = false;
-                      forwardMsg.chatThreadOverview = undefined;
-                      forwardMsg.chatThread = undefined;
-                      setForwardedMessages(forwardMsg);
-                      setContactListVisible(true);
-                    },
+                    onForwardMessage: handleForwardMessage,
                     customAction: {
                       visible: true,
                       icon: null,

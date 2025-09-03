@@ -6,7 +6,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-y: hidden;
-  min-width: 1080px;
   font-family: Roboto;
 }
 
