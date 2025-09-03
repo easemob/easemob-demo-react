@@ -235,7 +235,21 @@ const ChatContainer = forwardRef((props, ref) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [detailsRef, groupMemberVisible]);
+  const showPanel =
+    thread.showThreadPanel || pinMsgVisible || conversationDetailVisible;
 
+  const closeFraudTip = () => {
+    setFraudTipVisible(false);
+  };
+  const [fraudTipVisible, setFraudTipVisible] = useState(true);
+
+  useEffect(() => {
+    if (rootStore.conversationStore.currentCvs.conversationId !== "") {
+      setFraudTipVisible(true);
+    } else {
+      setFraudTipVisible(false);
+    }
+  }, [rootStore.conversationStore.currentCvs]);
   return (
     <div
       className={classNames("chat-container", {
@@ -323,6 +337,44 @@ const ChatContainer = forwardRef((props, ref) => {
       </div>
 
       <div className="chat-container-chat">
+        <div
+          className="zhapian"
+          style={
+            showPanel ? { width: "calc(100% - 350px)" } : { width: "100%" }
+          }
+        >
+          {fraudTipVisible && (
+            <div className="zhapian-content">
+              <div>
+                <Icon
+                  type="EXCLAMATION_MARK_IN_CIRCLE_FILL"
+                  width={16}
+                  height={16}
+                  style={{ marginRight: "8px" }}
+                  color="var(--cui-primary-color5)"
+                ></Icon>
+                <div>
+                  请勿轻信任何关于汇款、中奖等信息，务必提高警惕，谨慎对待来自陌生号码的电话。如遇可疑情况，请及时向相关部门反馈并采取必要的防范措施。
+                  <span
+                    onClick={() => {
+                      toast.success("感谢您的举报，我们将尽快处理");
+                    }}
+                  >
+                    点我举报
+                  </span>
+                </div>
+              </div>
+              <Icon
+                type="CLOSE"
+                className="zhapian-content-close"
+                width={16}
+                height={16}
+                style={{ marginLeft: "8px" }}
+                onClick={closeFraudTip}
+              ></Icon>
+            </div>
+          )}
+        </div>
         <div
           style={{
             display: "flex",
