@@ -328,7 +328,8 @@ const ChatContainer = forwardRef((props, ref) => {
               },
               messageProps: {
                 // 单条转发
-                onForwardMessage: (msg: any) => {
+                onForwardMessage: async (msg: any) => {
+                  console.log("要转发的消息", msg);
                   let forwardMsg = { ...msg };
                   if (forwardMsg.type === "video") {
                     forwardMsg.body = {
@@ -353,6 +354,21 @@ const ChatContainer = forwardRef((props, ref) => {
                       secret: forwardMsg.secret,
                       file_length: forwardMsg.file_length,
                     };
+                  } else if (
+                    forwardMsg.type === "combine" &&
+                    !forwardMsg.messageList
+                  ) {
+                    try {
+                      const messageList =
+                        await rootStore.client.downloadAndParseCombineMessage({
+                          url: forwardMsg.url,
+                          secret: forwardMsg.secret,
+                        });
+                      forwardMsg.messageList = messageList;
+                    } catch (err) {
+                      toast.error("解析合并消息失败，无法转发");
+                      return;
+                    }
                   }
                   forwardMsg.file && delete forwardMsg.file;
                   forwardMsg.id = Date.now() + "";
@@ -449,6 +465,7 @@ const ChatContainer = forwardRef((props, ref) => {
             }}
             callkitProps={{
               logLevel: "debug",
+              encoderConfig: "720p_1",
               enableLogging: true,
             }}
           ></Chat>

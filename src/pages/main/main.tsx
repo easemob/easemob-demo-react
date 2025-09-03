@@ -118,11 +118,15 @@ const ChatApp: FC<any> = () => {
                 }}
                 onAudioCall={() => {
                   navRef.current?.changeTab(0);
-                  chatContainerRef.current?.startAudioCall();
+                  setTimeout(() => {
+                    chatContainerRef.current?.startAudioCall();
+                  }, 300);
                 }}
                 onVideoCall={() => {
                   navRef.current?.changeTab(0);
-                  chatContainerRef.current?.startVideoCall();
+                  setTimeout(() => {
+                    chatContainerRef.current?.startVideoCall();
+                  }, 300);
                 }}
               />
             ),
