@@ -56,7 +56,7 @@ npm start
 
 ### 正式模式运行
 
-1. 首先需要实现 appServer, 然后将 src/service 里面用到的服务替换成你自己的服务，然后把 src/config 里面的 appKey 和 appId 替换成和 appServer 里一样的。
+1. 首先需要实现 appServer, 然后将 src/service 里面用到的服务替换成你自己的服务。
 
 2. 安装依赖
 
