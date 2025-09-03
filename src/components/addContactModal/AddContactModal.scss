@@ -1,0 +1,10 @@
+.add-contact-modal {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+  &__input input{
+    background: #eee;
+  }
+} 
+

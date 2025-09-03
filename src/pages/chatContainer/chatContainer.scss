@@ -31,40 +31,19 @@
         display: flex;
         position: relative;
         background-color: #F9FAFA;
-        &-right{
+                &-right{
             width: 350px;
             border-left: 1px solid #E3E6E8;
             background-color: #F9FAFA;
         }
 
-        .zhapian{
+        .fraud {
             position: absolute;
             z-index: 9;
             padding: 12px;
             top: 60px;
             width: 100%;
             box-sizing: border-box;
-            &-content{
-                background: #DCE2EF;
-                font-size: 12px;
-                line-height: 18px;
-                padding: 12px;
-                border-radius: 8px;
-                display: flex;
-                box-shadow: 1px 0 2px 0 rgba(26, 26, 26, .1);
-                justify-content: space-between;
-                &>div{
-                    display: flex;
-                }
-                span{
-                    color: var(--cui-primary-color5);
-                    cursor: pointer;
-                }
-
-                .zhapian-content-close {
-                    cursor: pointer;
-                }
-            }
         }
     }
 }
@@ -83,10 +62,7 @@
         border-left: 1px solid #2F3437;
         background-color: #171A1C;
     }
-    .zhapian-content{
-        background: #212D45;
-        color: #E3E6E8;
-    }
+
 }
 
 .create-chat-container{

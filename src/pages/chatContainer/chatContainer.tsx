@@ -9,7 +9,6 @@ import {
 import {
   Chat,
   GroupDetail,
-  ContactList,
   Header,
   rootStore,
   ConversationList,
@@ -24,49 +23,75 @@ import {
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { getGroupAvatar } from "../../service/avatar";
-import { getUserIdWithPhoneNumber } from "../../service/user";
 import "./chatContainer.scss";
 import UserInfo from "../../components/userInfo/userInfo";
+import FraudTip from "../../components/fraudTip/FraudTip";
+import AddContactModal from "../../components/addContactModal/AddContactModal";
+import ForwardModal from "../../components/forwardModal/ForwardModal";
 import { observer } from "mobx-react-lite";
-import { useAppSelector, useAppDispatch, useForwardMessage } from "../../hooks";
+import { useAppSelector, useForwardMessage } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
 import chats from "../../assets/chats@2x.png";
+import {
+  CHAT_TYPES,
+  MESSAGE_TYPES,
+  CALLKIT_CONFIG,
+} from "../../constants/chat";
+import {
+  createMessageActions,
+  createThreadMessageActions,
+  createHeaderIcon,
+} from "../../utils/chatHelpers";
+
 const ChatContainer = forwardRef((props, ref) => {
+  // ==================== 外部状态 ====================
   const appConfig = useAppSelector((state) => state.appConfig);
-  const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
-  const [addContactVisible, setAddContactVisible] = useState(false); //是否显示添加联系人弹窗
-  const [conversationDetailVisible, setConversationDetailVisible] =
-    useState(false); //是否显示群组设置/联系人详情弹窗
-  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
-  const [cvsItem, setCvsItem] = useState<any>([]);
-  const [forwardedMessages, setForwardedMessages] = useState<
-    Record<string, any>
-  >({});
-  const [contactListVisible, setContactListVisible] = useState(false); // 是否显示单条消息转发弹窗
-
-  const [userId, setUserId] = useState(""); // 要添加联系人的userId
-
   const context = useContext(RootContext);
   const { theme } = context;
   const themeMode = theme?.mode;
+  const thread = rootStore.threadStore;
+  const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
 
-  // 使用转发消息 hook
-  const handleForwardMessage = useForwardMessage(
-    setForwardedMessages,
-    setContactListVisible
-  );
-  const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserId(e.target.value);
-  };
+  // ==================== UI 控制状态 ====================
+  const [userSelectVisible, setUserSelectVisible] = useState(false); // 创建群组弹窗
+  const [addContactVisible, setAddContactVisible] = useState(false); // 添加联系人弹窗
+  const [conversationDetailVisible, setConversationDetailVisible] =
+    useState(false); // 群组设置/联系人详情弹窗
+  const [contactListVisible, setContactListVisible] = useState(false); // 转发消息弹窗
+  const [createChatVisible, setCreateChatVisible] = useState(false); // 创建会话弹窗
+  const [groupMemberVisible, setGroupMemberVisible] = useState(false); // 群组成员弹窗
+  const [fraudTipVisible, setFraudTipVisible] = useState(true); // 诈骗提示
 
+  // ==================== 数据状态 ====================
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]); // 选中的用户
+  const [cvsItem, setCvsItem] = useState<any>([]); // 当前会话项
+  const [forwardedMessages, setForwardedMessages] = useState<
+    Record<string, any>
+  >({}); // 转发的消息
+
+  // ==================== Refs ====================
+  const chatRef = useRef<any>(null);
+  const detailsRef = useRef<HTMLDivElement>(null);
+
+  // ==================== 计算属性 ====================
+  const showPanel =
+    thread.showThreadPanel || pinMsgVisible || conversationDetailVisible;
   const isInGroup = rootStore.addressStore.groups.some((item) => {
     // @ts-ignore
     return item.groupid == cvsItem.conversationId;
   });
+
+  // ==================== 自定义 Hooks ====================
+  const handleForwardMessage = useForwardMessage(
+    setForwardedMessages,
+    setContactListVisible
+  );
+
+  // ==================== 事件处理函数 ====================
   const handleEllipsisClick = () => {
-    if (cvsItem.chatType == "groupChat") {
+    if (cvsItem.chatType == CHAT_TYPES.GROUP_CHAT) {
       if (thread.showThreadPanel) {
         rootStore.threadStore.setThreadVisible(false);
       }
@@ -79,17 +104,19 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   };
 
-  const thread = rootStore.threadStore;
+  const closeFraudTip = () => {
+    setFraudTipVisible(false);
+  };
 
-  const chatRef = useRef<any>(null);
-
+  // ==================== 副作用 ====================
+  // 暴露给父组件的方法
   useImperativeHandle(ref, () => ({
-    startVideoCall: chatRef.current.startVideoCall,
-    startAudioCall: chatRef.current.startAudioCall,
+    startVideoCall: chatRef.current?.startVideoCall,
+    startAudioCall: chatRef.current?.startAudioCall,
   }));
 
+  // 获取群组头像
   useEffect(() => {
-    // 获取群组头像
     if (rootStore.loginState) {
       const groupIds =
         rootStore.addressStore.groups
@@ -106,16 +133,13 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }, [rootStore.loginState, rootStore.addressStore.groups.length]);
 
-  // --- 创建会话 ---
-  const [createChatVisible, setCreateChatVisible] = useState(false);
+  // 监听当前会话变化
   useEffect(() => {
     setConversationDetailVisible(false);
     setCvsItem(rootStore.conversationStore.currentCvs);
   }, [rootStore.conversationStore.currentCvs]);
 
-  // ---- pin message ----
-  const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
-
+  // 管理面板间的互斥显示
   useEffect(() => {
     if (pinMsgVisible) {
       thread.setThreadVisible(false);
@@ -130,33 +154,7 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }, [thread.showThreadPanel]);
 
-  const detailsRef = useRef<HTMLDivElement>(null);
-  const [groupMemberVisible, setGroupMemberVisible] = useState(false);
-  useEffect(() => {
-    const handleClickOutside = (event: any) => {
-      if (detailsRef.current && !detailsRef.current.contains(event.target)) {
-        setConversationDetailVisible(false);
-      }
-    };
-
-    // 监听全局点击事件
-    if (!groupMemberVisible) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      // 清理事件监听器
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [detailsRef, groupMemberVisible]);
-  const showPanel =
-    thread.showThreadPanel || pinMsgVisible || conversationDetailVisible;
-
-  const closeFraudTip = () => {
-    setFraudTipVisible(false);
-  };
-  const [fraudTipVisible, setFraudTipVisible] = useState(true);
-
+  // 诈骗提示显示控制
   useEffect(() => {
     if (rootStore.conversationStore.currentCvs.conversationId !== "") {
       setFraudTipVisible(true);
@@ -164,12 +162,32 @@ const ChatContainer = forwardRef((props, ref) => {
       setFraudTipVisible(false);
     }
   }, [rootStore.conversationStore.currentCvs]);
+
+  // 点击外部关闭详情面板
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (detailsRef.current && !detailsRef.current.contains(event.target)) {
+        setConversationDetailVisible(false);
+      }
+    };
+
+    if (!groupMemberVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [detailsRef, groupMemberVisible]);
+
+  // ==================== 渲染 ====================
   return (
     <div
       className={classNames("chat-container", {
         "chat-container-dark": themeMode === "dark",
       })}
     >
+      {/* 会话列表区域 */}
       <div className="chat-container-conversation">
         <ConversationList
           renderHeader={() => (
@@ -177,56 +195,44 @@ const ChatContainer = forwardRef((props, ref) => {
               moreAction={{
                 visible: true,
                 icon: (
-                  <Icon
-                    type="PLUS_IN_CIRCLE"
-                    width={24}
-                    height={24}
-                    color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
-                  />
+                  <Icon {...createHeaderIcon("MORE", themeMode || "light")} />
                 ),
                 actions: [
                   {
                     icon: (
                       <Icon
-                        type="BUBBLE_FILL"
-                        width={24}
-                        height={24}
-                        color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                        {...createHeaderIcon(
+                          "NEW_CONVERSATION",
+                          themeMode || "light"
+                        )}
                       />
                     ),
                     content: i18next.t("newConversation"),
-                    onClick: () => {
-                      setCreateChatVisible(true);
-                    },
+                    onClick: () => setCreateChatVisible(true),
                   },
                   {
                     icon: (
                       <Icon
-                        type="PERSON_ADD_FILL"
-                        width={24}
-                        height={24}
-                        color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                        {...createHeaderIcon(
+                          "ADD_CONTACT",
+                          themeMode || "light"
+                        )}
                       />
                     ),
                     content: i18next.t("addContact"),
-                    onClick: () => {
-                      setAddContactVisible(true);
-                      // setUserSelectVisible(true);
-                    },
+                    onClick: () => setAddContactVisible(true),
                   },
                   {
                     icon: (
                       <Icon
-                        type="PERSON_DOUBLE_FILL"
-                        width={24}
-                        height={24}
-                        color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                        {...createHeaderIcon(
+                          "CREATE_GROUP",
+                          themeMode || "light"
+                        )}
                       />
                     ),
                     content: i18next.t("createGroup"),
-                    onClick: () => {
-                      setUserSelectVisible(true);
-                    },
+                    onClick: () => setUserSelectVisible(true),
                   },
                 ],
                 tooltipProps: {
@@ -234,61 +240,37 @@ const ChatContainer = forwardRef((props, ref) => {
                 },
               }}
               content={
-                // <div className={`header-content ${themeMode}`}>Chats</div>
                 <div className={`header-content ${themeMode}`}>
                   <img className="header-img" src={chats} alt="" />
                 </div>
               }
               avatar={<></>}
-            ></Header>
+            />
           )}
           onItemClick={(item) => {
             setConversationDetailVisible(false);
             setCvsItem(item);
           }}
           className="conversation-list"
-        ></ConversationList>
+        />
       </div>
 
+      {/* 聊天区域 */}
       <div className="chat-container-chat">
+        {/* 诈骗提示 */}
         <div
-          className="zhapian"
+          className="fraud"
           style={
             showPanel ? { width: "calc(100% - 350px)" } : { width: "100%" }
           }
         >
-          {fraudTipVisible && (
-            <div className="zhapian-content">
-              <div>
-                <Icon
-                  type="EXCLAMATION_MARK_IN_CIRCLE_FILL"
-                  width={16}
-                  height={16}
-                  style={{ marginRight: "8px" }}
-                  color="var(--cui-primary-color5)"
-                ></Icon>
-                <div>
-                  请勿轻信任何关于汇款、中奖等信息，务必提高警惕，谨慎对待来自陌生号码的电话。如遇可疑情况，请及时向相关部门反馈并采取必要的防范措施。
-                  <span
-                    onClick={() => {
-                      toast.success("感谢您的举报，我们将尽快处理");
-                    }}
-                  >
-                    点我举报
-                  </span>
-                </div>
-              </div>
-              <Icon
-                type="CLOSE"
-                className="zhapian-content-close"
-                width={16}
-                height={16}
-                style={{ marginLeft: "8px" }}
-                onClick={closeFraudTip}
-              ></Icon>
-            </div>
-          )}
+          <FraudTip
+            visible={fraudTipVisible && cvsItem.conversationId !== ""}
+            onClose={closeFraudTip}
+          />
         </div>
+
+        {/* 主聊天内容区域 */}
         <div
           style={{
             display: "flex",
@@ -298,15 +280,13 @@ const ChatContainer = forwardRef((props, ref) => {
             transition: "all 0.5s ease",
           }}
         >
+          {/* 创建聊天组件 */}
           {createChatVisible && (
-            <CreateChat
-              onClosed={() => {
-                setCreateChatVisible(false);
-              }}
-            />
+            <CreateChat onClosed={() => setCreateChatVisible(false)} />
           )}
+
+          {/* 聊天组件 */}
           <Chat
-            // MessageList 使用mome缓存了消息组件，修改这些控制显示开关时需要重新渲染组件
             key={
               appConfig.reaction.toString() +
               appConfig.thread.toString() +
@@ -319,65 +299,23 @@ const ChatContainer = forwardRef((props, ref) => {
               }
             }}
             messageListProps={{
-              renderUserProfile: () => {
-                return null;
-              },
+              renderUserProfile: () => null,
               messageProps: {
-                // 单条转发
                 onForwardMessage: handleForwardMessage,
                 reaction: appConfig.reaction,
                 thread: appConfig.thread,
                 customAction: {
                   visible: true,
                   icon: null,
-                  actions: [
-                    {
-                      content: "FORWARD",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "REPLY",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "UNSEND",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "Modify",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "SELECT",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "PIN",
-                      onClick: () => {},
-                    },
-                    {
-                      visible: appConfig.translation,
-                      content: "TRANSLATE",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "REPORT",
-                      onClick: () => {},
-                    },
-                    {
-                      content: "DELETE",
-                      onClick: () => {},
-                    },
-                  ],
+                  actions: createMessageActions(appConfig.translation),
                 },
               },
             }}
             messageInputProps={{
               enabledTyping: true,
               onSendMessage: (msg) => {
-                // 发送消息回调，如果是合并转发的消息，显示转发弹窗
                 // @ts-ignore
-                if (msg.type == "combine") {
+                if (msg.type == MESSAGE_TYPES.COMBINE) {
                   setForwardedMessages(msg);
                   setContactListVisible(true);
                 }
@@ -386,7 +324,6 @@ const ChatContainer = forwardRef((props, ref) => {
             //@ts-ignore
             headerProps={{
               moreAction: {
-                // 关闭默认行为，自定义更多操作
                 visible: true,
                 actions: [],
               },
@@ -394,28 +331,20 @@ const ChatContainer = forwardRef((props, ref) => {
               onClickAvatar: handleEllipsisClick,
               onClickEllipsis: handleEllipsisClick,
             }}
-            callkitProps={{
-              logLevel: "debug",
-              encoderConfig: "720p_1",
-              enableLogging: true,
-            }}
-          ></Chat>
+            callkitProps={CALLKIT_CONFIG}
+          />
 
-          {/** 是否显示群组设置 */}
+          {/* 群组设置/联系人详情 */}
           {conversationDetailVisible && (
             <div className="chat-container-chat-right" ref={detailsRef}>
-              {cvsItem.chatType == "groupChat" ? (
+              {cvsItem.chatType == CHAT_TYPES.GROUP_CHAT ? (
                 <GroupDetail
                   conversation={{
-                    chatType: "groupChat",
+                    chatType: CHAT_TYPES.GROUP_CHAT,
                     conversationId: cvsItem.conversationId,
                   }}
-                  onLeaveGroup={() => {
-                    setConversationDetailVisible(false);
-                  }}
-                  onDestroyGroup={() => {
-                    setConversationDetailVisible(false);
-                  }}
+                  onLeaveGroup={() => setConversationDetailVisible(false)}
+                  onDestroyGroup={() => setConversationDetailVisible(false)}
                   // @ts-ignore
                   groupMemberProps={{
                     onPrivateChat: () => {
@@ -434,14 +363,15 @@ const ChatContainer = forwardRef((props, ref) => {
                   onUserIdCopied={() => {
                     toast.success(i18next.t("copied"));
                   }}
-                ></GroupDetail>
+                />
               ) : (
-                <UserInfo conversation={cvsItem}></UserInfo>
+                <UserInfo conversation={cvsItem} />
               )}
             </div>
           )}
         </div>
-        {/** 是否显示子区 */}
+
+        {/* Thread 面板 */}
         {thread.showThreadPanel &&
           !pinMsgVisible &&
           !conversationDetailVisible && (
@@ -454,50 +384,23 @@ const ChatContainer = forwardRef((props, ref) => {
                     customAction: {
                       visible: true,
                       icon: null,
-                      actions: [
-                        {
-                          content: "REPLY",
-                          onClick: () => {},
-                        },
-
-                        {
-                          content: "TRANSLATE",
-                          onClick: () => {},
-                        },
-                        {
-                          content: "Modify",
-                          onClick: () => {},
-                        },
-                        {
-                          content: "SELECT",
-                          onClick: () => {},
-                        },
-                        {
-                          content: "FORWARD",
-                          onClick: () => {},
-                        },
-                        {
-                          content: "PIN",
-                          onClick: () => {},
-                        },
-                      ],
+                      actions: createThreadMessageActions(),
                     },
                   },
                 }}
                 messageInputProps={{
                   onSendMessage: (msg: any) => {
-                    if (msg.type == "combine") {
+                    if (msg.type == MESSAGE_TYPES.COMBINE) {
                       setForwardedMessages(msg);
                       setContactListVisible(true);
                     }
                   },
-                  // enabledTyping: state?.typingSwitch,
                 }}
-              ></Thread>
+              />
             </div>
           )}
 
-        {/** 是否显示 pin message*/}
+        {/* Pin Message 面板 */}
         {pinMsgVisible &&
           !thread.showThreadPanel &&
           !conversationDetailVisible && (
@@ -506,11 +409,11 @@ const ChatContainer = forwardRef((props, ref) => {
             </div>
           )}
       </div>
-      {/** 创建群组的联系人弹窗 */}
+
+      {/* ==================== 弹窗组件 ==================== */}
+      {/* 创建群组联系人选择弹窗 */}
       <UserSelect
-        onCancel={() => {
-          setUserSelectVisible(false);
-        }}
+        onCancel={() => setUserSelectVisible(false)}
         onConfirm={() => {
           rootStore.addressStore.createGroup(
             selectedUsers.map((user) => user.userId)
@@ -519,101 +422,23 @@ const ChatContainer = forwardRef((props, ref) => {
         }}
         okText={i18next.t("create")}
         enableMultipleSelection
-        onUserSelect={(user, users) => {
-          setSelectedUsers(users);
-        }}
+        onUserSelect={(user, users) => setSelectedUsers(users)}
         open={userSelectVisible}
-      ></UserSelect>
-      {/** 转发消息的联系人弹窗 */}
-      <Modal
-        open={contactListVisible}
-        closable={false}
-        onCancel={() => {
-          setContactListVisible(false);
-        }}
-        bodyStyle={{ padding: 0 }}
-        footer={null}
-      >
-        <div style={{ height: "600px" }}>
-          <ContactList
-            style={{ padding: "24px" }}
-            menu={["groups", "contacts"]}
-            header={<></>}
-            onItemClick={(data) => {
-              forwardedMessages.to = data.id;
-              forwardedMessages.chatType =
-                data.type == "contact" ? "singleChat" : "groupChat";
-              //@ts-ignore
-              rootStore.messageStore.sendMessage(forwardedMessages);
-              setContactListVisible(false);
+      />
 
-              rootStore.messageStore.setSelectedMessage(cvsItem, {
-                selectable: false,
-                selectedMessage: [],
-              });
-              rootStore.conversationStore.setCurrentCvs({
-                chatType: data.type == "contact" ? "singleChat" : "groupChat",
-                conversationId: data.id,
-                //@ts-ignore
-                lastMessage: forwardedMessages,
-                name: data.name,
-              });
-            }}
-          ></ContactList>
-        </div>
-      </Modal>
-      {/** 添加联系人弹窗 */}
-      <Modal
-        open={addContactVisible}
-        onCancel={() => {
-          setAddContactVisible(false);
-        }}
-        onOk={() => {
-          // userId 可能是手机号也可能是环信id， 如果是手机号根据手机号获取环信id
-          if (!/^\d{11}$/.test(userId)) {
-            rootStore.addressStore.addContact(userId);
-            setAddContactVisible(false);
-          } else {
-            // 根据手机号获取环信id
-            getUserIdWithPhoneNumber(userId, rootStore.client.user)
-              .then((res) => {
-                if (res.status === 200) {
-                  const chatUserId = res.data.chatUserName;
-                  // 判断是不是好友
-                  if (
-                    rootStore.addressStore.contacts.some(
-                      (item) => item.userId === chatUserId
-                    )
-                  ) {
-                    toast.error(i18next.t("alreadyFriend"));
-                    return;
-                  }
+      {/* 转发消息联系人选择弹窗 */}
+      <ForwardModal
+        visible={contactListVisible}
+        forwardedMessages={forwardedMessages}
+        currentConversation={cvsItem}
+        onCancel={() => setContactListVisible(false)}
+      />
 
-                  rootStore.addressStore.addContact(chatUserId);
-                  setAddContactVisible(false);
-                } else {
-                  toast.error(i18next.t("userNotExist"));
-                }
-              })
-              .catch(() => {
-                toast.error(i18next.t("userNotExist"));
-              });
-          }
-        }}
-        okText={i18next.t("add")}
-        closable={false}
-        title={i18next.t("addContactByUserIdOrPhone")}
-      >
-        <>
-          <div className="add-contact">
-            <Input
-              placeholder={i18next.t("enterUserIDOrPhoneNum")}
-              className="add-contact-input"
-              onChange={handleUserIdChange}
-            ></Input>
-          </div>
-        </>
-      </Modal>
+      {/* 添加联系人弹窗 */}
+      <AddContactModal
+        visible={addContactVisible}
+        onCancel={() => setAddContactVisible(false)}
+      />
     </div>
   );
 });

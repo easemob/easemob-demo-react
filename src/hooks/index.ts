@@ -6,3 +6,6 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 // 导出转发消息 hook
 export { useForwardMessage } from "./useForwardMessage";
+
+// 导出添加联系人 hook
+export { useAddContact } from "./useAddContact";

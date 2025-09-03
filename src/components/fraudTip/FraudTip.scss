@@ -1,0 +1,41 @@
+.fraud-tip {
+  // 这里不设置任何定位和宽度，由父容器控制
+  
+  .fraud-content {
+    background: #DCE2EF;
+    font-size: 12px;
+    line-height: 18px;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    box-shadow: 1px 0 2px 0 rgba(26, 26, 26, .1);
+    justify-content: space-between;
+    box-sizing: border-box;
+
+    .fraud-main {
+      display: flex;
+      align-items: flex-start;
+
+      .fraud-text {
+        color: inherit;
+
+        .fraud-report {
+          color: var(--cui-primary-color5);
+          cursor: pointer;
+          margin-left: 4px;
+        }
+      }
+    }
+
+    .fraud-content-close {
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// 暗色主题支持
+.chat-container-dark .fraud-tip .fraud-content {
+  background: #212D45;
+  color: #E3E6E8;
+} 
