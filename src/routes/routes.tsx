@@ -10,6 +10,8 @@ import {
 // import Dev from "../pages/dev";
 import ChatApp from "../pages/main/main";
 import AuthCheck from "./authCheck";
+import { DEFAULT_ROUTE } from "../config";
+
 const Dev = React.lazy(() => import("../pages/dev"));
 const Login = React.lazy(() => import("../pages/login/login"));
 
@@ -17,7 +19,7 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to={DEFAULT_ROUTE} />} />
         <Route
           path="/login"
           element={

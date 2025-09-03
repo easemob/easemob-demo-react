@@ -33,11 +33,8 @@ import {
   RootContext,
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
-import { APP_ID, appKey } from "../../config";
-import { getRtcToken, getRtcChannelMembers } from "../../service/rtc";
 import { getGroupAvatar } from "../../service/avatar";
 import { getUserIdWithPhoneNumber } from "../../service/user";
-import UserInviteModal from "../../components/userInviteModal/userInviteModal";
 import "./chatContainer.scss";
 import UserInfo from "../../components/userInfo/userInfo";
 import { observer } from "mobx-react-lite";
@@ -45,10 +42,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import CreateChat from "./createChat";
 import classNames from "classnames";
 import i18next from "../../i18n";
-import { url } from "inspector";
-import { rotateSize } from "react-easy-crop/helpers";
 import chats from "../../assets/chats@2x.png";
-import { serverConfig } from "../../utils";
 const ChatContainer = forwardRef((props, ref) => {
   const appConfig = useAppSelector((state) => state.appConfig);
   const [userSelectVisible, setUserSelectVisible] = useState(false); // 是否显示创建群组弹窗
@@ -61,13 +55,8 @@ const ChatContainer = forwardRef((props, ref) => {
     Record<string, any>
   >({});
   const [contactListVisible, setContactListVisible] = useState(false); // 是否显示单条消息转发弹窗
-  const [userInviteModalVisible, setUserInviteModalVisible] = useState(false); // 是否显示音视频邀请人员弹窗
-  const [agoraUuId, setAgoraUuId] = useState<string>(""); // 当前用户的音视频时的agoraUid
-  const [joinedRtcRoomUsers, setJoinedRtcRoomUsers] = useState<
-    { userId: string }[]
-  >([]); // 已加入音视频房间的用户
+
   const [userId, setUserId] = useState(""); // 要添加联系人的userId
-  const [rtcGroupId, setRtcGroupId] = useState(""); // 当前音视频房间的groupId
 
   const context = useContext(RootContext);
   const { theme } = context;
@@ -94,68 +83,6 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   };
 
-  const handleGetIdMap = (data: { userId: string; channel: string }) => {
-    return getRtcChannelMembers({
-      username: data.userId,
-      channelName: data.channel,
-      appKey: appKey,
-    }).then((res) => {
-      return res;
-    });
-  };
-
-  const handleRtcStateChange = (state: any) => {
-    console.log("handleRtcStateChange", state);
-  };
-
-  const getRtcToken2 = (data: {
-    channel: string | number;
-    chatUserId: string;
-  }) => {
-    if (serverConfig.useAppkey) {
-      toast.error("如果要体验音视频通话功能，请实现app server。");
-      return Promise.resolve({
-        accessToken: "",
-        agoraUid: 0,
-      });
-    }
-    return getRtcToken({
-      channelName: data.channel,
-      username: data.chatUserId,
-      appKey: appKey,
-    }).then((res) => {
-      const { agoraUserId, accessToken } = res;
-      setAgoraUuId(String(agoraUserId));
-      return {
-        agoraUid: agoraUserId,
-        accessToken,
-      };
-    });
-  };
-
-  const [mediaType, setMediaType] = useState<"audio" | "video">("audio");
-  const handleInviteUser = (data: any) => {
-    setMediaType(data.type);
-    setRtcGroupId(data.conversation.conversationId);
-
-    setUserInviteModalVisible(true);
-    // getGroupMembers(data.conversation.conversationId)
-    setJoinedRtcRoomUsers([{ userId: rootStore.client.user }]);
-    return new Promise((resolve, reject) => {
-      _resolve.current = resolve;
-    });
-  };
-
-  const handleRing = (data: any) => {
-    if (data.type === 2 || data.type === 3) {
-      let groupAvatarUrl = rootStore.addressStore.groups.find(
-        (item: any) => item.groupid === data.groupId
-      )?.avatarUrl;
-      setGroupAvatar(groupAvatarUrl || "");
-    }
-  };
-
-  let _resolve = useRef<any>(null);
   const thread = rootStore.threadStore;
 
   const chatRef = useRef<any>(null);
@@ -185,18 +112,9 @@ const ChatContainer = forwardRef((props, ref) => {
 
   // --- 创建会话 ---
   const [createChatVisible, setCreateChatVisible] = useState(false);
-  let [groupAvatar, setGroupAvatar] = useState("");
   useEffect(() => {
     setConversationDetailVisible(false);
     setCvsItem(rootStore.conversationStore.currentCvs);
-
-    if (rootStore.conversationStore.currentCvs.chatType === "groupChat") {
-      let groupAvatarUrl = rootStore.addressStore.groups.find(
-        (item: any) =>
-          item.groupid === rootStore.conversationStore.currentCvs.conversationId
-      )?.avatarUrl;
-      setGroupAvatar(groupAvatarUrl || "");
-    }
   }, [rootStore.conversationStore.currentCvs]);
 
   // ---- pin message ----
@@ -529,33 +447,9 @@ const ChatContainer = forwardRef((props, ref) => {
               onClickAvatar: handleEllipsisClick,
               onClickEllipsis: handleEllipsisClick,
             }}
-            rtcConfig={{
-              // @ts-ignore
-              onInvite: handleInviteUser,
-
-              onRing: handleRing,
-              agoraUid: agoraUuId,
-              getIdMap: handleGetIdMap,
-              onStateChange: handleRtcStateChange,
-              appId: APP_ID,
-              getRTCToken: getRtcToken2,
-              //@ts-ignore
-              onAddPerson: (data: any) => {
-                // console.log("onAddPerson", data);
-                setMediaType(data.type === 2 ? "video" : "audio");
-                setRtcGroupId(data.groupId);
-                setUserInviteModalVisible(true);
-                const joinedUsers = data.joinedMembers.map(
-                  (item: { agoraUid: number; imUserId: string }) => {
-                    return { userId: item.imUserId };
-                  }
-                );
-                setJoinedRtcRoomUsers(joinedUsers);
-                return new Promise((resolve) => {
-                  _resolve.current = resolve;
-                });
-              },
-              groupAvatar: groupAvatar,
+            callkitProps={{
+              logLevel: "debug",
+              enableLogging: true,
             }}
           ></Chat>
 
@@ -825,24 +719,6 @@ const ChatContainer = forwardRef((props, ref) => {
           </div>
         </>
       </Modal>
-      {/** 音视频邀请用户组件 */}
-      <UserInviteModal
-        title={
-          mediaType === "audio"
-            ? i18next.t("audioCall")
-            : i18next.t("videoCall")
-        }
-        visible={userInviteModalVisible}
-        groupId={rtcGroupId}
-        onClose={() => {
-          setUserInviteModalVisible(false);
-        }}
-        onInvite={(users) => {
-          _resolve.current(users);
-          setUserInviteModalVisible(false);
-        }}
-        checkedUsers={joinedRtcRoomUsers}
-      ></UserInviteModal>
     </div>
   );
 });

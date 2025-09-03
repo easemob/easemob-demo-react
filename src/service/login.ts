@@ -2,7 +2,7 @@ import axios from "axios";
 const isSandBox = false;
 const domain =
   (window.location.protocol === "https:" ? "https:" : "http:") +
-  (isSandBox ? "//a1-hsb.easemob.com" : "//a1-appserver.easemob.com");
+  (isSandBox ? "//a1-hsb.easemob.com" : "//appserver.easesdk.com");
 
 export const sendSms = (param: {
   phoneNumber: string;

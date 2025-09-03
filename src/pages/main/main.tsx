@@ -3,29 +3,10 @@ import { useEffect, useState, FC, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import toast, { Toaster } from "react-hot-toast";
 import {
-  Chat,
-  GroupDetail,
-  ContactList,
-  ContactDetail,
-  Header,
   rootStore,
-  ConversationList,
-  Provider,
   useClient,
   Icon,
-  Avatar,
-  MessageList,
-  useConversationContext,
-  useChatContext,
-  UserSelect,
-  TextMessage,
-  GroupMember,
-  Modal,
-  Input,
   eventHandler,
-  Tooltip,
-  Button,
-  Thread,
 } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./main.scss";
@@ -57,7 +38,6 @@ const ChatApp: FC<any> = () => {
           pwd: webImAuthObj.password,
         });
       } else {
-        console.log("webimAuthObj", webImAuthObj);
         client.open({
           user: webImAuthObj.userId,
           accessToken: webImAuthObj.chatToken,

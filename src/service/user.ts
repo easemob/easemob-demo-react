@@ -11,7 +11,7 @@ export const getUserIdWithPhoneNumber = (
     "Bearer " + rootStore.client.context.accessToken;
   return axios
     .get(
-      "https://a1-appserver.easemob.com" +
+      "https://appserver.easesdk.com" +
         `/inside/app/user/${phoneNumber}?operator=${userId}`
     )
     .then(function (response) {

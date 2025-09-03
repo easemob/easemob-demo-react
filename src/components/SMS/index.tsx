@@ -3,7 +3,6 @@ import { sendSms } from "../../service/login";
 import toast from "../toast/toast";
 import i18next from "../../i18n";
 import { encryptAES } from "./utils";
-import { secret, SCENE_ID, PREFIX } from "../../config";
 
 const SMS = ({
   phoneNumber,
@@ -48,7 +47,10 @@ const SMS = ({
 
     // 对secret进行base64解码
 
-    captchaVerifyParam = await encryptAES(captchaVerifyParam, secret);
+    captchaVerifyParam = await encryptAES(
+      captchaVerifyParam,
+      process.env.REACT_APP_SECRET as string
+    );
     try {
       const result = await sendSms({
         phoneNumber: phoneNumberRef.current,
@@ -99,8 +101,8 @@ const SMS = ({
     // 只用初始化一次验证码即可
     // @ts-ignore
     window.initAliyunCaptcha({
-      SceneId: SCENE_ID, // 场景ID。根据步骤二新建验证场景后，您可以在验证码场景列表，获取该场景的场景ID
-      prefix: PREFIX, // 身份标。开通阿里云验证码2.0后，您可以在控制台概览页面的实例基本信息卡片区域，获取身份标
+      SceneId: process.env.REACT_APP_SCENE_ID, // 场景ID。根据步骤二新建验证场景后，您可以在验证码场景列表，获取该场景的场景ID
+      prefix: process.env.REACT_APP_PREFIX, // 身份标。开通阿里云验证码2.0后，您可以在控制台概览页面的实例基本信息卡片区域，获取身份标
       mode: "popup", // 验证码模式。popup表示要集成的验证码模式为弹出式。无需修改
       element: "#captcha-element", // 页面上预留的渲染验证码的元素，与原代码中预留的页面元素保持一致。
       button: "#captcha-button", // 触发验证码弹窗的元素。button表示单击登录按钮后，触发captchaVerifyCallback函数。您可以根据实际使用的元素修改element的值
