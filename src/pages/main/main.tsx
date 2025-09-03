@@ -69,7 +69,7 @@ const ChatApp: FC<any> = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (!state.loggedIn) {
-      navigate("/login");
+      navigate("/dev");
     }
   }, [state.loggedIn]);
 
