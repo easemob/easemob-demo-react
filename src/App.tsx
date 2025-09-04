@@ -15,10 +15,9 @@ import { updateAppConfig } from "./store/appConfigSlice";
 window.rootStore = rootStore;
 
 const ChatApp: FC<any> = () => {
-  // close Chat and RTC log
-  const { AgoraRTC, ChatSDK } = useSDK();
+  // close Chat log
+  const { ChatSDK } = useSDK();
   // ChatSDK.logger.disableAll();
-  AgoraRTC.setLogLevel(4);
 
   const state = useAppSelector((state) => state.appConfig);
   const loginState = useAppSelector((state) => state.login);

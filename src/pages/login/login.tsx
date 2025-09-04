@@ -189,9 +189,8 @@ const Login = () => {
             />
           )}
         </div>
-        {values.phoneNumber && (
-          <SMS phoneNumber={values.phoneNumber} onVerified={handleVerify}></SMS>
-        )}
+
+        <SMS phoneNumber={values.phoneNumber} onVerified={handleVerify}></SMS>
         <div className="input-box">
           <input
             disabled={state.isLogging}
