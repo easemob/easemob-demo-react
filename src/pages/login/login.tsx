@@ -1,5 +1,10 @@
 import "./login.scss";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  useEffect,
+  useState,
+  startTransition,
+} from "react";
 import i18next from "../../i18n";
 import loading from "../../assets/loading.png";
 import closeIcon from "../../assets/Xmark@2x.png";
@@ -148,7 +153,9 @@ const Login = () => {
   };
   const navigate = useNavigate();
   const goDev = () => {
-    navigate("/dev", { replace: true });
+    startTransition(() => {
+      navigate("/dev", { replace: true });
+    });
   };
 
   const changeLang = () => {
