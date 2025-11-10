@@ -147,6 +147,8 @@
         "Please set browser support notification": "请设置浏览器支持通知",
         "userNotExist": "此用户不存在",
         "alreadyFriend": "此联系人已存在",
-        "addContactByUserIdOrPhone": "通过手机号或ID添加联系人"
+        "addContactByUserIdOrPhone": "通过手机号或ID添加联系人",
+        "contactDetails": "联系人详情",
+        "groupSettings": "群组设置"
     }
 }

@@ -5,11 +5,14 @@ import {
   Switch,
   RootContext,
   Blocklist as BlocklistUIKit,
+  useIsMobile,
 } from "easemob-chat-uikit";
 import UserInfo from "../../../components/userInfo/userInfo";
 import classNames from "classnames";
 
-const Blocklist = () => {
+const Blocklist = (props: { onBack?: () => void }) => {
+  const { onBack } = props;
+  const isMobile = useIsMobile();
   const prefixCls = "blocklist";
 
   const context = useContext(RootContext);
@@ -29,9 +32,18 @@ const Blocklist = () => {
     <div
       className={classNames("setting-personal", {
         "setting-personal-dark": themeMode === "dark",
+        "mobile-fullwidth": isMobile,
       })}
     >
       <header className="setting-personal-header">
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
         {i18next.t("blocklist")}
       </header>
       <main className="setting-personal-main">
@@ -43,12 +55,19 @@ const Blocklist = () => {
 
         {selectedUser && (
           <div
-            style={{
-              width: "360px",
-              borderLeft: `1px solid ${
-                themeMode == "dark" ? "#464E53" : "#E3E6E8"
-              }`,
-            }}
+            style={
+              isMobile
+                ? {
+                    width: "100%",
+                    position: "absolute",
+                  }
+                : {
+                    width: "360px",
+                    borderLeft: `1px solid ${
+                      themeMode == "dark" ? "#464E53" : "#E3E6E8"
+                    }`,
+                  }
+            }
           >
             <UserInfo
               itemConfig={{
@@ -69,6 +88,9 @@ const Blocklist = () => {
               conversation={{
                 chatType: "singleChat",
                 conversationId: selectedUser,
+              }}
+              onBack={() => {
+                setSelectedUser("");
               }}
             />
           </div>

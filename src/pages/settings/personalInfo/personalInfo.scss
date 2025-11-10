@@ -1,6 +1,7 @@
 .setting-personal{
     width: 100%;
     height: 100%;
+    height: calc(100 * var(--dvh, 1vh));
     display: flex;
     flex-direction: column;
 
@@ -33,6 +34,11 @@
     }
 }
 
+.setting-personal.mobile-fullwidth{
+    position: absolute;
+    left: 0;
+    background: #F9FAFA;
+}
 .setting-tab-dark{
     .setting-tab-content{
         .setting-personal-dark{

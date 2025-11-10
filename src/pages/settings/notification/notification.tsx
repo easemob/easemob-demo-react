@@ -1,13 +1,15 @@
 import React, { useContext } from "react";
 import "./notification.scss";
 import i18next from "../../../i18n";
-import { Icon, Switch, RootContext } from "easemob-chat-uikit";
+import { Icon, Switch, RootContext, useIsMobile } from "easemob-chat-uikit";
 import classNames from "classnames";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { updateAppConfig } from "../../../store/appConfigSlice";
 
-const Notification = () => {
+const Notification = (props: { onBack?: () => void }) => {
+  const { onBack } = props;
   const prefixCls = "user-info";
+  const isMobile = useIsMobile();
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.appConfig);
   const handleNotificationChange = (e: { target: { checked: boolean } }) => {
@@ -28,9 +30,18 @@ const Notification = () => {
     <div
       className={classNames("setting-personal", {
         "setting-personal-dark": themeMode === "dark",
+        "mobile-fullwidth": isMobile,
       })}
     >
       <header className="setting-personal-header">
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
         {i18next.t("messageNotification")}
       </header>
       <main className="setting-personal-main">

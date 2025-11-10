@@ -8,7 +8,7 @@ import React, {
 import i18next from "../../i18n";
 import loading from "../../assets/loading.png";
 import closeIcon from "../../assets/Xmark@2x.png";
-import { Icon, Checkbox } from "easemob-chat-uikit";
+import { Icon, Checkbox, useIsMobile } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { useNavigate } from "react-router-dom";
 import { getChatToken } from "../../service/login";
@@ -17,6 +17,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import { updateAppConfig } from "../../store/appConfigSlice";
 import { DEMO_VERSION, SDK_VERSION, UIKIT_VERSION } from "../../config";
 import SMS from "../../components/SMS";
+import classNames from "classnames";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -44,6 +45,7 @@ const Login = () => {
   const [countdown, setCountdown] = useState(60);
   const [isCounting, setIsCounting] = useState(false);
   const [agree, setAgree] = useState(false);
+  const isMobile = useIsMobile();
   const handleChange =
     (type: "phoneNumber" | "vCode") =>
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -285,7 +287,11 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <div className="login-copyright">
+      <div
+        className={classNames("login-copyright", {
+          "login-copyright-mobile": isMobile,
+        })}
+      >
         {appConfigState.language == "zh"
           ? `© ${new Date().getFullYear()} 环信，SDK版本：${SDK_VERSION} UIkit版本：${UIKIT_VERSION} Demo版本：${DEMO_VERSION}`
           : `${new Date().getFullYear()} Easemob Inc, SDK Version: ${SDK_VERSION}  UIkit Version: ${UIKIT_VERSION}  Demo Version: ${DEMO_VERSION}`}

@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import i18next from "../../../i18n";
-import { Icon, Switch, RootContext } from "easemob-chat-uikit";
+import { Icon, Switch, RootContext, useIsMobile } from "easemob-chat-uikit";
 import classNames from "classnames";
 import { DEMO_VERSION, UIKIT_VERSION } from "../../../config";
-const About = () => {
+const About = (props: { onBack?: () => void }) => {
+  const { onBack } = props;
+  const isMobile = useIsMobile();
   const prefixCls = "user-info";
 
   const context = useContext(RootContext);
@@ -13,9 +15,20 @@ const About = () => {
     <div
       className={classNames("setting-personal", {
         "setting-personal-dark": themeMode === "dark",
+        "mobile-fullwidth": isMobile,
       })}
     >
-      <header className="setting-personal-header">{i18next.t("about")}</header>
+      <header className="setting-personal-header">
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
+        {i18next.t("about")}
+      </header>
       <main className="setting-personal-main">
         <section className="setting-personal-content">
           <div className="user-info-content">

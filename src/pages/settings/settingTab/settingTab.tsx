@@ -13,6 +13,7 @@ import {
 import { use } from "i18next";
 import { useAppSelector, useAppDispatch } from "../../../hooks";
 import { observer } from "mobx-react-lite";
+import { useIsMobile } from "easemob-chat-uikit";
 interface Tab {
   title: React.ReactNode;
   icon: React.ReactNode;
@@ -35,8 +36,13 @@ const getKeyIndex = (activeKey: string) => {
   return { key, index };
 };
 const SettingTab = (props: SettingMenuProps) => {
+  const isMobile = useIsMobile();
+  const [showContent, setShowContent] = useState(isMobile ? false : true);
   const { tabGroups } = props;
-  const [activeKey, setActiveKey] = useState(tabGroups[0].key + "_0");
+  const [activeKey, setActiveKey] = useState(
+    isMobile ? "" : tabGroups[0].key + "_0"
+  );
+
   const { key, index } = getKeyIndex(activeKey);
 
   const context = useContext(RootContext);
@@ -105,12 +111,24 @@ const SettingTab = (props: SettingMenuProps) => {
         "setting-tab-dark": themeMode === "dark",
       })}
     >
-      <div className="setting-tab-menu">
-        <div className="setting-tab-menu-header">{i18next.t("me")}</div>
+      <div
+        className="setting-tab-menu"
+        style={{
+          display: showContent && isMobile ? "none" : "block",
+          width: isMobile ? "100%" : "360px",
+          borderRight: isMobile ? "none" : "1px solid #E3E6E8",
+        }}
+      >
+        <div
+          className="setting-tab-menu-header"
+          style={{ borderBottom: isMobile ? "none" : "1px solid #E3E6E8" }}
+        >
+          {i18next.t("me")}
+        </div>
 
         {tabGroups.map((group, index) => {
           return (
-            <div key={index} className="setting-tab-group">
+            <div key={group.key} className="setting-tab-group">
               <div className="setting-tab-group-title">{group.title}</div>
               <div className="setting-tab-group-content">
                 {group.tabs.map((item, index) => {
@@ -129,7 +147,6 @@ const SettingTab = (props: SettingMenuProps) => {
                             });
                             return newMenuTab;
                           });
-
                           item.onClick?.();
                         }}
                       >
@@ -144,6 +161,7 @@ const SettingTab = (props: SettingMenuProps) => {
                               <ul className="cui-header-more">
                                 {(item.content as string[]).map((menuItem) => (
                                   <li
+                                    key={menuItem}
                                     className={
                                       themeMode == "dark" ? "cui-li-dark" : ""
                                     }
@@ -231,12 +249,15 @@ const SettingTab = (props: SettingMenuProps) => {
                   }
                   return (
                     <div
-                      key={`${group.key}_${index}`}
+                      key={`${item.key}_${index}`}
                       className={classNames("setting-menu-item", {
                         active: `${group.key}_${index}` === activeKey,
                       })}
                       onClick={() => {
                         setActiveKey(`${group.key}_${index}`);
+                        if (isMobile && item.key !== "login") {
+                          setShowContent(true);
+                        }
                         item.onClick?.();
                       }}
                     >
@@ -250,17 +271,27 @@ const SettingTab = (props: SettingMenuProps) => {
           );
         })}
       </div>
-      <div className="setting-tab-content">
-        {
-          // 根据key index 获取对应的content
-          tabGroups.map((group, index) => {
-            if (group.key === getKeyIndex(activeKey).key) {
-              return group.tabs[Number(getKeyIndex(activeKey).index)].content;
-            } else {
-              return null;
-            }
-          })
-        }
+      <div
+        className="setting-tab-content"
+        style={{ display: !showContent && isMobile ? "none" : "block" }}
+      >
+        {(() => {
+          const { key: activeGroupKey, index: activeIndex } =
+            getKeyIndex(activeKey);
+          const group = tabGroups.find((g) => g.key === activeGroupKey);
+          const tab = group ? group.tabs[Number(activeIndex)] : undefined;
+          const originalContent = tab?.content;
+
+          if (isMobile && React.isValidElement(originalContent)) {
+            return React.cloneElement(
+              originalContent as React.ReactElement<any>,
+              {
+                onBack: () => setShowContent(false),
+              }
+            );
+          }
+          return originalContent ?? null;
+        })()}
       </div>
 
       <Modal

@@ -1,7 +1,8 @@
 
 .setting-tab{
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
+    height: calc(100 * var(--dvh, 1vh));
     display: flex;
 
     &-menu{

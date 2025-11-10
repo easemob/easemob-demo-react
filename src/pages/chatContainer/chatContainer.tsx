@@ -20,6 +20,7 @@ import {
   PinnedMessage,
   usePinnedMessage,
   RootContext,
+  useIsMobile,
 } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { getGroupAvatar } from "../../service/avatar";
@@ -91,6 +92,9 @@ const ChatContainer = forwardRef((props, ref) => {
 
   // ==================== 事件处理函数 ====================
   const handleEllipsisClick = () => {
+    if (isMobile) {
+      return;
+    }
     if (cvsItem.chatType == CHAT_TYPES.GROUP_CHAT) {
       if (thread.showThreadPanel) {
         rootStore.threadStore.setThreadVisible(false);
@@ -135,6 +139,14 @@ const ChatContainer = forwardRef((props, ref) => {
 
   // 监听当前会话变化
   useEffect(() => {
+    if (
+      isMobile &&
+      rootStore.conversationStore.currentCvs.conversationId != undefined
+    ) {
+      setShowChatView(true);
+    } else {
+      setShowChatView(false);
+    }
     setConversationDetailVisible(false);
     setCvsItem(rootStore.conversationStore.currentCvs);
   }, [rootStore.conversationStore.currentCvs]);
@@ -180,15 +192,73 @@ const ChatContainer = forwardRef((props, ref) => {
     };
   }, [detailsRef, groupMemberVisible]);
 
+  // ==================== 移动端状态 ====================
+  const [isMobile, setIsMobile] = useState(false);
+  const [showChatView, setShowChatView] = useState(false); // 移动端是否显示聊天视图
+
+  // 检测屏幕尺寸
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      // 桌面端总是显示聊天视图
+      if (window.innerWidth > 768) {
+        setShowChatView(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // 移动端选择会话后显示聊天视图
+  const handleMobileItemClick = (item: any) => {
+    setConversationDetailVisible(false);
+    setCvsItem(item);
+
+    // 移动端点击会话后显示聊天视图
+    if (isMobile) {
+      setShowChatView(true);
+    }
+  };
+
+  // 移动端返回会话列表
+  const handleBackToConversations = () => {
+    setShowChatView(false);
+  };
+
+  // 移动端更多按钮菜单内容
+  const mobileMoreActions: any[] = [];
+  if (isMobile) {
+    if (cvsItem.chatType == CHAT_TYPES.SINGLE_CHAT) {
+      mobileMoreActions.push({
+        icon: <Icon type="PERSON_SINGLE_FILL" width={20} height={20} />,
+        content: i18next.t("contactDetails"),
+        onClick: () => setConversationDetailVisible(true),
+      });
+    } else if (cvsItem.chatType == CHAT_TYPES.GROUP_CHAT) {
+      mobileMoreActions.push({
+        icon: <Icon type="PERSON_DOUBLE_FILL" width={20} height={20} />,
+        content: i18next.t("groupSettings"),
+        onClick: () => setConversationDetailVisible(true),
+      });
+    }
+  }
+
   // ==================== 渲染 ====================
   return (
     <div
       className={classNames("chat-container", {
         "chat-container-dark": themeMode === "dark",
+        "chat-container-mobile": isMobile,
       })}
     >
       {/* 会话列表区域 */}
-      <div className="chat-container-conversation">
+      <div
+        className={classNames("chat-container-conversation", {
+          "mobile-hidden": isMobile && showChatView,
+        })}
+      >
         <ConversationList
           renderHeader={() => (
             <Header
@@ -208,7 +278,12 @@ const ChatContainer = forwardRef((props, ref) => {
                       />
                     ),
                     content: i18next.t("newConversation"),
-                    onClick: () => setCreateChatVisible(true),
+                    onClick: () => {
+                      if (isMobile) {
+                        setShowChatView(true);
+                      }
+                      setCreateChatVisible(true);
+                    },
                   },
                   {
                     icon: (
@@ -247,25 +322,34 @@ const ChatContainer = forwardRef((props, ref) => {
               avatar={<></>}
             />
           )}
-          onItemClick={(item) => {
-            setConversationDetailVisible(false);
-            setCvsItem(item);
-          }}
+          onItemClick={handleMobileItemClick}
           className="conversation-list"
         />
       </div>
 
       {/* 聊天区域 */}
-      <div className="chat-container-chat">
+      <div
+        className={classNames("chat-container-chat", {
+          "mobile-hidden": isMobile && !showChatView,
+          "mobile-fullwidth": isMobile && showChatView,
+        })}
+      >
         {/* 诈骗提示 */}
         <div
           className="fraud"
           style={
-            showPanel ? { width: "calc(100% - 350px)" } : { width: "100%" }
+            showPanel
+              ? { width: isMobile ? "100%" : "calc(100% - 350px)" }
+              : { width: "100%" }
           }
         >
           <FraudTip
-            visible={fraudTipVisible && cvsItem.conversationId !== ""}
+            visible={
+              fraudTipVisible &&
+              cvsItem.conversationId !== "" &&
+              !createChatVisible &&
+              !conversationDetailVisible
+            }
             onClose={closeFraudTip}
           />
         </div>
@@ -276,13 +360,31 @@ const ChatContainer = forwardRef((props, ref) => {
             display: "flex",
             flex: 1,
             borderLeft: "1px solid transparent",
-            overflow: "hidden",
             transition: "all 0.5s ease",
           }}
         >
           {/* 创建聊天组件 */}
           {createChatVisible && (
-            <CreateChat onClosed={() => setCreateChatVisible(false)} />
+            <CreateChat
+              onClosed={() => {
+                setCreateChatVisible(false);
+                if (isMobile) {
+                  setShowChatView(false);
+                } else {
+                  setShowChatView(true);
+                }
+              }}
+              onBack={() => {
+                setCreateChatVisible(false);
+                setShowChatView(false);
+              }}
+              onCreateChat={() => {
+                setCreateChatVisible(false);
+                if (isMobile) {
+                  setShowChatView(true);
+                }
+              }}
+            />
           )}
 
           {/* 聊天组件 */}
@@ -325,20 +427,32 @@ const ChatContainer = forwardRef((props, ref) => {
             headerProps={{
               moreAction: {
                 visible: true,
-                actions: [],
+                actions: mobileMoreActions,
               },
               style: { cursor: "pointer" },
               onClickAvatar: handleEllipsisClick,
               onClickEllipsis: handleEllipsisClick,
+              onClickBack: handleBackToConversations,
             }}
             callkitProps={CALLKIT_CONFIG}
           />
 
           {/* 群组设置/联系人详情 */}
           {conversationDetailVisible && (
-            <div className="chat-container-chat-right" ref={detailsRef}>
+            <div
+              className={classNames("chat-container-chat-right", {
+                "mobile-fullwidth": isMobile && showChatView,
+              })}
+              ref={detailsRef}
+            >
               {cvsItem.chatType == CHAT_TYPES.GROUP_CHAT ? (
                 <GroupDetail
+                  onBack={() => {
+                    setConversationDetailVisible(false);
+                    // if (isMobile) {
+                    //   setShowChatView(false);
+                    // }
+                  }}
                   conversation={{
                     chatType: CHAT_TYPES.GROUP_CHAT,
                     conversationId: cvsItem.conversationId,
@@ -357,7 +471,6 @@ const ChatContainer = forwardRef((props, ref) => {
                     },
                   }}
                   onGroupMemberVisibleChange={(visible: boolean) => {
-                    console.log("onGroupMemberVisibleChange", visible);
                     setGroupMemberVisible(visible);
                   }}
                   onUserIdCopied={() => {
@@ -365,7 +478,15 @@ const ChatContainer = forwardRef((props, ref) => {
                   }}
                 />
               ) : (
-                <UserInfo conversation={cvsItem} />
+                <UserInfo
+                  conversation={cvsItem}
+                  onBack={() => {
+                    setConversationDetailVisible(false);
+                    // if (isMobile) {
+                    //   setShowChatView(false);
+                    // }
+                  }}
+                />
               )}
             </div>
           )}
@@ -375,7 +496,11 @@ const ChatContainer = forwardRef((props, ref) => {
         {thread.showThreadPanel &&
           !pinMsgVisible &&
           !conversationDetailVisible && (
-            <div className="chat-container-chat-right">
+            <div
+              className={classNames("chat-container-chat-right", {
+                "mobile-fullwidth": isMobile && showChatView,
+              })}
+            >
               <Thread
                 messageListProps={{
                   renderUserProfile: () => null,
@@ -404,7 +529,11 @@ const ChatContainer = forwardRef((props, ref) => {
         {pinMsgVisible &&
           !thread.showThreadPanel &&
           !conversationDetailVisible && (
-            <div className="chat-container-chat-right">
+            <div
+              className={classNames("chat-container-chat-right", {
+                "mobile-fullwidth": isMobile && showChatView,
+              })}
+            >
               <PinnedMessage />
             </div>
           )}

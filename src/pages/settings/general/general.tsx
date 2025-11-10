@@ -6,6 +6,7 @@ import {
   Icon,
   Collapse,
   RootContext,
+  useIsMobile,
 } from "easemob-chat-uikit";
 import React, { useState, useEffect, useContext } from "react";
 import { HuePicker } from "react-color";
@@ -33,7 +34,9 @@ const Pointer = () => {
   return <div className="color-picker-pointer"></div>;
 };
 
-const General = () => {
+const General = (props: { onBack?: () => void }) => {
+  const { onBack } = props;
+  const isMobile = useIsMobile();
   const state = useAppSelector((state) => state.appConfig);
   const dispatch = useAppDispatch();
 
@@ -263,9 +266,18 @@ const General = () => {
     <div
       className={classNames("setting-personal", {
         "setting-personal-dark": appThemeMode === "dark",
+        "mobile-fullwidth": isMobile,
       })}
     >
       <header className="setting-personal-header">
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
         {i18next.t("general")}
       </header>
       <main className="setting-personal-main">

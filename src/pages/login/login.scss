@@ -9,8 +9,10 @@
     align-items: center;
     min-height: 698px;
     background-position: center;
-    height: 100vh;
+    height: 100dvh;
+    height: calc(100 * var(--dvh, 1vh));
     font-family: "Roboto";
+    overflow: hidden;
 }
 .language-switch{
     position: absolute;
@@ -34,7 +36,18 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    gap: 16px;
+    margin: -8px;
+    >* {
+        margin: 8px 0; // = gap/2
+    }
+    // 现代浏览器支持 gap 时走这里
+    // @supports (gap: 1px) {
+    //     margin: 0;
+    //     gap: 16px;
+    //     >* {
+    //         margin: 0;
+    //     }
+    // }
 }
 
 .login-form-icon {
@@ -68,7 +81,7 @@
     border: 1px solid #F2F3F3;
     border-radius: 4px;
     /* margin: 2% 0; */
-    font-size: 14px;
+    font-size: 16px;
     // color: #919BA1;
     color: #171A1C;
     box-sizing: border-box;
@@ -152,6 +165,12 @@
         height: 24px;
         margin-left: 12px;
         cursor: pointer;
+    }
+
+    &-mobile{
+        position: unset;
+        margin: 30px 20px 0;
+        
     }
 }
 

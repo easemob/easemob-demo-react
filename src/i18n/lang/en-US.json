@@ -148,6 +148,8 @@
         "Please set browser support notification": "Please set browser support notification",
         "userNotExist": "The user does not exist",
         "alreadyFriend": "You have already added this contact",
-        "addContactByUserIdOrPhone": "Search contacts by phone number or ID"
+        "addContactByUserIdOrPhone": "Search contacts by phone number or ID",
+        "contactDetails": "Contact Details",
+        "groupSettings": "Group Settings"
     }
 }

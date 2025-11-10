@@ -9,14 +9,17 @@ import {
   Modal,
   Input,
   RootContext,
+  useIsMobile,
 } from "easemob-chat-uikit";
 import { uploadImage } from "../../../service/avatar";
 import { observer } from "mobx-react-lite";
 import classNames from "classnames";
 import ImageCrop from "../../../components/imageCrop/imageCrop";
 import toast from "../../../components/toast/toast";
-const PersonalInfo = () => {
+const PersonalInfo = (props: { onBack?: () => void }) => {
+  const { onBack } = props;
   const prefixCls = "user-info";
+  const isMobile = useIsMobile();
   const { addressStore } = rootStore;
   const [nicknameModalVisible, setNicknameModalVisible] = useState(false);
 
@@ -102,7 +105,8 @@ const PersonalInfo = () => {
   const context = useContext(RootContext);
   const { theme, presenceMap } = context;
   const themeMode = theme?.mode;
-  const myInfo = rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+  const myInfo =
+    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
   const presence = myInfo.isOnline
     ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];
@@ -123,9 +127,18 @@ const PersonalInfo = () => {
     <div
       className={classNames("setting-personal", {
         "setting-personal-dark": themeMode === "dark",
+        "mobile-fullwidth": isMobile,
       })}
     >
       <header className="setting-personal-header">
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
         {i18next.t("personalInfo")}
       </header>
       <main className="setting-personal-main">

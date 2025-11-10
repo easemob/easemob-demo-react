@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ContactList,
   ContactDetail,
@@ -13,6 +13,7 @@ import "./contacts.scss";
 import toast from "../../components/toast/toast";
 import i18next from "../../i18n";
 import { getUserIdWithPhoneNumber } from "../../service/user";
+import classNames from "classnames";
 interface ContactsProps {
   onMessageClick?: () => void;
   onVideoCall?: () => void;
@@ -35,9 +36,34 @@ const Contacts = ({
   const handleUserIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserId(e.target.value);
   };
+
+  // ==================== 移动端状态 ====================
+  const [isMobile, setIsMobile] = useState(false);
+  const [showDetailView, setShowDetailView] = useState(false); // 移动端是否显示聊天视图
+
+  // 检测屏幕尺寸
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+      // 桌面端总是显示聊天视图
+      if (window.innerWidth > 768) {
+        setShowDetailView(true);
+      }
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   return (
     <div className="contacts-container">
-      <div className="contacts-container-list">
+      <div
+        className={classNames("contacts-container-list", {
+          "mobile-hidden": isMobile && showDetailView,
+          "mobile-fullwidth": isMobile && !showDetailView,
+        })}
+      >
         <ContactList
           header={
             <Header
@@ -73,10 +99,16 @@ const Contacts = ({
               name: data.name,
               type: type,
             });
+            setShowDetailView(true);
           }}
         ></ContactList>
       </div>
-      <div className="contacts-container-detail">
+      <div
+        className={classNames("contacts-container-detail", {
+          "mobile-hidden": isMobile && !showDetailView,
+          "mobile-fullwidth": isMobile && showDetailView,
+        })}
+      >
         <ContactDetail
           // @ts-ignore
           data={contactData}
@@ -91,6 +123,9 @@ const Contacts = ({
           }}
           onUserIdCopied={(userId) => {
             toast.success(i18next.t("copySuccess"));
+          }}
+          onClickBack={() => {
+            setShowDetailView(false);
           }}
         ></ContactDetail>
       </div>

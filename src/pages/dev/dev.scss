@@ -9,7 +9,8 @@
     align-items: center;
     min-height: 698px;
     background-position: center;
-    height: 100vh;
+    height: 100dvh;
+    height: calc(100 * var(--dvh, 1vh));
     flex-direction: row;
 }
 .language-switch{

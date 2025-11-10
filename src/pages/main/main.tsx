@@ -2,12 +2,7 @@ import { useEffect, useState, FC, useRef } from "react";
 // import "./index.css";
 import { observer } from "mobx-react-lite";
 import toast, { Toaster } from "react-hot-toast";
-import {
-  rootStore,
-  useClient,
-  Icon,
-  eventHandler,
-} from "easemob-chat-uikit";
+import { rootStore, useClient, Icon, eventHandler } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./main.scss";
 import NavigationBar from "../../components/navigationBar/navigationBar";
@@ -24,7 +19,6 @@ const ChatApp: FC<any> = () => {
   useEffect(() => {
     const webImAuth = sessionStorage.getItem("webImAuth");
 
-    console.log("webImAuth", webImAuth);
     let webImAuthObj = {
       userId: "",
       password: "",

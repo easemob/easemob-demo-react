@@ -6,16 +6,21 @@ import {
   rootStore,
   Avatar,
   RootContext,
+  useIsMobile,
+  Icon,
 } from "easemob-chat-uikit";
 import { useRef, useEffect, ChangeEvent, useState, useContext } from "react";
 import classNames from "classnames";
 import i18next from "../../i18n";
 interface CreateChatProps {
   onClosed?: () => void;
+  onBack?: () => void;
+  onCreateChat?: () => void;
 }
 const CreateChat = (props: CreateChatProps) => {
-  const { onClosed } = props;
+  const { onClosed, onBack, onCreateChat } = props;
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useIsMobile();
   useEffect(() => {
     inputRef.current?.focus?.();
     //@ts-ignore
@@ -28,7 +33,6 @@ const CreateChat = (props: CreateChatProps) => {
     { nickname: string; remark?: string; userId: string; silent?: boolean }[]
   >([]);
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value, contacts);
 
     if (e.target.value.length > 0) {
       setShowSearch(true);
@@ -67,6 +71,14 @@ const CreateChat = (props: CreateChatProps) => {
       })}
     >
       <header>
+        {isMobile && (
+          <Icon
+            type="ARROW_LEFT"
+            width={24}
+            height={24}
+            onClick={onBack}
+          ></Icon>
+        )}
         <span style={{ marginRight: "8px" }}>
           {i18next.t("newConversation")}
         </span>
@@ -78,14 +90,15 @@ const CreateChat = (props: CreateChatProps) => {
             onClosed?.();
           }}
           onBlur={() => {
-            console.log("showSearch", showSearch);
-            setTimeout(() => {
-              setShowSearch(false);
-              onClosed?.();
-            }, 500);
-
-            // !showSearch && onClosed?.();
+            !isMobile &&
+              setTimeout(() => {
+                setShowSearch(false);
+                onClosed?.();
+              }, 500);
           }}
+          className={classNames({
+            "create-chat-input-mobile": isMobile,
+          })}
         />
       </header>
       <main>
@@ -113,14 +126,16 @@ const CreateChat = (props: CreateChatProps) => {
                       lastMessage: {} as never,
                       unreadCount: 0,
                     });
-                    rootStore.conversationStore.setCurrentCvs({
-                      chatType: "singleChat",
-                      name:
-                        contact.remark || contact.nickname || contact.userId,
-                      conversationId: contact.userId,
-                      unreadCount: 0,
-                    });
-                    onClosed?.();
+                    setTimeout(() => {
+                      rootStore.conversationStore.setCurrentCvs({
+                        chatType: "singleChat",
+                        name:
+                          contact.remark || contact.nickname || contact.userId,
+                        conversationId: contact.userId,
+                        unreadCount: 0,
+                      });
+                    }, 100);
+                    onCreateChat?.();
                   }}
                 >
                   <Avatar
@@ -140,6 +155,14 @@ const CreateChat = (props: CreateChatProps) => {
             })
           ) : (
             <div className="search-content-item search-content-none">
+              {isMobile && (
+                <Icon
+                  type="ARROW_LEFT"
+                  width={24}
+                  height={24}
+                  onClick={onBack}
+                />
+              )}
               {i18next.t("noResults")}
             </div>
           )}

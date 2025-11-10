@@ -7,7 +7,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-y: hidden;
   font-family: Roboto;
+  height: 100dvh;
+  overflow: hidden;
 }
+
+* { -webkit-tap-highlight-color: transparent; }
 
 .cui-messageList {
   background-image: url("./assets/chat-background.svg");
@@ -30,9 +34,12 @@ body {
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
-  line-height: 20px; /* 142.857% */
   text-align: center;
   margin-top: 15px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 code {

@@ -6,6 +6,7 @@ import {
   Modal,
   rootStore,
   Input,
+  useIsMobile,
 } from "easemob-chat-uikit";
 import i18next from "../../i18n";
 import classNames from "classnames";
@@ -31,6 +32,7 @@ interface UserInfoProps {
     onBlockedChange?: (e: { target: { checked: boolean } }) => void;
     onDeleteContact?: () => void;
   };
+  onBack?: () => void;
   // themeMode?: string;
 }
 const UserInfo = (props: UserInfoProps) => {
@@ -45,11 +47,12 @@ const UserInfo = (props: UserInfoProps) => {
       deleteContact: true,
       addContact: true,
     },
+    onBack,
   } = props;
   const context = useContext(RootContext);
   const { theme } = context;
   const themeMode = theme?.mode || "light";
-
+  const isMobile = useIsMobile();
   const prefixCls = "user-info";
   const { addressStore, conversationStore } = rootStore;
   const userInfo =
@@ -157,6 +160,16 @@ const UserInfo = (props: UserInfoProps) => {
   return (
     <div className={classString}>
       <div className={`${prefixCls}-header`}>
+        {isMobile && (
+          <div className={`${prefixCls}-header-back`}>
+            <Icon
+              type="ARROW_LEFT"
+              width={24}
+              height={24}
+              onClick={onBack}
+            ></Icon>
+          </div>
+        )}
         <Avatar
           src={
             addressStore.appUsersInfo[conversation.conversationId]?.avatarurl
