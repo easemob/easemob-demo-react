@@ -5,6 +5,7 @@ import {
   useImperativeHandle,
   useEffect,
   useContext,
+  useMemo,
 } from "react";
 import {
   Chat,
@@ -245,6 +246,22 @@ const ChatContainer = forwardRef((props, ref) => {
     }
   }
 
+  const serverConfig = useMemo(() => {
+    try {
+      const raw = localStorage.getItem("serverConfig");
+      return raw ? JSON.parse(raw) : {};
+    } catch (err) {
+      console.warn("读取 serverConfig 失败", err);
+      return {};
+    }
+  }, []);
+  // 获取 rtc server list
+  const rtcServerList = serverConfig.rtcServerList?.split(",") || [];
+  const rtcServerDomain = serverConfig.rtcServerDomain || "";
+  const useRtcServer = serverConfig.useRtcServer;
+  const checkRtcToken =
+    useRtcServer && serverConfig.checkRtcToken == false ? false : true;
+
   // ==================== 渲染 ====================
   return (
     <div
@@ -434,7 +451,20 @@ const ChatContainer = forwardRef((props, ref) => {
               onClickEllipsis: handleEllipsisClick,
               onClickBack: handleBackToConversations,
             }}
-            callkitProps={CALLKIT_CONFIG}
+            callkitProps={{
+              ...CALLKIT_CONFIG,
+              onRtcEngineCreated: (engine: any) => {
+                if (useRtcServer) {
+                  engine.setLocalAccessPointsV2({
+                    accessPoints: {
+                      serverList: rtcServerList,
+                      domain: rtcServerDomain,
+                    },
+                  });
+                }
+              },
+              useRTCToken: checkRtcToken,
+            }}
           />
 
           {/* 群组设置/联系人详情 */}

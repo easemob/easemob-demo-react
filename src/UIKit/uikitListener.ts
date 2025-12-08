@@ -77,6 +77,14 @@ const listener = (store: any) => {
         }
       },
     },
+    getConversationlist: {
+      success: () => {
+        console.log("getConversationlist success");
+      },
+      error: (error: any) => {
+        console.log("getConversationlist error");
+      },
+    },
   });
 };
 

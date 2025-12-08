@@ -26,6 +26,10 @@ const ConfigForm = () => {
     rest: "",
     useAppkey: false,
     useCustomServer: false,
+    useRtcServer: false,
+    rtcServerList: "",
+    rtcServerDomain: "",
+    checkRtcToken: false,
   });
 
   useEffect(() => {
@@ -84,7 +88,7 @@ const ConfigForm = () => {
         ></input>
       </div>
       <div className="dev-config-switchItem">
-        <div className="dev-config-switchItem-label">使用私有服务器</div>
+        <div className="dev-config-switchItem-label">使用IM私有服务器</div>
         <Switch
           checked={config.useCustomServer}
           onChange={handleSwitchChange("useCustomServer")}
@@ -106,6 +110,38 @@ const ConfigForm = () => {
           className="dev-config-input"
           placeholder="请输入"
           onChange={handleInputChange("rest")}
+        ></input>
+      </div>
+      <div className="dev-config-switchItem">
+        <div className="dev-config-switchItem-label">使用RTC私有服务器</div>
+        <Switch
+          checked={config.useRtcServer}
+          onChange={handleSwitchChange("useRtcServer")}
+        ></Switch>
+      </div>
+      <div className="dev-config-switchItem">
+        <div className="dev-config-switchItem-label">是否校验 RTC Token</div>
+        <Switch
+          checked={config.checkRtcToken}
+          onChange={handleSwitchChange("checkRtcToken")}
+        ></Switch>
+      </div>
+      <div className="dev-config-label">RTC Server List</div>
+      <div>
+        <input
+          value={config.rtcServerList}
+          className="dev-config-input"
+          placeholder="请输入"
+          onChange={handleInputChange("rtcServerList")}
+        ></input>
+      </div>
+      <div className="dev-config-label">RTC Server Domain</div>
+      <div>
+        <input
+          value={config.rtcServerDomain}
+          className="dev-config-input"
+          placeholder="请输入"
+          onChange={handleInputChange("rtcServerDomain")}
         ></input>
       </div>
     </div>
