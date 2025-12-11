@@ -86,6 +86,7 @@ export const loginSlice = createSlice({
             userId: state.userId,
             chatToken: state.chatToken,
             password: state.password,
+            phoneNumber: state.phoneNumber,
           })
         );
       }
@@ -123,6 +124,7 @@ export const loginSlice = createSlice({
             userId: state.userId,
             chatToken: state.chatToken,
             password: state.password,
+            phoneNumber: state.phoneNumber,
           })
         );
       })

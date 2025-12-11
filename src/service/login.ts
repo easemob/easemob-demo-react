@@ -21,3 +21,11 @@ export const getChatToken = (phoneNumber: string, VCode: string) => {
     smsCode: VCode,
   });
 };
+
+export const deleteAccount = (token: string, phoneNumber: string) => {
+  return axios.delete(domain + `/inside/app/user/${phoneNumber}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

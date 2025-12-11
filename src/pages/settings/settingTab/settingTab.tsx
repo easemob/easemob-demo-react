@@ -19,7 +19,7 @@ interface Tab {
   icon: React.ReactNode;
   key: string;
   content: React.ReactNode | string[];
-  type: "button" | "menu";
+  type: "button" | "menu" | "link";
   onClick?: (data?: any) => void;
 }
 
@@ -246,6 +246,30 @@ const SettingTab = (props: SettingMenuProps) => {
                         </div>
                       </div>
                     );
+                  } else if (item.type === "link") {
+                    return (
+                      <div
+                        key={`${item.key}_${index}`}
+                        className={classNames("setting-menu-item")}
+                        onClick={() => {
+                          item.onClick?.();
+                        }}
+                      >
+                        <div className="setting-menu-item-icon">
+                          {item.icon}
+                        </div>
+                        <div className="setting-menu-item-name">
+                          {item.title}
+                          <Icon
+                            type="BOX_UP_ARROW"
+                            width={16}
+                            height={16}
+                            color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
+                            style={{ marginRight: "12px" }}
+                          ></Icon>
+                        </div>
+                      </div>
+                    );
                   }
                   return (
                     <div
@@ -255,7 +279,11 @@ const SettingTab = (props: SettingMenuProps) => {
                       })}
                       onClick={() => {
                         setActiveKey(`${group.key}_${index}`);
-                        if (isMobile && item.key !== "login") {
+                        if (
+                          isMobile &&
+                          item.key !== "login" &&
+                          item.key !== "deleteAccount"
+                        ) {
                           setShowContent(true);
                         }
                         item.onClick?.();

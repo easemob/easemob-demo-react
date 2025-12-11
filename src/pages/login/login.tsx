@@ -12,7 +12,12 @@ import { Icon, Checkbox, useIsMobile } from "easemob-chat-uikit";
 import toast from "../../components/toast/toast";
 import { useNavigate } from "react-router-dom";
 import { getChatToken } from "../../service/login";
-import { setSDKConfig, setIsLogging, loginAsync } from "../../store/loginSlice";
+import {
+  setSDKConfig,
+  setIsLogging,
+  loginAsync,
+  setPhoneNumber,
+} from "../../store/loginSlice";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { updateAppConfig } from "../../store/appConfigSlice";
 import { DEMO_VERSION, SDK_VERSION, UIKIT_VERSION } from "../../config";
@@ -122,6 +127,7 @@ const Login = () => {
       .then((res) => {
         const { token, chatUserName } = res.data;
         dispatch(loginAsync({ userId: chatUserName, chatToken: token }));
+        dispatch(setPhoneNumber(values.phoneNumber));
       })
       .catch(function (error) {
         console.log("error", error);
@@ -279,7 +285,7 @@ const Login = () => {
                 {i18next.t("privacy")}
               </a>
               {i18next.t("and")}
-              <a target="blank" href="https://www.easemob.com/protocol">
+              <a target="blank" href="https://www.easemob.com/console/privacy">
                 {i18next.t("policy")}
               </a>
               》

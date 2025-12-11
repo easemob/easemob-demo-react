@@ -12,10 +12,16 @@ import Settings from "../settings/settings";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import i18n from "../../i18n";
+import {
+  setLoggedIn,
+  setChatToken,
+  setPhoneNumber,
+} from "../../store/loginSlice";
 // @ts-ignore
 window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
   const client = useClient();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     const webImAuth = sessionStorage.getItem("webImAuth");
 
@@ -23,19 +29,38 @@ const ChatApp: FC<any> = () => {
       userId: "",
       password: "",
       chatToken: "",
+      phoneNumber: "",
     };
     if (webImAuth && !client.token) {
       webImAuthObj = JSON.parse(webImAuth);
       if (webImAuthObj.password) {
-        client.open({
-          user: webImAuthObj.userId,
-          pwd: webImAuthObj.password,
-        });
+        client
+          .open({
+            user: webImAuthObj.userId,
+            pwd: webImAuthObj.password,
+          })
+          .then((data: any) => {
+            dispatch(setLoggedIn(true));
+            dispatch(setChatToken(data.accessToken));
+            dispatch(setPhoneNumber(webImAuthObj.phoneNumber));
+          })
+          .catch(() => {
+            console.log("login with password error");
+          });
       } else {
-        client.open({
-          user: webImAuthObj.userId,
-          accessToken: webImAuthObj.chatToken,
-        });
+        client
+          .open({
+            user: webImAuthObj.userId,
+            accessToken: webImAuthObj.chatToken,
+          })
+          .then(() => {
+            dispatch(setLoggedIn(true));
+            dispatch(setChatToken(webImAuthObj.chatToken));
+            dispatch(setPhoneNumber(webImAuthObj.phoneNumber));
+          })
+          .catch(() => {
+            console.log("login with token error");
+          });
       }
     }
   }, [client]);
