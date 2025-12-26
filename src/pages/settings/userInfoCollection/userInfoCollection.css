@@ -1,0 +1,140 @@
+.user-info-container {
+  max-width: 100%;
+  overflow: hidden;
+  margin: 60px 15px;
+}
+
+.user-info-container-dark {
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.user-info-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.user-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.user-info-table th,
+.user-info-table td {
+  border: 1px solid #ddd;
+  padding: 12px 8px;
+  text-align: left;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+.user-info-container-dark .user-info-table th,
+.user-info-container-dark .user-info-table td {
+  border-color: #333;
+}
+
+.user-info-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.user-info-container-dark .user-info-table th {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+}
+
+/* 第一列固定宽度，防止挤压 */
+.user-info-table td:first-child,
+.user-info-table th:first-child {
+  min-width: 60px;
+}
+
+.user-info-table td {
+  color: #666;
+}
+
+.user-info-container-dark .user-info-table td {
+  color: #b0b0b0;
+}
+
+.avatar-cell {
+  text-align: center;
+  padding: 8px;
+}
+
+.avatar-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+}
+
+.default-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+.info-content {
+  word-break: break-all;
+}
+
+/* 空状态样式 */
+.empty-data {
+  color: #999;
+  font-style: italic;
+}
+
+.user-info-container-dark .empty-data {
+  color: #666;
+}
+
+/* 移动端优化 */
+@media screen and (max-width: 768px) {
+  .user-info-container {
+    margin: 10px;
+  }
+
+  .user-info-table {
+    font-size: 13px;
+  }
+
+  .user-info-table th,
+  .user-info-table td {
+    padding: 10px 6px;
+  }
+
+  .avatar-img,
+  .default-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .default-avatar {
+    font-size: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .user-info-table {
+    font-size: 12px;
+  }
+
+  .user-info-table th,
+  .user-info-table td {
+    padding: 8px 5px;
+  }
+}
+

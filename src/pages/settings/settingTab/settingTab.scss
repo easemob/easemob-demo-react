@@ -9,7 +9,8 @@
         width: 360px;
         background-color: #F1F2F3;
         border-right: 1px solid #E3E6E8;
-
+        overflow-y: auto;
+        overflow-x: hidden;
         &-header{
             display: flex;
             width: 360px;

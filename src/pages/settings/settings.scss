@@ -1,0 +1,12 @@
+.filing-title{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 12px;
+    width: 100%;
+    span:last-child{
+        color: #919BA1;
+        font-size: 12px;
+        font-weight: 500;
+    }
+}

@@ -102,7 +102,20 @@ function checkValidServiceWorker(swUrl) {
 export function unregister() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.ready.then(registration => {
-            registration.unregister()
+            registration.unregister().then(success => {
+                if (success) {
+                    console.log('Service worker unregistered successfully')
+                }
+            })
+        }).catch(error => {
+            console.error('Error unregistering service worker:', error)
+        })
+
+        // 清理所有已注册的 service workers
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            registrations.forEach(registration => {
+                registration.unregister()
+            })
         })
     }
 }

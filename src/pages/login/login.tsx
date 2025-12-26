@@ -277,15 +277,18 @@ const Login = () => {
           <div>
             {i18next.t("agree")}{" "}
             <span
-              style={{ color: state.isLogging ? "#ACB4B9" : "#009EFF" }}
+              // style={{ color: state.isLogging ? "#ACB4B9" : "#009EFF" }}
               className="login-form-protocol"
             >
               《
-              <a target="blank" href="https://www.easemob.com/terms">
+              <a
+                target="blank"
+                href="https://www.easemob.com/demo/privacy-policy"
+              >
                 {i18next.t("privacy")}
               </a>
               {i18next.t("and")}
-              <a target="blank" href="https://www.easemob.com/console/privacy">
+              <a target="blank" href="https://www.easemob.com/demo/agreement">
                 {i18next.t("policy")}
               </a>
               》

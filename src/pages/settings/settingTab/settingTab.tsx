@@ -19,7 +19,7 @@ interface Tab {
   icon: React.ReactNode;
   key: string;
   content: React.ReactNode | string[];
-  type: "button" | "menu" | "link";
+  type: "button" | "menu" | "link" | "text";
   onClick?: (data?: any) => void;
 }
 
@@ -116,12 +116,12 @@ const SettingTab = (props: SettingMenuProps) => {
         style={{
           display: showContent && isMobile ? "none" : "block",
           width: isMobile ? "100%" : "360px",
-          borderRight: isMobile ? "none" : "1px solid #E3E6E8",
+          borderRight: isMobile ? "none" : "",
         }}
       >
         <div
           className="setting-tab-menu-header"
-          style={{ borderBottom: isMobile ? "none" : "1px solid #E3E6E8" }}
+          style={isMobile ? { borderBottom: "none" } : {}}
         >
           {i18next.t("me")}
         </div>
@@ -229,7 +229,6 @@ const SettingTab = (props: SettingMenuProps) => {
                                   i18next.t(menuTab.get(item.key)?.value ?? "")}
                               </div>
                               <Icon
-                                style={{ cursor: "pointer" }}
                                 type={
                                   menuTab.get(item.key)?.open
                                     ? "ARROW_UP"
@@ -238,15 +237,19 @@ const SettingTab = (props: SettingMenuProps) => {
                                 color={
                                   themeMode == "dark" ? "#C8CDD0" : "#464E53"
                                 }
-                                width={24}
-                                height={24}
+                                width={16}
+                                height={16}
+                                style={{
+                                  marginRight: "12px",
+                                  cursor: "pointer",
+                                }}
                               ></Icon>
                             </div>
                           </Tooltip>
                         </div>
                       </div>
                     );
-                  } else if (item.type === "link") {
+                  } else if (item.type === "link" || item.type === "text") {
                     return (
                       <div
                         key={`${item.key}_${index}`}
@@ -260,13 +263,17 @@ const SettingTab = (props: SettingMenuProps) => {
                         </div>
                         <div className="setting-menu-item-name">
                           {item.title}
-                          <Icon
-                            type="BOX_UP_ARROW"
-                            width={16}
-                            height={16}
-                            color={themeMode == "dark" ? "#C8CDD0" : "#464E53"}
-                            style={{ marginRight: "12px" }}
-                          ></Icon>
+                          {item.type === "link" && (
+                            <Icon
+                              type="BOX_UP_ARROW"
+                              width={16}
+                              height={16}
+                              color={
+                                themeMode == "dark" ? "#C8CDD0" : "#464E53"
+                              }
+                              style={{ marginRight: "12px" }}
+                            ></Icon>
+                          )}
                         </div>
                       </div>
                     );
@@ -278,7 +285,12 @@ const SettingTab = (props: SettingMenuProps) => {
                         active: `${group.key}_${index}` === activeKey,
                       })}
                       onClick={() => {
-                        setActiveKey(`${group.key}_${index}`);
+                        if (
+                          item.key !== "login" &&
+                          item.key !== "deleteAccount"
+                        ) {
+                          setActiveKey(`${group.key}_${index}`);
+                        }
                         if (
                           isMobile &&
                           item.key !== "login" &&

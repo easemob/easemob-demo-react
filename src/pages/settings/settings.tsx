@@ -12,6 +12,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks";
 import { logout } from "../../store/loginSlice";
 import { PRESENCE_CONFIG } from "../../config";
 import { deleteAccount } from "../../service/login";
+import UserInfoCollection from "./userInfoCollection/userInfoCollection";
 const Settings = () => {
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
   const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState(false);
@@ -84,12 +85,26 @@ const Settings = () => {
                 // @ts-ignore
                 icon: <Icon type="DOC_LOCK" width={24} height={24}></Icon>,
                 title: i18next.t("privacyPolicyLink"),
-                key: "presence",
+                key: "privacyPolicyLink",
                 content: "11",
                 type: "link",
                 onClick: () => {
                   window.open(
-                    "https://www.easemob.com/console/privacy",
+                    "https://www.easemob.com/demo/privacy-policy",
+                    "_blank"
+                  );
+                },
+              },
+              {
+                // @ts-ignore
+                icon: <Icon type="DOC" width={24} height={24}></Icon>,
+                title: i18next.t("policy"),
+                key: "policy",
+                content: "11",
+                type: "link",
+                onClick: () => {
+                  window.open(
+                    "https://www.easemob.com/demo/agreement",
                     "_blank"
                   );
                 },
@@ -98,7 +113,7 @@ const Settings = () => {
                 // @ts-ignore
                 icon: <Icon type="THREE_CHART" width={24} height={24}></Icon>,
                 title: i18next.t("thirdPartyInfoSharing"),
-                key: "presence",
+                key: "thirdPartyInfoSharing",
                 content: "11",
                 type: "link",
                 onClick: () => {
@@ -117,15 +132,21 @@ const Settings = () => {
                   ></Icon>
                 ),
                 title: i18next.t("personalInformationCollected"),
-                key: "presence",
-                content: "11",
-                type: "link",
-                onClick: () => {
-                  window.open(
-                    "https://www.easemob.com/demo/personal-info-collection",
-                    "_blank"
-                  );
-                },
+                key: "personalInformationCollected",
+                content: <UserInfoCollection />,
+                type: "button",
+              },
+              {
+                icon: <Icon type="SHIELD_STAR" width={24} height={24}></Icon>,
+                title: (
+                  <div className="filing-title">
+                    <span>{i18next.t("filingNumber")}</span>{" "}
+                    <span>京ICP备 202300793号-10A</span>
+                  </div>
+                ),
+                key: "filing",
+                content: "",
+                type: "text",
               },
               {
                 icon: <Icon type="DOC" width={24} height={24}></Icon>,

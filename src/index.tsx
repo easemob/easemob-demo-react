@@ -6,8 +6,8 @@ import reportWebVitals from "./reportWebVitals";
 import { Provider } from "easemob-chat-uikit";
 import { Provider as ReduxProvider } from "react-redux";
 import { store } from "./store/store";
-import register, { unregister } from "./serviceWorker";
-register();
+import { unregister } from "./serviceWorker";
+// 完全取消注册 service worker，避免拦截跨域请求
 unregister();
 
 function updateViewportHeight() {
