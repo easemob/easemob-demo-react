@@ -1,6 +1,6 @@
 export const UIKIT_VERSION = "2.3.0";
 export const SDK_VERSION = "4.16.0";
-export const DEMO_VERSION = "2.7.0";
+export const DEMO_VERSION = "2.8.0";
 
 // 在线状态配置
 export const PRESENCE_CONFIG = [

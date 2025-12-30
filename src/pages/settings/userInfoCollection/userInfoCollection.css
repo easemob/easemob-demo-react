@@ -1,17 +1,18 @@
 .user-info-container {
   max-width: 100%;
+  border-radius: 8px;
   overflow: hidden;
-  margin: 60px 15px;
+  margin: 15px;
 }
 
 .user-info-container-dark {
-  background-color: #1a1a1a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* background-color: #171A1C; */
 }
 
 .user-info-table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 2px;
 }
 
 .user-info-table {
@@ -49,7 +50,7 @@
 /* 第一列固定宽度，防止挤压 */
 .user-info-table td:first-child,
 .user-info-table th:first-child {
-  min-width: 60px;
+  min-width: 120px;
 }
 
 .user-info-table td {
@@ -60,46 +61,6 @@
   color: #b0b0b0;
 }
 
-.avatar-cell {
-  text-align: center;
-  padding: 8px;
-}
-
-.avatar-img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: inline-block;
-}
-
-.default-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  margin: 0 auto;
-}
-
-.info-content {
-  word-break: break-all;
-}
-
-/* 空状态样式 */
-.empty-data {
-  color: #999;
-  font-style: italic;
-}
-
-.user-info-container-dark .empty-data {
-  color: #666;
-}
 
 /* 移动端优化 */
 @media screen and (max-width: 768px) {
@@ -114,16 +75,6 @@
   .user-info-table th,
   .user-info-table td {
     padding: 10px 6px;
-  }
-
-  .avatar-img,
-  .default-avatar {
-    width: 50px;
-    height: 50px;
-  }
-
-  .default-avatar {
-    font-size: 20px;
   }
 }
 

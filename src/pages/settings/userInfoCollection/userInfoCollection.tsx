@@ -1,9 +1,7 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
 import i18next from "../../../i18n";
-import { Icon, rootStore, RootContext, useIsMobile } from "easemob-chat-uikit";
+import { Icon, RootContext, useIsMobile } from "easemob-chat-uikit";
 import classNames from "classnames";
-import { DEMO_VERSION, UIKIT_VERSION } from "../../../config";
-import { useAppSelector } from "../../../hooks";
 import "./userInfoCollection.css";
 
 const About = (props: { onBack?: () => void }) => {
@@ -15,99 +13,30 @@ const About = (props: { onBack?: () => void }) => {
   const { theme } = context;
   const themeMode = theme?.mode;
 
-  // 获取浏览器名称
-  const getBrowserName = () => {
-    const ua = navigator.userAgent;
-    if (ua.includes("Edg/")) return "Microsoft Edge";
-    if (ua.includes("Chrome/")) return "Chrome";
-    if (ua.includes("Firefox/")) return "Firefox";
-    if (ua.includes("Safari/") && !ua.includes("Chrome/")) return "Safari";
-    if (ua.includes("OPR/") || ua.includes("Opera/")) return "Opera";
-    if (ua.includes("MSIE") || ua.includes("Trident/"))
-      return "Internet Explorer";
-    return "Unknown Browser";
-  };
-
-  // 获取用户信息
-  const userInfo =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
-  const phoneNumber = useAppSelector((state) => state.login.phoneNumber);
-
-  const userData = useMemo(() => {
-    const username = userInfo?.nickname || rootStore.client.user || "";
-    const avatar = userInfo?.avatarurl || "";
-    const phone = phoneNumber || "";
-    const device = getBrowserName();
-
-    return {
-      username: {
-        value: username,
-        count: username ? 1 : 0,
-      },
-      avatar: {
-        value: avatar,
-        count: avatar ? 1 : 0,
-      },
-      phone: {
-        value: phone,
-        count: phone ? 1 : 0,
-      },
-      device: {
-        value: device,
-        count: device ? 1 : 0,
-      },
-    };
-  }, [userInfo, phoneNumber]);
-
-  // 手机号脱敏处理
-  const maskPhone = (phone: string) => {
-    if (!phone) return "-";
-    if (phone.length === 11) {
-      return phone.substring(0, 3) + "****" + phone.substring(7);
-    }
-    return phone;
-  };
-
+  // 静态表格数据
   const tableData = [
     {
-      name: "昵称/用户名",
-      purpose: "用于完善网络身份标识",
-      scene: "用户注册、登录",
-      count: `用户提供，已收集${userData.username.count}条`,
-      content: userData.username.value || "-",
-      isAvatar: false,
+      scene: "当您注册或登录时",
+      collectedInfo:
+        "手机号。收集手机号码是为了满足相关法律法规关于网络实名制要求的必要信息。如果您不提供手机号，您可能无法正常使用我们的服务。用户名、头像。您可以选择修改用户名和头像完善您的个人账号。",
+      usage:
+        "用于帮助您完成账号注册、登录服务。您的手机号还会被用于进行电话回访，若您不愿继续接受回访，可直接拒绝，不会影响您正常使用我们的服务。",
     },
     {
-      name: "头像",
-      purpose: "用于展示头像信息",
-      scene: "用户个人信息/聊天房/直播间等页面信息展示",
-      count: `用户提供，已收集${userData.avatar.count}条`,
-      content: userData.avatar.value,
-      isAvatar: true,
+      scene: "当您使用我们的服务时",
+      collectedInfo:
+        "设备类型、设备型号、操作系统信息、网络状态、IP地址等日志信息。",
+      usage: "用于保障服务的正常使用，维护服务的正常运行，改进及优化服务体验。",
     },
     {
-      name: "手机号码",
-      purpose: "用于注册创建账号和登录",
-      scene: "用户注册、登录及实名认证",
-      count: `用户提供，已收集${userData.phone.count}条`,
-      content: maskPhone(userData.phone.value),
-      isAvatar: false,
+      scene: "当您使用聊天、视频功能时",
+      collectedInfo: "音频、视频、聊天记录、图片、文件",
+      usage: "用于为您提供聊天相关功能的体验使用",
     },
     {
-      name: "行为日志",
-      purpose: "记录用户功能使用偏好",
-      scene: "功能打点上报",
-      count: "用户提供，已收集0条",
-      content: "",
-      isAvatar: false,
-    },
-    {
-      name: "设备型号和名称",
-      purpose: "用于兼容性判断和安全保障等功能",
-      scene: "使用APP过程中",
-      count: `用户提供，已收集${userData.device.count}条`,
-      content: userData.device.value || "-",
-      isAvatar: false,
+      scene: "当您使用电话功能拨打客服电话时",
+      collectedInfo: "手机号",
+      usage: "用于为您提供拨打客服电话的功能体验",
     },
   ];
 
@@ -139,47 +68,17 @@ const About = (props: { onBack?: () => void }) => {
             <table className="user-info-table">
               <thead>
                 <tr>
-                  <th>信息名称</th>
-                  <th>使用目的</th>
-                  <th>使用场景</th>
-                  <th>收集情况</th>
-                  <th>信息内容</th>
+                  <th>收集场景</th>
+                  <th>我们收集哪些您的个人信息</th>
+                  <th>我们如何使用</th>
                 </tr>
               </thead>
               <tbody>
                 {tableData.map((row, index) => (
                   <tr key={index}>
-                    <td>{row.name}</td>
-                    <td>{row.purpose}</td>
                     <td>{row.scene}</td>
-                    <td>{row.count}</td>
-                    <td
-                      className={row.isAvatar ? "avatar-cell" : "info-content"}
-                    >
-                      {row.isAvatar ? (
-                        row.content ? (
-                          <img
-                            src={row.content}
-                            alt="用户头像"
-                            className="avatar-img"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="default-avatar">
-                            {userData.username.value
-                              ? userData.username.value.charAt(0).toUpperCase()
-                              : "?"}
-                          </div>
-                        )
-                      ) : (
-                        <span className={!row.content ? "empty-data" : ""}>
-                          {row.content || "-"}
-                        </span>
-                      )}
-                    </td>
+                    <td>{row.collectedInfo}</td>
+                    <td>{row.usage}</td>
                   </tr>
                 ))}
               </tbody>

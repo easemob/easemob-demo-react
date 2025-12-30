@@ -76,7 +76,7 @@ const Settings = () => {
               {
                 //@ts-ignore
                 icon: <Icon type="LOCK" width={24} height={24}></Icon>,
-                title: i18next.t("privacy"),
+                title: i18next.t("privacyButton"),
                 key: "privacy",
                 content: <Blocklist />,
                 type: "button",
