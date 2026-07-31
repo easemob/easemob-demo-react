@@ -23,7 +23,7 @@ const ChatApp: FC<any> = () => {
   const loginState = useAppSelector((state) => state.login);
 
   useEffect(() => {
-    listener(store);
+    return listener(store);
   }, [loginState.appKey, loginState.useDNS]);
 
   const dispatch = useAppDispatch();
@@ -44,6 +44,9 @@ const ChatApp: FC<any> = () => {
         isHttpDNS: loginState.useDNS,
         restUrl: serverConfig.rest,
         msyncUrl: serverConfig.msync,
+        // 用户昵称/头像走 SDK 用户属性；头像文件本身上传到业务私有 App Server。
+        // 当前 npm easemob-chat-uikit@2.4.3 尚无 providers 合同，群头像仍由
+        // chatContainer 调用 getGroupAvatar 补齐。本地 UIKit 升级后可改为 providers.groupInfo。
         useUserInfo: true,
         translationTargetLanguage: state.translationTargetLanguage,
       }}
@@ -70,7 +73,6 @@ const ChatApp: FC<any> = () => {
             translate: state.translation,
             edit: true,
             delete: true,
-            report: true,
             pin: true,
           },
           messageInput: {

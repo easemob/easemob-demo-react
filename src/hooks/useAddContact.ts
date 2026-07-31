@@ -52,7 +52,7 @@ export const useAddContact = (
       try {
         const response = await getUserIdWithPhoneNumber(
           phoneNumber,
-          rootStore.client.user
+          rootStore.client.getCurrentUserId()
         );
 
         if (response.status === 200) {

@@ -50,18 +50,16 @@ export const checkBrowerNotifyStatus = (
   }
 };
 export const notification = (iconTitle: string, params: any, store: any) => {
-  const config = { ...options, ...params };
+  const preview =
+    params?.type === "txt" && typeof params?.body?.content === "string"
+      ? params.body.content
+      : "new message";
+  const config = { ...options, body: preview, data: params };
 
   const state = store.getState();
   const appConfig = state.appConfig;
   if (!appConfig.notification) return;
-  const { chatType, from, to, ext } = params;
-  let conversationId = "";
-  if (chatType == "singleChat") {
-    conversationId = from;
-  } else {
-    conversationId = to;
-  }
+  const { conversationId, ext } = params;
   const conversationList = rootStore.conversationStore.conversationList;
   const conversation = conversationList.find(
     (item: any) => item.conversationId === conversationId
@@ -70,10 +68,12 @@ export const notification = (iconTitle: string, params: any, store: any) => {
     return;
   }
   if (conversation?.chatType == "groupChat" && conversation?.silent) {
+    const atList = ext?.em_at_list;
     if (
       !(
-        ext.em_at_list.includes(rootStore.client.user) ||
-        ext.em_at_list == "ALL"
+        (Array.isArray(atList) &&
+          atList.includes(rootStore.client.getCurrentUserId())) ||
+        atList == "ALL"
       )
     ) {
       return;
@@ -82,7 +82,10 @@ export const notification = (iconTitle: string, params: any, store: any) => {
   const bodyList = config.body.split("?");
   config.body = bodyList[0];
   if (Notification?.permission === "granted") {
-    var notification = new Notification(config.title || "New Message", config);
+    var notification = new Notification(
+      iconTitle || "New Message",
+      config as NotificationOptions
+    );
     const session = {};
     notification.onclick = (res: any) => {
       //   bodyList[1]?.split("&")?.forEach((item: any) => {

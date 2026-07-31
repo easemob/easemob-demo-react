@@ -10,8 +10,8 @@ export interface ConversationItem {
 }
 
 export interface GroupInfo {
-  groupid: string;
-  groupname: string;
+  groupId: string;
+  groupName: string;
   avatarUrl?: string;
   description?: string;
   memberCount?: number;

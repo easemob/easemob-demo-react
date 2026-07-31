@@ -42,16 +42,17 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
       setActiveTab(index);
     },
   }));
-  const avatarUrl =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user]?.avatarurl;
-
   const context = useContext(RootContext);
-  const { theme, presenceMap } = context;
+  const { theme, presenceMap, client } = context;
+  const currentUserId = client.getCurrentUserId() || "";
+  const avatarUrl =
+    rootStore.addressStore.appUsersInfo[currentUserId]?.avatarurl;
+
   const themeMode = theme?.mode;
   const state = useAppSelector((state) => state.appConfig);
 
   const myInfo =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+    rootStore.addressStore.appUsersInfo[currentUserId] || {};
 
   const presence = myInfo.isOnline
     ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
@@ -61,7 +62,7 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
   const [currentPresence, setCurrentPresence] = useState("");
   const [customPresenceExt, setCustomPresenceExt] = useState("");
   const userInfo =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+    rootStore.addressStore.appUsersInfo[currentUserId] || {};
   useEffect(() => {
     setCustomPresenceExt(() => {
       return PRESENCE_CONFIG.includes(userInfo.presenceExt || "")
@@ -126,8 +127,7 @@ const NavigationBar = forwardRef(({ tabs }: NavigationBarProps, ref) => {
               src={avatarUrl}
               presence={{ visible: true, icon: presence }}
             >
-              {rootStore.addressStore.appUsersInfo[rootStore.client.user]
-                ?.nickname || rootStore.client.user}
+              {rootStore.addressStore.appUsersInfo[currentUserId]?.nickname || currentUserId}
             </Avatar>
           </Tooltip>
         </div>

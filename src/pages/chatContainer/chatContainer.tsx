@@ -82,7 +82,7 @@ const ChatContainer = forwardRef((props, ref) => {
     thread.showThreadPanel || pinMsgVisible || conversationDetailVisible;
   const isInGroup = rootStore.addressStore.groups.some((item) => {
     // @ts-ignore
-    return item.groupid == cvsItem.conversationId;
+    return item.groupId == cvsItem.conversationId;
   });
 
   // ==================== 自定义 Hooks ====================
@@ -120,22 +120,21 @@ const ChatContainer = forwardRef((props, ref) => {
     startAudioCall: chatRef.current?.startAudioCall,
   }));
 
-  // 获取群组头像
+  // 获取群组头像（业务私有 App Server；npm UIKit 尚无 providers.groupInfo）
   useEffect(() => {
-    if (rootStore.loginState) {
-      const groupIds =
-        rootStore.addressStore.groups
-          .filter((item) => !item.avatarUrl)
-          .map((item) => {
-            //@ts-ignore
-            return item.groupid;
-          }) || [];
-      getGroupAvatar(groupIds).then((res) => {
-        for (let groupId in res) {
+    if (!rootStore.loginState) return;
+    const groupIds = rootStore.addressStore.groups
+      .filter((item) => !item.avatarUrl)
+      .map((item) => (item as any).groupId ?? (item as any).groupid)
+      .filter(Boolean) as string[];
+    if (groupIds.length === 0) return;
+    getGroupAvatar(groupIds).then((res) => {
+      for (const groupId in res) {
+        if (res[groupId]) {
           rootStore.addressStore.updateGroupAvatar(groupId, res[groupId]);
         }
-      });
-    }
+      }
+    });
   }, [rootStore.loginState, rootStore.addressStore.groups.length]);
 
   // 监听当前会话变化

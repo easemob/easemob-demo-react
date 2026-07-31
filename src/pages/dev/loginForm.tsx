@@ -1,14 +1,11 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Icon } from "easemob-chat-uikit";
 import i18next from "../../i18n";
 
 import loading from "../../assets/loading.png";
 import closeIcon from "../../assets/Xmark@2x.png";
-import eyeOpen from "../../assets/eye@2x.png";
-import eyeClose from "../../assets/eye_slash@2x.png";
 import toast from "../../components/toast/toast";
 import { useAppSelector, useAppDispatch } from "../../hooks";
-import { loginWithPassword } from "../../store/loginSlice";
+import { loginAsync } from "../../store/loginSlice";
 import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const dispatch = useAppDispatch();
@@ -21,12 +18,12 @@ const LoginForm = () => {
   }, [state.loggedIn]);
   const [values, setValues] = useState({
     userId: "",
-    password: "",
+    token: "",
   });
-  const [isLogging, setIsLogging] = useState(false);
+  const isLogging = state.isLogging;
 
   const handleChange =
-    (type: "userId" | "password") => (event: ChangeEvent<HTMLInputElement>) => {
+    (type: "userId" | "token") => (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
       setValues({
         ...values,
@@ -42,25 +39,18 @@ const LoginForm = () => {
   };
 
   const login = () => {
-    setIsLogging(true);
-    if (values.userId === "" || values.password === "") {
-      setIsLogging(false);
-      toast.error("用户名或密码不能为空");
+    if (values.userId === "" || values.token === "") {
+      toast.error("用户名或Token不能为空");
       return;
     }
     dispatch(
-      loginWithPassword({
+      loginAsync({
         userId: values.userId,
-        password: values.password,
+        chatToken: values.token,
       })
     );
   };
 
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const switchPasswordVisible = () => {
-    console.log("switchPasswordVisible");
-    setPasswordVisible((value) => !value);
-  };
   return (
     <div className="dev-form">
       <div className="dev-form-icon"></div>
@@ -90,21 +80,12 @@ const LoginForm = () => {
       <div className="input-box">
         <input
           disabled={isLogging}
-          type={passwordVisible ? "text" : "password"}
-          maxLength={32}
+          type="text"
           className="dev-form-input"
-          placeholder={i18next.t("password")}
-          value={values.password}
-          onChange={handleChange("password")}
+          placeholder="Token"
+          value={values.token}
+          onChange={handleChange("token")}
         ></input>
-        {values.password && (
-          <img
-            onClick={switchPasswordVisible}
-            src={passwordVisible ? eyeClose : eyeOpen}
-            alt="close"
-            className="close-btn"
-          />
-        )}
       </div>
       <div className="loading-box">
         <input

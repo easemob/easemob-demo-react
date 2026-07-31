@@ -8,22 +8,8 @@ import toast from "../components/toast/toast";
 interface ForwardMessage {
   [key: string]: any;
   type: string;
-  url?: string;
-  filename?: string;
-  secret?: string;
-  file_length?: number;
-  length?: number;
-  thumb?: string;
-  messageList?: any[];
-  file?: any;
-  id?: string;
-  from?: string;
+  body?: Record<string, any>;
   ext?: any;
-  reactions?: any;
-  isChatThread?: boolean;
-  chatThreadOverview?: any;
-  chatThread?: any;
-  time?: number;
 }
 
 /**
@@ -37,47 +23,14 @@ export const useForwardMessage = (
   setContactListVisible: (visible: boolean) => void
 ) => {
   /**
-   * 处理不同类型消息的 body 构建
-   */
-  const buildMessageBody = useCallback((msg: ForwardMessage) => {
-    switch (msg.type) {
-      case "video":
-        return {
-          url: msg.url?.split("?")[0],
-          filename: msg.filename,
-          secret: msg.secret,
-          file_length: msg.file_length,
-        };
-      case "audio":
-        return {
-          url: msg.url,
-          filename: msg.filename,
-          secret: msg.secret,
-          file_length: msg.file_length,
-          length: msg.length,
-        };
-      case "file":
-        return {
-          url: msg.url,
-          filename: msg.filename,
-          secret: msg.secret,
-          file_length: msg.file_length,
-        };
-      default:
-        return msg.body;
-    }
-  }, []);
-
-  /**
    * 处理合并消息的解析
    */
   const handleCombineMessage = useCallback(async (msg: ForwardMessage) => {
-    if (msg.type === "combine" && !msg.messageList) {
+    if (msg.type === "combine" && !msg.body?.messageList) {
       try {
         const messageList =
-          await rootStore.client.downloadAndParseCombineMessage({
-            url: msg.url!,
-            secret: msg.secret!,
+          await rootStore.client.chatManager.downloadAndParseCombineMessage({
+            message: msg,
           });
         return messageList;
       } catch (err) {
@@ -85,20 +38,7 @@ export const useForwardMessage = (
         throw err;
       }
     }
-    return msg.messageList;
-  }, []);
-
-  /**
-   * 构建用户信息扩展字段
-   */
-  const buildUserExtension = useCallback(() => {
-    const currentUser = rootStore.client.user;
-    return {
-      ease_chat_uikit_user_info: {
-        nickname: rootStore.addressStore.appUsersInfo[currentUser]?.nickname,
-        avatarURL: rootStore.addressStore.appUsersInfo[currentUser]?.avatarurl,
-      },
-    };
+    return msg.body?.messageList;
   }, []);
 
   /**
@@ -109,42 +49,15 @@ export const useForwardMessage = (
       console.log("要转发的消息", msg);
 
       try {
-        // 深拷贝消息对象
-        const forwardMsg: ForwardMessage = { ...msg };
+        const forwardMsg: ForwardMessage = {
+          ...msg,
+          body: { ...(msg.body || {}) },
+        };
 
-        // 处理不同类型消息的 body
-        if (["video", "audio", "file"].includes(forwardMsg.type)) {
-          forwardMsg.body = buildMessageBody(forwardMsg);
-
-          // 视频消息需要清空缩略图
-          if (forwardMsg.type === "video") {
-            forwardMsg.thumb = "";
-          }
-        }
-
-        // 处理合并消息
         if (forwardMsg.type === "combine") {
-          forwardMsg.messageList = await handleCombineMessage(forwardMsg);
+          forwardMsg.body!.messageList = await handleCombineMessage(forwardMsg);
         }
 
-        // 清理不需要的字段
-        if (forwardMsg.file) {
-          delete forwardMsg.file;
-        }
-
-        // 设置新的消息属性
-        forwardMsg.id = Date.now().toString();
-        forwardMsg.from = rootStore.client.user;
-        forwardMsg.ext = buildUserExtension();
-        forwardMsg.time = Date.now();
-
-        // 清理线程相关属性
-        forwardMsg.reactions = undefined;
-        forwardMsg.isChatThread = false;
-        forwardMsg.chatThreadOverview = undefined;
-        forwardMsg.chatThread = undefined;
-
-        // 执行转发逻辑
         setForwardedMessages(forwardMsg);
         setContactListVisible(true);
       } catch (error) {
@@ -153,9 +66,7 @@ export const useForwardMessage = (
       }
     },
     [
-      buildMessageBody,
       handleCombineMessage,
-      buildUserExtension,
       setForwardedMessages,
       setContactListVisible,
     ]

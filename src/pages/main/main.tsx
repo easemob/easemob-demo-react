@@ -2,7 +2,7 @@ import { useEffect, useState, FC, useRef } from "react";
 // import "./index.css";
 import { observer } from "mobx-react-lite";
 import toast, { Toaster } from "react-hot-toast";
-import { rootStore, useClient, Icon, eventHandler } from "easemob-chat-uikit";
+import { rootStore, Icon, eventHandler } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./main.scss";
 import NavigationBar from "../../components/navigationBar/navigationBar";
@@ -20,57 +20,81 @@ import {
 // @ts-ignore
 window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
-  const client = useClient();
+  const client = rootStore.client;
   const dispatch = useAppDispatch();
+  const state = useAppSelector((state) => state.login);
+  const navigate = useNavigate();
+  // 刷新 /main 时 Redux loggedIn 会重置为 false，但 session 可能仍有效。
+  // 恢复完成前不要根据 loggedIn 踢回登录页。
+  const [isRestoringSession, setIsRestoringSession] = useState(
+    () => !!sessionStorage.getItem("webImAuth")
+  );
+
   useEffect(() => {
     const webImAuth = sessionStorage.getItem("webImAuth");
+    if (!webImAuth) {
+      setIsRestoringSession(false);
+      return;
+    }
 
     let webImAuthObj = {
       userId: "",
-      password: "",
       chatToken: "",
       phoneNumber: "",
     };
-    if (webImAuth && !client.token) {
+
+    try {
       webImAuthObj = JSON.parse(webImAuth);
-      if (webImAuthObj.password) {
-        client
-          .open({
-            user: webImAuthObj.userId,
-            pwd: webImAuthObj.password,
-          })
-          .then((data: any) => {
-            dispatch(setLoggedIn(true));
-            dispatch(setChatToken(data.accessToken));
-            dispatch(setPhoneNumber(webImAuthObj.phoneNumber));
-          })
-          .catch(() => {
-            console.log("login with password error");
-          });
-      } else {
-        client
-          .open({
-            user: webImAuthObj.userId,
-            accessToken: webImAuthObj.chatToken,
-          })
-          .then(() => {
-            dispatch(setLoggedIn(true));
-            dispatch(setChatToken(webImAuthObj.chatToken));
-            dispatch(setPhoneNumber(webImAuthObj.phoneNumber));
-          })
-          .catch(() => {
-            console.log("login with token error");
-          });
-      }
+    } catch {
+      sessionStorage.removeItem("webImAuth");
+      setIsRestoringSession(false);
+      return;
     }
-  }, [client]);
-  const state = useAppSelector((state) => state.login);
-  const navigate = useNavigate();
+
+    if (client.authToken || state.loggedIn) {
+      setIsRestoringSession(false);
+      return;
+    }
+
+    if (!webImAuthObj.chatToken || !webImAuthObj.userId) {
+      sessionStorage.removeItem("webImAuth");
+      setIsRestoringSession(false);
+      return;
+    }
+
+    let cancelled = false;
+    client
+      .login({
+        userId: webImAuthObj.userId,
+        token: webImAuthObj.chatToken,
+      })
+      .then(() => {
+        if (cancelled) return;
+        dispatch(setLoggedIn(true));
+        dispatch(setChatToken(webImAuthObj.chatToken));
+        dispatch(setPhoneNumber(webImAuthObj.phoneNumber));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        console.log("login with token error");
+        sessionStorage.removeItem("webImAuth");
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsRestoringSession(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [client, dispatch, state.loggedIn]);
+
   useEffect(() => {
-    if (!state.loggedIn) {
+    if (!isRestoringSession && !state.loggedIn) {
       navigate("/login");
     }
-  }, [state.loggedIn]);
+  }, [isRestoringSession, navigate, state.loggedIn]);
 
   useEffect(() => {
     eventHandler.addEventHandler("chatroom", {
@@ -110,6 +134,9 @@ const ChatApp: FC<any> = () => {
         },
       },
     });
+    return () => {
+      eventHandler.removeEventHandler("chatroom");
+    };
   }, []);
 
   const navRef = useRef<any>(null);

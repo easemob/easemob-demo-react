@@ -46,7 +46,8 @@ const SettingTab = (props: SettingMenuProps) => {
   const { key, index } = getKeyIndex(activeKey);
 
   const context = useContext(RootContext);
-  const { theme } = context;
+  const { theme, client } = context;
+  const currentUserId = client.getCurrentUserId() || "";
   const themeMode = theme?.mode;
   const state = useAppSelector((state) => state.appConfig);
   //找出type === 'menu'的tab, 如果有则保存对应的key, value保存选中的值,
@@ -62,21 +63,18 @@ const SettingTab = (props: SettingMenuProps) => {
   });
 
   const [menuTab, setMenuTab] = useState(menuTabsMap);
-  const userInfo =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+  const userInfo = rootStore.addressStore.appUsersInfo[currentUserId] || {};
   const [presenceModalOpen, setPresenceModalOpen] = useState(false);
   const [customPresenceExt, setCustomPresenceExt] = useState("");
   useEffect(() => {
     if (
       //@ts-ignore
       !context.presenceMap[
-        rootStore.addressStore.appUsersInfo[rootStore.client.user]
-          ?.presenceExt ?? ""
+        rootStore.addressStore.appUsersInfo[currentUserId]?.presenceExt ?? ""
       ]
     ) {
       setCustomPresenceExt(
-        rootStore.addressStore.appUsersInfo[rootStore.client.user]
-          ?.presenceExt || ""
+        rootStore.addressStore.appUsersInfo[currentUserId]?.presenceExt || ""
       );
     }
 

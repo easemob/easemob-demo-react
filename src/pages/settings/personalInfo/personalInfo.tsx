@@ -21,33 +21,43 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
   const prefixCls = "user-info";
   const isMobile = useIsMobile();
   const { addressStore } = rootStore;
+  const context = useContext(RootContext);
+  const { theme, presenceMap, client } = context;
+  const currentUserId = client.getCurrentUserId() || "";
   const [nicknameModalVisible, setNicknameModalVisible] = useState(false);
 
   const [nicknameValue, setNicknameValue] = useState(
-    addressStore.appUsersInfo[rootStore.client.user]?.nickname
+    addressStore.appUsersInfo[currentUserId]?.nickname
   );
   const editNickname = () => {
-    addressStore.setAppUserInfo({
-      ...addressStore.appUsersInfo,
-      [rootStore.client.user]: {
-        ...addressStore.appUsersInfo[rootStore.client.user],
-        nickname: nicknameValue,
-      },
-    });
-    setNicknameModalVisible(false);
+    const nickname = (nicknameValue || "").trim();
+    if (!currentUserId || !nickname) {
+      setNicknameModalVisible(false);
+      return;
+    }
+
+    client.userInfoManager
+      .updateOwnInfo({ nickname })
+      .then(() => {
+        addressStore.setAppUserInfo({
+          ...addressStore.appUsersInfo,
+          [currentUserId]: {
+            ...addressStore.appUsersInfo[currentUserId],
+            userId: currentUserId,
+            nickname,
+          },
+        });
+        setNicknameModalVisible(false);
+      })
+      .catch((error: unknown) => {
+        console.error("update nickname failed", error);
+        toast.error(i18next.t("Request failed") || "更新昵称失败");
+      });
   };
 
   const handleNicknameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
     if (e.target.value.length > 20) return;
-
-    rootStore.client
-      .updateUserInfo({
-        nickname: e.target.value,
-      })
-      .then(() => {
-        setNicknameValue(e.target.value);
-      });
+    setNicknameValue(e.target.value);
   };
 
   const imageEl = useRef<HTMLInputElement>(null);
@@ -72,8 +82,8 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
     // uploadImage(formData).then((url) => {
     //   rootStore.addressStore.setAppUserInfo({
     //     ...addressStore.appUsersInfo,
-    //     [rootStore.client.user]: {
-    //       ...addressStore.appUsersInfo[rootStore.client.user],
+    //     [rootStore.client.getCurrentUserId()]: {
+    //       ...addressStore.appUsersInfo[rootStore.client.getCurrentUserId()],
     //       avatarurl: url,
     //     },
     //   });
@@ -82,37 +92,39 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
   };
 
   const handleUploadImage = (url: string) => {
-    fetch(url).then((res) => {
-      res.blob().then((blob) => {
-        console.log("blob", blob);
+    fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
         const formData = new FormData();
         formData.append("file", blob);
-        console.log("formData", formData);
-        uploadImage(formData).then((url) => {
-          rootStore.addressStore.setAppUserInfo({
-            ...addressStore.appUsersInfo,
-            [rootStore.client.user]: {
-              ...addressStore.appUsersInfo[rootStore.client.user],
-              avatarurl: url,
-            },
-          });
-          setCropModalOpen(false);
+        return uploadImage(formData);
+      })
+      .then((avatarUrl) => {
+        if (!currentUserId || !avatarUrl) return;
+        rootStore.addressStore.setAppUserInfo({
+          ...addressStore.appUsersInfo,
+          [currentUserId]: {
+            ...addressStore.appUsersInfo[currentUserId],
+            userId: currentUserId,
+            avatarUrl,
+            avatarurl: avatarUrl,
+          },
         });
+        setCropModalOpen(false);
+      })
+      .catch((error: unknown) => {
+        console.error("upload avatar failed", error);
       });
-    });
   };
 
-  const context = useContext(RootContext);
-  const { theme, presenceMap } = context;
   const themeMode = theme?.mode;
-  const myInfo =
-    rootStore.addressStore.appUsersInfo[rootStore.client.user] || {};
+  const myInfo = rootStore.addressStore.appUsersInfo[currentUserId] || {};
   const presence = myInfo.isOnline
     ? presenceMap?.[myInfo.presenceExt ?? "Online"] || presenceMap?.["Custom"]
     : presenceMap?.["Offline"];
   const handleCopy = () => {
     var textArea = document.createElement("textarea");
-    textArea.value = rootStore.client.user;
+    textArea.value = currentUserId;
     // 添加到 DOM 元素中，方便调用 select 方法
     document.body.appendChild(textArea);
     // 选中文本
@@ -145,20 +157,20 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
         <section className="setting-personal-content">
           <div className={`${prefixCls}-header`}>
             <Avatar
-              src={addressStore.appUsersInfo[rootStore.client.user]?.avatarurl}
+              src={addressStore.appUsersInfo[currentUserId]?.avatarurl}
               size={100}
               shape={theme?.avatarShape}
               presence={{ visible: true, icon: presence }}
             >
-              {addressStore.appUsersInfo[rootStore.client.user]?.nickname}
+              {addressStore.appUsersInfo[currentUserId]?.nickname}
             </Avatar>
             <div>
               <div className={`${prefixCls}-header-name`}>
-                {addressStore.appUsersInfo[rootStore.client.user]?.nickname}
+                {addressStore.appUsersInfo[currentUserId]?.nickname}
               </div>
               <div className={`${prefixCls}-header-id`}>
                 <div>{i18next.t("easemob")} ID:</div>
-                {rootStore.client.user}
+                {currentUserId}
                 <Icon
                   type="DOC_ON_DOC"
                   style={{ cursor: "copy" }}
@@ -178,7 +190,7 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
               >
                 <span>{i18next.t("nickname")}</span>
                 <div>
-                  {addressStore.appUsersInfo[rootStore.client.user]?.nickname}
+                  {addressStore.appUsersInfo[currentUserId]?.nickname}
                   <Icon type="SLASH_IN_BOX" width={24} height={24}></Icon>
                 </div>
               </div>
@@ -195,14 +207,11 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
                 <span>{i18next.t("avatar")}</span>
                 <div>
                   <Avatar
-                    src={
-                      addressStore.appUsersInfo[rootStore.client.user]
-                        ?.avatarurl
-                    }
+                    src={addressStore.appUsersInfo[currentUserId]?.avatarurl}
                     size={40}
                     shape={theme?.avatarShape}
                   >
-                    {addressStore.appUsersInfo[rootStore.client.user]?.nickname}
+                    {addressStore.appUsersInfo[currentUserId]?.nickname}
                   </Avatar>
                   <Icon
                     type="SLASH_IN_BOX"

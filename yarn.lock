@@ -4033,10 +4033,10 @@ duplexer@^0.1.2:
   resolved "https://registry.npmjs.org/duplexer/-/duplexer-0.1.2.tgz"
   integrity sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==
 
-easemob-chat-uikit@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.npmjs.org/easemob-chat-uikit/-/easemob-chat-uikit-2.3.0.tgz"
-  integrity sha512-R0wZoAE/RY5NfYMX9cHXZjTNq4JOILeAI7dboaUqh4ibljkGMoRnGKak2PhYc5i8glRHVP5D7SQDlYSu6KLiRA==
+easemob-chat-uikit@^2.4.3:
+  version "2.4.3"
+  resolved "https://registry.npmjs.org/easemob-chat-uikit/-/easemob-chat-uikit-2.4.3.tgz"
+  integrity sha512-2BQhgQXYPkygDkr/3UW7idw9xl4prAWZnSHJqmIXKcDla/Y4BJgY3vji8WGgfqkeQRm/gxccrHVyZ+S07269+A==
   dependencies:
     mobx "^6.9.0"
     mobx-react-lite "^4.1.0"

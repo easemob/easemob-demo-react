@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { rootStore } from "../UIKit/uikitListener";
+import { rootStore } from "easemob-chat-uikit";
 import type { RootState } from "./store";
 import toast from "../components/toast/toast";
 
@@ -9,13 +9,13 @@ export const loginAsync = createAsyncThunk(
     const { client } = rootStore;
     const { userId, chatToken } = params;
     try {
-      await client.open({
-        user: userId,
-        accessToken: chatToken,
+      await client.login({
+        userId,
+        token: chatToken,
       });
       return {
         chatToken,
-        userId: userId,
+        userId,
       };
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -23,16 +23,27 @@ export const loginAsync = createAsyncThunk(
   }
 );
 
+export const logout = createAsyncThunk("login/logout", async () => {
+  try {
+    await rootStore.client.logout();
+  } finally {
+    rootStore.setLoginState(false);
+    rootStore.clear();
+    sessionStorage.removeItem("webImAuth");
+  }
+});
+
+const serverConfig = JSON.parse(localStorage.getItem("serverConfig") || "{}");
+
 export const loginSlice = createSlice({
   name: "login",
   initialState: {
     phoneNumber: "",
     chatToken: "",
-    password: "",
     userId: "",
     loggedIn: false,
-    appKey: process.env.REACT_APP_APP_KEY || "org#app",
-    useDNS: true,
+    appKey: serverConfig.appkey || process.env.REACT_APP_APP_KEY || "org#app",
+    useDNS: serverConfig.useCustomServer ? false : true,
     isLogging: false,
   },
   reducers: {
@@ -46,37 +57,6 @@ export const loginSlice = createSlice({
       state.chatToken = action.payload;
     },
 
-    loginWithToken: (
-      state,
-      action: PayloadAction<{ userId: string; chatToken: string }>
-    ) => {
-      const { client } = rootStore;
-      client
-        .open({
-          user: action.payload.userId,
-          accessToken: action.payload.chatToken,
-        })
-        .catch((err: any) => {
-          toast.error(err.message);
-          console.log("loginWithToken error", err);
-        });
-      state.userId = action.payload.userId;
-      state.chatToken = action.payload.chatToken;
-    },
-
-    loginWithPassword: (
-      state,
-      action: PayloadAction<{ userId: string; password: string }>
-    ) => {
-      const { client } = rootStore;
-      client.open({
-        user: action.payload.userId,
-        pwd: action.payload.password,
-      });
-      state.userId = action.payload.userId;
-      state.password = action.payload.password;
-    },
-
     setLoggedIn: (state, action: PayloadAction<boolean>) => {
       state.loggedIn = action.payload;
       if (action.payload && state.userId) {
@@ -85,19 +65,10 @@ export const loginSlice = createSlice({
           JSON.stringify({
             userId: state.userId,
             chatToken: state.chatToken,
-            password: state.password,
             phoneNumber: state.phoneNumber,
           })
         );
       }
-    },
-
-    logout: (state) => {
-      const { client } = rootStore;
-      rootStore.clear();
-      client.close();
-      state.loggedIn = false;
-      sessionStorage.removeItem("webImAuth");
     },
 
     setSDKConfig: (
@@ -123,13 +94,26 @@ export const loginSlice = createSlice({
           JSON.stringify({
             userId: state.userId,
             chatToken: state.chatToken,
-            password: state.password,
             phoneNumber: state.phoneNumber,
           })
         );
       })
       .addCase(loginAsync.rejected, (state, action) => {
         state.isLogging = false;
+        toast.error(
+          (action.payload as { message?: string } | undefined)?.message ||
+            action.error.message
+        );
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.loggedIn = false;
+        state.chatToken = "";
+        state.userId = "";
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.loggedIn = false;
+        state.chatToken = "";
+        state.userId = "";
         toast.error(action.error.message);
       });
   },
@@ -138,11 +122,8 @@ export const loginSlice = createSlice({
 export const {
   setPhoneNumber,
   setChatToken,
-  loginWithToken,
-  loginWithPassword,
   setLoggedIn,
   setIsLogging,
-  logout,
   setSDKConfig,
 } = loginSlice.actions;
 

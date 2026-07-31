@@ -1,25 +1,20 @@
-import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect, ComponentType, useState, ReactElement } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState, ReactElement } from "react";
 
 function AuthCheck({ children }: { children: ReactElement<any, any> }) {
-  // 获取用户信息或者登录状态，这个getUser可以是任何获取用户信息或者认证信息的方法
-  //   const user = getUser();
-  let navigate = useNavigate();
-
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const navigate = useNavigate();
+  // 初始先按 session 判断，避免首帧闪一下空内容；真正连接态由 /main 恢复登录补齐。
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => !!sessionStorage.getItem("webImAuth")
+  );
 
   useEffect(() => {
-    // 检查用户是否已登录
-    const checkAuthentication = () => {
-      const isAuthenticated: boolean = !!sessionStorage.getItem("webImAuth");
-      setIsAuthenticated(isAuthenticated);
-      if (!isAuthenticated) {
-        navigate("/login"); //跳转到登陆页面
-      }
-    };
-
-    checkAuthentication();
-  }, []);
+    const hasSession = !!sessionStorage.getItem("webImAuth");
+    setIsAuthenticated(hasSession);
+    if (!hasSession) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   return isAuthenticated ? children : <></>;
 }

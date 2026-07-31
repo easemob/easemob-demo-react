@@ -2,22 +2,13 @@ import { Switch } from "easemob-chat-uikit";
 import { ChangeEvent } from "react";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { setSDKConfig } from "../../store/loginSlice";
-import { useAppSelector, useAppDispatch } from "../../hooks";
 const ConfigForm = () => {
-  const dispatch = useAppDispatch();
   const saveConfig = () => {
     localStorage.setItem("serverConfig", JSON.stringify(config));
-    if (config.appkey) {
-      dispatch(
-        setSDKConfig({
-          appKey: config.appkey,
-          useDNS: !config.useCustomServer,
-        })
-      );
-    }
     toast.success("保存成功");
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   };
 
   const [config, setConfig] = useState({
@@ -36,12 +27,6 @@ const ConfigForm = () => {
     const config = JSON.parse(localStorage.getItem("serverConfig") || "{}");
     if (config.appkey) {
       setConfig(config);
-      dispatch(
-        setSDKConfig({
-          appKey: config.appkey,
-          useDNS: !config.useCustomServer,
-        })
-      );
     }
   }, []);
 

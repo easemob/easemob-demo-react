@@ -18,22 +18,7 @@ const listener = (store: any) => {
       dispatch(setLoggedIn(false));
       // dispatch(setIsLogging(false));
     },
-    onTextMessage: (message: any) => {
-      notification("新消息", message, store);
-    },
-    onImageMessage: (message: any) => {
-      notification("新消息", message, store);
-    },
-    onFileMessage: (message: any) => {
-      notification("新消息", message, store);
-    },
-    onAudioMessage: (message: any) => {
-      notification("新消息", message, store);
-    },
-    onVideoMessage: (message: any) => {
-      notification("新消息", message, store);
-    },
-    onCustomMessage: (message: any) => {
+    onMessage: (message: any) => {
       notification("新消息", message, store);
     },
     onContactAgreed: (data: any) => {
@@ -86,6 +71,11 @@ const listener = (store: any) => {
       },
     },
   });
+
+  return () => {
+    client.removeEventHandler("chatdemo");
+    eventHandler.removeEventHandler("uikit");
+  };
 };
 
 export { rootStore };

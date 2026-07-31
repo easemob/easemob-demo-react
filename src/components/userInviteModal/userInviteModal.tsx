@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { UserSelect, rootStore, useAddressContext } from "easemob-chat-uikit";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  RootContext,
+  UserSelect,
+  rootStore,
+  useAddressContext,
+} from "easemob-chat-uikit";
 const ALLOW_MAX_USER = 16;
 interface UserInviteModalProps {
   onClose?: () => void;
@@ -29,16 +34,17 @@ const UserInviteModal = (props: UserInviteModalProps) => {
     groupId,
     title,
   } = props;
+  const { client } = useContext(RootContext);
+  const currentUserId = client.getCurrentUserId();
   const [selectedUsers, setSelectedUsers] = useState<UserInfo[]>([]);
-  const [users, setUsers] = useState<UserInfo[]>([
-    { userId: rootStore.client.user },
-  ]);
+  const [users, setUsers] = useState<UserInfo[]>(
+    currentUserId ? [{ userId: currentUserId }] : []
+  );
   const [disabled, setDisabled] = useState(false);
   const { getGroupMembers: getGroupMembers2 } = useAddressContext();
 
   const rtcGroup = rootStore.addressStore.groups.filter((item) => {
-    // @ts-ignore
-    return item.groupid == groupId;
+    return ((item as any).groupId ?? (item as any).groupid) === groupId;
   });
   const getGroupMembers = (groupId: string) => {
     if (rtcGroup.length > 0) {

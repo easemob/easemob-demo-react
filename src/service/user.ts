@@ -8,7 +8,7 @@ export const getUserIdWithPhoneNumber = (
   userId: string
 ) => {
   axios.defaults.headers.common["Authorization"] =
-    "Bearer " + rootStore.client.context.accessToken;
+    "Bearer " + rootStore.client.authToken;
   return axios
     .get(
       "https://appserver.easesdk.com" +

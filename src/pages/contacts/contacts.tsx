@@ -142,7 +142,7 @@ const Contacts = ({
             setAddContactVisible(false);
           } else {
             // 根据手机号获取环信id
-            getUserIdWithPhoneNumber(userId, rootStore.client.user)
+            getUserIdWithPhoneNumber(userId, rootStore.client.getCurrentUserId())
               .then((res) => {
                 if (res.status === 200) {
                   const chatUserId = res.data.chatUserName;

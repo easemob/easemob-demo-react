@@ -23,7 +23,6 @@ export const createMessageActions = (includeTranslation: boolean = false) => {
       content: MESSAGE_ACTIONS.TRANSLATE,
       onClick: () => {},
     },
-    { content: MESSAGE_ACTIONS.REPORT, onClick: () => {} },
     { content: MESSAGE_ACTIONS.DELETE, onClick: () => {} },
   ];
 };

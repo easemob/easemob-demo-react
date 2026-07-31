@@ -196,7 +196,7 @@ const General = (props: { onBack?: () => void }) => {
     name: "";
   }>({ code: "", nativeName: "", name: "" });
   useEffect(() => {
-    let targetLang = generalConfig.translationSupportedLanguages.find(
+    let targetLang = (generalConfig.translationSupportedLanguages || []).find(
       (lang) => lang.code === generalConfig.translationTargetLanguage
     ) as { code: ""; nativeName: ""; name: "" };
 
@@ -208,7 +208,7 @@ const General = (props: { onBack?: () => void }) => {
       className={`cui-scrollList cui-header-more`}
       style={{ maxHeight: "400px", overflowY: "auto" }}
     >
-      {generalConfig.translationSupportedLanguages.map((lang, index) => (
+      {(generalConfig.translationSupportedLanguages || []).map((lang, index) => (
         <li
           className={appThemeMode == "dark" ? "cui-li-dark" : ""}
           style={{
@@ -244,10 +244,10 @@ const General = (props: { onBack?: () => void }) => {
     if (state.translationSupportedLanguages.length > 0) {
       return;
     }
-    client.getSupportedLanguages().then((res: any) => {
+    client.chatManager.getSupportedTranslationLanguages().then((res: any) => {
       console.log("getSupportedLanguages", res);
       const languages: { code: string; nativeName: string; name: string }[] =
-        res.data;
+        Array.isArray(res) ? res : res.data;
       dispatch(
         updateAppConfig({
           ...generalConfig,
