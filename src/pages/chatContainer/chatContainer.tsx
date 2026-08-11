@@ -84,6 +84,13 @@ const ChatContainer = forwardRef((props, ref) => {
     // @ts-ignore
     return item.groupId == cvsItem.conversationId;
   });
+  const groupDetailConversation = useMemo(
+    () => ({
+      chatType: CHAT_TYPES.GROUP_CHAT,
+      conversationId: cvsItem.conversationId,
+    }),
+    [cvsItem.conversationId]
+  );
 
   // ==================== 自定义 Hooks ====================
   const handleForwardMessage = useForwardMessage(
@@ -482,10 +489,7 @@ const ChatContainer = forwardRef((props, ref) => {
                     //   setShowChatView(false);
                     // }
                   }}
-                  conversation={{
-                    chatType: CHAT_TYPES.GROUP_CHAT,
-                    conversationId: cvsItem.conversationId,
-                  }}
+                  conversation={groupDetailConversation}
                   onLeaveGroup={() => setConversationDetailVisible(false)}
                   onDestroyGroup={() => setConversationDetailVisible(false)}
                   // @ts-ignore

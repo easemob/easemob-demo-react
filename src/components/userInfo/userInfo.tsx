@@ -10,7 +10,7 @@ import {
 } from "easemob-chat-uikit";
 import i18next from "../../i18n";
 import classNames from "classnames";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import toast from "../toast/toast";
 import { useState, ChangeEvent } from "react";
 import "./userInfo.scss";
@@ -76,6 +76,15 @@ const UserInfo = (props: UserInfoProps) => {
 
   const [remarkModalVisible, setRemarkModalVisible] = useState(false);
   const [remarkValue, setRemarkValue] = useState(userInfo.remark || "");
+
+  useEffect(() => {
+    setRemarkValue(userInfo.remark || "");
+  }, [conversation.conversationId, userInfo.remark]);
+
+  const displayName =
+    userInfo.remark ||
+    addressStore.appUsersInfo[conversation.conversationId]?.nickname ||
+    conversation.conversationId;
 
   const { t } = i18next;
 
@@ -342,8 +351,7 @@ const UserInfo = (props: UserInfoProps) => {
         onOk={deleteContact}
       >
         <div>{`${t("want to delete contact")} “${
-          remarkValue ||
-          addressStore.appUsersInfo[conversation.conversationId]?.nickname
+          displayName
         }” ${t("and delete all chat history")}?`}</div>
       </Modal>
 
@@ -361,8 +369,7 @@ const UserInfo = (props: UserInfoProps) => {
         }}
       >
         <div>{`${t("Confirm blocking user")} ${
-          remarkValue ||
-          addressStore.appUsersInfo[conversation.conversationId]?.nickname
+          displayName
         }?`}</div>
       </Modal>
     </div>
