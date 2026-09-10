@@ -51,7 +51,7 @@ const ChatContainer = forwardRef((props, ref) => {
   // ==================== 外部状态 ====================
   const appConfig = useAppSelector((state) => state.appConfig);
   const context = useContext(RootContext);
-  const { theme } = context;
+  const { client, theme } = context;
   const themeMode = theme?.mode;
   const thread = rootStore.threadStore;
   const { visible: pinMsgVisible, hide: hidePinMsg } = usePinnedMessage();
@@ -127,7 +127,7 @@ const ChatContainer = forwardRef((props, ref) => {
     startAudioCall: chatRef.current?.startAudioCall,
   }));
 
-  // 获取群组头像（业务私有 App Server；npm UIKit 尚无 providers.groupInfo）
+  // 会话列表中的群头像由业务 App Server 提供。
   useEffect(() => {
     if (!rootStore.loginState) return;
     const groupIds = rootStore.addressStore.groups
@@ -135,14 +135,14 @@ const ChatContainer = forwardRef((props, ref) => {
       .map((item) => (item as any).groupId ?? (item as any).groupid)
       .filter(Boolean) as string[];
     if (groupIds.length === 0) return;
-    getGroupAvatar(groupIds).then((res) => {
+    getGroupAvatar(client, groupIds).then((res) => {
       for (const groupId in res) {
         if (res[groupId]) {
           rootStore.addressStore.updateGroupAvatar(groupId, res[groupId]);
         }
       }
     });
-  }, [rootStore.loginState, rootStore.addressStore.groups.length]);
+  }, [client, rootStore.loginState, rootStore.addressStore.groups.length]);
 
   // 监听当前会话变化
   useEffect(() => {

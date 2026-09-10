@@ -55,17 +55,18 @@ const UserInviteModal = (props: UserInviteModalProps) => {
       const members = rtcGroup[0]?.members?.map((item) => {
         const member = { ...item };
         if (!item?.attributes?.nickName) {
-          if (!member.attributes) {
-            member.attributes = {};
-          }
-
-          member.attributes.nickName =
+          const nickname =
             rootStore.addressStore.appUsersInfo[item.userId]?.nickname;
+          if (nickname) {
+            (member.attributes ??= {}).nickName = nickname;
+          }
         }
         if (!item?.attributes?.avatarurl) {
-          member.attributes &&
-            (member.attributes.avatarurl =
-              rootStore.addressStore.appUsersInfo[item.userId]?.avatarurl);
+          const userInfo = rootStore.addressStore.appUsersInfo[item.userId];
+          const avatarUrl = userInfo?.avatarUrl ?? userInfo?.avatarurl;
+          if (avatarUrl) {
+            (member.attributes ??= {}).avatarurl = avatarUrl;
+          }
         }
         // @ts-ignore
         member.nickname =

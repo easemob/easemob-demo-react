@@ -1,18 +1,21 @@
 import axios from "axios";
-import { rootStore } from "easemob-chat-uikit";
 import { serverConfig } from "../utils";
 import toast from "../components/toast/toast";
 
 export const getUserIdWithPhoneNumber = (
   phoneNumber: string,
-  userId: string
+  userId: string,
+  token: string
 ) => {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + rootStore.client.authToken;
   return axios
     .get(
       "https://appserver.easesdk.com" +
-        `/inside/app/user/${phoneNumber}?operator=${userId}`
+        `/inside/app/user/${phoneNumber}?operator=${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
     .then(function (response) {
       return response;

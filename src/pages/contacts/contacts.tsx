@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   ContactList,
   ContactDetail,
@@ -6,6 +6,7 @@ import {
   Icon,
   Modal,
   Input,
+  RootContext,
   rootStore,
   Button,
 } from "easemob-chat-uikit";
@@ -24,6 +25,7 @@ const Contacts = ({
   onVideoCall,
   onAudioCall,
 }: ContactsProps) => {
+  const { client } = useContext(RootContext);
   const [contactData, setContactData] = useState({
     id: "",
     name: "",
@@ -142,7 +144,17 @@ const Contacts = ({
             setAddContactVisible(false);
           } else {
             // 根据手机号获取环信id
-            getUserIdWithPhoneNumber(userId, rootStore.client.getCurrentUserId())
+            const currentUserId = client.getCurrentUserId();
+            if (!currentUserId) {
+              toast.error(i18next.t("userNotExist"));
+              return;
+            }
+
+            getUserIdWithPhoneNumber(
+              userId,
+              currentUserId,
+              client.getRestContext().token
+            )
               .then((res) => {
                 if (res.status === 200) {
                   const chatUserId = res.data.chatUserName;

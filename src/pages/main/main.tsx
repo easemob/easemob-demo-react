@@ -1,8 +1,8 @@
-import { useEffect, useState, FC, useRef } from "react";
+import { useContext, useEffect, useState, FC, useRef } from "react";
 // import "./index.css";
 import { observer } from "mobx-react-lite";
-import toast, { Toaster } from "react-hot-toast";
-import { rootStore, Icon, eventHandler } from "easemob-chat-uikit";
+import toast from "react-hot-toast";
+import { rootStore, RootContext, Icon, eventHandler } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./main.scss";
 import NavigationBar from "../../components/navigationBar/navigationBar";
@@ -12,6 +12,7 @@ import Settings from "../settings/settings";
 import { useAppSelector, useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import i18n from "../../i18n";
+import { getUIKitErrorDetails } from "../../utils/chatHelpers";
 import {
   setLoggedIn,
   setChatToken,
@@ -20,7 +21,7 @@ import {
 // @ts-ignore
 window.rootStore = rootStore;
 const ChatApp: FC<any> = () => {
-  const client = rootStore.client;
+  const { client } = useContext(RootContext);
   const dispatch = useAppDispatch();
   const state = useAppSelector((state) => state.login);
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const ChatApp: FC<any> = () => {
       return;
     }
 
-    if (client.authToken || state.loggedIn) {
+    if (client.getCurrentUserId() || state.loggedIn) {
       setIsRestoringSession(false);
       return;
     }
@@ -109,21 +110,14 @@ const ChatApp: FC<any> = () => {
           toast.error(i18n.t("Recall message failed"));
         },
       },
-      reportMessage: {
-        success: () => {
-          toast.success(i18n.t("Reported successfully"));
-        },
-        error: (error) => {
-          toast.error(i18n.t("Report failed"));
-        },
-      },
       sendMessage: {
         error: (error) => {
-          if (error.type == 507) {
+          const { type, message } = getUIKitErrorDetails(error);
+          if (type === 507) {
             toast.error(i18n.t("You have been banned from sending messages"));
           } else if (
-            error.type == 602 &&
-            error.message == "not in group or chatroom"
+            type === 602 &&
+            message === "not in group or chatroom"
           ) {
             toast.error(
               i18n.t(

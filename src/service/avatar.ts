@@ -1,21 +1,27 @@
 import axios from "axios";
-import { rootStore } from "easemob-chat-uikit";
+import type { ChatClient, UserInfoManager } from "easemob-websdk";
 import { serverConfig } from "../utils";
 import toast from "../components/toast/toast";
+
+type UIKitClient = Pick<ChatClient, "getCurrentUserId" | "getRestContext"> & {
+  userInfoManager: Pick<UserInfoManager, "updateOwnInfo">;
+};
 
 /**
  * 头像两步更新：
  * 1. 上传图片文件到业务私有 App Server（appserver.easesdk.com）拿到 URL
  * 2. 用 SDK 5 userInfoManager.updateOwnInfo 把 URL 写回 IM 用户资料
  */
-export const uploadImage = async (formData: FormData): Promise<string> => {
-  const client = rootStore.client;
+export const uploadImage = async (
+  client: UIKitClient,
+  formData: FormData
+): Promise<string> => {
   const userId = client.getCurrentUserId();
-  if (!userId || !client.authToken) {
+  if (!userId) {
     throw new Error("未登录，无法上传头像");
   }
 
-  axios.defaults.headers.common["Authorization"] = "Bearer " + client.authToken;
+  const { token } = client.getRestContext();
 
   try {
     const response = await axios.post(
@@ -23,6 +29,7 @@ export const uploadImage = async (formData: FormData): Promise<string> => {
       formData,
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       }
@@ -43,11 +50,14 @@ export const uploadImage = async (formData: FormData): Promise<string> => {
   }
 };
 
-async function sendRequest(groupId: string) {
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + rootStore.client.authToken;
+async function sendRequest(client: Pick<ChatClient, "getRestContext">, groupId: string) {
+  const { token } = client.getRestContext();
   return await axios
-    .get(`https://appserver.easesdk.com/inside/app/group/${groupId}/avatarurl`)
+    .get(`https://appserver.easesdk.com/inside/app/group/${groupId}/avatarurl`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     .then((response) => {
       return response.data.avatarUrl;
     })
@@ -56,10 +66,13 @@ async function sendRequest(groupId: string) {
     });
 }
 
-export const getGroupAvatar = async (groupIds: string[]) => {
-  let result: { [key: string]: string } = {};
-  for (let groupId of groupIds) {
-    result[groupId] = await sendRequest(groupId);
+export const getGroupAvatar = async (
+  client: Pick<ChatClient, "getRestContext">,
+  groupIds: string[]
+) => {
+  const result: Record<string, string> = {};
+  for (const groupId of groupIds) {
+    result[groupId] = await sendRequest(client, groupId);
   }
   return result;
 };

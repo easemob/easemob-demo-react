@@ -29,7 +29,8 @@ export const checkBrowerNotifyStatus = (
   showFlag: boolean,
   params: any,
   iconTitle: string,
-  store: any
+  store: any,
+  currentUserId?: string | null
 ) => {
   if (hasRequestPermission) {
     return;
@@ -40,7 +41,7 @@ export const checkBrowerNotifyStatus = (
     Notification.requestPermission().then((e) => {
       hasRequestPermission = true;
       if (e === "granted" && showFlag) {
-        notification(params, iconTitle, store);
+        notification(iconTitle, params, store, currentUserId);
       } else if (e !== "granted") {
         alert(i18next.t("Please set browser support notification"));
       }
@@ -49,7 +50,12 @@ export const checkBrowerNotifyStatus = (
     alert(i18next.t("Please set browser support notification"));
   }
 };
-export const notification = (iconTitle: string, params: any, store: any) => {
+export const notification = (
+  iconTitle: string,
+  params: any,
+  store: any,
+  currentUserId?: string | null
+) => {
   const preview =
     params?.type === "txt" && typeof params?.body?.content === "string"
       ? params.body.content
@@ -72,7 +78,7 @@ export const notification = (iconTitle: string, params: any, store: any) => {
     if (
       !(
         (Array.isArray(atList) &&
-          atList.includes(rootStore.client.getCurrentUserId())) ||
+          atList.includes(currentUserId)) ||
         atList == "ALL"
       )
     ) {
@@ -106,6 +112,6 @@ export const notification = (iconTitle: string, params: any, store: any) => {
     });
     // changeIcon(iconTitle);
   } else {
-    checkBrowerNotifyStatus(true, params, iconTitle, store);
+    checkBrowerNotifyStatus(true, params, iconTitle, store, currentUserId);
   }
 };

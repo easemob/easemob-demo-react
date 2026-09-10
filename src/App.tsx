@@ -1,8 +1,8 @@
-import { useEffect, useState, FC } from "react";
+import { useContext, useEffect, FC } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { Toaster } from "react-hot-toast";
-import { rootStore, UIKitProvider, useSDK } from "easemob-chat-uikit";
+import { rootStore, RootContext, UIKitProvider } from "easemob-chat-uikit";
 import "easemob-chat-uikit/style.css";
 import "./App.css";
 import AppRoutes from "./routes/routes";
@@ -15,16 +15,8 @@ import { updateAppConfig } from "./store/appConfigSlice";
 window.rootStore = rootStore;
 
 const ChatApp: FC<any> = () => {
-  // close Chat log
-  const { ChatSDK } = useSDK();
-  // ChatSDK.logger.disableAll();
-
   const state = useAppSelector((state) => state.appConfig);
   const loginState = useAppSelector((state) => state.login);
-
-  useEffect(() => {
-    return listener(store);
-  }, [loginState.appKey, loginState.useDNS]);
 
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -34,7 +26,7 @@ const ChatApp: FC<any> = () => {
       dispatch(updateAppConfig(config));
       i18next.changeLanguage(config.language);
     }
-  }, []);
+  }, [dispatch]);
 
   const serverConfig = JSON.parse(localStorage.getItem("serverConfig") || "{}");
   return (
@@ -44,9 +36,7 @@ const ChatApp: FC<any> = () => {
         isHttpDNS: loginState.useDNS,
         restUrl: serverConfig.rest,
         msyncUrl: serverConfig.msync,
-        // 用户昵称/头像走 SDK 用户属性；头像文件本身上传到业务私有 App Server。
-        // 当前 npm easemob-chat-uikit@2.4.3 尚无 providers 合同，群头像仍由
-        // chatContainer 调用 getGroupAvatar 补齐。本地 UIKit 升级后可改为 providers.groupInfo。
+        // 用户昵称和头像使用 SDK 5 用户属性同步。
         useUserInfo: true,
         translationTargetLanguage: state.translationTargetLanguage,
       }}
@@ -92,10 +82,24 @@ const ChatApp: FC<any> = () => {
         lng: state.language || "zh",
       }}
     >
+      <UIKitEventListener />
       <AppRoutes></AppRoutes>
       <Toaster></Toaster>
     </UIKitProvider>
   );
+};
+
+/**
+ * UIKit 3 在 Provider 挂载后才把 client 写入 rootStore。
+ * 监听器作为 Provider 的子节点注册，直接使用 context 中同步创建的 client，
+ * 避免首屏拿到尚未初始化的 rootStore.client。
+ */
+const UIKitEventListener = () => {
+  const { client } = useContext(RootContext);
+
+  useEffect(() => listener(store, client), [client]);
+
+  return null;
 };
 
 export default observer(ChatApp);

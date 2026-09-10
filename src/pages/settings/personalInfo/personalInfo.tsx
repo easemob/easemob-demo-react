@@ -97,7 +97,7 @@ const PersonalInfo = (props: { onBack?: () => void }) => {
       .then((blob) => {
         const formData = new FormData();
         formData.append("file", blob);
-        return uploadImage(formData);
+        return uploadImage(client, formData);
       })
       .then((avatarUrl) => {
         if (!currentUserId || !avatarUrl) return;

@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { rootStore } from "easemob-chat-uikit";
+import { useCallback, useContext } from "react";
+import { RootContext } from "easemob-chat-uikit";
 import toast from "../components/toast/toast";
 
 /**
@@ -7,9 +7,9 @@ import toast from "../components/toast/toast";
  */
 interface ForwardMessage {
   [key: string]: any;
-  type: string;
+  type?: string;
   body?: Record<string, any>;
-  ext?: any;
+  ext?: Record<string, any>;
 }
 
 /**
@@ -22,6 +22,7 @@ export const useForwardMessage = (
   setForwardedMessages: (msg: ForwardMessage) => void,
   setContactListVisible: (visible: boolean) => void
 ) => {
+  const { client } = useContext(RootContext);
   /**
    * 处理合并消息的解析
    */
@@ -29,7 +30,7 @@ export const useForwardMessage = (
     if (msg.type === "combine" && !msg.body?.messageList) {
       try {
         const messageList =
-          await rootStore.client.chatManager.downloadAndParseCombineMessage({
+          await client.chatManager.downloadAndParseCombineMessage({
             message: msg,
           });
         return messageList;
@@ -39,7 +40,7 @@ export const useForwardMessage = (
       }
     }
     return msg.body?.messageList;
-  }, []);
+  }, [client]);
 
   /**
    * 转发消息处理函数

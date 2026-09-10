@@ -13,7 +13,6 @@ import toast from "../../components/toast/toast";
 import { useNavigate } from "react-router-dom";
 import { getChatToken } from "../../service/login";
 import {
-  setSDKConfig,
   setIsLogging,
   loginAsync,
   setPhoneNumber,
@@ -29,14 +28,6 @@ const Login = () => {
   const state = useAppSelector((state) => state.login);
   const appConfigState = useAppSelector((state) => state.appConfig);
 
-  useEffect(() => {
-    dispatch(
-      setSDKConfig({
-        appKey: process.env.REACT_APP_APP_KEY || "org#app",
-        useDNS: true,
-      })
-    );
-  }, []);
   useEffect(() => {
     if (state.loggedIn) {
       navigate("/main");

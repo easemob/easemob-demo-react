@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { rootStore } from "easemob-chat-uikit";
+import { useCallback, useContext } from "react";
+import { RootContext, rootStore } from "easemob-chat-uikit";
 import { getUserIdWithPhoneNumber } from "../service/user";
 import toast from "../components/toast/toast";
 import i18next from "../i18n";
@@ -11,6 +11,7 @@ import { PHONE_REGEX } from "../constants/chat";
 export const useAddContact = (
   setAddContactVisible: (visible: boolean) => void
 ) => {
+  const { client } = useContext(RootContext);
   /**
    * 验证是否为手机号格式
    */
@@ -50,9 +51,14 @@ export const useAddContact = (
   const addContactByPhone = useCallback(
     async (phoneNumber: string) => {
       try {
+        const currentUserId = client.getCurrentUserId();
+        if (!currentUserId) {
+          throw new Error("用户未登录");
+        }
         const response = await getUserIdWithPhoneNumber(
           phoneNumber,
-          rootStore.client.getCurrentUserId()
+          currentUserId,
+          client.getRestContext().token
         );
 
         if (response.status === 200) {
@@ -72,7 +78,7 @@ export const useAddContact = (
         toast.error(i18next.t("userNotExist"));
       }
     },
-    [addContactById, isAlreadyFriend]
+    [addContactById, client, isAlreadyFriend]
   );
 
   /**

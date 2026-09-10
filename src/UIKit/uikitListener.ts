@@ -1,12 +1,10 @@
 import { rootStore, eventHandler } from "easemob-chat-uikit";
-import { useSelector, useDispatch } from "react-redux";
-import { setLoggedIn, setIsLogging } from "../store/loginSlice";
-import { store } from "../store/store";
+import { setLoggedIn } from "../store/loginSlice";
 import { notification } from "../utils/notification";
+import { getUIKitErrorDetails } from "../utils/chatHelpers";
 import toast from "react-hot-toast";
 import i18next from "../i18n";
-const listener = (store: any) => {
-  const { client } = rootStore;
+const listener = (store: any, client: typeof rootStore.client) => {
   const dispatch = store.dispatch;
 
   client.addEventHandler("chatdemo", {
@@ -19,7 +17,7 @@ const listener = (store: any) => {
       // dispatch(setIsLogging(false));
     },
     onMessage: (message: any) => {
-      notification("新消息", message, store);
+      notification("新消息", message, store, client.getCurrentUserId());
     },
     onContactAgreed: (data: any) => {
       console.log("data", data);
@@ -42,7 +40,7 @@ const listener = (store: any) => {
     addReaction: {
       error: (error) => {
         console.log("addReaction error", error);
-        if (error.type == 50) {
+        if (getUIKitErrorDetails(error).type === 50) {
           toast.error(`Reaction ${i18next.t("Exceeded maximum number")}`);
         }
       },
@@ -52,9 +50,10 @@ const listener = (store: any) => {
         toast.success(i18next.t("Friend request sent"));
       },
       error: (error) => {
+        const { type, message } = getUIKitErrorDetails(error);
         if (
-          error.type == 204 &&
-          error.message == "Service resource not found"
+          type === 204 &&
+          message === "Service resource not found"
         ) {
           toast.error(i18next.t("User does not exist"));
         } else {
@@ -66,8 +65,8 @@ const listener = (store: any) => {
       success: () => {
         console.log("getConversationlist success");
       },
-      error: (error: any) => {
-        console.log("getConversationlist error");
+      error: (error) => {
+        console.log("getConversationlist error", error);
       },
     },
   });
